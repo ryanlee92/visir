@@ -1,0 +1,107 @@
+{
+  "ok": true,
+  "channel": "C1005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1756981920.000632",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll update the timeline and owners."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1006",
+            "U1003"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1005",
+        "U1003",
+        "U1001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756981920.000636"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1756981920.000633",
+      "thread_ts": "1756981920.000632",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — aligning on this (re: mockup). I'll reflect this in owners/timeline."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1006",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756981920.000634",
+      "thread_ts": "1756981920.000632",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Appreciate the context — pairing later today (re: usability). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1756981920.000635",
+      "thread_ts": "1756981920.000632",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — will update the doc (re: mockup). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    }
+  ]
+}

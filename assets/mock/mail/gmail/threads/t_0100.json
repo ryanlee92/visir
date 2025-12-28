@@ -1,0 +1,48 @@
+{
+  "id": "t_0100",
+  "historyId": "1123571",
+  "messages": [
+    {
+      "id": "m_0100_01",
+      "threadId": "t_0100",
+      "labelIds": [
+        "INBOX",
+        "UNREAD"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rat\u2026",
+      "historyId": "210291",
+      "internalDate": "1755063041950",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Mason Green <mason.green+57@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Updated SOW attached"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 13 Aug 2025 05:30:41 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3599454451.541408@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 695,
+          "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LgoKV2UgYWxpZ25lZCBvbiB0aGUgY29yZSByZXF1aXJlbWVudHMgYW5kIHRyaW1tZWQgYSBmZXcgbmljZeKAkXRv4oCRaGF2ZSBpdGVtcyBzbyB3ZSBjYW4gaGl0IHRoZSB0YXJnZXQgZGF0ZS4gSSBpbmNsdWRlZCBjb25jcmV0ZSBleGFtcGxlcyBmb3IgdGhlIHBheWxvYWRzIHNvIHdlIGF2b2lkIGFtYmlndWl0eSBsYXRlci4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpIYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS4="
+        }
+      },
+      "sizeEstimate": 995
+    }
+  ],
+  "snippet": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rat\u2026"
+}

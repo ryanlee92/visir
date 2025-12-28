@@ -1,0 +1,47 @@
+{
+  "id": "t_0126",
+  "historyId": "1756342",
+  "messages": [
+    {
+      "id": "m_0126_01",
+      "threadId": "t_0126",
+      "labelIds": [
+        "DRAFT"
+      ],
+      "snippet": "Good morning, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error\u2026",
+      "historyId": "452255",
+      "internalDate": "1756142585003",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Everly Martinez <everly.martinez+27@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Draft: Follow-up on pricing"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 25 Aug 2025 17:23:05 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7966648952.546945@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 705,
+          "data": "R29vZCBtb3JuaW5nLAoKRm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4KCuKAlCBCcmFuZG9u"
+        }
+      },
+      "sizeEstimate": 1005
+    }
+  ],
+  "snippet": "Good morning, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error\u2026"
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="android.device_info" target="17" />
+      <module name="android.google_one_tap_sign_in" target="17" />
+      <module name="android.open_app_file" target="17" />
+      <module name="android.platform_device_id" target="17" />
+      <module name="com.di1shuai.platform_device_id.android.platform_device_id" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

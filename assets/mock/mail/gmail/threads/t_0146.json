@@ -1,0 +1,68 @@
+{
+  "id": "t_0146",
+  "historyId": "946562",
+  "messages": [
+    {
+      "id": "m_0146_01",
+      "threadId": "t_0146",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency,\u2026",
+      "historyId": "112062",
+      "internalDate": "1756495123872",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Scarlett Sanchez <scarlett.sanchez+30@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Sharing the deck"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 29 Aug 2025 19:18:43 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1632207937.824200@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 688,
+              "data": "SGksCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3QuCgrigJQgQnJhbmRvbg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 784,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGksPC9wPgo8cD5UaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuPC9wPgo8cD5Gb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48L3A-CjxwPkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3QuPC9wPgo8cD7igJQgQnJhbmRvbjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1972
+    }
+  ],
+  "snippet": "Hi, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency,\u2026"
+}

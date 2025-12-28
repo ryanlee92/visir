@@ -1,0 +1,980 @@
+{
+  "ok": true,
+  "channel": "G1002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757409540.000019",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll write test cases for that. I'll push a branch so you can review headers and error codes. \u2014 alignment; Capturing action items now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757409960.000026",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted \u2014 I\u2019ll take it from here. \u2014 handoff; Sharing updates in-thread."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757410260.000031",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1004> Let's sync at 2 PM to unblock the review. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757410500.000035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria? Sharing a quick mockup for clarity. Will follow up shortly."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757410800.000040",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> Let's sync at 2 PM to unblock the review. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757411220.000047",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll push a branch so you can review headers and error codes. \u2014 notes; Capturing action items now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757411700.000055",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood; I\u2019ll handle the next step. \u2014 alignment; Sharing updates in-thread."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757411880.000058",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. Sharing a quick mockup for clarity. \u2014 alignment; Capturing action items now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757412120.000062",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> Pushing a patch now; ETA 20 min. Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1003",
+            "U1004",
+            "U1005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757412300.000065",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria? I'll push a branch so you can review headers and error codes. \u2014 handoff; Sharing updates in-thread."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757412480.000068",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll update the timeline and owners. \u2014 notes; Capturing action items now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757412960.000076",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1004> Added notes to the doc \u2014 please review. Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757413260.000081",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. Sharing a quick mockup for clarity. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757413560.000086",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll write test cases for that. I'll push a branch so you can review headers and error codes. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757413740.000089",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll push a branch so you can review headers and error codes. \u2014 handoff; Will confirm once verified."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757413980.000093",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> Added notes to the doc \u2014 please review. Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1003",
+            "U1004",
+            "U1005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1003",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757414160.000096",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. Sharing a quick mockup for clarity. \u2014 notes; Capturing action items now."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757414460.000101",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's sync at 2 PM to unblock the review. I'll update the timeline and owners. \u2014 handoff; Sharing updates in-thread."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757414760.000106",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll write test cases for that. I'll update the timeline and owners. \u2014 alignment; Logging this in the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757414940.000109",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's sync at 2 PM to unblock the review. I'll update the timeline and owners. Adding to the doc."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "curl -X POST https://api.example.com/login \\\n  -H 'Authorization: Bearer <token>' \\\n  -d '{\"email\":\"user@example.com\",\"password\":\"***\"}'"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757415240.000114",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria? I'll push a branch so you can review headers and error codes. Nudging owners."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "curl -X GET https://api.example.com/data \\\n  -H \"Authorization: Bearer token\" "
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757415480.000118",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll push a branch so you can review headers and error codes. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757415900.000125",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll push a branch so you can review headers and error codes. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757416380.000133",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1004> I'll pick up the remaining items. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757495100.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Got it \u2014 following up shortly. \u2014 alignment; Circling back after standup."
+          }
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U1005",
+        "U1003"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757495100.000007"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757495100.000006",
+      "thread_ts": "1757495100.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking \u2014 taking the next step (re: context). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757495100.000007",
+      "thread_ts": "1757495100.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear \u2014 taking the next step (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll push a branch so you can review headers and error codes. Quick heads-up saved."
+          }
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1005",
+        "U1003"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757495880.000022"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757495880.000019",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that \u2014 aligning on this (re: context). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757495880.000020",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged \u2014 syncing offline (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757495880.000021",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear \u2014 aligning on this (re: context). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757495880.000022",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that \u2014 confirming scope (re: context). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757496600.000030",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's sync at 2 PM to unblock the review. I'll update the timeline and owners. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757496960.000036",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria? I'll update the timeline and owners. \u2014 alignment; Sharing updates in-thread."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "tada",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757497200.000040",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood; I\u2019ll handle the next step. \u2014 notes; Logging this in the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757497560.000046",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1003> I'll pick up the remaining items. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757498040.000054",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1003> I'll update the doc with notes. Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757498340.000059",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good \u2014 I\u2019m on it. \u2014 alignment; Circling back after standup."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757498700.000065",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. Sharing a quick mockup for clarity. Will follow up shortly."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757499120.000072",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll update the timeline and owners. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757499540.000079",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll pick up the remaining items. Sharing a quick mockup for clarity. Will follow up shortly."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "const result = await fetch('/api/users');"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757499720.000082",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. Sharing a quick mockup for clarity. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757499900.000085",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757500080.000088",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll pick up the remaining items. I'll update the timeline and owners. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757500260.000091",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll push a branch so you can review headers and error codes. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757500560.000096",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1003> Added notes to the doc \u2014 please review. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757500740.000099",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> Can we align on acceptance criteria? I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757501040.000104",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good \u2014 I\u2019m on it. \u2014 notes; Will confirm once verified."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Quick check\nconsole.log(\"Testing...\");"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757501520.000112",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. Sharing a quick mockup for clarity. Circling back after lunch."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757502000.000120",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> I'll pick up the remaining items. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757502300.000125",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria? I'll update the timeline and owners. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757502480.000128",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> Let's sync at 2 PM to unblock the review. Sharing a quick mockup for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757502840.000134",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll update the timeline and owners. \u2014 alignment; Logging this in the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757503080.000138",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. I'll push a branch so you can review headers and error codes. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757503440.000144",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood; I\u2019ll handle the next step. \u2014 alignment; Will confirm once verified."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757503800.000150",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll update the timeline and owners. Flagging in the board."
+          }
+        }
+      ]
+    }
+  ]
+}

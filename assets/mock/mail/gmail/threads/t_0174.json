@@ -1,0 +1,69 @@
+{
+  "id": "t_0174",
+  "historyId": "874330",
+  "messages": [
+    {
+      "id": "m_0174_01",
+      "threadId": "t_0174",
+      "labelIds": [
+        "SPAM",
+        "UNREAD"
+      ],
+      "snippet": "Hi, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect\u2026",
+      "historyId": "190301",
+      "internalDate": "1756284656125",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Mia Scott <mia.scott+54@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Earn money fast from home"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 27 Aug 2025 08:50:56 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2777627059.971056@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 476,
+              "data": "SGksCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 560,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGksPC9wPgo8cD5DaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuPC9wPgo8cD5JIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuPC9wPgo8dWw-PGxpPlNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycyk8L2xpPjxsaT5SaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPC9saT48bGk-VGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3M8L2xpPjxsaT5Pd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbjwvbGk-PC91bD4KPHA-SWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1536
+    }
+  ],
+  "snippet": "Hi, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect\u2026"
+}

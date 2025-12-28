@@ -1,0 +1,71 @@
+{
+  "id": "m_0113_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-09-05T19:31:58.480000+00:00",
+  "sentDateTime": "2025-09-05T19:31:42.864000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<7853463481.737190@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Olivia Walker <olivia.walker+46@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Intro: Michael from Vehement"
+    },
+    {
+      "name": "Date",
+      "value": "2025-09-05T19:31:42.864000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<7853463481.737190@testdomain.com>"
+    }
+  ],
+  "subject": "Intro: Michael from Vehement",
+  "bodyPreview": "Good morning, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. - Scope: finalize API contract (auth, pagination, errors) - Risks: rat",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Circling back with answers inline.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0113",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": false,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Olivia Walker",
+      "address": "olivia.walker+46@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Olivia Walker",
+      "address": "olivia.walker+46@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

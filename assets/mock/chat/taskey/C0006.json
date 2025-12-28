@@ -1,0 +1,618 @@
+{
+  "ok": true,
+  "channel": "C0006",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757409300.000020",
+      "thread_ts": "1757409300.000015",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to discuss the Q4 strategy"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757410860.000041",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The budget proposal is ready for review"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "SELECT SUM(revenue) FROM sales WHERE quarter = 'Q4';\n-- Budget analysis\nSELECT category, SUM(amount) FROM expenses GROUP BY category;"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757411220.000047",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should align on the hiring plan"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "# Hiring Plan\n- Backend: +1 engineer\n- Design: +1 designer\n- Timeline: Q1 2024"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001",
+            "U0002"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757411700.000055",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0002> The quarterly goals need to be updated"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757411880.000058",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to review the team structure"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757412360.000066",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The business metrics look positive"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757412780.000073",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the product roadmap"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757413080.000078",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> The investor update is scheduled"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757413500.000085",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to align on the priorities"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757413740.000089",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0002> The team performance review is complete"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757414040.000094",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the expansion plans"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757414220.000097",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> The financial forecast is ready"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "SELECT SUM(revenue) FROM sales WHERE quarter = 'Q4';\n-- Budget analysis\nSELECT category, SUM(amount) FROM expenses GROUP BY category;"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757415120.000112",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to review the strategic initiatives"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757415360.000116",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The market analysis is complete"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757415960.000126",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pipeline quality improving, but conversion lags in SMB. I'll summarize action items by EOD."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757495040.000005",
+      "thread_ts": "1757495040.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should align on the vision"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0001",
+            "U0002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757497200.000040",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The quarterly review is scheduled"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0002",
+            "U0004"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757497440.000044",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to discuss the resource allocation"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0002",
+            "U0001"
+          ],
+          "count": 3
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757497680.000048",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The business plan needs updates"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757498460.000061",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should review the company goals"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757498880.000068",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The strategic planning session is set"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757499660.000081",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to align on the direction"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757500560.000096",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The team growth plan is ready"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757500980.000103",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the market strategy"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757501880.000118",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The quarterly results are in"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0004",
+            "U0002",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757502960.000136",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to review the priorities"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757503440.000144",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> The business objectives are clear"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757504400.000160",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> We should align on the next steps"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757505960.000186",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> The strategic review is complete"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757506200.000190",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> We need to discuss the roadmap"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3354 @@
+{
+  "ok": true,
+  "channel": "C0001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756976940.000549",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We just shipped v2.3.0 with the new calendar sync feature! \ud83d\ude80"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0003",
+            "U0006"
+          ],
+          "count": 3
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0003",
+        "U0001"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1756976940.000552"
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756976940.000550",
+      "thread_ts": "1756976940.000549",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Awesome work everyone!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756976940.000552",
+      "thread_ts": "1756976940.000549",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the update!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756978560.000576",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All-hands today at 3 PM ET. We'll cover Q4 goals and team updates."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0002",
+        "U0001",
+        "U0007"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756978560.000579"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756978560.000577",
+      "thread_ts": "1756978560.000576",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just pushed a fix for the calendar sync bug \ud83d\udc1b"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756978560.000579",
+      "thread_ts": "1756978560.000576",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new notification system is live! Check it out"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756980060.000601",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Found a bug in the task creation flow - investigating now"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005",
+            "U0006",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0006",
+            "U0004"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U0002",
+        "U0006",
+        "U0001",
+        "U0003"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1756980060.000605"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756980060.000602",
+      "thread_ts": "1756980060.000601",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone available for a quick code review?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756980060.000603",
+      "thread_ts": "1756980060.000601",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great job on the latest release everyone! \ud83c\udf89"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756980060.000605",
+      "thread_ts": "1756980060.000601",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll take a look"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The Slack integration is working great, thanks <@U0003>!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0004",
+            "U0007",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0002",
+        "U0003"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1756981680.000631"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756981680.000629",
+      "thread_ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Found an issue with the task filtering - working on it"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756981680.000630",
+      "thread_ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The analytics dashboard is looking great!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756981680.000631",
+      "thread_ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we schedule a meeting to discuss the roadmap?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982940.000649",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We hit 10k active users this week! \ud83c\udf89"
+          }
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U0007",
+        "U0006"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1756982940.000651"
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756982940.000650",
+      "thread_ts": "1756982940.000649",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The API documentation has been updated"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756982940.000651",
+      "thread_ts": "1756982940.000649",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the feedback on the new UI!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0006",
+            "U0001"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0006",
+            "U0002"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756984380.000673",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone review the PR for the inbox improvements?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756984920.000682",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new design system is ready for review"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756985100.000685",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update: the API rate limit issue has been resolved"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0001",
+            "U0006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756985580.000693",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The database migration completed successfully"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: improve user onboarding"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: data migration complexity"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: create test plan"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756985760.000696",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User feedback on the new task view has been overwhelmingly positive"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756986060.000701",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The mobile app redesign is looking great!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756986960.000716",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the documentation for the new API endpoints"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756987140.000719",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The performance improvements are showing great results"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756987620.000727",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we schedule a demo for the new features next week?"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Demo code\nconst demoFeature = {\n  name: \"New Feature\",\n  enabled: true,\n  version: \"1.0.0\"\n};"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756988160.000736",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The security audit passed with flying colors \u2705"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0004",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756988400.000740",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The onboarding flow improvements are live now"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: enhance search functionality"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: performance impact"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: run benchmarks"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756988940.000749",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the quick turnaround on the bug fix!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756989720.000762",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The customer support metrics are looking great this month"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756990260.000771",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's sync on the onboarding improvements"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: optimize API response time"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: breaking changes"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: update documentation"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756990680.000778",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just deployed the fix for the API rate limiting issue"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0006",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756991400.000790",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new database indexes are improving query performance significantly"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756991880.000798",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll push a PR for the Slack webhook improvements later today"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756992180.000803",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Found the root cause of the timeout errors - fixing now"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0006",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756992600.000810",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The architecture review is scheduled for next week"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756993080.000818",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the API documentation for the new endpoints"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756993260.000821",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The security audit passed - great work team!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756993680.000828",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's discuss the technical debt prioritization"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756993920.000832",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new task creation flow is ready for testing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756994460.000841",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User research shows strong interest in calendar integration"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756994820.000847",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we get an ETA on the inbox improvements?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756995300.000855",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The roadmap for next quarter is ready for review"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0002",
+            "U0007"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756995540.000859",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I've updated the mockups based on your feedback"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756996620.000877",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone check the new task view designs?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756997520.000892",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The blog post about the new features is live"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756997700.000895",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User testimonials are coming in - they love the new UI!"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// UI Component example\nconst Button = ({ onClick, children }) => (\n  <button onClick={onClick}>{children}</button>\n);"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756998240.000904",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The product announcement is scheduled for next Monday"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002",
+            "U0005",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756998480.000908",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we sync up on the project status?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756998960.000916",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick question about the authentication flow"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756999500.000925",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The mobile app update is ready for testing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756999980.000933",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great collaboration on the last sprint!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757000220.000937",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The search functionality has been improved"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757000520.000942",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone else seeing the caching issue?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757000760.000946",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new feature is getting positive feedback"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: implement new feature"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: timeline constraints"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: assign team members"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757001240.000954",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone help with the deployment?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757001660.000961",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The test coverage has improved significantly"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "white_check_mark",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757002020.000967",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for catching that bug!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757002200.000970",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The design mockups are ready for review"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// UI Component example\nconst Button = ({ onClick, children }) => (\n  <button onClick={onClick}>{children}</button>\n);"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757002500.000975",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The customer support tickets are down this week"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757002980.000983",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great work on the accessibility improvements"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757003700.000995",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The CI/CD pipeline is running smoothly"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757004180.001003",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we discuss the pricing strategy?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757004660.001011",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The onboarding flow has been simplified"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757005140.001019",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the quick response!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757005620.001027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The security audit passed with flying colors"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757006160.001036",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone want to pair program on this feature?"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: refactor legacy code"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: regression bugs"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: write unit tests"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757006700.001045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new documentation is much clearer"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757006940.001049",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great catch on the edge case!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757007300.001055",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The user feedback has been very positive"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0003",
+            "U0006"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757007780.001063",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on the project timeline?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757008320.001072",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The bug fix is ready for review"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757008560.001076",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the thorough testing!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757008800.001080",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The performance metrics look good"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757063280.000548",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone have thoughts on the new design?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757063940.000559",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The integration tests are passing"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: improve error handling"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: user experience impact"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: gather feedback"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757064360.000566",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great progress on the feature!"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: add new integrations"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: API rate limits"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: test endpoints"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757064900.000575",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone verify the deployment?"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: enhance security measures"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: user friction"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: conduct security audit"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0002",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0006",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757065920.000592",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The customer demo went really well"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757066460.000601",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I've updated the mockups based on your feedback (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757066880.000608",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone check the new task view designs? (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0006",
+            "U0007"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0003"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757067540.000619",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The blog post about the new features is live (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0006",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757068080.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User testimonials are coming in - they love the new UI! (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: streamline workflow"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: learning curve"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: create training materials"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757068620.000637",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The product announcement is scheduled for next Monday (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: reduce technical debt"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: feature delays"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: prioritize tasks"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757069280.000648",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We just shipped v2.3.0 with the new calendar sync feature! \ud83d\ude80 (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: improve scalability"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: infrastructure costs"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: analyze metrics"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757069880.000658",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All-hands today at 3 PM ET. We'll cover Q4 goals and team updates. (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0007",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757070600.000670",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Found a bug in the task creation flow - investigating now (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: enhance mobile experience"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: platform differences"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: test on devices"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757071260.000681",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The Slack integration is working great, thanks <@U0003>! (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757072160.000696",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We hit 10k active users this week! \ud83c\udf89 (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757072640.000704",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone review the PR for the inbox improvements? (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0002",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757073300.000715",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new design system is ready for review (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0006",
+            "U0001"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0002",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757073780.000723",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update: the API rate limit issue has been resolved (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757074380.000733",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The database migration completed successfully (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: optimize database queries"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: data consistency"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: review schema"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0005",
+            "U0002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757074920.000742",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User feedback on the new task view has been overwhelmingly positive (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757075580.000753",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The mobile app redesign is looking great! (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757076240.000764",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the documentation for the new API endpoints (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757076660.000771",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The performance improvements are showing great results (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0002",
+            "U0003"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757077080.000778",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we schedule a demo for the new features next week? (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: improve accessibility"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: design constraints"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: run accessibility audit"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757077620.000787",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The security audit passed with flying colors \u2705 (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0004",
+            "U0002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0005",
+            "U0004",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757078280.000798",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The onboarding flow improvements are live now (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757078820.000807",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the quick turnaround on the bug fix! (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757079300.000815",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The customer support metrics are looking great this month (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757079720.000822",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's sync on the onboarding improvements (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0002",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757080320.000832",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just deployed the fix for the API rate limiting issue (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757080920.000842",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new database indexes are improving query performance significantly (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757081520.000852",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll push a PR for the Slack webhook improvements later today (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757082000.000860",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Found the root cause of the timeout errors - fixing now (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0003",
+            "U0007",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "heart",
+          "users": [
+            "U0002",
+            "U0006",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757082600.000870",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The architecture review is scheduled for next week (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757083080.000878",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the API documentation for the new endpoints (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757083560.000886",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The security audit passed - great work team! (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757084280.000898",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's discuss the technical debt prioritization (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757084880.000908",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new task creation flow is ready for testing (updated)"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0007",
+            "U0006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0006",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757086200.000930",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User research shows strong interest in calendar integration (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757086800.000940",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we get an ETA on the inbox improvements? (updated)"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757087340.000949",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The roadmap for next quarter is ready for review (updated)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: expand feature set"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: maintenance overhead"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: plan architecture"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757088060.000961",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The error handling is more robust now"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757088720.000972",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great work on the refactoring!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757089440.000984",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The user onboarding flow needs some tweaks"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0006",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757090640.001004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone tested the new feature yet?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757091060.001011",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The deployment went smoothly"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757091780.001023",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the detailed PR review!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757092440.001034",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The caching strategy is working well"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757092860.001041",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone verify the API endpoints?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757093340.001049",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The UI improvements are looking good"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: improve performance"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: resource usage"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: monitor metrics"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0005",
+            "U0004",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757094000.001060",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The database query optimization helped a lot"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: enhance user interface"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: design changes"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: get stakeholder approval"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757094720.001072",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great catch on the security issue!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757095320.001082",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new feature is ready for beta testing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757150220.000557",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we discuss the user feedback?"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_list",
+              "style": "bullet",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Goal: strengthen testing coverage"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Risks: development speed"
+                    }
+                  ]
+                },
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "Next: set up CI/CD"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757150700.000565",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The performance is much better now"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757151120.000572",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the quick turnaround!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757152140.000589",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The documentation needs an update"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757152800.000600",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone want to review the design changes?"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005",
+            "U0002",
+            "U0004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757153220.000607",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The bug fix is in production now"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757153940.000619",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great collaboration on this feature!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757154480.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The analytics show positive trends"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "heart",
+          "users": [
+            "U0005",
+            "U0007",
+            "U0002"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757155080.000638",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can someone help with the integration?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757155740.000649",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The test suite is passing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757156460.000661",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The customer feedback has been helpful"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757157600.000680",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new API version is stable"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757158080.000688",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The testing results look great!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757158620.000697",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The mobile app update is ready"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757159700.000715",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on the next steps?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757160300.000725",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The performance metrics are improving"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757160720.000732",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Great job on the latest release!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757161320.000742",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The security patch is deployed"
+          }
+        }
+      ]
+    }
+  ]
+}

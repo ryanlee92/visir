@@ -1,0 +1,71 @@
+{
+  "id": "m_0113_03",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-09-05T20:42:22.686000+00:00",
+  "sentDateTime": "2025-09-05T20:42:10.318000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<5529205703.790884@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Dylan Thompson <dylan.thompson+47@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Intro: Michael from Vehement"
+    },
+    {
+      "name": "Date",
+      "value": "2025-09-05T20:42:10.318000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<5529205703.790884@testdomain.com>"
+    }
+  ],
+  "subject": "Intro: Michael from Vehement",
+  "bodyPreview": "Good afternoon, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. - Scope: finalize AP",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>If anything looks off, let me know and I\u2019ll adjust.</p>\n<p><br>On 2025-09-05T19:46:59.499000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; Good afternoon,<br>&gt; <br>&gt; Circling back with answers inline.<br>&gt; <br>&gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; If anything looks off, let me know and I\u2019ll adjust.<br>&gt; <br>&gt; \u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0113",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": false,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Dylan Thompson",
+      "address": "dylan.thompson+47@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Dylan Thompson",
+      "address": "dylan.thompson+47@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

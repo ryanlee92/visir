@@ -1,0 +1,47 @@
+{
+  "id": "t_0161",
+  "historyId": "1546085",
+  "messages": [
+    {
+      "id": "m_0161_01",
+      "threadId": "t_0161",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hello, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 s\u2026",
+      "historyId": "271353",
+      "internalDate": "1754188939204",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Confirming our plan"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 03 Aug 2025 02:42:19 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3097839819.234138@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 652,
+          "data": "SGVsbG8sCgpGb2xsb3dpbmcgdXAgd2l0aCBhIGZldyBkZXRhaWxzIGZyb20gb3VyIGNoYXQuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSeKAmWxsIHBvc3QgYSBicmllZiB1cGRhdGUgaW4gU2xhY2sgYWZ0ZXIgSSBwdXNoIHRoZSBicmFuY2guCgrigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 952
+    }
+  ],
+  "snippet": "Hello, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 s\u2026"
+}

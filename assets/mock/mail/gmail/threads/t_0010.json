@@ -1,0 +1,68 @@
+{
+  "id": "t_0010",
+  "historyId": "1559583",
+  "messages": [
+    {
+      "id": "m_0010_01",
+      "threadId": "t_0010",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rat\u2026",
+      "historyId": "183175",
+      "internalDate": "1756009170809",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Nora Scott <nora.scott+31@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Quick question about billing"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 24 Aug 2025 04:19:30 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5194538360.394401@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 523,
+              "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KClRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50Lg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 607,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBtb3JuaW5nLDwvcD4KPHA-QXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy48L3A-CjxwPkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPlRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50LjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1630
+    }
+  ],
+  "snippet": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rat\u2026"
+}

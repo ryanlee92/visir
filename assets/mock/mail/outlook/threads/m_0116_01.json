@@ -1,0 +1,71 @@
+{
+  "id": "m_0116_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-04T15:26:27.202000+00:00",
+  "sentDateTime": "2025-08-04T15:26:14.812000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<4559249252.503096@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Aria Davis <aria.davis+49@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Heads up on release timing"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-04T15:26:14.812000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<4559249252.503096@testdomain.com>"
+    }
+  ],
+  "subject": "Heads up on release timing",
+  "bodyPreview": "Hey, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have item",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hey,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>If anything looks off, let me know and I\u2019ll adjust.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0116",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": false,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Aria Davis",
+      "address": "aria.davis+49@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Aria Davis",
+      "address": "aria.davis+49@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

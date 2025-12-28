@@ -1,0 +1,71 @@
+{
+  "id": "m_0195_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-09-02T08:00:22.246000+00:00",
+  "sentDateTime": "2025-09-02T08:00:11.289000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<9727053010.876178@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Olivia Thompson <olivia.thompson+48@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Action needed: verify account"
+    },
+    {
+      "name": "Date",
+      "value": "2025-09-02T08:00:11.289000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<9727053010.876178@testdomain.com>"
+    }
+  ],
+  "subject": "Action needed: verify account",
+  "bodyPreview": "Hey, Circling back with answers inline. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. I refactored a couple of helpers to ",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hey,</p>\n<p>Circling back with answers inline.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Thanks again \u2014 this unblocks the rest of the sprint.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "deleteditems",
+  "conversationId": "cv_0195",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Olivia Thompson",
+      "address": "olivia.thompson+48@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Olivia Thompson",
+      "address": "olivia.thompson+48@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

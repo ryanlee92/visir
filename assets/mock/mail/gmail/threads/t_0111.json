@@ -1,0 +1,149 @@
+{
+  "id": "t_0111",
+  "historyId": "1727375",
+  "messages": [
+    {
+      "id": "m_0111_01",
+      "threadId": "t_0111",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hello, Circling back with answers inline. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we\u2026",
+      "historyId": "33060",
+      "internalDate": "1755640915951",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Ava White <ava.white+40@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: Avery from Soylent"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 22:01:55 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4032253536.110329@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 681,
+          "data": "SGVsbG8sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMu"
+        }
+      },
+      "sizeEstimate": 981
+    },
+    {
+      "id": "m_0111_02",
+      "threadId": "t_0111",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and a\u2026",
+      "historyId": "494682",
+      "internalDate": "1755643891844",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Dylan Brown <dylan.brown+10@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: Avery from Soylent"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 22:51:31 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9867104406.328140@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 1314,
+          "data": "SGksCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4KCuKAlCBCcmFuZG9uCgpPbiBUdWUsIDE5IEF1ZyAyMDI1IDIyOjAxOjU1IEdNVCwgQXZhIFdoaXRlIDxhdmEud2hpdGUrNDBAdGVzdGRvbWFpbi5jb20-IHdyb3RlOgo-IEhlbGxvLAo-IAo-IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS4KPiAKPiBXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgo-IAo-IEkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KPiAKPiAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKPiAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgo-IAo-IEZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMu"
+        }
+      },
+      "sizeEstimate": 1614
+    },
+    {
+      "id": "m_0111_03",
+      "threadId": "t_0111",
+      "labelIds": [
+        "INBOX",
+        "UNREAD"
+      ],
+      "snippet": "Hello, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2026",
+      "historyId": "309733",
+      "internalDate": "1755647782990",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Camila Martinez <camila.martinez+51@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: Avery from Soylent"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 23:56:22 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9806879729.459071@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 2081,
+              "data": "SGVsbG8sCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgoKT24gVHVlLCAxOSBBdWcgMjAyNSAyMjo1MTozMSBHTVQsIEJyYW5kb24gTWlsZXMgPGJyYW5kb25AdGFza2V5Lndvcms-IHdyb3RlOgo-IEhpLAo-IAo-IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS4KPiAKPiBGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KPiAKPiAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKPiAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgo-IAo-IEnigJlsbCBwb3N0IGEgYnJpZWYgdXBkYXRlIGluIFNsYWNrIGFmdGVyIEkgcHVzaCB0aGUgYnJhbmNoLgo-IAo-IOKAlCBCcmFuZG9uCj4gCj4gT24gVHVlLCAxOSBBdWcgMjAyNSAyMjowMTo1NSBHTVQsIEF2YSBXaGl0ZSA8YXZhLndoaXRlKzQwQHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiA-IEhlbGxvLAo-ID4gCj4gPiBDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCj4gPiAKPiA-IFdlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCj4gPiAKPiA-IEkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KPiA-IAo-ID4gLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCj4gPiAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKPiA-IC0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKPiA-IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KPiA-IAo-ID4gRmVlbCBmcmVlIHRvIGNvbW1lbnQgZGlyZWN0bHkgaW4gdGhlIGRvYzsgSeKAmW0gdHJhY2tpbmcgbm90aWZpY2F0aW9ucy4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 2414,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGVsbG8sPC9wPgo8cD5UaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuPC9wPgo8cD5JIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuPC9wPgo8cD5JIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuPC9wPgo8dWw-PGxpPlNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycyk8L2xpPjxsaT5SaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPC9saT48bGk-VGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3M8L2xpPjxsaT5Pd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbjwvbGk-PC91bD4KPHA-VGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuPC9wPgo8cD48YnI-T24gVHVlLCAxOSBBdWcgMjAyNSAyMjo1MTozMSBHTVQsIEJyYW5kb24gTWlsZXMgJmx0O2JyYW5kb25AdGFza2V5LndvcmsmZ3Q7IHdyb3RlOjxicj4mZ3Q7IEhpLDxicj4mZ3Q7IDxicj4mZ3Q7IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS48YnI-Jmd0OyA8YnI-Jmd0OyBGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48YnI-Jmd0OyA8YnI-Jmd0OyAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycyk8YnI-Jmd0OyAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8YnI-Jmd0OyAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPGJyPiZndDsgLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbjxicj4mZ3Q7IDxicj4mZ3Q7IEnigJlsbCBwb3N0IGEgYnJpZWYgdXBkYXRlIGluIFNsYWNrIGFmdGVyIEkgcHVzaCB0aGUgYnJhbmNoLjxicj4mZ3Q7IDxicj4mZ3Q7IOKAlCBCcmFuZG9uPGJyPiZndDsgPGJyPiZndDsgT24gVHVlLCAxOSBBdWcgMjAyNSAyMjowMTo1NSBHTVQsIEF2YSBXaGl0ZSAmbHQ7YXZhLndoaXRlKzQwQHRlc3Rkb21haW4uY29tJmd0OyB3cm90ZTo8YnI-Jmd0OyAmZ3Q7IEhlbGxvLDxicj4mZ3Q7ICZndDsgPGJyPiZndDsgJmd0OyBDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuPGJyPiZndDsgJmd0OyA8YnI-Jmd0OyAmZ3Q7IFdlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuPGJyPiZndDsgJmd0OyA8YnI-Jmd0OyAmZ3Q7IEkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS48YnI-Jmd0OyAmZ3Q7IDxicj4mZ3Q7ICZndDsgLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPGJyPiZndDsgJmd0OyAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8YnI-Jmd0OyAmZ3Q7IC0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3M8YnI-Jmd0OyAmZ3Q7IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248YnI-Jmd0OyAmZ3Q7IDxicj4mZ3Q7ICZndDsgRmVlbCBmcmVlIHRvIGNvbW1lbnQgZGlyZWN0bHkgaW4gdGhlIGRvYzsgSeKAmW0gdHJhY2tpbmcgbm90aWZpY2F0aW9ucy48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 4995
+    }
+  ],
+  "snippet": "Hello, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2026"
+}

@@ -1,0 +1,367 @@
+name: Visir
+description: Stop Switching Apps. Get Things Done.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+
+version: 2.0.0+999
+
+inno_bundle:
+    id: 6D809377-6AF0-444B-8957-A3773F02200E
+    publisher: Wave Corporation
+    name: Visir
+    version: 2.0.0+999
+    url: https://visir.pro
+    installer_icon: assets\app_icon\app_icon.ico
+    admin: true
+
+environment:
+    sdk: ^3.9.0
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+    flutter:
+        sdk: flutter
+    flutter_localizations:
+        sdk: flutter
+    flutter_web_plugins:
+        sdk: flutter
+    flutter_riverpod: ^3.0.3
+    fpdart: ^1.1.0
+    freezed_annotation: ^3.1.0
+    go_router: ^16.2.1
+    intl: ^0.20.2
+    json_annotation: ^4.9.0
+    riverpod_annotation: ^3.0.3
+    validators: ^3.0.0
+    uuid: ^4.3.1
+    ficonsax: ^0.0.3
+    animations: ^2.0.10
+    googleapis: ^14.0.0
+    googleapis_auth: ^2.0.0
+    url_launcher: ^6.3.2
+    cached_network_image: ^3.4.1
+    shimmer: ^3.0.0
+    email_validator: ^3.0.0
+    font_awesome_flutter: ^10.6.0
+    flutter_advanced_avatar: ^1.5.0
+    flutter_animator: ^3.2.2
+    timezone: ^0.10.1
+    day: ^0.8.0
+    flutter_linkify: ^6.0.0
+    time: ^2.1.3
+    debounce_throttle: ^2.0.0
+    bottom_sheet_scroll_physics: ^1.0.0
+    file_picker: ^10.3.2
+    collection: ^1.18.0
+    firebase_messaging: ^16.0.4
+    firebase_core: ^4.2.1
+    logger: ^2.6.1
+    encrypt: ^5.0.3
+    html_unescape: ^2.0.0
+    package_info_plus: ^8.0.0
+    sign_in_with_apple: ^7.0.1
+    easy_debounce: ^2.0.3
+    flutterlifecyclehooks: ^5.0.0
+    tuple: ^2.0.2
+    crypto: ^3.0.3
+    numerus: ^2.2.0
+    media_kit: ^1.1.11
+    media_kit_video: ^1.2.5
+    media_kit_libs_video: ^1.0.5
+    audio_video_progress_bar: ^2.0.2
+    scrollable_positioned_list: ^0.3.8
+    http: ^1.4.0
+    mime: ^2.0.0
+    desktop_drop: ^0.7.0
+    photo_view: ^0.15.0
+    flutter_keyboard_visibility: ^6.0.0
+    share_plus: ^11.0.0
+    path: ^1.9.0
+    visibility_detector: ^0.4.0+2
+    pointer_interceptor: ^0.10.1+1
+    cupertino_icons: ^1.0.8
+    universal_html: ^2.2.4
+    path_provider: ^2.1.3
+    image: ^4.2.0
+    super_sliver_list: ^0.4.1
+    super_clipboard: ^0.9.1
+    icons_launcher: ^3.0.2
+    rename: ^3.1.0
+    flutter_timezone: ^4.1.1
+    color_models: ^2.0.0
+    url_launcher_ios: ^6.3.1
+    flutter_switch: ^0.3.2
+    google_sign_in: ^7.1.1
+    open_file: ^3.5.7
+    android_id: ^0.4.0
+    device_info_plus: ^11.5.0
+    flutter_inappwebview: ^6.2.0-beta.2
+    back_button_interceptor: ^8.0.4
+    parse_color: ^0.0.1
+    fluentui_system_icons: ^1.1.273
+    bitsdojo_window: ^0.1.6
+    dotted_border: ^3.1.0
+    dio: ^5.7.0
+    cookie_jar: ^4.0.8
+    dio_cookie_manager: ^3.1.1
+    supabase_flutter: ^2.10.3
+    queue: ^3.4.0
+    another_xlider: ^3.0.2
+    win32_registry: ^2.1.0
+    auto_updater: ^1.0.0
+    rename_app: ^1.6.5
+    audioplayers: ^6.5.1
+    app_links: ^6.3.3
+    flutter_native_splash: ^2.4.4
+    video_compress: ^3.1.4
+    app_badge_plus: ^1.2.3
+    change_case: ^2.2.0
+    easy_sticky_header: ^1.1.1
+    any_link_preview: ^3.0.3
+    animated_reorderable_list: ^1.2.0
+    favicon: ^1.1.2
+    flutter_svg: ^2.2.1
+    markdown: ^7.3.0
+    flutter_markdown: ^0.7.4+1
+    flutter_quill: ^11.4.1
+    vsc_quill_delta_to_html: ^1.0.5
+    flutter_quill_delta_from_html: ^1.5.3
+    material_symbols_icons: ^4.2872.1
+    screen_retriever: ^0.2.0
+    home_widget: ^0.8.0
+    launch_at_startup: ^0.5.1
+    windows_taskbar: ^1.1.2
+    web: ^1.1.1
+    super_context_menu: ^0.9.1
+    microsoft_graph_api: ^0.0.14
+    fl_chart: ^1.1.0
+    glass_kit: ^4.0.1
+    connectivity_plus: ^6.1.4
+    flutter_confetti: ^0.5.1
+    screenshot: ^3.0.0
+    emoji_extension:
+        git:
+            url: https://github.com/ryanlee92/emoji_extension.git
+            ref: 361cb0e
+    pull_to_refresh_flutter3:
+        git:
+            url: https://github.com/ryanlee92/flutter_pulltorefresh.git
+            ref: 724b572
+    enough_mail:
+        git:
+            url: https://github.com/ryanlee92/enough_mail.git
+            ref: d652c59
+    flutter_web_auth_2:
+        git:
+            url: https://github.com/ryanlee92/flutter_web_auth_2.git
+            path: flutter_web_auth_2
+            ref: 407c22c
+    flutter_local_notifications:
+        git:
+            url: https://github.com/ryanlee92/flutter_local_notifications.git
+            path: flutter_local_notifications
+            ref: 58a5d20
+    flutter_resizable_container:
+        git:
+            url: https://github.com/ryanlee92/flutter_resizable_container.git
+            ref: 9b4f5a9
+    log_inspector: ^1.0.3
+    shared_preferences: ^2.5.3
+    win32: ^5.14.0
+    new_version_plus: ^0.1.1
+    riverpod_sqflite: ^0.3.3
+    sqflite: ^2.4.2
+    sqflite_common_ffi: ^2.3.6
+    hugeicons:
+        hosted: https://onepub.dev/api/kdpxxpsdav/
+        version: ^1.1.0
+    flutter_svg_provider: ^1.0.7
+    animated_toggle_switch: ^0.8.5
+    flutter_widget_from_html: ^0.17.1
+    mesh_gradient: ^1.3.8
+    google_fonts: ^6.3.2
+    glass: ^2.0.0+2
+    color_mesh: ^1.0.2
+    hooks_riverpod: ^3.0.3
+    animated_text_kit: ^4.3.0
+    shimmer_text: ^0.0.2
+    ipwhois: ^1.1.0
+    google_weather_flutter: ^0.1.2
+    weather_kit: ^0.3.0
+    flutter_infinite_marquee: 
+        git: 
+            url: https://github.com/ryanlee92/flutter_infinite_marquee.git
+            ref: 3717fe4
+
+dev_dependencies:
+    freezed: ^3.1.0
+    json_serializable: ^6.7.1
+    build_runner: ^2.5.4
+    riverpod_generator: ^3.0.3
+    inno_bundle:
+        git:
+            url: https://github.com/ryanlee92/inno_bundle.git
+            ref: '620420a'
+
+dependency_overrides:
+    intl: ^0.20.2
+    flutter_quill:
+        git:
+            url: https://github.com/ryanlee92/flutter-quill.git
+            ref: 72bdabf
+    quill_native_bridge_windows: ^0.0.2
+    flutter_cache_manager:
+        git:
+            url: https://github.com/bothyculture/flutter_cache_manager.git
+            path: flutter_cache_manager
+            ref: 9a99dec
+    flutter_inappwebview_macos:
+        git:
+            url: https://github.com/ryanlee92/flutter_inappwebview.git
+            path: flutter_inappwebview_macos
+            ref: a721654
+    flutter_inappwebview_windows:
+        git:
+            url: https://github.com/ryanlee92/flutter_inappwebview.git
+            path: flutter_inappwebview_windows
+            ref: 'c0811f92'
+    media_kit_libs_android_video:
+        git:
+            url: https://github.com/Predidit/media-kit.git
+            ref: main
+            path: ./libs/android/media_kit_libs_android_video
+    irondash_engine_context:
+        git:
+            url: https://github.com/ryanlee92/irondash.git
+            ref: 'a87ee0d'
+            path: engine_context/dart
+
+icons_launcher:
+    image_path: 'assets/app_icon/visir_foreground.png'
+    platforms:
+        android:
+            enable: true
+            image_path: 'assets/app_icon/visir_foreground.png'
+            notification_image: 'assets/app_icon/visir_foreground.png'
+            adaptive_background_image: 'assets/app_icon/visir_background.png'
+            adaptive_foreground_image: 'assets/app_icon/visir_foreground.png'
+            adaptive_round_image: 'assets/app_icon/visir_icon_dark_default.png'
+        windows:
+            enable: true
+            image_path: 'assets/app_icon/visir_icon_dark_default.png'
+        web:
+            enable: true
+            image_path: 'assets/app_icon/visir_foreground.png'
+            favicon_path: 'assets/app_icon/visir_foreground.png'
+        linux:
+            enable: true
+            image_path: 'assets/app_icon/visir_icon_dark_default.png'
+
+flutter_native_splash:
+    color: '#F3F3F5'
+    color_dark: '#232325'
+    web: false
+    android_12:
+        color: '#F3F3F5'
+        color_dark: '#232325'
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+    uses-material-design: true
+    generate: true
+
+    assets:
+        - assets/config/config.json
+        - assets/logos/
+        - assets/sounds/
+        - assets/icons/
+        - assets/app_icon/ic_badge.ico
+        - assets/app_icon/visir_foreground.png
+        - assets/app_icon/visir_background.png
+        - assets/app_icon/visir_icon_dark_default.png
+        - assets/latest_all.tzf
+        - assets/html_editor/
+        - assets/place_holder/
+        - assets/images/
+        - web/integration/index.html
+        - assets/mock/chat/taskey/
+        - assets/mock/chat/wave/
+        - assets/mock/chat/taskey/threads/C0001/
+        - assets/mock/chat/taskey/threads/C0002/
+        - assets/mock/chat/taskey/threads/C0003/
+        - assets/mock/chat/taskey/threads/C0004/
+        - assets/mock/chat/taskey/threads/C0005/
+        - assets/mock/chat/taskey/threads/C0006/
+        - assets/mock/chat/taskey/threads/D0001/
+        - assets/mock/chat/taskey/threads/D0002/
+        - assets/mock/chat/taskey/threads/D0003/
+        - assets/mock/chat/taskey/threads/D0004/
+        - assets/mock/chat/taskey/threads/D0005/
+        - assets/mock/chat/taskey/threads/D0006/
+        - assets/mock/chat/taskey/threads/G0001/
+        - assets/mock/chat/taskey/threads/G0002/
+        - assets/mock/chat/wave/threads/C1001/
+        - assets/mock/chat/wave/threads/C1002/
+        - assets/mock/chat/wave/threads/C1003/
+        - assets/mock/chat/wave/threads/C1004/
+        - assets/mock/chat/wave/threads/C1005/
+        - assets/mock/chat/wave/threads/C1006/
+        - assets/mock/chat/wave/threads/D1001/
+        - assets/mock/chat/wave/threads/D1002/
+        - assets/mock/chat/wave/threads/D1003/
+        - assets/mock/chat/wave/threads/D1004/
+        - assets/mock/chat/wave/threads/D1005/
+        - assets/mock/chat/wave/threads/G1001/
+        - assets/mock/chat/wave/threads/G1002/
+        - assets/mock/mail/gmail/
+        - assets/mock/mail/gmail/threads/
+        - assets/mock/mail/outlook/
+        - assets/mock/mail/outlook/threads/
+        - assets/mock/calendar/google/
+        - assets/mock/calendar/google/events/
+        - assets/mock/calendar/microsoft/
+        - assets/mock/calendar/microsoft/events/
+        - assets/mock/
+        - assets/mock/time_saved/
+        - assets/mock/time_saved/by_view_type/
+        - assets/illust/
+        - assets/background/
+
+    fonts:
+        - family: Suit
+          fonts:
+              - asset: assets/fonts/SUITE-Medium.otf
+                weight: 400
+              - asset: assets/fonts/SUITE-SemiBold.otf
+                weight: 600
+              - asset: assets/fonts/SUITE-Bold.otf
+                weight: 700
+              - asset: assets/fonts/SUITE-ExtraBold.otf
+                weight: 900
+        - family: Montserrat
+          fonts:
+              - asset: assets/fonts/Montserrat-Medium.ttf
+                weight: 500
+              - asset: assets/fonts/Montserrat-Bold.ttf
+                weight: 700

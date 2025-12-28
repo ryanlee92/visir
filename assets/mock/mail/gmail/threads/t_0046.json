@@ -1,0 +1,108 @@
+{
+  "id": "t_0046",
+  "historyId": "1420300",
+  "messages": [
+    {
+      "id": "m_0046_01",
+      "threadId": "t_0046",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026",
+      "historyId": "274632",
+      "internalDate": "1754420545777",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Aria Davis <aria.davis+49@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 05 Aug 2025 19:02:25 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3538282316.232268@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 706,
+          "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0Lg=="
+        }
+      },
+      "sizeEstimate": 1006
+    },
+    {
+      "id": "m_0046_02",
+      "threadId": "t_0046",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026",
+      "historyId": "92408",
+      "internalDate": "1754422736474",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Dylan Thompson <dylan.thompson+47@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 05 Aug 2025 19:38:56 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<6821264951.880965@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1331,
+              "data": "R29vZCBhZnRlcm5vb24sCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KClRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50LgoK4oCUIEJyYW5kb24KCk9uIFR1ZSwgMDUgQXVnIDIwMjUgMTk6MDI6MjUgR01ULCBBcmlhIERhdmlzIDxhcmlhLmRhdmlzKzQ5QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIG1vcm5pbmcsCj4gCj4gQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KPiAKPiBXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgo-IAo-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-IAo-IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQo-IC0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwo-IC0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKPiAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCj4gCj4gSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1517,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBhZnRlcm5vb24sPC9wPgo8cD5BcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPlRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50LjwvcD4KPHA-4oCUIEJyYW5kb248L3A-CjxwPk9uIFR1ZSwgMDUgQXVnIDIwMjUgMTk6MDI6MjUgR01ULCBBcmlhIERhdmlzICZsdDthcmlhLmRhdmlzKzQ5QHRlc3Rkb21haW4uY29tJmd0OyB3cm90ZTo8YnI-Jmd0OyBHb29kIG1vcm5pbmcsPGJyPiZndDsgPGJyPiZndDsgQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy48YnI-Jmd0OyA8YnI-Jmd0OyBXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLjxicj4mZ3Q7IDxicj4mZ3Q7IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Ljxicj4mZ3Q7IDxicj4mZ3Q7IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKTxicj4mZ3Q7IC0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczxicj4mZ3Q7IC0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3M8YnI-Jmd0OyAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduPGJyPiZndDsgPGJyPiZndDsgSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 3348
+    }
+  ],
+  "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026"
+}

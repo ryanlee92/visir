@@ -1,0 +1,149 @@
+{
+  "id": "t_0105",
+  "historyId": "1414216",
+  "messages": [
+    {
+      "id": "m_0105_01",
+      "threadId": "t_0105",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates\u2026",
+      "historyId": "80466",
+      "internalDate": "1756045118743",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Avery Walker <avery.walker+38@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Request for quote"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 24 Aug 2025 14:18:38 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<6146151961.712926@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 709,
+              "data": "R29vZCBtb3JuaW5nLAoKVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCknigJlsbCBwb3N0IGEgYnJpZWYgdXBkYXRlIGluIFNsYWNrIGFmdGVyIEkgcHVzaCB0aGUgYnJhbmNoLg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 799,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBtb3JuaW5nLDwvcD4KPHA-VGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjwvcD4KPHA-Rm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPC9wPgo8cD5XZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPknigJlsbCBwb3N0IGEgYnJpZWYgdXBkYXRlIGluIFNsYWNrIGFmdGVyIEkgcHVzaCB0aGUgYnJhbmNoLjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 2008
+    },
+    {
+      "id": "m_0105_02",
+      "threadId": "t_0105",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hey, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, laten\u2026",
+      "historyId": "105405",
+      "internalDate": "1756048683211",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Harper Wilson <harper.wilson+07@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Request for quote"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 24 Aug 2025 15:18:03 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4906100114.313348@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 1508,
+          "data": "SGV5LAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXkuCgrigJQgQnJhbmRvbgoKT24gU3VuLCAyNCBBdWcgMjAyNSAxNDoxODozOCBHTVQsIEF2ZXJ5IFdhbGtlciA8YXZlcnkud2Fsa2VyKzM4QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIG1vcm5pbmcsCj4gCj4gVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgo-IAo-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-IAo-IFdlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCj4gCj4gLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCj4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwo-IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KPiAKPiBJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4="
+        }
+      },
+      "sizeEstimate": 1808
+    },
+    {
+      "id": "m_0105_03",
+      "threadId": "t_0105",
+      "labelIds": [
+        "INBOX",
+        "UNREAD"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026",
+      "historyId": "314326",
+      "internalDate": "1756053700774",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Julian Lewis <julian.lewis+44@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Request for quote"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 24 Aug 2025 16:41:40 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7909423333.668628@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 2192,
+          "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgoKT24gU3VuLCAyNCBBdWcgMjAyNSAxNToxODowMyBHTVQsIEJyYW5kb24gTWlsZXMgPGJyYW5kb25AdGFza2V5Lndvcms-IHdyb3RlOgo-IEhleSwKPiAKPiBBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgo-IAo-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-IAo-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-IAo-IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQo-IC0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwo-IC0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKPiAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCj4gCj4gSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXkuCj4gCj4g4oCUIEJyYW5kb24KPiAKPiBPbiBTdW4sIDI0IEF1ZyAyMDI1IDE0OjE4OjM4IEdNVCwgQXZlcnkgV2Fsa2VyIDxhdmVyeS53YWxrZXIrMzhAdGVzdGRvbWFpbi5jb20-IHdyb3RlOgo-ID4gR29vZCBtb3JuaW5nLAo-ID4gCj4gPiBUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCj4gPiAKPiA-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-ID4gCj4gPiBXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgo-ID4gCj4gPiAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKPiA-IC0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwo-ID4gLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwo-ID4gLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgo-ID4gCj4gPiBJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4="
+        }
+      },
+      "sizeEstimate": 2492
+    }
+  ],
+  "snippet": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026"
+}

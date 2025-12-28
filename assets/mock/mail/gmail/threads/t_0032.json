@@ -1,0 +1,108 @@
+{
+  "id": "t_0032",
+  "historyId": "1486221",
+  "messages": [
+    {
+      "id": "m_0032_01",
+      "threadId": "t_0032",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hey, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t\u2026",
+      "historyId": "213241",
+      "internalDate": "1756024737985",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Re: Product roadmap sync"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 24 Aug 2025 08:38:57 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<8438508325.483237@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 472,
+              "data": "SGV5LAoKVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5Lg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 556,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGV5LDwvcD4KPHA-VGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5LjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1528
+    },
+    {
+      "id": "m_0032_02",
+      "threadId": "t_0032",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency,\u2026",
+      "historyId": "272051",
+      "internalDate": "1756027088640",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Scarlett Sanchez <scarlett.sanchez+30@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Re: Product roadmap sync"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 24 Aug 2025 09:18:08 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7969838626.815829@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 869,
+          "data": "SGksCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3QuCgrigJQgQnJhbmRvbgoKT24gU3VuLCAyNCBBdWcgMjAyNSAwODozODo1NyBHTVQsIFBhaXNsZXkgR2FyY2lhIDxwYWlzbGV5LmdhcmNpYSs1OUB0ZXN0ZG9tYWluLmNvbT4gd3JvdGU6Cj4gSGV5LAo-IAo-IFRoYW5rcyBmb3IgdGhlIHF1aWNrIHR1cm5hcm91bmQgb24gdGhpcy4KPiAKPiBJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCj4gCj4gLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCj4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwo-IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KPiAKPiBIYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS4="
+        }
+      },
+      "sizeEstimate": 1169
+    }
+  ],
+  "snippet": "Hi, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency,\u2026"
+}

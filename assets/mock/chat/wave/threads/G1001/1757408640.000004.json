@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "channel": "G1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757408640.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. Noted."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "rocket",
+          "users": [
+            "U1002",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1002",
+        "U1006",
+        "U1001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1757408640.000007"
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757408640.000005",
+      "thread_ts": "1757408640.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — confirming scope (re: context)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757408640.000006",
+      "thread_ts": "1757408640.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — capturing action items (re: context). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1002",
+            "U1006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001",
+            "U1006"
+          ],
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

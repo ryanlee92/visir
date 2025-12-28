@@ -1,0 +1,71 @@
+{
+  "id": "m_0139_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-07-26T09:35:20.679000+00:00",
+  "sentDateTime": "2025-07-26T09:35:20.679000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<7688343229.380594@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Scarlett Sanchez <scarlett.sanchez+30@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Draft: Follow-up on pricing"
+    },
+    {
+      "name": "Date",
+      "value": "2025-07-26T09:35:20.679000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<7688343229.380594@wavetogether.com>"
+    }
+  ],
+  "subject": "Draft: Follow-up on pricing",
+  "bodyPreview": "Hi, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. I refactored a couple of help",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hi,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "drafts",
+  "conversationId": "cv_0139",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": true,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Scarlett Sanchez",
+        "address": "scarlett.sanchez+30@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

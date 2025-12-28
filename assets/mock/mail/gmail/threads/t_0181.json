@@ -1,0 +1,69 @@
+{
+  "id": "t_0181",
+  "historyId": "1453385",
+  "messages": [
+    {
+      "id": "m_0181_01",
+      "threadId": "t_0181",
+      "labelIds": [
+        "SPAM",
+        "UNREAD"
+      ],
+      "snippet": "Good morning, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error\u2026",
+      "historyId": "97738",
+      "internalDate": "1754493119405",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Harper Hill <harper.hill+36@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "You are selected \u2014 claim now"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 06 Aug 2025 15:11:59 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<6191287525.452980@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 692,
+              "data": "R29vZCBtb3JuaW5nLAoKRm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 782,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBtb3JuaW5nLDwvcD4KPHA-Rm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LjwvcD4KPHA-Rm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPC9wPgo8cD5Gb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48L3A-Cjx1bD48bGk-U2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKTwvbGk-PGxpPlJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8L2xpPjxsaT5UaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrczwvbGk-PGxpPk93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduPC9saT48L3VsPgo8cD5UaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1974
+    }
+  ],
+  "snippet": "Good morning, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error\u2026"
+}

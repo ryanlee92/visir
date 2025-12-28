@@ -1,0 +1,103 @@
+{
+  "ok": true,
+  "channel": "G0001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757496420.000029",
+      "thread_ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — adding context (re: context). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001",
+            "U0006"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0006",
+            "U0001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0002",
+            "U0006"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757496420.000030",
+      "thread_ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — syncing offline (re: context)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757496420.000031",
+      "thread_ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — will update the doc (re: context). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0006"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

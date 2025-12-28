@@ -1,0 +1,47 @@
+{
+  "id": "t_0155",
+  "historyId": "910298",
+  "messages": [
+    {
+      "id": "m_0155_01",
+      "threadId": "t_0155",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, la\u2026",
+      "historyId": "246144",
+      "internalDate": "1755402554232",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Noah Wilson <noah.wilson+52@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Confirming our plan"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 17 Aug 2025 03:49:14 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3636150870.178092@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 534,
+          "data": "R29vZCBhZnRlcm5vb24sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4KCuKAlCBCcmFuZG9u"
+        }
+      },
+      "sizeEstimate": 834
+    }
+  ],
+  "snippet": "Good afternoon, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, la\u2026"
+}

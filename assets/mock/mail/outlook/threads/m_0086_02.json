@@ -1,0 +1,71 @@
+{
+  "id": "m_0086_02",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-22T05:55:31.899000+00:00",
+  "sentDateTime": "2025-08-22T05:55:31.899000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<9568217605.568789@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Nora White <nora.white+22@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Bug report: CSV import fails"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-22T05:55:31.899000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<9568217605.568789@wavetogether.com>"
+    }
+  ],
+  "subject": "Bug report: CSV import fails",
+  "bodyPreview": "Hello, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. - Scope: finalize API contract (auth,",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Following up with a few details from our chat.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-22T04:43:35.820000+00:00, Avery Sanchez &lt;avery.sanchez+41@testdomain.com&gt; wrote:<br>&gt; Good afternoon,<br>&gt; <br>&gt; Thanks for the quick turnaround on this.<br>&gt; <br>&gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Thanks again \u2014 this unblocks the rest of the sprint.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0086",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Nora White",
+        "address": "nora.white+22@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

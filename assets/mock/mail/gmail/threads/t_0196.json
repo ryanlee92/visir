@@ -1,0 +1,47 @@
+{
+  "id": "t_0196",
+  "historyId": "1742227",
+  "messages": [
+    {
+      "id": "m_0196_01",
+      "threadId": "t_0196",
+      "labelIds": [
+        "TRASH"
+      ],
+      "snippet": "Hello, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates,\u2026",
+      "historyId": "230736",
+      "internalDate": "1754080503877",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Riley Brown <riley.brown+25@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Action needed: verify account"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 01 Aug 2025 20:35:03 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5924300493.208689@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 294,
+          "data": "SGVsbG8sCgpGb2xsb3dpbmcgdXAgd2l0aCBhIGZldyBkZXRhaWxzIGZyb20gb3VyIGNoYXQuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCkZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMu"
+        }
+      },
+      "sizeEstimate": 594
+    }
+  ],
+  "snippet": "Hello, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates,\u2026"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "t_0180",
+  "historyId": "1337835",
+  "messages": [
+    {
+      "id": "m_0180_01",
+      "threadId": "t_0180",
+      "labelIds": [
+        "SPAM",
+        "UNREAD"
+      ],
+      "snippet": "Hey, Sharing a summary and next steps below. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t \u2026",
+      "historyId": "398089",
+      "internalDate": "1755272032075",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Avery Sanchez <avery.sanchez+41@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Congratulations! You won a prize"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 15 Aug 2025 15:33:52 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3636040385.683426@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 650,
+          "data": "SGV5LAoKU2hhcmluZyBhIHN1bW1hcnkgYW5kIG5leHQgc3RlcHMgYmVsb3cuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4="
+        }
+      },
+      "sizeEstimate": 950
+    }
+  ],
+  "snippet": "Hey, Sharing a summary and next steps below. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t \u2026"
+}

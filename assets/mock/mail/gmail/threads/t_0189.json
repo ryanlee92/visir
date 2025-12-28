@@ -1,0 +1,68 @@
+{
+  "id": "t_0189",
+  "historyId": "1357874",
+  "messages": [
+    {
+      "id": "m_0189_01",
+      "threadId": "t_0189",
+      "labelIds": [
+        "TRASH"
+      ],
+      "snippet": "Good morning, Sharing a summary and next steps below. For testing, I\u2019ll start with a small cohort and track error rates,\u2026",
+      "historyId": "95992",
+      "internalDate": "1754035302579",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Daniel Hill <daniel.hill+43@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "We couldn't deliver your package"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 01 Aug 2025 08:01:42 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5087508854.731713@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 506,
+              "data": "R29vZCBtb3JuaW5nLAoKU2hhcmluZyBhIHN1bW1hcnkgYW5kIG5leHQgc3RlcHMgYmVsb3cuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpIYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 590,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBtb3JuaW5nLDwvcD4KPHA-U2hhcmluZyBhIHN1bW1hcnkgYW5kIG5leHQgc3RlcHMgYmVsb3cuPC9wPgo8cD5Gb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48L3A-Cjx1bD48bGk-U2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKTwvbGk-PGxpPlJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8L2xpPjxsaT5UaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrczwvbGk-PGxpPk93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduPC9saT48L3VsPgo8cD5IYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1596
+    }
+  ],
+  "snippet": "Good morning, Sharing a summary and next steps below. For testing, I\u2019ll start with a small cohort and track error rates,\u2026"
+}

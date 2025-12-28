@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "channel": "D1002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757408700.000006",
+      "thread_ts": "1757408700.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — logging this (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757408700.000007",
+      "thread_ts": "1757408700.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — aligning on this (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

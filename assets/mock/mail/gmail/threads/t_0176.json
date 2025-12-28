@@ -1,0 +1,48 @@
+{
+  "id": "t_0176",
+  "historyId": "1469140",
+  "messages": [
+    {
+      "id": "m_0176_01",
+      "threadId": "t_0176",
+      "labelIds": [
+        "SPAM",
+        "UNREAD"
+      ],
+      "snippet": "Hey, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 sho\u2026",
+      "historyId": "417874",
+      "internalDate": "1756827698162",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Ava White <ava.white+40@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Congratulations! You won a prize"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 02 Sep 2025 15:41:38 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<8028834699.229578@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 432,
+          "data": "SGV5LAoKRm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKV2UgYWxpZ25lZCBvbiB0aGUgY29yZSByZXF1aXJlbWVudHMgYW5kIHRyaW1tZWQgYSBmZXcgbmljZeKAkXRv4oCRaGF2ZSBpdGVtcyBzbyB3ZSBjYW4gaGl0IHRoZSB0YXJnZXQgZGF0ZS4gSSBpbmNsdWRlZCBjb25jcmV0ZSBleGFtcGxlcyBmb3IgdGhlIHBheWxvYWRzIHNvIHdlIGF2b2lkIGFtYmlndWl0eSBsYXRlci4KCklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3Qu"
+        }
+      },
+      "sizeEstimate": 732
+    }
+  ],
+  "snippet": "Hey, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 sho\u2026"
+}

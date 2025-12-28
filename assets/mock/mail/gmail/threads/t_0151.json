@@ -1,0 +1,47 @@
+{
+  "id": "t_0151",
+  "historyId": "1649434",
+  "messages": [
+    {
+      "id": "m_0151_01",
+      "threadId": "t_0151",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t \u2026",
+      "historyId": "473893",
+      "internalDate": "1757309527363",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Scarlett Sanchez <scarlett.sanchez+30@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: connecting you two"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 08 Sep 2025 05:32:07 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2356088108.811036@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 496,
+          "data": "SGksCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgrigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 796
+    }
+  ],
+  "snippet": "Hi, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t \u2026"
+}

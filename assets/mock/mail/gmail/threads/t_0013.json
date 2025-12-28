@@ -1,0 +1,68 @@
+{
+  "id": "t_0013",
+  "historyId": "1591499",
+  "messages": [
+    {
+      "id": "m_0013_01",
+      "threadId": "t_0013",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hi, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and a\u2026",
+      "historyId": "312082",
+      "internalDate": "1756308735580",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Nora Scott <nora.scott+15@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Quick question about billing"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 27 Aug 2025 15:32:15 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9021399723.990890@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 491,
+              "data": "SGksCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpIYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 575,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGksPC9wPgo8cD5DaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuPC9wPgo8cD5Gb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48L3A-Cjx1bD48bGk-U2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKTwvbGk-PGxpPlJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8L2xpPjxsaT5UaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrczwvbGk-PGxpPk93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduPC9saT48L3VsPgo8cD5IYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1566
+    }
+  ],
+  "snippet": "Hi, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and a\u2026"
+}

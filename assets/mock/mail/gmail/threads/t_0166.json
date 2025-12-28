@@ -1,0 +1,68 @@
+{
+  "id": "t_0166",
+  "historyId": "646615",
+  "messages": [
+    {
+      "id": "m_0166_01",
+      "threadId": "t_0166",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hey, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t\u2026",
+      "historyId": "45001",
+      "internalDate": "1754343746900",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Aria Davis <aria.davis+49@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Thanks for the quick turnaround"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 04 Aug 2025 21:42:26 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7674195732.968827@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 514,
+              "data": "SGV5LAoKVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMuCgrigJQgQnJhbmRvbg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 604,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGV5LDwvcD4KPHA-VGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPkZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMuPC9wPgo8cD7igJQgQnJhbmRvbjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1618
+    }
+  ],
+  "snippet": "Hey, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t\u2026"
+}

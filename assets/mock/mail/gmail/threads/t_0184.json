@@ -1,0 +1,48 @@
+{
+  "id": "t_0184",
+  "historyId": "1368368",
+  "messages": [
+    {
+      "id": "m_0184_01",
+      "threadId": "t_0184",
+      "labelIds": [
+        "SPAM",
+        "UNREAD"
+      ],
+      "snippet": "Hello, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, laten\u2026",
+      "historyId": "289921",
+      "internalDate": "1754991630932",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Harper Walker <harper.walker+09@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "You are selected \u2014 claim now"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 12 Aug 2025 09:40:30 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1846081864.892163@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 518,
+          "data": "SGVsbG8sCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4="
+        }
+      },
+      "sizeEstimate": 818
+    }
+  ],
+  "snippet": "Hello, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, laten\u2026"
+}

@@ -1,0 +1,130 @@
+{
+  "ok": true,
+  "channel": "C1004",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1756988580.000744",
+      "thread_ts": "1756988580.000743",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — taking the next step (re: stream parse). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1001",
+            "U1004",
+            "U1006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1003",
+            "U1004",
+            "U1007"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1006",
+            "U1003",
+            "U1007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1756988580.000745",
+      "thread_ts": "1756988580.000743",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — logging this (re: heap)."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1756988580.000746",
+      "thread_ts": "1756988580.000743",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — logging this (re: stream parse)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1756988580.000747",
+      "thread_ts": "1756988580.000743",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood — taking the next step (re: stream parse). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1004",
+            "U1006"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1006",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

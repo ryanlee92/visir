@@ -1,0 +1,71 @@
+{
+  "id": "m_0151_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-20T20:13:06.036000+00:00",
+  "sentDateTime": "2025-08-20T20:13:06.036000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<3854409683.131763@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Thanks for the quick turnaround"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-20T20:13:06.036000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<3854409683.131763@wavetogether.com>"
+    }
+  ],
+  "subject": "Thanks for the quick turnaround",
+  "bodyPreview": "Good afternoon, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. I refactored a coupl",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0151",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Paisley Garcia",
+        "address": "paisley.garcia+59@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

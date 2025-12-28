@@ -1,0 +1,87 @@
+{
+  "id": "t_0061",
+  "historyId": "833684",
+  "messages": [
+    {
+      "id": "m_0061_01",
+      "threadId": "t_0061",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good afternoon, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cl\u2026",
+      "historyId": "348918",
+      "internalDate": "1753863805101",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Emily Moore <emily.moore+01@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Re: Product roadmap sync"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 30 Jul 2025 08:23:25 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3256801202.884411@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 702,
+          "data": "R29vZCBhZnRlcm5vb24sCgpGb2xsb3dpbmcgdXAgd2l0aCBhIGZldyBkZXRhaWxzIGZyb20gb3VyIGNoYXQuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMu"
+        }
+      },
+      "sizeEstimate": 1002
+    },
+    {
+      "id": "m_0061_02",
+      "threadId": "t_0061",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shou\u2026",
+      "historyId": "292221",
+      "internalDate": "1753866018699",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Avery Garcia <avery.garcia+50@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Re: Product roadmap sync"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 30 Jul 2025 09:00:18 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7420296781.781697@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 669,
+          "data": "R29vZCBhZnRlcm5vb24sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4KCuKAlCBCcmFuZG9u"
+        }
+      },
+      "sizeEstimate": 969
+    }
+  ],
+  "snippet": "Good afternoon, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shou\u2026"
+}

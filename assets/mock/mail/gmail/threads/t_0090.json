@@ -1,0 +1,48 @@
+{
+  "id": "t_0090",
+  "historyId": "1517824",
+  "messages": [
+    {
+      "id": "m_0090_01",
+      "threadId": "t_0090",
+      "labelIds": [
+        "INBOX",
+        "UNREAD"
+      ],
+      "snippet": "Hi, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect\u2026",
+      "historyId": "474387",
+      "internalDate": "1755075969521",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Ava White <ava.white+40@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Could we move the meeting?"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 13 Aug 2025 09:06:09 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<6168957398.289934@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 476,
+          "data": "SGksCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+        }
+      },
+      "sizeEstimate": 776
+    }
+  ],
+  "snippet": "Hi, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect\u2026"
+}

@@ -1,0 +1,71 @@
+{
+  "id": "m_0163_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-10T04:02:25.415000+00:00",
+  "sentDateTime": "2025-08-10T04:02:25.415000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1233233934.550794@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Noah Williams <noah.williams+24@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Sharing the deck"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-10T04:02:25.415000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1233233934.550794@wavetogether.com>"
+    }
+  ],
+  "subject": "Sharing the deck",
+  "bodyPreview": "Hi, Sharing a summary and next steps below. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. For testing, I\u2019ll start with a small cohort and track error rates, latency,",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hi,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<p>Happy to jump on a quick call later today.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0163",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Noah Williams",
+        "address": "noah.williams+24@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

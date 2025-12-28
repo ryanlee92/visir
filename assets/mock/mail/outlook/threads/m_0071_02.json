@@ -1,0 +1,71 @@
+{
+  "id": "m_0071_02",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-12T00:24:38.897000+00:00",
+  "sentDateTime": "2025-08-12T00:24:38.897000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<9748575262.338330@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Logan Sanchez <logan.sanchez+17@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Feedback on the new onboarding"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-12T00:24:38.897000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<9748575262.338330@wavetogether.com>"
+    }
+  ],
+  "subject": "Feedback on the new onboarding",
+  "bodyPreview": "Hi, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have i",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hi,</p>\n<p>Following up with a few details from our chat.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-11T23:56:17.648000+00:00, Camila Jones &lt;camila.jones+58@testdomain.com&gt; wrote:<br>&gt; Good afternoon,<br>&gt; <br>&gt; Following up with a few details from our chat.<br>&gt; <br>&gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0071",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Logan Sanchez",
+        "address": "logan.sanchez+17@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "channel": "C0005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756978140.000569",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U0001",
+        "U0004",
+        "U0005"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756978140.000575"
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756978140.000571",
+      "thread_ts": "1756978140.000569",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — will follow up (re: usability). Sharing a small mock for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756978140.000575",
+      "thread_ts": "1756978140.000569",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — syncing offline (re: usability). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    }
+  ]
+}

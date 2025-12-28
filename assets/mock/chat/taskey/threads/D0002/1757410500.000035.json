@@ -1,0 +1,95 @@
+{
+  "ok": true,
+  "channel": "D0002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757410500.000035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U0003"
+      ],
+      "reply_users_count": 1,
+      "latest_reply": "1757410500.000039"
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757410500.000036",
+      "thread_ts": "1757410500.000035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — taking the next step (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757410500.000037",
+      "thread_ts": "1757410500.000035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — pairing later today (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757410500.000038",
+      "thread_ts": "1757410500.000035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — aligning on this (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757410500.000039",
+      "thread_ts": "1757410500.000035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — taking the next step (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "m_0014_03",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-10T06:25:44.906000+00:00",
+  "sentDateTime": "2025-08-10T06:25:28.769000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<3911092381.866010@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Logan Harris <logan.harris+13@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Feedback on the new onboarding"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-10T06:25:28.769000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<3911092381.866010@testdomain.com>"
+    }
+  ],
+  "subject": "Feedback on the new onboarding",
+  "bodyPreview": "Hello, Sharing a summary and next steps below. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. - Scope: finalize API contract (auth, pagination, errors) - Risks: rate ",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p>\n<p><br>On 2025-08-10T04:56:00.466000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; Hi,<br>&gt; <br>&gt; Circling back with answers inline.<br>&gt; <br>&gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; If anything looks off, let me know and I\u2019ll adjust.<br>&gt; <br>&gt; \u2014 Alex<br>&gt; <br>&gt; On 2025-08-10T03:50:09.011000+00:00, Paisley Jones &lt;paisley.jones+16@testdomain.com&gt; wrote:<br>&gt; &gt; Good afternoon,<br>&gt; &gt; <br>&gt; &gt; Sharing a summary and next steps below.<br>&gt; &gt; <br>&gt; &gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; &gt; <br>&gt; &gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; &gt; <br>&gt; &gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; &gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; &gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; &gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; &gt; <br>&gt; &gt; Thanks again \u2014 this unblocks the rest of the sprint.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0014",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Logan Harris",
+      "address": "logan.harris+13@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Logan Harris",
+      "address": "logan.harris+13@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

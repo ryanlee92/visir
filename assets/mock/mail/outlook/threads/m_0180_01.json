@@ -1,0 +1,71 @@
+{
+  "id": "m_0180_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-07-28T02:43:47.425000+00:00",
+  "sentDateTime": "2025-07-28T02:43:17.920000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<8436253594.494729@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Camila Martinez <camila.martinez+51@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Congratulations! You won a prize"
+    },
+    {
+      "name": "Date",
+      "value": "2025-07-28T02:43:17.920000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<8436253594.494729@testdomain.com>"
+    }
+  ],
+  "subject": "Congratulations! You won a prize",
+  "bodyPreview": "Hello, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. - Scope: finalize API contract (auth, pagination, errors) - Risks: rate limit",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Circling back with answers inline.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "junkemail",
+  "conversationId": "cv_0180",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Camila Martinez",
+      "address": "camila.martinez+51@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Camila Martinez",
+      "address": "camila.martinez+51@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

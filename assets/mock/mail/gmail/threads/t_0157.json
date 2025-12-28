@@ -1,0 +1,47 @@
+{
+  "id": "t_0157",
+  "historyId": "1674640",
+  "messages": [
+    {
+      "id": "m_0157_01",
+      "threadId": "t_0157",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026",
+      "historyId": "242466",
+      "internalDate": "1755177959733",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Zoey Johnson <zoey.johnson+35@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Thanks for the quick turnaround"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 14 Aug 2025 13:25:59 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2717567483.252029@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 713,
+          "data": "R29vZCBhZnRlcm5vb24sCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKV2UgYWxpZ25lZCBvbiB0aGUgY29yZSByZXF1aXJlbWVudHMgYW5kIHRyaW1tZWQgYSBmZXcgbmljZeKAkXRv4oCRaGF2ZSBpdGVtcyBzbyB3ZSBjYW4gaGl0IHRoZSB0YXJnZXQgZGF0ZS4gSSBpbmNsdWRlZCBjb25jcmV0ZSBleGFtcGxlcyBmb3IgdGhlIHBheWxvYWRzIHNvIHdlIGF2b2lkIGFtYmlndWl0eSBsYXRlci4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpGZWVsIGZyZWUgdG8gY29tbWVudCBkaXJlY3RseSBpbiB0aGUgZG9jOyBJ4oCZbSB0cmFja2luZyBub3RpZmljYXRpb25zLgoK4oCUIEJyYW5kb24="
+        }
+      },
+      "sizeEstimate": 1013
+    }
+  ],
+  "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026"
+}

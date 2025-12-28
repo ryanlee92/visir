@@ -1,0 +1,440 @@
+<h3>Version 1.0.45+988</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Inbox items on the home screen now display sender information and unread indicators</li>
+		<li>Fixed lazy loading issue on the task list screen and added label support</li>
+		<li>Improved stability and performance with various bug fixes for a smoother, more reliable experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.43+984</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Agent home added: get a summary of your inbox items and tasks that need your attention.</li>
+		<li>Introduced the Braindump section: quickly capture thoughts and ideas you don't want to forget.</li>
+		<li>Launched Projects: Group your tasks and events by project. AI suggestions now intelligently recommend the most appropriate project for your inbox items.</li>
+		<li>Experience performance improvements with a user interface that's now up to three times faster.</li>
+		<li>Benefit from enhanced stability and a variety of bug fixes, ensuring a smoother and more reliable workflow.</li>
+	</ul>
+</section>
+
+
+<h3>Version 1.0.42+977</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enjoy a brand new look and feel, designed to deliver a more intuitive and engaging experience.</li>
+		<li>Experience performance improvements with a user interface that's now up to three times faster.</li>
+		<li>Introduced the Braindump section: quickly capture thoughts and ideas you don't want to forget.</li>
+		<li>Seamlessly create Braindump items, unscheduled tasks, or scheduled events by dragging and dropping emails or chat messages directly within their respective tabs.</li>
+		<li>Launched Projects: Group your tasks and events by project. AI suggestions now intelligently recommend the most appropriate project for your inbox items.</li>
+		<li>Benefit from enhanced stability and a variety of bug fixes, ensuring a smoother and more reliable workflow.</li>
+	</ul>
+
+	<h4>Mobile</h4>
+	<ul>
+		<li>Updated Mobile Gestures: Swipe right to access mail and chat options. Long-press to initiate drag-and-drop for creating tasks from messages.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.41+961</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enjoy a brand new look and feel, designed to deliver a more intuitive and engaging experience.</li>
+		<li>Experience performance improvements with a user interface that's now up to three times faster.</li>
+		<li>Benefit from enhanced stability and a variety of bug fixes, ensuring a smoother and more reliable workflow.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.40+946</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enjoy a brand new look and feel, designed to deliver a more intuitive and engaging experience.</li>
+		<li>Experience performance improvements with a user interface that's now up to three times faster.</li>
+		<li>Benefit from enhanced stability and a variety of bug fixes, ensuring a smoother and more reliable workflow.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.39+934</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and implemented various bug fixes for a smoother experience.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.38+926</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and implemented various bug fixes for a smoother experience.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.37+923</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Fixed an issue where some calendar events were not displayed.</li>
+		<li>Enhanced stability and implemented various bug fixes for a smoother experience.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.36+922</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Fixed timezone reflection in inbox.</li>
+		<li>Improved stability and various bug fixes for a smoother experience.</li>
+	</ul>
+
+	<h4>Windows</h4>
+	<ul>
+		<li>Resolved Windows WebView interaction problems for improved desktop experience.</li>
+		<li>Resolved pointer issues on Windows WebView.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.35+919</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Linked tasks and events now appear in the inbox list.</li>
+		<li>AI suggestion accuracy has been improved.</li>
+		<li>Added text scale preference.</li>
+		<li>Unread indicators have been added to the chat channel list.</li>
+		<li>You can now create a task or event directly by clicking a suggestion tag.</li>
+		<li>Secondary timezone is now supported on the calendar view.</li>
+		<li>Improved stability and various bug fixes for a smoother experience.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.34+905</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Fixed an issue with lazy loading</li>
+		<li>Improved stability and various bug fixes for a smoother experience.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.33+902</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>New users now receive default tasks to help them get started quickly and easily.</li>
+		<li>Improved chat input performance.</li>
+		<li>Fixed incorrect display issues in the month view calendar.</li>
+		<li>Improved stability and various bug fixes for a smoother experience.</li>
+	</ul>
+
+	<h4>Windows</h4>
+	<ul>
+		<li>Resolved a critical issue where desktop mouse interaction would stop working after opening the mail view.</li>
+	</ul>
+</section>
+
+
+<h3>Version 1.0.32+892</h3>
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Fixed several bugs related to notifications.</li>
+		<li>Improved stability and various bug fixes for a smoother experience.</li>
+	</ul>
+</section>
+
+
+<h3>Version 1.0.31+891</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>The onboarding experience has been completely redesigned. You can now explore the app with a guided tour even before signing in.</li>
+		<li>You can start your trial without providing payment information.</li>
+		<li>Improved stability and various bug fixes for a smoother experience.</li>
+	</ul>
+
+	<h4>Windows</h4>
+	<ul>
+		<li>Resolved a critical issue where desktop mouse interaction would stop working after opening the mail view.</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.30+859</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Resolved timezone discrepancies on calendar-related screens</li>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.29+856</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Pinch-to-zoom enabled on mail screens</li>
+		<li>Significant performance improvements to chat-related UI</li>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.28+850</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Significant performance improvements to mail-related UI</li>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.27+847</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.26+846</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.25+844</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.24+843</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.23+826</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.22+808</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Added comprehensive keyboard shortcuts for message actions—no mouse required</li>
+		<li>Redesigned the time saved dashboard for improved clarity and visibility</li>
+		<li>Enhanced stability and implemented bug fixes for a smoother experience</li>
+	</ul>
+	</ul>
+</section>
+
+<section>
+	<h4>Windows</h4>
+	<ul>
+		<li>Improved email readability</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.21+765</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.20+750</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Optimize cpu usage for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.19+739</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Optimize memory usage for a smoother experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.18+726</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Fixed slack notification issues for improved reliability</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.16+719</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Fixed notification issues for improved reliability</li>
+		<li>Enhanced overall stability with comprehensive bug fixes for a smoother user experience</li>
+	</ul>
+</section>
+
+<h3>Version 1.0.15+709</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Welcome Outlook! We're excited to announce full integration with Outlook Calendar</li>
+		<li>Outlook Mail integration is now live - manage your emails seamlessly</li>
+		<li>Discover your productivity insights with our beautifully redesigned Time Saved dashboard</li>
+		<li>Experience lightning-fast performance with our latest optimizations</li>
+		<li>Enhanced stability and bug fixes for a smoother experience</li>
+	</ul>
+</section>
+
+<!-- MacOS -->
+<section>
+	<h4>MacOS</h4>
+	<ul>
+		<li>MacOS-specific optimizations deliver even better performance</li>
+	</ul>
+</section>
+
+<!-- Windows -->
+<section>
+	<h4>Windows</h4>
+	<ul>
+		<li>Windows-specific optimizations deliver even better performance</li>
+	</ul>
+</section>
+
+<!-- iOS -->
+<section>
+	<h4>iOS</h4>
+	<ul>
+		<li>Stay on top of your day with our new Today home screen widget</li>
+		<li>Deeper iOS integration means a more native, seamless experience</li>
+	</ul>
+</section>
+
+<!-- Android -->
+<section>
+	<h4>Android</h4>
+	<ul>
+		<li>Stay on top of your day with our new Today home screen widget</li>
+		<li>Deeper Android integration means a more native, seamless experience</li>
+	</ul>
+</section>
+
+<!-- Web -->
+<section>
+	<h4>Web</h4>
+	<ul>
+		<li>Web-specific optimizations ensure a snappy, responsive experience</li>
+	</ul>
+</section>
+
+<br/>
+
+
+<h3>Version 1.0.14+663</h3>
+
+<!-- All Platforms -->
+<section>
+	<h4>All Platforms</h4>
+	<ul>
+		<li>Experience smarter inbox management with our new AI-powered suggestion system</li>
+		<li>Take control of your inbox with new filtering and sorting capabilities</li>
+		<li>Enjoy a faster, more responsive experience with significant performance enhancements</li>
+		<li>Discover a more polished interface with refined visual design elements</li>
+		<li>Benefit from various stability improvements and bug fixes</li>
+	</ul>
+</section>
+
+<!-- MacOS -->
+<section>
+	<h4>MacOS</h4>
+	<ul>
+		<li>Stay productive with the new auto-launch feature at system startup</li>
+		<li>Experience improved performance with optimized MacOS-specific features</li>
+	</ul>
+</section>
+
+<!-- Windows -->
+<section>
+	<h4>Windows</h4>
+	<ul>
+		<li>Never miss a beat with auto-launch capability at system startup</li>
+		<li>Stay informed with new taskbar notification badges</li>
+		<li>Enjoy enhanced performance with optimized Windows-specific features</li>
+	</ul>
+</section>
+
+<!-- iOS -->
+<section>
+	<h4>iOS</h4>
+	<ul>
+		<li>Access your important information instantly with new home screen widgets</li>
+		<li>Experience seamless integration with native iOS features</li>
+	</ul>
+</section>
+
+<!-- Android -->
+<section>
+	<h4>Android</h4>
+	<ul>
+		<li>Get quick access to your key information with new home screen widgets</li>
+		<li>Enjoy deeper integration with native Android features</li>
+	</ul>
+</section>
+
+<!-- Web -->
+<section>
+	<h4>Web</h4>
+	<ul>
+		<li>Experience improved performance with optimized web-specific features</li>
+	</ul>
+</section>

@@ -1,0 +1,47 @@
+{
+  "id": "t_0144",
+  "historyId": "939928",
+  "messages": [
+    {
+      "id": "m_0144_01",
+      "threadId": "t_0144",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Thanks for the quick turnaround on this. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026",
+      "historyId": "374342",
+      "internalDate": "1756274613065",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Riley Brown <riley.brown+25@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Confirming our plan"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 27 Aug 2025 06:03:33 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5936467875.267462@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 557,
+          "data": "R29vZCBhZnRlcm5vb24sCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCknigJlsbCBwb3N0IGEgYnJpZWYgdXBkYXRlIGluIFNsYWNrIGFmdGVyIEkgcHVzaCB0aGUgYnJhbmNoLgoK4oCUIEJyYW5kb24="
+        }
+      },
+      "sizeEstimate": 857
+    }
+  ],
+  "snippet": "Good afternoon, Thanks for the quick turnaround on this. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026"
+}

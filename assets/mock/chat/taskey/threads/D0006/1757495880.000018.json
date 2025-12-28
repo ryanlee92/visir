@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "channel": "D0006",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495880.000019",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — confirming scope (re: context). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495880.000020",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — will follow up (re: context). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495880.000021",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — logging this (re: context). Nice momentum."
+          }
+        }
+      ]
+    }
+  ]
+}

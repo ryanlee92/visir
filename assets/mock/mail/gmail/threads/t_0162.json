@@ -1,0 +1,47 @@
+{
+  "id": "t_0162",
+  "historyId": "1943086",
+  "messages": [
+    {
+      "id": "m_0162_01",
+      "threadId": "t_0162",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026",
+      "historyId": "451665",
+      "internalDate": "1755551574883",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Mateo Jones <mateo.jones+19@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Sharing the deck"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 18 Aug 2025 21:12:54 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<6714917360.937750@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 277,
+          "data": "R29vZCBhZnRlcm5vb24sCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKSeKAmWxsIHBvc3QgYSBicmllZiB1cGRhdGUgaW4gU2xhY2sgYWZ0ZXIgSSBwdXNoIHRoZSBicmFuY2guCgrigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 577
+    }
+  ],
+  "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026"
+}

@@ -1,0 +1,71 @@
+{
+  "id": "m_0044_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-07T04:40:22.577000+00:00",
+  "sentDateTime": "2025-08-07T04:40:07.895000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<2909527372.141123@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Michael Miller <michael.miller+29@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Re: Product roadmap sync"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-07T04:40:07.895000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<2909527372.141123@testdomain.com>"
+    }
+  ],
+  "subject": "Re: Product roadmap sync",
+  "bodyPreview": "Good afternoon, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. I\u2019ll post a brief update in Slack after I push the branch.",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Thanks for the quick turnaround on this.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>I\u2019ll post a brief update in Slack after I push the branch.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0044",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Michael Miller",
+      "address": "michael.miller+29@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Michael Miller",
+      "address": "michael.miller+29@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

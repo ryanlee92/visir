@@ -1,0 +1,71 @@
+{
+  "id": "m_0153_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-09T23:29:41.364000+00:00",
+  "sentDateTime": "2025-08-09T23:29:41.364000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<8462405097.640756@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Layla Gonzalez <layla.gonzalez+26@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Intro: connecting you two"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-09T23:29:41.364000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<8462405097.640756@wavetogether.com>"
+    }
+  ],
+  "subject": "Intro: connecting you two",
+  "bodyPreview": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. - Scope: finalize A",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0153",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Layla Gonzalez",
+        "address": "layla.gonzalez+26@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

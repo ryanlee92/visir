@@ -1,0 +1,32 @@
+[
+  {
+    "id": "alex@taskey.work",
+    "summary": "Alex \u2014 Primary",
+    "description": "Primary calendar for Alex",
+    "timeZone": "Asia/Seoul",
+    "accessRole": "owner",
+    "primary": true,
+    "backgroundColor": "#039BE5",
+    "foregroundColor": "#000000"
+  },
+  {
+    "id": "taskey.work_product@group.calendar.google.com",
+    "summary": "Visir \u2014 Product & Releases",
+    "description": "Roadmaps, releases, internal milestones",
+    "timeZone": "Asia/Seoul",
+    "accessRole": "owner",
+    "primary": false,
+    "backgroundColor": "#7CB342",
+    "foregroundColor": "#000000"
+  },
+  {
+    "id": "taskey.work_sales@group.calendar.google.com",
+    "summary": "Visir \u2014 Sales & Customers",
+    "description": "Customer calls, demos, renewals",
+    "timeZone": "Asia/Seoul",
+    "accessRole": "owner",
+    "primary": false,
+    "backgroundColor": "#8E24AA",
+    "foregroundColor": "#ffffff"
+  }
+]

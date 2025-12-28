@@ -1,0 +1,148 @@
+{
+  "id": "t_0080",
+  "historyId": "1364213",
+  "messages": [
+    {
+      "id": "m_0080_01",
+      "threadId": "t_0080",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hey, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2026",
+      "historyId": "344579",
+      "internalDate": "1757040964842",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Liam Young <liam.young+20@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Next steps on partnership"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 05 Sep 2025 02:56:04 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3883982446.455206@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 487,
+          "data": "SGV5LAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0Lg=="
+        }
+      },
+      "sizeEstimate": 787
+    },
+    {
+      "id": "m_0080_02",
+      "threadId": "t_0080",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hey, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and \u2026",
+      "historyId": "491334",
+      "internalDate": "1757042571898",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Wyatt White <wyatt.white+18@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Next steps on partnership"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 05 Sep 2025 03:22:51 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9270015020.870679@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 1113,
+          "data": "SGV5LAoKQ2lyY2xpbmcgYmFjayB3aXRoIGFuc3dlcnMgaW5saW5lLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgrigJQgQnJhbmRvbgoKT24gRnJpLCAwNSBTZXAgMjAyNSAwMjo1NjowNCBHTVQsIExpYW0gWW91bmcgPGxpYW0ueW91bmcrMjBAdGVzdGRvbWFpbi5jb20-IHdyb3RlOgo-IEhleSwKPiAKPiBBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgo-IAo-IEkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KPiAKPiAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKPiAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgo-IAo-IElmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3Qu"
+        }
+      },
+      "sizeEstimate": 1413
+    },
+    {
+      "id": "m_0080_03",
+      "threadId": "t_0080",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hey, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t\u2026",
+      "historyId": "406256",
+      "internalDate": "1757044660300",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Liam Young <liam.young+20@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Next steps on partnership"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 05 Sep 2025 03:57:40 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2274535215.151291@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1491,
+              "data": "SGV5LAoKVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4KCgpPbiBGcmksIDA1IFNlcCAyMDI1IDAzOjIyOjUxIEdNVCwgQnJhbmRvbiBNaWxlcyA8YnJhbmRvbkB0YXNrZXkud29yaz4gd3JvdGU6Cj4gSGV5LAo-IAo-IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS4KPiAKPiBGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KPiAKPiAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKPiAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgo-IAo-IFRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50Lgo-IAo-IOKAlCBCcmFuZG9uCj4gCj4gT24gRnJpLCAwNSBTZXAgMjAyNSAwMjo1NjowNCBHTVQsIExpYW0gWW91bmcgPGxpYW0ueW91bmcrMjBAdGVzdGRvbWFpbi5jb20-IHdyb3RlOgo-ID4gSGV5LAo-ID4gCj4gPiBBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgo-ID4gCj4gPiBJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCj4gPiAKPiA-IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQo-ID4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gPiAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCj4gPiAKPiA-IElmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3Qu"
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1767,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGV5LDwvcD4KPHA-VGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHA-SWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC48L3A-CjxwPjxicj5PbiBGcmksIDA1IFNlcCAyMDI1IDAzOjIyOjUxIEdNVCwgQnJhbmRvbiBNaWxlcyAmbHQ7YnJhbmRvbkB0YXNrZXkud29yayZndDsgd3JvdGU6PGJyPiZndDsgSGV5LDxicj4mZ3Q7IDxicj4mZ3Q7IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS48YnI-Jmd0OyA8YnI-Jmd0OyBGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48YnI-Jmd0OyA8YnI-Jmd0OyAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycyk8YnI-Jmd0OyAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8YnI-Jmd0OyAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPGJyPiZndDsgLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbjxicj4mZ3Q7IDxicj4mZ3Q7IFRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50Ljxicj4mZ3Q7IDxicj4mZ3Q7IOKAlCBCcmFuZG9uPGJyPiZndDsgPGJyPiZndDsgT24gRnJpLCAwNSBTZXAgMjAyNSAwMjo1NjowNCBHTVQsIExpYW0gWW91bmcgJmx0O2xpYW0ueW91bmcrMjBAdGVzdGRvbWFpbi5jb20mZ3Q7IHdyb3RlOjxicj4mZ3Q7ICZndDsgSGV5LDxicj4mZ3Q7ICZndDsgPGJyPiZndDsgJmd0OyBBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLjxicj4mZ3Q7ICZndDsgPGJyPiZndDsgJmd0OyBJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuPGJyPiZndDsgJmd0OyA8YnI-Jmd0OyAmZ3Q7IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKTxicj4mZ3Q7ICZndDsgLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPGJyPiZndDsgJmd0OyAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPGJyPiZndDsgJmd0OyAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduPGJyPiZndDsgJmd0OyA8YnI-Jmd0OyAmZ3Q7IElmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3QuPC9wPjwvYm9keT48L2h0bWw-"
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 3758
+    }
+  ],
+  "snippet": "Hey, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t\u2026"
+}

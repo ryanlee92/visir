@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "channel": "C0006",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757495040.000005",
+      "thread_ts": "1757495040.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — will update the doc (re: context). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0001",
+            "U0002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757495040.000007",
+      "thread_ts": "1757495040.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — taking the next step (re: context). Captured for EOD summary."
+          }
+        }
+      ]
+    }
+  ]
+}

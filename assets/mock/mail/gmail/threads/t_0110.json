@@ -1,0 +1,170 @@
+{
+  "id": "t_0110",
+  "historyId": "1252096",
+  "messages": [
+    {
+      "id": "m_0110_01",
+      "threadId": "t_0110",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates\u2026",
+      "historyId": "157950",
+      "internalDate": "1754315896677",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Layla Gonzalez <layla.gonzalez+26@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: Aria from Umbrella"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 04 Aug 2025 13:58:16 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1315717226.903769@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 462,
+              "data": "R29vZCBtb3JuaW5nLAoKVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQu"
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 519,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBtb3JuaW5nLDwvcD4KPHA-VGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjwvcD4KPHA-Rm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPC9wPgo8cD5XZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLjwvcD4KPHA-VGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuPC9wPjwvYm9keT48L2h0bWw-"
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1481
+    },
+    {
+      "id": "m_0110_02",
+      "threadId": "t_0110",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026",
+      "historyId": "175893",
+      "internalDate": "1754320943777",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: Aria from Umbrella"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 04 Aug 2025 15:22:23 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<8283910501.861426@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1143,
+              "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKRmVlbCBmcmVlIHRvIGNvbW1lbnQgZGlyZWN0bHkgaW4gdGhlIGRvYzsgSeKAmW0gdHJhY2tpbmcgbm90aWZpY2F0aW9ucy4KCuKAlCBCcmFuZG9uCgpPbiBNb24sIDA0IEF1ZyAyMDI1IDEzOjU4OjE2IEdNVCwgTGF5bGEgR29uemFsZXogPGxheWxhLmdvbnphbGV6KzI2QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIG1vcm5pbmcsCj4gCj4gVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgo-IAo-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-IAo-IFdlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCj4gCj4gVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQu"
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1299,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBtb3JuaW5nLDwvcD4KPHA-QXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy48L3A-CjxwPldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuPC9wPgo8dWw-PGxpPlNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycyk8L2xpPjxsaT5SaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPC9saT48bGk-VGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3M8L2xpPjxsaT5Pd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbjwvbGk-PC91bD4KPHA-RmVlbCBmcmVlIHRvIGNvbW1lbnQgZGlyZWN0bHkgaW4gdGhlIGRvYzsgSeKAmW0gdHJhY2tpbmcgbm90aWZpY2F0aW9ucy48L3A-CjxwPuKAlCBCcmFuZG9uPC9wPgo8cD5PbiBNb24sIDA0IEF1ZyAyMDI1IDEzOjU4OjE2IEdNVCwgTGF5bGEgR29uemFsZXogJmx0O2xheWxhLmdvbnphbGV6KzI2QHRlc3Rkb21haW4uY29tJmd0OyB3cm90ZTo8YnI-Jmd0OyBHb29kIG1vcm5pbmcsPGJyPiZndDsgPGJyPiZndDsgVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjxicj4mZ3Q7IDxicj4mZ3Q7IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Ljxicj4mZ3Q7IDxicj4mZ3Q7IFdlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuPGJyPiZndDsgPGJyPiZndDsgVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuPC9wPjwvYm9keT48L2h0bWw-"
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 2942
+    },
+    {
+      "id": "m_0110_03",
+      "threadId": "t_0110",
+      "labelIds": [
+        "INBOX",
+        "UNREAD"
+      ],
+      "snippet": "Hey, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, l\u2026",
+      "historyId": "494492",
+      "internalDate": "1754321612930",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Everly Martinez <everly.martinez+27@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: Aria from Umbrella"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 04 Aug 2025 15:33:32 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9959047884.742145@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 515,
+          "data": "SGV5LAoKRm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+        }
+      },
+      "sizeEstimate": 815
+    }
+  ],
+  "snippet": "Hey, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, l\u2026"
+}

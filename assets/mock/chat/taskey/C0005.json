@@ -1,0 +1,2524 @@
+{
+  "ok": true,
+  "channel": "C0005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756976640.000544",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to finalize the API design by end of week"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005",
+            "U0003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0005",
+        "U0003",
+        "U0001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756976640.000547"
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756976640.000545",
+      "thread_ts": "1756976640.000544",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The authentication flow is ready for review"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756976640.000546",
+      "thread_ts": "1756976640.000544",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Database migration plan is ready"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756978140.000569",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the UI mockups"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U0001",
+        "U0004",
+        "U0005"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756978140.000575"
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756978140.000571",
+      "thread_ts": "1756978140.000569",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new feature is ready for testing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756978140.000575",
+      "thread_ts": "1756978140.000569",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the documentation"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756980840.000614",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The deployment is scheduled for next week"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0004",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U0004",
+        "U0005",
+        "U0001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756980840.000618"
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756980840.000615",
+      "thread_ts": "1756980840.000614",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should review the code changes"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001",
+            "U0003",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0003",
+            "U0004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756980840.000616",
+      "thread_ts": "1756980840.000614",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The performance improvements are complete"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756980840.000617",
+      "thread_ts": "1756980840.000614",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to align on the project timeline"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756982940.000649",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new integration is working well"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0001"
+      ],
+      "reply_users_count": 1,
+      "latest_reply": "1756982940.000652"
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756984140.000669",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the architecture changes"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0004",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U0001",
+        "U0005",
+        "U0004",
+        "U0003"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1756984140.000675"
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756984140.000671",
+      "thread_ts": "1756984140.000669",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The testing phase is almost complete"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756984140.000672",
+      "thread_ts": "1756984140.000669",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to prioritize the next features"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756984140.000673",
+      "thread_ts": "1756984140.000669",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The bug fixes are ready for review"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756984140.000674",
+      "thread_ts": "1756984140.000669",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should sync on the project status"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756984140.000675",
+      "thread_ts": "1756984140.000669",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new design is ready for feedback"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756987140.000719",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the project roadmap"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0005",
+            "U0004"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0004",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ],
+      "reply_count": 5,
+      "reply_users": [
+        "U0003",
+        "U0001",
+        "U0005",
+        "U0004"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1756987140.000724"
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756987140.000720",
+      "thread_ts": "1756987140.000719",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The API endpoints are implemented"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756987140.000722",
+      "thread_ts": "1756987140.000719",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the next sprint"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756987140.000723",
+      "thread_ts": "1756987140.000719",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The feature is ready for beta testing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756989120.000753",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to align on the requirements"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989120.000755",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The code review is complete"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0005",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989120.000757",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should plan the next release"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0001",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0003",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989120.000758",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new functionality is working"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756991820.000797",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to update the test coverage"
+          }
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U0004",
+        "U0005",
+        "U0001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756991820.000801"
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756991820.000798",
+      "thread_ts": "1756991820.000797",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The deployment went smoothly"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005",
+            "U0004",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756991820.000799",
+      "thread_ts": "1756991820.000797",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the technical approach"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756991820.000801",
+      "thread_ts": "1756991820.000797",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new component is ready"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756993620.000827",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to finalize the specifications"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756994160.000836",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> The integration testing is complete"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756994700.000845",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> We should review the user feedback"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Code review checklist\n- [ ] Tests pass\n- [ ] Code follows style guide\n- [ ] Documentation updated"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756995420.000857",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> The performance metrics look good"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756995660.000861",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to plan the next iteration"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0004"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756995900.000865",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new feature is in development"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "npm run build && npm run deploy"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756996080.000868",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should align on the priorities"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756997340.000889",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The code is ready for merge"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756997820.000897",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> We need to update the project status"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756998240.000904",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The testing is progressing well"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756998780.000913",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> We should discuss the timeline"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756999200.000920",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new implementation is complete"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001",
+            "U0003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756999680.000928",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to review the architecture"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757000100.000935",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The feature is ready for production"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757000280.000938",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should sync on the progress"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757000760.000946",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new changes are working"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757001600.000960",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to finalize the approach"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757002800.000980",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> The deployment is ready"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757003160.000986",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We should discuss the next steps"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757003700.000995",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new functionality is tested"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757004900.001015",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "We need to align on the scope"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757005140.001019",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757005620.001027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. Sharing a quick mockup for clarity. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757006040.001034",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll push a branch so you can review headers and error codes. Will follow up shortly."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757007420.001057",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757063460.000551",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757064060.000561",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Design walkthrough for the sidebar and calendar overlay. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757064780.000573",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757065440.000584",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Will follow up shortly."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757066100.000595",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. Sharing a quick mockup for clarity. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757066760.000606",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757067180.000613",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757067660.000621",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757068260.000631",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll push a branch so you can review headers and error codes. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757068740.000639",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757069400.000650",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757070120.000662",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Let's finalize the API contract and unblock frontend. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757071200.000680",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757071800.000690",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757072340.000699",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757072940.000709",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757074260.000731",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757074860.000741",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. Sharing a quick mockup for clarity. Marking as action."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757075520.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757076240.000764",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Nudging owners."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0003",
+            "U0001",
+            "U0004"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757076720.000772",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll update the timeline and owners. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757077380.000783",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Error handling example\ntry {\n  processData();\n} catch (error) {\n  console.error(\"Error:\", error.message);\n  logError(error);\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757077800.000790",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Design walkthrough for the sidebar and calendar overlay. Sharing a quick mockup for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757079240.000814",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. Sharing a quick mockup for clarity. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757079840.000824",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757080440.000834",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Marking as action."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// UI Component example\nconst Button = ({ onClick, children }) => (\n  <button onClick={onClick}>{children}</button>\n);"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757080980.000843",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757081700.000855",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757082180.000863",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757082900.000875",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Will follow up shortly."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757085000.000910",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Circling back after lunch."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757086140.000929",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757087340.000949",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Scheduling a check-in."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757089200.000980",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll update the timeline and owners. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757089680.000988",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. Sharing a quick mockup for clarity. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757091480.001018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757091960.001026",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes. Scheduling a check-in."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0005",
+            "U0003",
+            "U0001"
+          ],
+          "count": 3
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0001",
+            "U0003",
+            "U0004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757092500.001035",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll update the timeline and owners. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757093460.001051",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757094600.001070",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757095140.001079",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757095800.001090",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757150580.000563",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners. Will follow up shortly."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757151180.000573",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757152320.000592",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757153160.000606",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757153880.000618",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Let's finalize the API contract and unblock frontend. I'll update the timeline and owners. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757154360.000626",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll update the timeline and owners. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757154780.000633",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757155260.000641",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Design walkthrough for the sidebar and calendar overlay. Sharing a quick mockup for clarity. Noted on my end."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757155920.000652",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Lock sprint scope and assign owners for remaining tasks. I'll update the timeline and owners. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757156520.000662",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes. Aligning offline."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// UI Component example\nconst Button = ({ onClick, children }) => (\n  <button onClick={onClick}>{children}</button>\n);"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757157120.000672",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Will follow up shortly."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757157840.000684",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757159160.000706",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757160420.000727",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757160960.000736",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757161500.000745",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll update the timeline and owners. Circling back after lunch."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757162820.000767",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757163360.000776",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll push a branch so you can review headers and error codes. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757164020.000787",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Aligning offline."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0004",
+            "U0005",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757164560.000796",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757165760.000816",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll update the timeline and owners. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757166240.000824",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757166960.000836",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Lock sprint scope and assign owners for remaining tasks. I'll update the timeline and owners. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757167560.000846",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll summarize action items by EOD. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757168220.000857",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Let's finalize the API contract and unblock frontend. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757168760.000866",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Design walkthrough for the sidebar and calendar overlay. I'll update the timeline and owners. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757169360.000876",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. Sharing a quick mockup for clarity. Quick heads-up saved."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0003"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757169960.000886",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Auth token refresh, session rules, and pagination limits need alignment. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757171100.000905",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll push a branch so you can review headers and error codes. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757171640.000914",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auth token refresh, session rules, and pagination limits need alignment. I'll push a branch so you can review headers and error codes. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757172060.000921",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757172480.000928",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Design walkthrough for the sidebar and calendar overlay. Sharing a quick mockup for clarity. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757173080.000938",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. Adding to the doc."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0004",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757173560.000946",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Auth token refresh, session rules, and pagination limits need alignment. Sharing a quick mockup for clarity. (115)"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// UI Component example\nconst Button = ({ onClick, children }) => (\n  <button onClick={onClick}>{children}</button>\n);"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757174040.000954",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> <@U0005> Lock sprint scope and assign owners for remaining tasks. Sharing a quick mockup for clarity. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757174520.000962",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Design walkthrough for the sidebar and calendar overlay. I'll push a branch so you can review headers and error codes. Nudging owners."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0004",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757174940.000969",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Lock sprint scope and assign owners for remaining tasks. Sharing a quick mockup for clarity. Adding to the doc."
+          }
+        }
+      ]
+    }
+  ]
+}

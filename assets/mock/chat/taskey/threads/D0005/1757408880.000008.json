@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D0005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757408880.000009",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — will update the doc (re: context). Captured for EOD summary."
+          }
+        }
+      ]
+    }
+  ]
+}

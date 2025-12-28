@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "channel": "D1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757410080.000030",
+      "thread_ts": "1757410080.000028",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — taking the next step (re: context)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757410080.000031",
+      "thread_ts": "1757410080.000028",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — adding context (re: context)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757410080.000032",
+      "thread_ts": "1757410080.000028",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — will update the doc (re: context)."
+          }
+        }
+      ]
+    }
+  ]
+}

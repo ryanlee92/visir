@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "channel": "D1005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757495640.000014",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1001",
+        "U1006"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757495640.000018"
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757495640.000018",
+      "thread_ts": "1757495640.000014",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — aligning on this (re: context). I'll verify edge cases."
+          }
+        }
+      ]
+    }
+  ]
+}

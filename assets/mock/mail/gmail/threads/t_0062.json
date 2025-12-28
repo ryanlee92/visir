@@ -1,0 +1,47 @@
+{
+  "id": "t_0062",
+  "historyId": "1796807",
+  "messages": [
+    {
+      "id": "m_0062_01",
+      "threadId": "t_0062",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2026",
+      "historyId": "67238",
+      "internalDate": "1756874547499",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Sebastian Garcia <sebastian.garcia+02@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Follow-up on access request"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 03 Sep 2025 04:42:27 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9200586934.322769@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 485,
+          "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpIYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS4="
+        }
+      },
+      "sizeEstimate": 785
+    }
+  ],
+  "snippet": "Good morning, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2026"
+}

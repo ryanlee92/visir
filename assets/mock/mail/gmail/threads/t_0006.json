@@ -1,0 +1,148 @@
+{
+  "id": "t_0006",
+  "historyId": "1640400",
+  "messages": [
+    {
+      "id": "m_0006_01",
+      "threadId": "t_0006",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good afternoon, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, la\u2026",
+      "historyId": "148605",
+      "internalDate": "1755608269189",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Aria Davis <aria.davis+49@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 12:57:49 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5332152822.698610@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 514,
+          "data": "R29vZCBhZnRlcm5vb24sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0Lg=="
+        }
+      },
+      "sizeEstimate": 814
+    },
+    {
+      "id": "m_0006_02",
+      "threadId": "t_0006",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error r\u2026",
+      "historyId": "489037",
+      "internalDate": "1755613664702",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Camila Martinez <camila.martinez+51@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 14:27:44 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2772701125.880530@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1327,
+              "data": "R29vZCBhZnRlcm5vb24sCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0LgoK4oCUIEJyYW5kb24KCk9uIFR1ZSwgMTkgQXVnIDIwMjUgMTI6NTc6NDkgR01ULCBBcmlhIERhdmlzIDxhcmlhLmRhdmlzKzQ5QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIGFmdGVybm9vbiwKPiAKPiBDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCj4gCj4gRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCj4gCj4gLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCj4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwo-IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KPiAKPiBJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0Lg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1507,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBhZnRlcm5vb24sPC9wPgo8cD5BcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLjwvcD4KPHA-Rm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPC9wPgo8cD5Gb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48L3A-Cjx1bD48bGk-U2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKTwvbGk-PGxpPlJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXM8L2xpPjxsaT5UaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrczwvbGk-PGxpPk93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduPC9saT48L3VsPgo8cD5JZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0LjwvcD4KPHA-4oCUIEJyYW5kb248L3A-CjxwPk9uIFR1ZSwgMTkgQXVnIDIwMjUgMTI6NTc6NDkgR01ULCBBcmlhIERhdmlzICZsdDthcmlhLmRhdmlzKzQ5QHRlc3Rkb21haW4uY29tJmd0OyB3cm90ZTo8YnI-Jmd0OyBHb29kIGFmdGVybm9vbiw8YnI-Jmd0OyA8YnI-Jmd0OyBDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuPGJyPiZndDsgPGJyPiZndDsgRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPGJyPiZndDsgPGJyPiZndDsgLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPGJyPiZndDsgLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPGJyPiZndDsgLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrczxicj4mZ3Q7IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248YnI-Jmd0OyA8YnI-Jmd0OyBJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0LjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 3334
+    },
+    {
+      "id": "m_0006_03",
+      "threadId": "t_0006",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hi, Thanks for the quick turnaround on this. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so\u2026",
+      "historyId": "158029",
+      "internalDate": "1755615185605",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Nora Scott <nora.scott+31@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 14:53:05 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7016871521.141478@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 693,
+          "data": "SGksCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQu"
+        }
+      },
+      "sizeEstimate": 993
+    }
+  ],
+  "snippet": "Hi, Thanks for the quick turnaround on this. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so\u2026"
+}

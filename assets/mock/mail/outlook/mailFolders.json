@@ -1,0 +1,22 @@
+[
+  {
+    "id": "inbox",
+    "displayName": "Inbox"
+  },
+  {
+    "id": "drafts",
+    "displayName": "Drafts"
+  },
+  {
+    "id": "sentitems",
+    "displayName": "Sent Items"
+  },
+  {
+    "id": "junkemail",
+    "displayName": "Junk Email"
+  },
+  {
+    "id": "deleteditems",
+    "displayName": "Deleted Items"
+  }
+]

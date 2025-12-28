@@ -1,0 +1,32 @@
+[
+  {
+    "id": "alex@wavetogether.com",
+    "name": "Alex — Primary",
+    "owner": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    },
+    "timeZone": "Asia/Seoul",
+    "primary": true
+  },
+  {
+    "id": "product@wavetogether.com",
+    "name": "Wavetogether — Product & Releases",
+    "owner": {
+      "name": "Product Team",
+      "address": "product@wavetogether.com"
+    },
+    "timeZone": "Asia/Seoul",
+    "primary": false
+  },
+  {
+    "id": "sales@wavetogether.com",
+    "name": "Wavetogether — Sales & Customers",
+    "owner": {
+      "name": "Sales Team",
+      "address": "sales@wavetogether.com"
+    },
+    "timeZone": "Asia/Seoul",
+    "primary": false
+  }
+]

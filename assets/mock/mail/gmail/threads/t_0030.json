@@ -1,0 +1,47 @@
+{
+  "id": "t_0030",
+  "historyId": "585036",
+  "messages": [
+    {
+      "id": "m_0030_01",
+      "threadId": "t_0030",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 should\u2026",
+      "historyId": "383229",
+      "internalDate": "1755215760444",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Sofia Jackson <sofia.jackson+11@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Notes from user interview"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 14 Aug 2025 23:56:00 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7678859700.699895@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 671,
+          "data": "R29vZCBtb3JuaW5nLAoKQ2lyY2xpbmcgYmFjayB3aXRoIGFuc3dlcnMgaW5saW5lLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKV2UgYWxpZ25lZCBvbiB0aGUgY29yZSByZXF1aXJlbWVudHMgYW5kIHRyaW1tZWQgYSBmZXcgbmljZeKAkXRv4oCRaGF2ZSBpdGVtcyBzbyB3ZSBjYW4gaGl0IHRoZSB0YXJnZXQgZGF0ZS4gSSBpbmNsdWRlZCBjb25jcmV0ZSBleGFtcGxlcyBmb3IgdGhlIHBheWxvYWRzIHNvIHdlIGF2b2lkIGFtYmlndWl0eSBsYXRlci4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4="
+        }
+      },
+      "sizeEstimate": 971
+    }
+  ],
+  "snippet": "Good morning, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 should\u2026"
+}

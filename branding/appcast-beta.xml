@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+	<channel>
+		<title>Visir</title>
+		<description>Your AI Executive Assistant.</description>
+		<language>en</language>
+		<item>
+			<title>Version 2.0.0</title>
+			<!-- For the macOS item, it is recommended to add 'sparkle:version' and 'sparkle:shortVersionString' to the item node, rather than as part of the enclosure. -->
+			<sparkle:version>998</sparkle:version>
+			<sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
+			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
+			<pubDate>Sun, 28 Dec 2025 18:00:00 +0900</pubDate>
+			<enclosure url="https://visir.pro/release/visir-beta.zip"
+                sparkle:edSignature="8Q8XQ8YwAG7dY+kHy0zTO5mAoYjFW3wYnAUWWSOQBj+DdnivULl9oysB8sjunlJbCn+j4XuJx/NJiDs5MUzUDA==" length="101943594"
+				sparkle:os="macos"
+				type="application/octet-stream" />
+		</item>
+		<item>
+			<title>Version 2.0.0</title>
+			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
+			<pubDate>Sun, 28 Dec 2025 18:00:00 +0900</pubDate>
+			<enclosure url="https://visir.pro/release/visir-beta.exe"
+                sparkle:dsaSignature="MDwCHDLKkYYPCJo4EBzhPdbKElgnJgpHKuYE1Mdn9uwCHDECxT+elCff0JG6O/47HlbBC2JuekajJAcCEgc=" length="0"
+				sparkle:version="2.0.0+998"
+				sparkle:os="windows"
+				type="application/octet-stream" />
+		</item>
+	</channel>
+</rss>
+

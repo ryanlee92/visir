@@ -1,0 +1,71 @@
+{
+  "id": "m_0061_02",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-31T17:00:34.634000+00:00",
+  "sentDateTime": "2025-08-31T17:00:34.634000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<2098765719.824632@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Sofia Jackson <sofia.jackson+11@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Re: Product roadmap sync"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-31T17:00:34.634000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<2098765719.824632@wavetogether.com>"
+    }
+  ],
+  "subject": "Re: Product roadmap sync",
+  "bodyPreview": "Hey, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. I refactored a couple of helper",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hey,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-31T15:58:56.249000+00:00, Scarlett Sanchez &lt;scarlett.sanchez+30@testdomain.com&gt; wrote:<br>&gt; Hey,<br>&gt; <br>&gt; Appreciate the context \u2014 adding specifics.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; I\u2019ll post a brief update in Slack after I push the branch.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0061",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Sofia Jackson",
+        "address": "sofia.jackson+11@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

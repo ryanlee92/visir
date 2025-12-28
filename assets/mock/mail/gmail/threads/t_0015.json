@@ -1,0 +1,108 @@
+{
+  "id": "t_0015",
+  "historyId": "893095",
+  "messages": [
+    {
+      "id": "m_0015_01",
+      "threadId": "t_0015",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hi, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019\u2026",
+      "historyId": "70391",
+      "internalDate": "1754848894376",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Sebastian Garcia <sebastian.garcia+02@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Your calendar for next week"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 10 Aug 2025 18:01:34 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7928027413.573909@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 486,
+              "data": "SGksCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3Qu"
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 570,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGksPC9wPgo8cD5BcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3QuPC9wPjwvYm9keT48L2h0bWw-"
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1556
+    },
+    {
+      "id": "m_0015_02",
+      "threadId": "t_0015",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so \u2026",
+      "historyId": "414801",
+      "internalDate": "1754849804893",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Harper Hill <harper.hill+36@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Your calendar for next week"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 10 Aug 2025 18:16:44 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4474116829.408688@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 1329,
+          "data": "SGksCgpTaGFyaW5nIGEgc3VtbWFyeSBhbmQgbmV4dCBzdGVwcyBiZWxvdy4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpGZWVsIGZyZWUgdG8gY29tbWVudCBkaXJlY3RseSBpbiB0aGUgZG9jOyBJ4oCZbSB0cmFja2luZyBub3RpZmljYXRpb25zLgoK4oCUIEJyYW5kb24KCk9uIFN1biwgMTAgQXVnIDIwMjUgMTg6MDE6MzQgR01ULCBTZWJhc3RpYW4gR2FyY2lhIDxzZWJhc3RpYW4uZ2FyY2lhKzAyQHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBIaSwKPiAKPiBBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgo-IAo-IEkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KPiAKPiAtIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKPiAtIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgo-IAo-IElmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3Qu"
+        }
+      },
+      "sizeEstimate": 1629
+    }
+  ],
+  "snippet": "Hi, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so \u2026"
+}

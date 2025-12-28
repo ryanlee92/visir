@@ -1,0 +1,47 @@
+{
+  "id": "t_0078",
+  "historyId": "1323056",
+  "messages": [
+    {
+      "id": "m_0078_01",
+      "threadId": "t_0078",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good afternoon, Following up with a few details from our chat. We aligned on the core requirements and trimmed a few nic\u2026",
+      "historyId": "240728",
+      "internalDate": "1755858862763",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Mateo Jones <mateo.jones+19@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Follow-up on access request"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 22 Aug 2025 10:34:22 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4286434797.275648@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 711,
+          "data": "R29vZCBhZnRlcm5vb24sCgpGb2xsb3dpbmcgdXAgd2l0aCBhIGZldyBkZXRhaWxzIGZyb20gb3VyIGNoYXQuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQu"
+        }
+      },
+      "sizeEstimate": 1011
+    }
+  ],
+  "snippet": "Good afternoon, Following up with a few details from our chat. We aligned on the core requirements and trimmed a few nic\u2026"
+}

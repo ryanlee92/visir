@@ -1,0 +1,71 @@
+{
+  "id": "m_0176_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-11T10:26:15.104000+00:00",
+  "sentDateTime": "2025-08-11T10:26:01.529000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<7003107589.633919@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Mateo Jones <mateo.jones+19@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Earn money fast from home"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-11T10:26:01.529000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<7003107589.633919@testdomain.com>"
+    }
+  ],
+  "subject": "Earn money fast from home",
+  "bodyPreview": "Good afternoon, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. For testing, I\u2019ll start with a small cohort and track er",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Following up with a few details from our chat.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<p>Happy to jump on a quick call later today.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "junkemail",
+  "conversationId": "cv_0176",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Mateo Jones",
+      "address": "mateo.jones+19@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Mateo Jones",
+      "address": "mateo.jones+19@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "channel": "C0004",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982760.000647",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood — logging this (re: telemetry). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982760.000648",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — logging this (re: telemetry). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982760.000651",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — pairing later today (re: refresh). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756982760.000652",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Appreciate the context — will update the doc (re: retry). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    }
+  ]
+}

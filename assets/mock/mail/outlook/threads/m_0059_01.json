@@ -1,0 +1,71 @@
+{
+  "id": "m_0059_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-21T16:56:05.326000+00:00",
+  "sentDateTime": "2025-08-21T16:55:38.948000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1176867688.201061@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Nora Scott <nora.scott+31@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Next steps on partnership"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-21T16:55:38.948000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1176867688.201061@testdomain.com>"
+    }
+  ],
+  "subject": "Next steps on partnership",
+  "bodyPreview": "Hello, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. For testing, I\u2019ll start with a small cohort and track error rates, la",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0059",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Nora Scott",
+      "address": "nora.scott+31@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Nora Scott",
+      "address": "nora.scott+31@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

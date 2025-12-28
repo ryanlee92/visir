@@ -1,0 +1,148 @@
+{
+  "id": "t_0039",
+  "historyId": "1250772",
+  "messages": [
+    {
+      "id": "m_0039_01",
+      "threadId": "t_0039",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, late\u2026",
+      "historyId": "109182",
+      "internalDate": "1757164489026",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Dylan Thompson <dylan.thompson+08@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 06 Sep 2025 13:14:49 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1758762246.840849@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 671,
+          "data": "R29vZCBtb3JuaW5nLAoKQ2lyY2xpbmcgYmFjayB3aXRoIGFuc3dlcnMgaW5saW5lLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKRmVlbCBmcmVlIHRvIGNvbW1lbnQgZGlyZWN0bHkgaW4gdGhlIGRvYzsgSeKAmW0gdHJhY2tpbmcgbm90aWZpY2F0aW9ucy4="
+        }
+      },
+      "sizeEstimate": 971
+    },
+    {
+      "id": "m_0039_02",
+      "threadId": "t_0039",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hey, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency\u2026",
+      "historyId": "285580",
+      "internalDate": "1757169595451",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Riley Taylor <riley.taylor+34@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 06 Sep 2025 14:39:55 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2090299074.672707@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1315,
+              "data": "SGV5LAoKVGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgrigJQgQnJhbmRvbgoKT24gU2F0LCAwNiBTZXAgMjAyNSAxMzoxNDo0OSBHTVQsIER5bGFuIFRob21wc29uIDxkeWxhbi50aG9tcHNvbiswOEB0ZXN0ZG9tYWluLmNvbT4gd3JvdGU6Cj4gR29vZCBtb3JuaW5nLAo-IAo-IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS4KPiAKPiBGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KPiAKPiBJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCj4gCj4gLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCj4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwo-IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KPiAKPiBGZWVsIGZyZWUgdG8gY29tbWVudCBkaXJlY3RseSBpbiB0aGUgZG9jOyBJ4oCZbSB0cmFja2luZyBub3RpZmljYXRpb25zLg=="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1501,
+              "data": "PGh0bWw-PGJvZHk-PHA-SGV5LDwvcD4KPHA-VGhhbmtzIGZvciB0aGUgcXVpY2sgdHVybmFyb3VuZCBvbiB0aGlzLjwvcD4KPHA-Rm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPC9wPgo8dWw-PGxpPlNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycyk8L2xpPjxsaT5SaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPC9saT48bGk-VGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3M8L2xpPjxsaT5Pd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbjwvbGk-PC91bD4KPHA-VGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuPC9wPgo8cD7igJQgQnJhbmRvbjwvcD4KPHA-T24gU2F0LCAwNiBTZXAgMjAyNSAxMzoxNDo0OSBHTVQsIER5bGFuIFRob21wc29uICZsdDtkeWxhbi50aG9tcHNvbiswOEB0ZXN0ZG9tYWluLmNvbSZndDsgd3JvdGU6PGJyPiZndDsgR29vZCBtb3JuaW5nLDxicj4mZ3Q7IDxicj4mZ3Q7IENpcmNsaW5nIGJhY2sgd2l0aCBhbnN3ZXJzIGlubGluZS48YnI-Jmd0OyA8YnI-Jmd0OyBGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS48YnI-Jmd0OyA8YnI-Jmd0OyBJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuPGJyPiZndDsgPGJyPiZndDsgLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPGJyPiZndDsgLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzPGJyPiZndDsgLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrczxicj4mZ3Q7IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248YnI-Jmd0OyA8YnI-Jmd0OyBGZWVsIGZyZWUgdG8gY29tbWVudCBkaXJlY3RseSBpbiB0aGUgZG9jOyBJ4oCZbSB0cmFja2luZyBub3RpZmljYXRpb25zLjwvcD48L2JvZHk-PC9odG1sPg=="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 3316
+    },
+    {
+      "id": "m_0039_03",
+      "threadId": "t_0039",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good morning, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 should\u2026",
+      "historyId": "30561",
+      "internalDate": "1757170517620",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 06 Sep 2025 14:55:17 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<8347025447.272179@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 1701,
+          "data": "R29vZCBtb3JuaW5nLAoKQ2lyY2xpbmcgYmFjayB3aXRoIGFuc3dlcnMgaW5saW5lLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgoKT24gU2F0LCAwNiBTZXAgMjAyNSAxNDozOTo1NSBHTVQsIEJyYW5kb24gTWlsZXMgPGJyYW5kb25AdGFza2V5Lndvcms-IHdyb3RlOgo-IEhleSwKPiAKPiBUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCj4gCj4gRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCj4gCj4gLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCj4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwo-IC0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KPiAKPiBUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4KPiAKPiDigJQgQnJhbmRvbgo-IAo-IE9uIFNhdCwgMDYgU2VwIDIwMjUgMTM6MTQ6NDkgR01ULCBEeWxhbiBUaG9tcHNvbiA8ZHlsYW4udGhvbXBzb24rMDhAdGVzdGRvbWFpbi5jb20-IHdyb3RlOgo-ID4gR29vZCBtb3JuaW5nLAo-ID4gCj4gPiBDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCj4gPiAKPiA-IEZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5Lgo-ID4gCj4gPiBJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCj4gPiAKPiA-IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQo-ID4gLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCj4gPiAtIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCj4gPiAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCj4gPiAKPiA-IEZlZWwgZnJlZSB0byBjb21tZW50IGRpcmVjdGx5IGluIHRoZSBkb2M7IEnigJltIHRyYWNraW5nIG5vdGlmaWNhdGlvbnMu"
+        }
+      },
+      "sizeEstimate": 2001
+    }
+  ],
+  "snippet": "Good morning, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 should\u2026"
+}

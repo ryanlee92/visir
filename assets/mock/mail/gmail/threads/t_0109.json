@@ -1,0 +1,87 @@
+{
+  "id": "t_0109",
+  "historyId": "1169683",
+  "messages": [
+    {
+      "id": "m_0109_01",
+      "threadId": "t_0109",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hey, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2026",
+      "historyId": "196046",
+      "internalDate": "1753908337713",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Reminder: action required"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 30 Jul 2025 20:45:37 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4686956116.229643@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 660,
+          "data": "SGV5LAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXku"
+        }
+      },
+      "sizeEstimate": 960
+    },
+    {
+      "id": "m_0109_02",
+      "threadId": "t_0109",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hello, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, lat\u2026",
+      "historyId": "127654",
+      "internalDate": "1753909846992",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Daniel Allen <daniel.allen+05@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Reminder: action required"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 30 Jul 2025 21:10:46 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<3775827014.683230@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 670,
+          "data": "SGVsbG8sCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgrigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 970
+    }
+  ],
+  "snippet": "Hello, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, lat\u2026"
+}

@@ -1,0 +1,71 @@
+{
+  "id": "m_0160_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-19T22:02:22.852000+00:00",
+  "sentDateTime": "2025-08-19T22:02:22.852000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1054337934.705937@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Olivia Walker <olivia.walker+46@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Re: Great to meet you"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-19T22:02:22.852000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1054337934.705937@wavetogether.com>"
+    }
+  ],
+  "subject": "Re: Great to meet you",
+  "bodyPreview": "Good morning, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. For testing, I\u2019ll star",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Thanks again \u2014 this unblocks the rest of the sprint.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0160",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Olivia Walker",
+        "address": "olivia.walker+46@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

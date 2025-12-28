@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/date_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/date_header_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:includeFontPadding="false"
+            android:fontFamily="@font/suite_medium"
+            android:layout_margin="2dp"
+            android:paddingStart="6dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="2dp"/>
+
+        <FrameLayout
+            android:id="@+id/date_header_count_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp">
+
+            <ImageView
+                android:id="@+id/date_header_count_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/date_header_count_background" />
+
+            <TextView
+                android:id="@+id/date_header_count"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:paddingStart="6dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="4dp" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/appointment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_margin="2dp">
+
+        <ImageView
+            android:id="@+id/task_item_root_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/task_item_background" />
+
+        <LinearLayout
+            android:id="@+id/task_item_root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/appointment_time"
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:textSize="11sp"
+                android:layout_marginBottom="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/suite_medium"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false" />
+
+            <TextView
+                android:id="@+id/appointment_title"
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/task_checkbox_inner"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="start|bottom"
+            android:layout_marginStart="6dp"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/task_checkbox_inner_background" />
+
+        <Button
+            android:id="@+id/task_checkbox"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="start|bottom"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="1dp" />
+
+    </FrameLayout>
+</LinearLayout> 

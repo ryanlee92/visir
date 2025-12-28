@@ -1,0 +1,115 @@
+{
+  "ok": true,
+  "channel": "C1006",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757497500.000046",
+      "thread_ts": "1757497500.000045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — syncing offline (re: context)."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1004",
+            "U1002",
+            "U1001"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004",
+            "U1002"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757497500.000047",
+      "thread_ts": "1757497500.000045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — aligning on this (re: context)."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "white_check_mark",
+          "users": [
+            "U1004",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757497500.000048",
+      "thread_ts": "1757497500.000045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — taking the next step (re: context). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1004",
+            "U1002",
+            "U1001"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1004",
+            "U1001",
+            "U1002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

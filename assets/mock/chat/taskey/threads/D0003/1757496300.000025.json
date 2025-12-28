@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "channel": "D0003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757496300.000026",
+      "thread_ts": "1757496300.000025",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — confirming scope (re: context). Sharing a small mock for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757496300.000027",
+      "thread_ts": "1757496300.000025",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — aligning on this (re: context). Sharing a small mock for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757496300.000028",
+      "thread_ts": "1757496300.000025",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — logging this (re: context). Sharing a small mock for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757496300.000029",
+      "thread_ts": "1757496300.000025",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — will update the doc (re: context). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="$FLUTTER_BASE_HREF">
+
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta content="Stop Switching Apps. Get Things Done." name="description">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="Taskey" name="apple-mobile-web-app-title">
+    <link href="icons/Icon-192.png" rel="apple-touch-icon">
+    <link href="favicon.png" rel="icon" type="image/png">
+    <meta content="#EBEBF0" media="(prefers-color-scheme: light)" name="theme-color">
+    <meta content="#2C2C2E" media="(prefers-color-scheme: dark)" name="theme-color">
+
+    <title>Taskey</title>
+    <link href="manifest.json" rel="manifest">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+          name="viewport">
+
+    <style id="splash-screen-style">
+        html {
+          height: 100%
+        }
+        body {
+          margin: 0;
+          min-height: 100%;
+          background-color: #EBEBF0;
+          background-size: 100% 100%;
+        }
+        .center {
+          width: 132px;
+          height: 99px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+          display: block;
+        }
+        @media (prefers-color-scheme: dark) {
+          body {
+            background-color: #2C2C2E;
+              }
+        }
+    </style>
+    <script id="splash-screen-script">
+        function removeSplashFromWeb() {
+          document.getElementById("splash")?.remove();
+        }
+    </script>
+</head>
+<body>
+
+<div id="splash">
+    <picture>
+        <source media="(prefers-color-scheme: light)" srcset="splash.gif"/>
+        <source media="(prefers-color-scheme: dark)" srcset="splash-dark.gif"/>
+        <img class="center" src="splash.gif"/>
+    </picture>
+</div>
+
+<script async="" src="flutter_bootstrap.js"></script>
+<script src="firebase_worker.js"></script>
+</body>
+</html>

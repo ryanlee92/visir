@@ -1,0 +1,47 @@
+{
+  "id": "t_0135",
+  "historyId": "928123",
+  "messages": [
+    {
+      "id": "m_0135_01",
+      "threadId": "t_0135",
+      "labelIds": [
+        "DRAFT"
+      ],
+      "snippet": "Hi, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so \u2026",
+      "historyId": "317645",
+      "internalDate": "1754210033693",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Julian Lewis <julian.lewis+44@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Draft: Investor intro"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 03 Aug 2025 08:33:53 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4845751451.521582@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 667,
+          "data": "SGksCgpTaGFyaW5nIGEgc3VtbWFyeSBhbmQgbmV4dCBzdGVwcyBiZWxvdy4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXkuCgrigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 967
+    }
+  ],
+  "snippet": "Hi, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so \u2026"
+}

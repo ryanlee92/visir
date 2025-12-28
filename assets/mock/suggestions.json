@@ -1,0 +1,90 @@
+[
+  {
+    "id": "mail_google_alex@taskey.work_m_0120_01",
+    "summary": "Summary and next steps on core requirements",
+    "reason": "action_required",
+    "date_type": "event",
+    "duration": 60,
+    "reasoned_body": "Sharing a summary and nex",
+    "target_date": "2025-09-15T22:30:00.000+09:00",
+    "is_asap": false,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_google_alex@taskey.work_m_0120_01",
+    "summary": "Summary and next steps on core requirements",
+    "reason": "need_review",
+    "date_type": "task",
+    "duration": null,
+    "reasoned_body": "Sharing a summary and nex",
+    "target_date": null,
+    "is_asap": false,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_microsoft_alex@wavetogether.com_m_0093_01",
+    "summary": "Align requirements and target date",
+    "reason": "need_review",
+    "date_type": "task",
+    "duration": null,
+    "reasoned_body": "We aligned on the core",
+    "target_date": null,
+    "is_asap": true,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_google_alex@taskey.work_m_0120_01",
+    "summary": "Summary and next steps on core requirements",
+    "reason": "need_review",
+    "date_type": "task",
+    "duration": null,
+    "reasoned_body": "Sharing a summary and nex",
+    "target_date": null,
+    "is_asap": false,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_google_alex@taskey.work_m_0097_03",
+    "summary": "Plan testing with small cohort",
+    "reason": "urgent",
+    "date_type": "event",
+    "duration": 120,
+    "reasoned_body": "For testing, I’ll start",
+    "target_date": "2025-09-17T22:30:00.000+09:00",
+    "is_asap": false,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_google_alex@taskey.work_m_0070_03",
+    "summary": "Follow up on core requirements and nice-to-have items",
+    "reason": "important",
+    "date_type": "task",
+    "duration": null,
+    "reasoned_body": "We aligned on the core requirements",
+    "target_date": null,
+    "is_asap": false,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_google_alex@taskey.work_m_0120_01",
+    "summary": "Summary and next steps on core requirements",
+    "reason": "need_review",
+    "date_type": "task",
+    "duration": null,
+    "reasoned_body": "Sharing a summary and nex",
+    "target_date": null,
+    "is_asap": false,
+    "is_date_only": false
+  },
+  {
+    "id": "mail_google_alex@taskey.work_m_0063_01",
+    "summary": "Follow-up on core requirements and priorities",
+    "reason": "need_review",
+    "date_type": "task",
+    "duration": null,
+    "reasoned_body": "Circling back with answers ",
+    "target_date": null,
+    "is_asap": false,
+    "is_date_only": false
+  }
+]

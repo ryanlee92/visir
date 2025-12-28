@@ -1,0 +1,71 @@
+{
+  "id": "m_0020_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-31T01:07:35.999000+00:00",
+  "sentDateTime": "2025-08-31T01:07:20.196000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1586840477.594953@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Nora White <nora.white+22@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Notes from user interview"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-31T01:07:20.196000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1586840477.594953@testdomain.com>"
+    }
+  ],
+  "subject": "Notes from user interview",
+  "bodyPreview": "Hello, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. - Scope: finalize API contract (auth, pagination, errors) - Risks: ra",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0020",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Nora White",
+      "address": "nora.white+22@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Nora White",
+      "address": "nora.white+22@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

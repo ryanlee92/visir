@@ -1,0 +1,44 @@
+[
+  {
+    "id": "INBOX",
+    "name": "INBOX",
+    "type": "system",
+    "labelListVisibility": "labelShow",
+    "messageListVisibility": "show"
+  },
+  {
+    "id": "UNREAD",
+    "name": "UNREAD",
+    "type": "system",
+    "labelListVisibility": "labelShow",
+    "messageListVisibility": "show"
+  },
+  {
+    "id": "SENT",
+    "name": "SENT",
+    "type": "system",
+    "labelListVisibility": "labelShow",
+    "messageListVisibility": "show"
+  },
+  {
+    "id": "DRAFT",
+    "name": "DRAFT",
+    "type": "system",
+    "labelListVisibility": "labelShow",
+    "messageListVisibility": "show"
+  },
+  {
+    "id": "SPAM",
+    "name": "SPAM",
+    "type": "system",
+    "labelListVisibility": "labelShow",
+    "messageListVisibility": "show"
+  },
+  {
+    "id": "TRASH",
+    "name": "TRASH",
+    "type": "system",
+    "labelListVisibility": "labelShow",
+    "messageListVisibility": "show"
+  }
+]

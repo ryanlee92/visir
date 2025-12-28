@@ -1,0 +1,181 @@
+{
+  "ok": true,
+  "channel": "C1004",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding — logs attached. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U1006",
+        "U1003",
+        "U1007",
+        "U1004",
+        "U1001"
+      ],
+      "reply_users_count": 5,
+      "latest_reply": "1756976760.000552"
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1756976760.000547",
+      "thread_ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Appreciate the context — will update the doc (re: whitelist). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1003"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1006",
+            "U1003",
+            "U1005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756976760.000548",
+      "thread_ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — taking the next step (re: whitelist). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756976760.000549",
+      "thread_ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — syncing offline (re: burst limit). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1756976760.000550",
+      "thread_ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — confirming scope (re: logs). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1002",
+            "U1003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1007",
+            "U1005",
+            "U1003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1007",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756976760.000551",
+      "thread_ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — syncing offline (re: logs). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1001",
+      "ts": "1756976760.000552",
+      "thread_ts": "1756976760.000546",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — will follow up (re: whitelist). Captured for EOD summary."
+          }
+        }
+      ]
+    }
+  ]
+}

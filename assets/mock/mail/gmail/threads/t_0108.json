@@ -1,0 +1,128 @@
+{
+  "id": "t_0108",
+  "historyId": "541479",
+  "messages": [
+    {
+      "id": "m_0108_01",
+      "threadId": "t_0108",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hey, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, l\u2026",
+      "historyId": "140182",
+      "internalDate": "1755185122706",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Liam Young <liam.young+20@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "One-pager for review"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 14 Aug 2025 15:25:22 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<2882116611.972222@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 657,
+          "data": "SGV5LAoKRm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQu"
+        }
+      },
+      "sizeEstimate": 957
+    },
+    {
+      "id": "m_0108_02",
+      "threadId": "t_0108",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shou\u2026",
+      "historyId": "305009",
+      "internalDate": "1755186577687",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Michael Miller <michael.miller+29@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "One-pager for review"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 14 Aug 2025 15:49:37 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5859030918.305680@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 261,
+          "data": "R29vZCBhZnRlcm5vb24sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4KCuKAlCBCcmFuZG9u"
+        }
+      },
+      "sizeEstimate": 561
+    },
+    {
+      "id": "m_0108_03",
+      "threadId": "t_0108",
+      "labelIds": [
+        "INBOX",
+        "UNREAD"
+      ],
+      "snippet": "Hi, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and a\u2026",
+      "historyId": "152378",
+      "internalDate": "1755187804449",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Avery Gonzalez <avery.gonzalez+55@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "One-pager for review"
+          },
+          {
+            "name": "Date",
+            "value": "Thu, 14 Aug 2025 16:10:04 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4015581427.939475@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 868,
+          "data": "SGksCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4KCgpPbiBUaHUsIDE0IEF1ZyAyMDI1IDE1OjQ5OjM3IEdNVCwgQnJhbmRvbiBNaWxlcyA8YnJhbmRvbkB0YXNrZXkud29yaz4gd3JvdGU6Cj4gR29vZCBhZnRlcm5vb24sCj4gCj4gQ2lyY2xpbmcgYmFjayB3aXRoIGFuc3dlcnMgaW5saW5lLgo-IAo-IEkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KPiAKPiBUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4KPiAKPiDigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 1168
+    }
+  ],
+  "snippet": "Hi, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and a\u2026"
+}

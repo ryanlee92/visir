@@ -1,0 +1,70 @@
+{
+  "project_info": {
+    "project_number": "939046847033",
+    "project_id": "fillin-cd65f",
+    "storage_bucket": "fillin-cd65f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939046847033:android:b15e593b02a86d394603e8",
+        "android_client_info": {
+          "package_name": "com.wavetogether.fillin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "939046847033-1ft3h2jjfflsvf4jbb19jd651mkc06jk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wavetogether.fillin",
+            "certificate_hash": "e06ecc32a45084cc7b87a153021007f25e43d8d2"
+          }
+        },
+        {
+          "client_id": "939046847033-5hgp81ppnqm12ahrncl6vkdc2ncafvje.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wavetogether.fillin",
+            "certificate_hash": "92407a49d3541e4d24fc3a85978f23eccda27c8b"
+          }
+        },
+        {
+          "client_id": "939046847033-8kgjshtpc6dc6l12m4vqse3m1emtqikc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wavetogether.fillin",
+            "certificate_hash": "be5cbad6b881026cd28ac7d4283b427060b7f262"
+          }
+        },
+        {
+          "client_id": "939046847033-v35g4ktvh52v4p21sda6b5j3nmu19uhc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQVyB9EhDtKfSRKuGicsdj86dO0cwE-uQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "939046847033-v35g4ktvh52v4p21sda6b5j3nmu19uhc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "939046847033-g7h3911n6nkaa2rd0477p05evos6ulq9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wavetogether.fillin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

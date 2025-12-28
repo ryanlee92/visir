@@ -1,0 +1,2836 @@
+{
+  "ok": true,
+  "channel": "C0004",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756976700.000545",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U0001",
+        "U0003",
+        "U0006",
+        "U0004"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1756976700.000551"
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756976700.000547",
+      "thread_ts": "1756976700.000545",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported an issue with login - investigating now"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756976700.000548",
+      "thread_ts": "1756976700.000545",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User experiencing slow page load times on dashboard"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756976700.000549",
+      "thread_ts": "1756976700.000545",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug report: 500 error on payment page"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "white_check_mark",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "rocket",
+          "users": [
+            "U0003",
+            "U0006"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        },
+        {
+          "name": "tada",
+          "users": [
+            "U0001",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756976700.000550",
+      "thread_ts": "1756976700.000545",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer needs help with API integration"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0002",
+            "U0007"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0004",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Reported issue with mobile app crashing on iOS"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U0006",
+        "U0005",
+        "U0003",
+        "U0007"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1756978860.000587"
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756978860.000582",
+      "thread_ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted \u2014 aligning on this (re: logs). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0003",
+            "U0004",
+            "U0002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756978860.000583",
+      "thread_ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User can't access their account after password reset"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756978860.000584",
+      "thread_ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug: Calendar sync not working for some users"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756978860.000585",
+      "thread_ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer feedback: feature request for dark mode"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756978860.000586",
+      "thread_ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Appreciate the context \u2014 taking the next step (re: whitelist). I'll verify edge cases."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756978860.000587",
+      "thread_ts": "1756978860.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue reported: notifications not appearing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756981320.000622",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User experiencing data sync issues"
+          }
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0006",
+        "U0002",
+        "U0005"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756981320.000625"
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756981320.000623",
+      "thread_ts": "1756981320.000622",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug report: search functionality returning wrong results"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756981320.000624",
+      "thread_ts": "1756981320.000622",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer needs assistance with account settings"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756981320.000625",
+      "thread_ts": "1756981320.000622",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Reported issue: unable to export data"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982760.000647",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User feedback: UI is confusing in some areas"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982760.000648",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug: file upload failing for large files"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756982760.000651",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported authentication timeout issue"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756982760.000652",
+      "thread_ts": "1756982760.000646",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue with email notifications not being sent"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756984980.000683",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002",
+            "U0001",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U0002",
+        "U0006",
+        "U0005"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756984980.000687"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756984980.000684",
+      "thread_ts": "1756984980.000683",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User experiencing performance issues"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756984980.000685",
+      "thread_ts": "1756984980.000683",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted \u2014 aligning on this (re: whitelist). I'll verify edge cases."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756984980.000686",
+      "thread_ts": "1756984980.000683",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug report: incorrect timezone display"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756984980.000687",
+      "thread_ts": "1756984980.000683",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer needs help with team permissions"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0002",
+            "U0005"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0006",
+            "U0002",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Reported issue: unable to create new project"
+          }
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U0004",
+        "U0007",
+        "U0006",
+        "U0005",
+        "U0003"
+      ],
+      "reply_users_count": 5,
+      "latest_reply": "1756987200.000726"
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756987200.000721",
+      "thread_ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User feedback: missing feature for bulk actions"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756987200.000722",
+      "thread_ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug: dashboard not loading for some users"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756987200.000723",
+      "thread_ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking \u2014 will update the doc (re: refresh). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0001",
+            "U0007",
+            "U0004"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0007",
+            "U0002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005",
+            "U0003",
+            "U0002"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756987200.000724",
+      "thread_ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported data loss issue"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756987200.000725",
+      "thread_ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue with integration not syncing properly"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756987200.000726",
+      "thread_ts": "1756987200.000720",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User needs help with API rate limits"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756989900.000765",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0002",
+        "U0003",
+        "U0004"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756989900.000768"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756989900.000766",
+      "thread_ts": "1756989900.000765",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug report: mobile app not updating"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756989900.000767",
+      "thread_ts": "1756989900.000765",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer experiencing login issues"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989900.000768",
+      "thread_ts": "1756989900.000765",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Reported issue: notifications delayed"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0006",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0007",
+            "U0004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756991580.000793",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User feedback: need better error messages"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756992060.000801",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug: search results not accurate"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756992600.000810",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer needs assistance with billing"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756993020.000817",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue reported: unable to invite team members"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756993380.000823",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User experiencing slow response times"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756993680.000828",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug report: calendar events duplicating"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756994040.000834",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported accessibility issue"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Error handling example\ntry {\n  processData();\n} catch (error) {\n  console.error(\"Error:\", error.message);\n  logError(error);\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0006",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756994580.000843",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue with file permissions"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756994760.000846",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> User needs help with data export"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756995000.000850",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> Bug: notifications appearing twice"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756995480.000858",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer feedback: need more customization options"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756995900.000865",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Love the pace \u2014 keep it rolling. Adding to the doc."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "heart",
+          "users": [
+            "U0002",
+            "U0005",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756996080.000868",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Reported issue: unable to delete items"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756996320.000872",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User experiencing sync problems"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756996800.000880",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Bug report: UI glitches on mobile"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756996980.000883",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Customer needs help with account recovery"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756997340.000889",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue with API authentication"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756997820.000897",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> User feedback: need better documentation"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756998300.000905",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Bug: incorrect data displayed"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756998600.000910",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Customer reported security concern"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756998840.000914",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Issue with team collaboration features"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756999260.000921",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "User needs assistance with setup"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756999500.000925",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1756999800.000930",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757000160.000936",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757000940.000949",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Noted. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757001360.000956",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0007> NPS mentions confusion around projects vs. workspaces; proposing copy updates. Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0006"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0002",
+            "U0003"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757002560.000976",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0002> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757003160.000986",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757003700.000995",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll update the timeline and owners. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757004780.001013",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Noted. Will follow up shortly."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Support ticket example\nconst ticket = {\n  id: \"#1842\",\n  issue: \"CSV import fails\",\n  status: \"in-progress\",\n  priority: \"high\"\n};"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757005680.001028",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Love the pace \u2014 keep it rolling. Will follow up shortly."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757006160.001036",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757006460.001041",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll push a branch so you can review headers and error codes. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757006700.001045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Noted. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757007180.001053",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> Ticket #1842: CSV import fails on files >50MB (heap spike). Sharing a quick mockup for clarity."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757007360.001056",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757007780.001063",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll push a branch so you can review headers and error codes. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757008860.001081",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757063280.000548",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757063820.000557",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757064420.000567",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll push a branch so you can review headers and error codes. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757064840.000574",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757065560.000586",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll validate edge cases and upload screenshots. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757066520.000602",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Sharing a quick mockup for clarity. Logging next steps."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0005",
+            "U0006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757067120.000612",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757067660.000621",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757068200.000630",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll update the timeline and owners. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757069400.000650",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Sharing a quick mockup for clarity. Marking as action."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0006",
+            "U0003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0004",
+            "U0002",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757070660.000671",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757071200.000680",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Love the pace \u2014 keep it rolling. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757071680.000688",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll push a branch so you can review headers and error codes. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757072280.000698",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. Sharing a quick mockup for clarity. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757073000.000710",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll push a branch so you can review headers and error codes. Circling back after lunch."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0002",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757073660.000721",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted. Will follow up shortly."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757074200.000730",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0007> NPS mentions confusion around projects vs. workspaces; proposing copy updates. Sharing a quick mockup for clarity. Noted on my end."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0005",
+            "U0003",
+            "U0004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757074920.000742",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll push a branch so you can review headers and error codes. Adding to the doc."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Rate limiting check\nif (requestCount > rateLimit) {\n  return { error: \"Rate limit exceeded\" };\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0001",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757076000.000760",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Noted. Circling back after lunch."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0007",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757076600.000770",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Sharing a quick mockup for clarity. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757077020.000777",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll summarize action items by EOD. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757077740.000789",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll update the timeline and owners. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757078160.000796",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll push a branch so you can review headers and error codes. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757078640.000804",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. Love the pace \u2014 keep it rolling. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757079180.000813",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0002> NPS mentions confusion around projects vs. workspaces; proposing copy updates. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0004",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757079780.000823",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> NPS mentions confusion around projects vs. workspaces; proposing copy updates. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0006",
+            "U0005",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757080380.000833",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757081940.000859",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0003> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted. Noted on my end."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "rocket",
+          "users": [
+            "U0005",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757082660.000871",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. Love the pace \u2014 keep it rolling. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757083260.000881",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Love the pace \u2014 keep it rolling. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757083740.000889",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Noted. Tracking this now."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Support ticket example\nconst ticket = {\n  id: \"#1842\",\n  issue: \"CSV import fails\",\n  status: \"in-progress\",\n  priority: \"high\"\n};"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757084340.000899",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Noted. Logging next steps."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "// Rate limiting check\nif (requestCount > rateLimit) {\n  return { error: \"Rate limit exceeded\" };\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005",
+            "U0007"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0002",
+            "U0007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757085660.000921",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Noted. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757086080.000928",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> Two customers hit rate limits during onboarding \u2014 logs attached. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0006",
+            "U0001",
+            "U0002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0005",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757087040.000944",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0002> NPS mentions confusion around projects vs. workspaces; proposing copy updates. Love the pace \u2014 keep it rolling. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757087520.000952",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0007> Ticket #1842: CSV import fails on files >50MB (heap spike). Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757088000.000960",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0007> Two customers hit rate limits during onboarding \u2014 logs attached. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757088480.000968",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll validate edge cases and upload screenshots. Adding to the doc."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757089140.000979",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Love the pace \u2014 keep it rolling. Noted on my end."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0006",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757090280.000998",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll push a branch so you can review headers and error codes. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757090760.001006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0005> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted. Circling back after lunch."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757092020.001027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling. Noted on my end."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0002",
+            "U0005",
+            "U0004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757092560.001036",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> NPS mentions confusion around projects vs. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757093760.001056",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll validate edge cases and upload screenshots. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757094780.001073",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll push a branch so you can review headers and error codes. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757150580.000563",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757151000.000570",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll validate edge cases and upload screenshots. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757151660.000581",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll validate edge cases and upload screenshots. Flagging in the board."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757152200.000590",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll update the timeline and owners. Flagging in the board."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757153340.000609",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0002> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757154000.000620",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757154720.000632",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll push a branch so you can review headers and error codes. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757155260.000641",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. Noted. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757155680.000648",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. Sharing a quick mockup for clarity. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757156220.000657",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll update the timeline and owners. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757156820.000667",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). I'll update the timeline and owners. Scheduling a check-in."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757158020.000687",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0006> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757158560.000696",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Love the pace \u2014 keep it rolling. Marking as action."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757159100.000705",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> NPS mentions confusion around projects vs. workspaces; proposing copy updates. I'll update the timeline and owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757159520.000712",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. I'll update the timeline and owners. Will follow up shortly."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757160060.000721",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Noted. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757161140.000739",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0004> Ticket #1842: CSV import fails on files >50MB (heap spike). Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757161800.000750",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Love the pace \u2014 keep it rolling. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757162760.000766",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "NPS mentions confusion around projects vs. workspaces; proposing copy updates. Sharing a quick mockup for clarity. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757163840.000784",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Noted. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757164980.000803",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0004",
+            "U0006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U0003"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757165460.000811",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll update the timeline and owners. Logging next steps."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757165940.000819",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Customer reported a 500 on /auth/refresh after idle; repro steps documented. Sharing a quick mockup for clarity. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757166660.000831",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ticket #1842: CSV import fails on files >50MB (heap spike). Sharing a quick mockup for clarity. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757167200.000840",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Two customers hit rate limits during onboarding \u2014 logs attached. Sharing a quick mockup for clarity. Adding to the doc."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0002",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757168520.000862",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Ticket #1842: CSV import fails on files >50MB (heap spike). Sharing a quick mockup for clarity. Will follow up shortly."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0006",
+            "U0005",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757168940.000869",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Customer reported a 500 on /auth/refresh after idle; repro steps documented. I'll update the timeline and owners. Tracking this now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757169420.000877",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> Ticket #1842: CSV import fails on files >50MB (heap spike). I'll update the timeline and owners. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757170080.000888",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> <@U0003> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0002"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0006",
+            "U0001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757170620.000897",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U0001> <@U0003> Customer reported a 500 on /auth/refresh after idle; repro steps documented. Love the pace \u2014 keep it rolling. Aligning offline."
+          }
+        }
+      ]
+    }
+  ]
+}

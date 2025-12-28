@@ -1,0 +1,108 @@
+{
+  "id": "t_0053",
+  "historyId": "763773",
+  "messages": [
+    {
+      "id": "m_0053_01",
+      "threadId": "t_0053",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good afternoon, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rat\u2026",
+      "historyId": "470788",
+      "internalDate": "1755627032062",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Aria Davis <aria.davis+49@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Next steps on partnership"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 18:10:32 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4641626804.990814@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 268,
+          "data": "R29vZCBhZnRlcm5vb24sCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5Lg=="
+        }
+      },
+      "sizeEstimate": 568
+    },
+    {
+      "id": "m_0053_02",
+      "threadId": "t_0053",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026",
+      "historyId": "220530",
+      "internalDate": "1755631902644",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Everly Martinez <everly.martinez+27@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Next steps on partnership"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 19 Aug 2025 19:31:42 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9421383099.677887@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1008,
+              "data": "R29vZCBhZnRlcm5vb24sCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5LgoK4oCUIEJyYW5kb24KCk9uIFR1ZSwgMTkgQXVnIDIwMjUgMTg6MTA6MzIgR01ULCBBcmlhIERhdmlzIDxhcmlhLmRhdmlzKzQ5QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIGFmdGVybm9vbiwKPiAKPiBUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCj4gCj4gRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCj4gCj4gSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXku"
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 1158,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBhZnRlcm5vb24sPC9wPgo8cD5BcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHA-SSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LjwvcD4KPHVsPjxsaT5TY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpPC9saT48bGk-Umlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlczwvbGk-PGxpPlRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzPC9saT48bGk-T3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ248L2xpPjwvdWw-CjxwPkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5LjwvcD4KPHA-4oCUIEJyYW5kb248L3A-CjxwPk9uIFR1ZSwgMTkgQXVnIDIwMjUgMTg6MTA6MzIgR01ULCBBcmlhIERhdmlzICZsdDthcmlhLmRhdmlzKzQ5QHRlc3Rkb21haW4uY29tJmd0OyB3cm90ZTo8YnI-Jmd0OyBHb29kIGFmdGVybm9vbiw8YnI-Jmd0OyA8YnI-Jmd0OyBUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuPGJyPiZndDsgPGJyPiZndDsgRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuPGJyPiZndDsgPGJyPiZndDsgSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXkuPC9wPjwvYm9keT48L2h0bWw-"
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 2666
+    }
+  ],
+  "snippet": "Good afternoon, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleane\u2026"
+}

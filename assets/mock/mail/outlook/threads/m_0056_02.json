@@ -1,0 +1,71 @@
+{
+  "id": "m_0056_02",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-02T16:25:40.548000+00:00",
+  "sentDateTime": "2025-08-02T16:25:40.548000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1428891311.219310@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Hannah Martin <hannah.martin+23@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Next steps on partnership"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-02T16:25:40.548000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1428891311.219310@wavetogether.com>"
+    }
+  ],
+  "subject": "Next steps on partnership",
+  "bodyPreview": "Hi, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. Feel free to comment directly in the doc; I\u2019m tracking notifications. \u2014 Br",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hi,</p>\n<p>Thanks for the quick turnaround on this.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-02T15:14:25.054000+00:00, Aria White &lt;aria.white+53@testdomain.com&gt; wrote:<br>&gt; Hi,<br>&gt; <br>&gt; Sharing a summary and next steps below.<br>&gt; <br>&gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Thanks again \u2014 this unblocks the rest of the sprint.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0056",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Hannah Martin",
+        "address": "hannah.martin+23@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

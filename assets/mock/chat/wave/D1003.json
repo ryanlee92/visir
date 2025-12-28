@@ -1,0 +1,497 @@
+{
+  "ok": true,
+  "channel": "D1003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757409840.000024",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Hey! How's it going?"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1001",
+        "U1004"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757409840.000028"
+    },
+    {
+      "type": "message",
+      "user": "U1001",
+      "ts": "1757409840.000025",
+      "thread_ts": "1757409840.000024",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for your help on that!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757409840.000026",
+      "thread_ts": "1757409840.000024",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we sync up on this later?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757409840.000028",
+      "thread_ts": "1757409840.000024",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That sounds good to me"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757411400.000050",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll take a look at that"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757411880.000058",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let me know if you need anything"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757412960.000076",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Got it, thanks!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757413440.000084",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll follow up on that"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757413740.000089",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds like a plan"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1004",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757414220.000097",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll check it out"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757414880.000108",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the update!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1004",
+            "U1001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757415960.000126",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll get back to you on that"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757416320.000132",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That makes sense"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757416980.000143",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll keep you posted"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757417400.000150",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for letting me know"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757418240.000164",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll review that and get back to you"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757496600.000030",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That works for me"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757497080.000038",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll look into it"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757497320.000042",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the heads up"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757497800.000050",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll circle back on this"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757498040.000054",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That's helpful, thanks!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757500080.000088",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update you once I have more info"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1004",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

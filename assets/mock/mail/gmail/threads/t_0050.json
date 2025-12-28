@@ -1,0 +1,87 @@
+{
+  "id": "t_0050",
+  "historyId": "1167453",
+  "messages": [
+    {
+      "id": "m_0050_01",
+      "threadId": "t_0050",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good afternoon, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011ha\u2026",
+      "historyId": "428536",
+      "internalDate": "1753558283381",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Harper Walker <harper.walker+09@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Notes from user interview"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 26 Jul 2025 19:31:23 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4671152525.134310@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 536,
+          "data": "R29vZCBhZnRlcm5vb24sCgpTaGFyaW5nIGEgc3VtbWFyeSBhbmQgbmV4dCBzdGVwcyBiZWxvdy4KCldlIGFsaWduZWQgb24gdGhlIGNvcmUgcmVxdWlyZW1lbnRzIGFuZCB0cmltbWVkIGEgZmV3IG5pY2XigJF0b-KAkWhhdmUgaXRlbXMgc28gd2UgY2FuIGhpdCB0aGUgdGFyZ2V0IGRhdGUuIEkgaW5jbHVkZWQgY29uY3JldGUgZXhhbXBsZXMgZm9yIHRoZSBwYXlsb2FkcyBzbyB3ZSBhdm9pZCBhbWJpZ3VpdHkgbGF0ZXIuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+        }
+      },
+      "sizeEstimate": 836
+    },
+    {
+      "id": "m_0050_02",
+      "threadId": "t_0050",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hey, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so\u2026",
+      "historyId": "94158",
+      "internalDate": "1753561608628",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Harper Hill <harper.hill+36@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Notes from user interview"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 26 Jul 2025 20:26:48 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9597687793.701309@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 1178,
+          "data": "SGV5LAoKU2hhcmluZyBhIHN1bW1hcnkgYW5kIG5leHQgc3RlcHMgYmVsb3cuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5LgoK4oCUIEJyYW5kb24KCk9uIFNhdCwgMjYgSnVsIDIwMjUgMTk6MzE6MjMgR01ULCBIYXJwZXIgV2Fsa2VyIDxoYXJwZXIud2Fsa2VyKzA5QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIGFmdGVybm9vbiwKPiAKPiBTaGFyaW5nIGEgc3VtbWFyeSBhbmQgbmV4dCBzdGVwcyBiZWxvdy4KPiAKPiBXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgo-IAo-IC0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQo-IC0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwo-IC0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKPiAtIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCj4gCj4gSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+        }
+      },
+      "sizeEstimate": 1478
+    }
+  ],
+  "snippet": "Hey, Sharing a summary and next steps below. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so\u2026"
+}

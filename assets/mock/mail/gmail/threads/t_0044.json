@@ -1,0 +1,108 @@
+{
+  "id": "t_0044",
+  "historyId": "1703210",
+  "messages": [
+    {
+      "id": "m_0044_01",
+      "threadId": "t_0044",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Good afternoon, Thanks for the quick turnaround on this. We aligned on the core requirements and trimmed a few nice\u2011to\u2011h\u2026",
+      "historyId": "457808",
+      "internalDate": "1756240931990",
+      "payload": {
+        "mimeType": "multipart/alternative",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Camila Jones <camila.jones+58@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Re: Design tokens handoff"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 26 Aug 2025 20:42:11 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9251812132.288889@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 0
+        },
+        "parts": [
+          {
+            "partId": "0",
+            "mimeType": "text/plain",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 296,
+              "data": "R29vZCBhZnRlcm5vb24sCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+            }
+          },
+          {
+            "partId": "1",
+            "mimeType": "text/html",
+            "filename": "",
+            "headers": [],
+            "body": {
+              "size": 347,
+              "data": "PGh0bWw-PGJvZHk-PHA-R29vZCBhZnRlcm5vb24sPC9wPgo8cD5UaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuPC9wPgo8cD5XZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLjwvcD4KPHA-SWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC48L3A-PC9ib2R5PjwvaHRtbD4="
+            }
+          }
+        ]
+      },
+      "sizeEstimate": 1143
+    },
+    {
+      "id": "m_0044_02",
+      "threadId": "t_0044",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, latenc\u2026",
+      "historyId": "62200",
+      "internalDate": "1756244157678",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Sofia Jackson <sofia.jackson+11@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Re: Design tokens handoff"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 26 Aug 2025 21:35:57 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5266522807.465231@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 913,
+          "data": "SGksCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSGFwcHkgdG8ganVtcCBvbiBhIHF1aWNrIGNhbGwgbGF0ZXIgdG9kYXkuCgrigJQgQnJhbmRvbgoKT24gVHVlLCAyNiBBdWcgMjAyNSAyMDo0MjoxMSBHTVQsIENhbWlsYSBKb25lcyA8Y2FtaWxhLmpvbmVzKzU4QHRlc3Rkb21haW4uY29tPiB3cm90ZToKPiBHb29kIGFmdGVybm9vbiwKPiAKPiBUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCj4gCj4gV2UgYWxpZ25lZCBvbiB0aGUgY29yZSByZXF1aXJlbWVudHMgYW5kIHRyaW1tZWQgYSBmZXcgbmljZeKAkXRv4oCRaGF2ZSBpdGVtcyBzbyB3ZSBjYW4gaGl0IHRoZSB0YXJnZXQgZGF0ZS4gSSBpbmNsdWRlZCBjb25jcmV0ZSBleGFtcGxlcyBmb3IgdGhlIHBheWxvYWRzIHNvIHdlIGF2b2lkIGFtYmlndWl0eSBsYXRlci4KPiAKPiBJZiBhbnl0aGluZyBsb29rcyBvZmYsIGxldCBtZSBrbm93IGFuZCBJ4oCZbGwgYWRqdXN0Lg=="
+        }
+      },
+      "sizeEstimate": 1213
+    }
+  ],
+  "snippet": "Hi, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, latenc\u2026"
+}

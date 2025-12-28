@@ -1,0 +1,47 @@
+{
+  "id": "t_0014",
+  "historyId": "1626133",
+  "messages": [
+    {
+      "id": "m_0014_01",
+      "threadId": "t_0014",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hello, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 s\u2026",
+      "historyId": "59575",
+      "internalDate": "1754947884748",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Dylan Thompson <dylan.thompson+08@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Feedback on the new onboarding"
+          },
+          {
+            "name": "Date",
+            "value": "Mon, 11 Aug 2025 21:31:24 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4768501018.188265@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 491,
+          "data": "SGVsbG8sCgpGb2xsb3dpbmcgdXAgd2l0aCBhIGZldyBkZXRhaWxzIGZyb20gb3VyIGNoYXQuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSWYgYW55dGhpbmcgbG9va3Mgb2ZmLCBsZXQgbWUga25vdyBhbmQgSeKAmWxsIGFkanVzdC4="
+        }
+      },
+      "sizeEstimate": 791
+    }
+  ],
+  "snippet": "Hello, Following up with a few details from our chat. I refactored a couple of helpers to make the interface cleaner \u2014 s\u2026"
+}

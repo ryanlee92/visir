@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "channel": "G0002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757496780.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll push a branch so you can review headers and error codes. Noted on my end."
+          }
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U0003"
+      ],
+      "reply_users_count": 1,
+      "latest_reply": "1757496780.000035"
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757496780.000034",
+      "thread_ts": "1757496780.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — aligning on this (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757496780.000035",
+      "thread_ts": "1757496780.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — syncing offline (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

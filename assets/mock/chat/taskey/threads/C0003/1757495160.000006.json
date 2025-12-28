@@ -1,0 +1,140 @@
+{
+  "ok": true,
+  "channel": "C0003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0006",
+      "ts": "1757495160.000006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Notification settings simplified; fewer toggles, clearer defaults. I'll validate edge cases and upload screenshots. Scheduling a check-in."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0006"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 5,
+      "reply_users": [
+        "U0005",
+        "U0004",
+        "U0003",
+        "U0007",
+        "U0002"
+      ],
+      "reply_users_count": 5,
+      "latest_reply": "1757495160.000011"
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757495160.000007",
+      "thread_ts": "1757495160.000006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — will follow up (re: copy). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1757495160.000008",
+      "thread_ts": "1757495160.000006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — logging this (re: copy). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0001",
+            "U0003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757495160.000009",
+      "thread_ts": "1757495160.000006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — logging this (re: tooltip). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495160.000010",
+      "thread_ts": "1757495160.000006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — aligning on this (re: defaults). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757495160.000011",
+      "thread_ts": "1757495160.000006",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — taking the next step (re: tooltip)."
+          }
+        }
+      ]
+    }
+  ]
+}

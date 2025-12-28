@@ -1,0 +1,95 @@
+{
+  "ok": true,
+  "channel": "C1005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756983840.000664",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's finalize the API contract and unblock frontend. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1003",
+        "U1006"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1756983840.000667"
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756983840.000665",
+      "thread_ts": "1756983840.000664",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — taking the next step (re: examples). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1756983840.000666",
+      "thread_ts": "1756983840.000664",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — confirming scope (re: unblock). I'll verify edge cases."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1756983840.000667",
+      "thread_ts": "1756983840.000664",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — capturing action items (re: API contract). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1003"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

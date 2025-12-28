@@ -1,0 +1,71 @@
+{
+  "id": "m_0002_03",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-24T09:59:38.070000+00:00",
+  "sentDateTime": "2025-08-24T09:59:23.664000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<8379762737.156607@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Michael Miller <michael.miller+29@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Feedback on the new onboarding"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-24T09:59:23.664000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<8379762737.156607@testdomain.com>"
+    }
+  ],
+  "subject": "Feedback on the new onboarding",
+  "bodyPreview": "Good afternoon, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. - Scope: finalize API contra",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Following up with a few details from our chat.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Thanks again \u2014 this unblocks the rest of the sprint.</p>\n<p><br>On 2025-08-24T09:47:41.535000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; Hey,<br>&gt; <br>&gt; Sharing a summary and next steps below.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Happy to jump on a quick call later today.<br>&gt; <br>&gt; \u2014 Alex<br>&gt; <br>&gt; On 2025-08-24T08:39:36.712000+00:00, Michael Miller &lt;michael.miller+29@testdomain.com&gt; wrote:<br>&gt; &gt; Good morning,<br>&gt; &gt; <br>&gt; &gt; Following up with a few details from our chat.<br>&gt; &gt; <br>&gt; &gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; &gt; <br>&gt; &gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; &gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; &gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; &gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; &gt; <br>&gt; &gt; Happy to jump on a quick call later today.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0002",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Michael Miller",
+      "address": "michael.miller+29@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Michael Miller",
+      "address": "michael.miller+29@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

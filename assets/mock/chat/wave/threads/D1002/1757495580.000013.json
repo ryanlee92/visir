@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "channel": "D1002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757495580.000013",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U1001",
+        "U1003"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757495580.000015"
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757495580.000015",
+      "thread_ts": "1757495580.000013",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — adding context (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

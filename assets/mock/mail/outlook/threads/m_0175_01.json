@@ -1,0 +1,71 @@
+{
+  "id": "m_0175_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-21T11:31:49.622000+00:00",
+  "sentDateTime": "2025-08-21T11:31:30.894000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<8250407702.806577@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Liam Davis <liam.davis+14@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "RE: Invoice overpayment detected"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-21T11:31:30.894000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<8250407702.806577@testdomain.com>"
+    }
+  ],
+  "subject": "RE: Invoice overpayment detected",
+  "bodyPreview": "Hey, Sharing a summary and next steps below. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. For testing, I\u2019ll start with a small cohort an",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hey,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "junkemail",
+  "conversationId": "cv_0175",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Liam Davis",
+      "address": "liam.davis+14@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Liam Davis",
+      "address": "liam.davis+14@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

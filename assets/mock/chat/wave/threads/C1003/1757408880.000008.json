@@ -1,0 +1,263 @@
+{
+  "ok": true,
+  "channel": "C1003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Release 1.8.0 is live in staging. Release notes posted. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "tada",
+          "users": [
+            "U1004",
+            "U1006"
+          ],
+          "count": 2
+        },
+        {
+          "name": "rocket",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 6,
+      "reply_users": [
+        "U1004",
+        "U1007",
+        "U1002",
+        "U1005"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1757408880.000014"
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757408880.000009",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood — taking the next step (re: smoke tests). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1007"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1002",
+            "U1005"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1007",
+            "U1005",
+            "U1003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757408880.000010",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — will follow up (re: staging). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757408880.000011",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — pairing later today (re: staging)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757408880.000012",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — aligning on this (re: staging). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "white_check_mark",
+          "users": [
+            "U1002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "rocket",
+          "users": [
+            "U1005",
+            "U1007"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004",
+            "U1001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "eyes",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "tada",
+          "users": [
+            "U1001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757408880.000013",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — aligning on this (re: staging). Nice momentum."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "white_check_mark",
+          "users": [
+            "U1003",
+            "U1005"
+          ],
+          "count": 2
+        },
+        {
+          "name": "rocket",
+          "users": [
+            "U1006",
+            "U1002",
+            "U1003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "tada",
+          "users": [
+            "U1001",
+            "U1004",
+            "U1006"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757408880.000014",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — aligning on this (re: staging). I'll reflect this in owners/timeline."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1005",
+            "U1001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1006",
+            "U1007",
+            "U1003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1005",
+            "U1003"
+          ],
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

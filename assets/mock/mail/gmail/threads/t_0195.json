@@ -1,0 +1,47 @@
+{
+  "id": "t_0195",
+  "historyId": "1203960",
+  "messages": [
+    {
+      "id": "m_0195_01",
+      "threadId": "t_0195",
+      "labelIds": [
+        "TRASH"
+      ],
+      "snippet": "Good afternoon, Sharing a summary and next steps below. For testing, I\u2019ll start with a small cohort and track error rate\u2026",
+      "historyId": "388192",
+      "internalDate": "1754082637103",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Riley Brown <riley.brown+25@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Unsubscribe confirmation"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 01 Aug 2025 21:10:37 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7892717618.141390@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 520,
+          "data": "R29vZCBhZnRlcm5vb24sCgpTaGFyaW5nIGEgc3VtbWFyeSBhbmQgbmV4dCBzdGVwcyBiZWxvdy4KCkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KClRoYW5rcyBhZ2FpbiDigJQgdGhpcyB1bmJsb2NrcyB0aGUgcmVzdCBvZiB0aGUgc3ByaW50Lg=="
+        }
+      },
+      "sizeEstimate": 820
+    }
+  ],
+  "snippet": "Good afternoon, Sharing a summary and next steps below. For testing, I\u2019ll start with a small cohort and track error rate\u2026"
+}

@@ -1,0 +1,71 @@
+{
+  "id": "m_0023_02",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-23T13:55:48.969000+00:00",
+  "sentDateTime": "2025-08-23T13:55:48.969000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<2653404103.808492@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Paisley Jones <paisley.jones+16@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Next steps on partnership"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-23T13:55:48.969000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<2653404103.808492@wavetogether.com>"
+    }
+  ],
+  "subject": "Next steps on partnership",
+  "bodyPreview": "Good afternoon, Sharing a summary and next steps below. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. - Scope: finalize API contract (aut",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>I\u2019ll post a brief update in Slack after I push the branch.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-23T13:35:34.403000+00:00, Michael Miller &lt;michael.miller+29@testdomain.com&gt; wrote:<br>&gt; Hi,<br>&gt; <br>&gt; Following up with a few details from our chat.<br>&gt; <br>&gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Thanks again \u2014 this unblocks the rest of the sprint.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0023",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Paisley Jones",
+        "address": "paisley.jones+16@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

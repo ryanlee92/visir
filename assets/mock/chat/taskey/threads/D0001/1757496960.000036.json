@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D0001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757496960.000039",
+      "thread_ts": "1757496960.000036",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — will follow up (re: context)."
+          }
+        }
+      ]
+    }
+  ]
+}

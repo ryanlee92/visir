@@ -1,0 +1,525 @@
+{
+  "ok": true,
+  "channel": "D0006",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757409840.000024",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Hey! How's it going?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757412000.000060",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for your help on that!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757412900.000075",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we sync up on this later?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757413260.000081",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That sounds good to me"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757414460.000101",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll take a look at that"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757414880.000108",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let me know if you need anything"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757415240.000114",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Got it, thanks!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757416500.000135",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll follow up on that"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757416680.000138",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds like a plan"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "heart",
+          "users": [
+            "U0001",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757417340.000149",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll check it out"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757494980.000003",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the update!"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0001",
+        "U0007"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757494980.000006"
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757494980.000006",
+      "thread_ts": "1757494980.000003",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll get back to you on that"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495880.000019",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That makes sense"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495880.000020",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll keep you posted"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757495880.000021",
+      "thread_ts": "1757495880.000018",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for letting me know"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757496780.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll review that and get back to you"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0001",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757497140.000039",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That works for me"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757497980.000053",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll look into it"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0001",
+            "U0007"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0001",
+            "U0007"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757498880.000068",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for the heads up"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757499780.000083",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll circle back on this"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U0001"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757500260.000091",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That's helpful, thanks!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757500860.000101",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update you once I have more info"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757501340.000109",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757501520.000112",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll send you the details"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757502000.000120",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for catching that"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757502300.000125",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll make sure to follow up"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757505780.000183",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That's a good point"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1757506440.000194",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll keep that in mind"
+          }
+        }
+      ]
+    }
+  ]
+}

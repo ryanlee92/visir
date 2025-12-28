@@ -1,0 +1,127 @@
+{
+  "ok": true,
+  "channel": "C1003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757410380.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "AI assistant beta flag is enabled internally. I'll update the timeline and owners."
+          }
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1007",
+        "U1003",
+        "U1004",
+        "U1006"
+      ],
+      "reply_users_count": 4,
+      "latest_reply": "1757410380.000037"
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757410380.000034",
+      "thread_ts": "1757410380.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — taking the next step (re: internal test). Nice momentum."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "white_check_mark",
+          "users": [
+            "U1002",
+            "U1005",
+            "U1003"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757410380.000035",
+      "thread_ts": "1757410380.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — adding context (re: feature flag). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757410380.000036",
+      "thread_ts": "1757410380.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — taking the next step (re: feature flag). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1006",
+            "U1001",
+            "U1002"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1007"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002",
+            "U1007",
+            "U1006"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757410380.000037",
+      "thread_ts": "1757410380.000033",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — syncing offline (re: acceptance). I'll verify edge cases."
+          }
+        }
+      ]
+    }
+  ]
+}

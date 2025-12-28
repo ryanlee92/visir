@@ -1,0 +1,808 @@
+{
+  "ok": true,
+  "channel": "C1002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That meme belongs here \ud83d\ude02"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004",
+            "U1003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1005",
+        "U1007",
+        "U1006"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1757495220.000010"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757495220.000008",
+      "thread_ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone else having trouble with the coffee machine today?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757495220.000009",
+      "thread_ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just discovered this amazing productivity app, thought I'd share"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757495220.000010",
+      "thread_ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who's up for lunch? I'm craving sushi \ud83c\udf63"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ship it \ud83d\udea2 Love the pace \u2014 keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001",
+            "U1003",
+            "U1007"
+          ],
+          "count": 3
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1002",
+        "U1006",
+        "U1005"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1757496420.000030"
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757496420.000028",
+      "thread_ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That new show on Netflix is actually pretty good"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757496420.000029",
+      "thread_ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone know a good place for team dinner?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757496420.000030",
+      "thread_ts": "1757496420.000027",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The weather is perfect today! Perfect day for a walk"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757497500.000045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> Just finished reading an interesting article about AI"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757497860.000051",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who else is excited for the weekend?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757498160.000056",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone tried that new restaurant downtown?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757498520.000062",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The office WiFi is acting up again"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757498760.000066",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Found this hilarious meme, had to share \ud83d\ude02"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757498940.000069",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone want to grab coffee later?"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1007",
+            "U1003",
+            "U1004"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004",
+            "U1001",
+            "U1002"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757499660.000081",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That presentation was great! Really enjoyed it"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1007",
+            "U1002",
+            "U1004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757499840.000084",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who's going to the company event next week?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757500260.000091",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just tried a new recipe, turned out pretty good"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757500920.000102",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone else notice how fast this week went by?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757501400.000110",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new office plants look great!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757501640.000114",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who's up for a quick break?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757501880.000118",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That meeting could have been an email \ud83d\ude34"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757502300.000125",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> Anyone else listening to that new podcast?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757502480.000128",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The sunset today was beautiful!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757502660.000131",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who else is ready for Friday?"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1007",
+            "U1006",
+            "U1004"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757503080.000138",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Ship it \ud83d\udea2 Love the pace \u2014 keep it rolling. Aligning offline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757503980.000153",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just saw the funniest thing on my way to work"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757504340.000159",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone want to join me for a walk?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757504700.000165",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Any podcast recs for the commute? Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757505240.000174",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> That new feature looks awesome!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757506080.000188",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Stretch break? Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757506440.000194",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who else is planning their weekend?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757506620.000197",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The coffee here is actually pretty good"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757507040.000204",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Anyone else feeling productive today?"
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "console.log(\"Random code snippet\");"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757507220.000207",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That was a great catch! Nice work"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757507580.000213",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who's excited for the team building event?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757507880.000218",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Just found this cool tool, thought I'd share"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757508180.000223",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1003> That meme belongs here \ud83d\ude02 Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757508360.000226",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1005> Anyone else think we need more snacks?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757508600.000230",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The office vibe is really good today"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757508780.000233",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Who else is working on something interesting?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757509020.000237",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "That joke was hilarious! \ud83d\ude02"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757509260.000241",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Dark mode fans unite. Love the pace \u2014 keep it rolling."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757509740.000249",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1002> Anyone want to discuss that new project?"
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1005"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757510040.000254",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "The new office setup looks great!"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757510280.000258",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> Who else is looking forward to lunch?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757510760.000266",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> Just had the best idea for a feature"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757511180.000273",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> Anyone else think we should have more team events?"
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757511720.000282",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> Dark mode fans unite. Love the pace \u2014 keep it rolling. Noted on my end."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1757512140.000289",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> The weather is making me want to work outside"
+          }
+        }
+      ]
+    }
+  ]
+}

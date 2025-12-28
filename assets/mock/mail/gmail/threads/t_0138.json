@@ -1,0 +1,47 @@
+{
+  "id": "t_0138",
+  "historyId": "833455",
+  "messages": [
+    {
+      "id": "m_0138_01",
+      "threadId": "t_0138",
+      "labelIds": [
+        "DRAFT"
+      ],
+      "snippet": "Good morning, Following up with a few details from our chat. I refactored a couple of helpers to make the interface clea\u2026",
+      "historyId": "390213",
+      "internalDate": "1755468454307",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Liam Young <liam.young+20@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Draft: Team update"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 17 Aug 2025 22:07:34 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4666556400.894845@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 271,
+          "data": "R29vZCBtb3JuaW5nLAoKRm9sbG93aW5nIHVwIHdpdGggYSBmZXcgZGV0YWlscyBmcm9tIG91ciBjaGF0LgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKVGhhbmtzIGFnYWluIOKAlCB0aGlzIHVuYmxvY2tzIHRoZSByZXN0IG9mIHRoZSBzcHJpbnQuCgrigJQgQnJhbmRvbg=="
+        }
+      },
+      "sizeEstimate": 571
+    }
+  ],
+  "snippet": "Good morning, Following up with a few details from our chat. I refactored a couple of helpers to make the interface clea\u2026"
+}

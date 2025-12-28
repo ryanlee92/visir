@@ -1,0 +1,71 @@
+{
+  "id": "m_0108_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-05T09:47:52.598000+00:00",
+  "sentDateTime": "2025-08-05T09:47:35.056000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<9535541298.470665@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Nora Scott <nora.scott+31@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Heads up on release timing"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-05T09:47:35.056000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<9535541298.470665@testdomain.com>"
+    }
+  ],
+  "subject": "Heads up on release timing",
+  "bodyPreview": "Hello, Sharing a summary and next steps below. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. - Scope: finalize API contract (auth, pagination, errors) - Risks: rate ",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0108",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": false,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Nora Scott",
+      "address": "nora.scott+31@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Nora Scott",
+      "address": "nora.scott+31@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

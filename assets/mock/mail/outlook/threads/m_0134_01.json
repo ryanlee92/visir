@@ -1,0 +1,71 @@
+{
+  "id": "m_0134_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-12T23:26:25.739000+00:00",
+  "sentDateTime": "2025-08-12T23:26:25.739000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<5800299141.160992@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Mason Green <mason.green+57@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Draft: Investor intro"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-12T23:26:25.739000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<5800299141.160992@wavetogether.com>"
+    }
+  ],
+  "subject": "Draft: Investor intro",
+  "bodyPreview": "Good afternoon, Sharing a summary and next steps below. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. I refactored a couple of helpers to make the interface cleaner ",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Sharing a summary and next steps below.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<p>I\u2019ll post a brief update in Slack after I push the branch.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "drafts",
+  "conversationId": "cv_0134",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": true,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Mason Green",
+        "address": "mason.green+57@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

@@ -1,0 +1,47 @@
+{
+  "id": "t_0183",
+  "historyId": "1854533",
+  "messages": [
+    {
+      "id": "m_0183_01",
+      "threadId": "t_0183",
+      "labelIds": [
+        "SPAM"
+      ],
+      "snippet": "Good afternoon, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shou\u2026",
+      "historyId": "247436",
+      "internalDate": "1753768590692",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Logan Sanchez <logan.sanchez+17@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Best deal today only"
+          },
+          {
+            "name": "Date",
+            "value": "Tue, 29 Jul 2025 05:56:30 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<5882462147.242529@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 644,
+          "data": "R29vZCBhZnRlcm5vb24sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpJIHJlZmFjdG9yZWQgYSBjb3VwbGUgb2YgaGVscGVycyB0byBtYWtlIHRoZSBpbnRlcmZhY2UgY2xlYW5lciDigJQgc2hvdWxkbuKAmXQgYWZmZWN0IHlvdXIgc2lkZSwgYnV0IGNhbGwgaXQgb3V0IGlmIGFueXRoaW5nIHN1cnByaXNlcyB5b3UuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpIYXBweSB0byBqdW1wIG9uIGEgcXVpY2sgY2FsbCBsYXRlciB0b2RheS4="
+        }
+      },
+      "sizeEstimate": 944
+    }
+  ],
+  "snippet": "Good afternoon, Circling back with answers inline. I refactored a couple of helpers to make the interface cleaner \u2014 shou\u2026"
+}

@@ -1,0 +1,1202 @@
+[
+  {
+    "id": "t_0007",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0006",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0157",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Thanks for the quick turnaround"
+  },
+  {
+    "id": "t_0184",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "You are selected \u2014 claim now"
+  },
+  {
+    "id": "t_0115",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Reminder: action required"
+  },
+  {
+    "id": "t_0047",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Invoice for September"
+  },
+  {
+    "id": "t_0029",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Next steps on partnership"
+  },
+  {
+    "id": "t_0123",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Agenda for Monday"
+  },
+  {
+    "id": "t_0004",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Docs share: API v2 draft"
+  },
+  {
+    "id": "t_0161",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0117",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "One-pager for review"
+  },
+  {
+    "id": "t_0121",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Follow-up on pricing"
+  },
+  {
+    "id": "t_0138",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Team update"
+  },
+  {
+    "id": "t_0028",
+    "messageCount": 4,
+    "category": "other",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0177",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Earn money fast from home"
+  },
+  {
+    "id": "t_0186",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Unsubscribe confirmation"
+  },
+  {
+    "id": "t_0058",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Your calendar for next week"
+  },
+  {
+    "id": "t_0085",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Request for quote"
+  },
+  {
+    "id": "t_0176",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Congratulations! You won a prize"
+  },
+  {
+    "id": "t_0195",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Unsubscribe confirmation"
+  },
+  {
+    "id": "t_0111",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Intro: Avery from Soylent"
+  },
+  {
+    "id": "t_0032",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0041",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0087",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Intro: Mia from Umbrella"
+  },
+  {
+    "id": "t_0017",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0037",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0065",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Docs share: API v2 draft"
+  },
+  {
+    "id": "t_0036",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0063",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0071",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0112",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Request for quote"
+  },
+  {
+    "id": "t_0051",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0105",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Request for quote"
+  },
+  {
+    "id": "t_0078",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0012",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Docs share: API v2 draft"
+  },
+  {
+    "id": "t_0139",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Team update"
+  },
+  {
+    "id": "t_0128",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Follow-up on pricing"
+  },
+  {
+    "id": "t_0182",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "You are selected \u2014 claim now"
+  },
+  {
+    "id": "t_0101",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Intro: Harper from Vehement"
+  },
+  {
+    "id": "t_0109",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Reminder: action required"
+  },
+  {
+    "id": "t_0011",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0155",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0016",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0149",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Re: Great to meet you"
+  },
+  {
+    "id": "t_0113",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "One-pager for review"
+  },
+  {
+    "id": "t_0097",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Could we move the meeting?"
+  },
+  {
+    "id": "t_0026",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0150",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Re: Great to meet you"
+  },
+  {
+    "id": "t_0062",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0175",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "RE: Invoice overpayment detected"
+  },
+  {
+    "id": "t_0053",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Next steps on partnership"
+  },
+  {
+    "id": "t_0039",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0124",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Feedback on contract redlines"
+  },
+  {
+    "id": "t_0197",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Your order has shipped"
+  },
+  {
+    "id": "t_0191",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Re: Availability this week"
+  },
+  {
+    "id": "t_0035",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Invoice for September"
+  },
+  {
+    "id": "t_0031",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0153",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Sharing the deck"
+  },
+  {
+    "id": "t_0021",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0024",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0122",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Follow-up on pricing"
+  },
+  {
+    "id": "t_0074",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Your calendar for next week"
+  },
+  {
+    "id": "t_0164",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0060",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0052",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Docs share: API v2 draft"
+  },
+  {
+    "id": "t_0079",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0061",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0131",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Agenda for Monday"
+  },
+  {
+    "id": "t_0141",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Re: Great to meet you"
+  },
+  {
+    "id": "t_0025",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0022",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0104",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Reminder: action required"
+  },
+  {
+    "id": "t_0154",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Intro: connecting you two"
+  },
+  {
+    "id": "t_0132",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Agenda for Monday"
+  },
+  {
+    "id": "t_0098",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Heads up on release timing"
+  },
+  {
+    "id": "t_0170",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Re: Great to meet you"
+  },
+  {
+    "id": "t_0096",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Heads up on release timing"
+  },
+  {
+    "id": "t_0091",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Reminder: action required"
+  },
+  {
+    "id": "t_0148",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0159",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Re: Great to meet you"
+  },
+  {
+    "id": "t_0059",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0179",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Earn money fast from home"
+  },
+  {
+    "id": "t_0137",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Feedback on contract redlines"
+  },
+  {
+    "id": "t_0009",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0020",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0042",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0014",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0086",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Intro: Mateo from Soylent"
+  },
+  {
+    "id": "t_0116",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "One-pager for review"
+  },
+  {
+    "id": "t_0005",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0054",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0019",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0199",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Action needed: verify account"
+  },
+  {
+    "id": "t_0057",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0200",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "We couldn't deliver your package"
+  },
+  {
+    "id": "t_0015",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Your calendar for next week"
+  },
+  {
+    "id": "t_0099",
+    "messageCount": 4,
+    "category": "other",
+    "subject": "Intro: Avery from Contoso"
+  },
+  {
+    "id": "t_0136",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Team update"
+  },
+  {
+    "id": "t_0043",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0083",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "One-pager for review"
+  },
+  {
+    "id": "t_0185",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "RE: Invoice overpayment detected"
+  },
+  {
+    "id": "t_0102",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Fwd: Support issue escalated"
+  },
+  {
+    "id": "t_0075",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Follow-up on access request"
+  },
+  {
+    "id": "t_0152",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Intro: connecting you two"
+  },
+  {
+    "id": "t_0180",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Congratulations! You won a prize"
+  },
+  {
+    "id": "t_0130",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Team update"
+  },
+  {
+    "id": "t_0166",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Thanks for the quick turnaround"
+  },
+  {
+    "id": "t_0082",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Intro: Julian from Soylent"
+  },
+  {
+    "id": "t_0073",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Docs share: API v2 draft"
+  },
+  {
+    "id": "t_0165",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Sharing the deck"
+  },
+  {
+    "id": "t_0094",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Reminder: action required"
+  },
+  {
+    "id": "t_0183",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Best deal today only"
+  },
+  {
+    "id": "t_0034",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Invoice for September"
+  },
+  {
+    "id": "t_0120",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Test results summary"
+  },
+  {
+    "id": "t_0089",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Request for quote"
+  },
+  {
+    "id": "t_0168",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Thanks for the quick turnaround"
+  },
+  {
+    "id": "t_0162",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Sharing the deck"
+  },
+  {
+    "id": "t_0076",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0158",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0056",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Invoice for September"
+  },
+  {
+    "id": "t_0045",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0090",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Could we move the meeting?"
+  },
+  {
+    "id": "t_0077",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0172",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Earn money fast from home"
+  },
+  {
+    "id": "t_0160",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Intro: connecting you two"
+  },
+  {
+    "id": "t_0013",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0190",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Action needed: verify account"
+  },
+  {
+    "id": "t_0110",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "Intro: Aria from Umbrella"
+  },
+  {
+    "id": "t_0100",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Updated SOW attached"
+  },
+  {
+    "id": "t_0092",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Fwd: Support issue escalated"
+  },
+  {
+    "id": "t_0108",
+    "messageCount": 3,
+    "category": "inbox_unread",
+    "subject": "One-pager for review"
+  },
+  {
+    "id": "t_0167",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Sharing the deck"
+  },
+  {
+    "id": "t_0146",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Sharing the deck"
+  },
+  {
+    "id": "t_0144",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0067",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0143",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0084",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Test results summary"
+  },
+  {
+    "id": "t_0163",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0169",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Intro: connecting you two"
+  },
+  {
+    "id": "t_0106",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Bug report: CSV import fails"
+  },
+  {
+    "id": "t_0127",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Investor intro"
+  },
+  {
+    "id": "t_0055",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0114",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Heads up on release timing"
+  },
+  {
+    "id": "t_0133",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Feedback on contract redlines"
+  },
+  {
+    "id": "t_0038",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0018",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0040",
+    "messageCount": 4,
+    "category": "other",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0156",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Thanks for the quick turnaround"
+  },
+  {
+    "id": "t_0173",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Earn money fast from home"
+  },
+  {
+    "id": "t_0023",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0081",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Intro: Olivia from Hooli"
+  },
+  {
+    "id": "t_0118",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Intro: Riley from Vehement"
+  },
+  {
+    "id": "t_0027",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0145",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Confirming our plan"
+  },
+  {
+    "id": "t_0181",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "You are selected \u2014 claim now"
+  },
+  {
+    "id": "t_0194",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Action needed: verify account"
+  },
+  {
+    "id": "t_0001",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0046",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Feedback on the new onboarding"
+  },
+  {
+    "id": "t_0188",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Action needed: verify account"
+  },
+  {
+    "id": "t_0171",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Best deal today only"
+  },
+  {
+    "id": "t_0142",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Sharing the deck"
+  },
+  {
+    "id": "t_0107",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Fwd: Support issue escalated"
+  },
+  {
+    "id": "t_0068",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Your calendar for next week"
+  },
+  {
+    "id": "t_0192",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Unsubscribe confirmation"
+  },
+  {
+    "id": "t_0010",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0070",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0072",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Re: Product roadmap sync"
+  },
+  {
+    "id": "t_0095",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Request for quote"
+  },
+  {
+    "id": "t_0196",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Action needed: verify account"
+  },
+  {
+    "id": "t_0088",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Request for quote"
+  },
+  {
+    "id": "t_0050",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0198",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "We couldn't deliver your package"
+  },
+  {
+    "id": "t_0044",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0008",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Docs share: API v2 draft"
+  },
+  {
+    "id": "t_0140",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Team update"
+  },
+  {
+    "id": "t_0126",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Follow-up on pricing"
+  },
+  {
+    "id": "t_0134",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Feedback on contract redlines"
+  },
+  {
+    "id": "t_0093",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Heads up on release timing"
+  },
+  {
+    "id": "t_0147",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Re: Great to meet you"
+  },
+  {
+    "id": "t_0103",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Intro: Avery from Stark"
+  },
+  {
+    "id": "t_0002",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0048",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0080",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Next steps on partnership"
+  },
+  {
+    "id": "t_0178",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Earn money fast from home"
+  },
+  {
+    "id": "t_0187",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Unsubscribe confirmation"
+  },
+  {
+    "id": "t_0174",
+    "messageCount": 1,
+    "category": "spam",
+    "subject": "Earn money fast from home"
+  },
+  {
+    "id": "t_0189",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "We couldn't deliver your package"
+  },
+  {
+    "id": "t_0066",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0129",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Feedback on contract redlines"
+  },
+  {
+    "id": "t_0125",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Agenda for Monday"
+  },
+  {
+    "id": "t_0033",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Quick question about billing"
+  },
+  {
+    "id": "t_0049",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Re: Design tokens handoff"
+  },
+  {
+    "id": "t_0151",
+    "messageCount": 1,
+    "category": "sent_only",
+    "subject": "Intro: connecting you two"
+  },
+  {
+    "id": "t_0193",
+    "messageCount": 1,
+    "category": "trash",
+    "subject": "Your order has shipped"
+  },
+  {
+    "id": "t_0119",
+    "messageCount": 1,
+    "category": "inbox_unread",
+    "subject": "Could we move the meeting?"
+  },
+  {
+    "id": "t_0003",
+    "messageCount": 2,
+    "category": "other",
+    "subject": "Notes from user interview"
+  },
+  {
+    "id": "t_0135",
+    "messageCount": 1,
+    "category": "draft",
+    "subject": "Draft: Investor intro"
+  },
+  {
+    "id": "t_0064",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Next steps on partnership"
+  },
+  {
+    "id": "t_0069",
+    "messageCount": 3,
+    "category": "inbox_read",
+    "subject": "Next steps on partnership"
+  },
+  {
+    "id": "t_0030",
+    "messageCount": 1,
+    "category": "inbox_read",
+    "subject": "Notes from user interview"
+  }
+]

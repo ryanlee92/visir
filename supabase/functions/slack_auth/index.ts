@@ -1,0 +1,46 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+serve(async (req) => {
+  const code = req.url.split("code=")[1].split("&state")[0];
+
+  const response = await fetch("https://slack.com/api/oauth.v2.access", {
+    method: "POST",
+    body: new URLSearchParams({
+      client_id: Deno.env.get("SLACK_CLIENT_ID")!,
+      client_secret: Deno.env.get("SLACK_CLIENT_SECRET")!,
+      code: code,
+      redirect_uri: "https://azukhxinzrivjforwnsc.supabase.co/functions/v1/slack_auth",
+    }),
+  });
+
+  if (response.ok) {
+    try {
+      const data = await response.json();
+      const token = data["authed_user"]["access_token"];
+
+      const userProfileResponse = await fetch(
+        "https://slack.com/api/users.profile.get",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const userProfileData = await userProfileResponse.json();
+      const email = userProfileData["profile"]["email"];
+
+      return Response.redirect(
+        "com.wavetogether.fillin.slack://ok?=true&token?=" +
+        token +
+        "&email?=" +
+        email
+      );
+    } catch (error) {
+      console.log(error);
+      return Response.redirect("com.wavetogether.fillin.slack://ok?=false");
+    }
+  } else {
+    return Response.redirect("com.wavetogether.fillin.slack://ok?=false");
+  }
+});

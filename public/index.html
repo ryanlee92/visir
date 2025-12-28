@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WAVE Corp.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="WAVE Corporation — We build mind-blowing products that elevate everyday work.">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F7FB">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141416">
+  <link rel="icon" type="image/png" href="https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo/wave.png">
+  <link rel="apple-touch-icon" href="https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo/wave.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="WAVE Corp.">
+  <meta property="og:description" content="We are a team dedicated to developing mind-blowing products.">
+  <meta property="og:image" content="https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo/wave.png">
+  <meta property="og:image:alt" content="WAVE Corp logo">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light scheme (from lib/config/theme.dart) */
+      --primary: #4DC1F7; /* colorScheme.primary */
+      --accent: #fbbc05; /* brand accent */
+      --bg: #F5F7FB; /* slightly tinted for stronger contrast */
+      --text: #1a1a1a; /* unified grayscale text */
+      --card-bg: #FFFFFF; /* crisper card contrast */
+      --border: #EBEBED; /* colorScheme.outline */
+      --radial-a: #ffe8b3; /* warmer & more visible */
+      --radial-b: #ffd685; /* warmer & more visible */
+      --muted-text: #555;
+      --footer-text: #666;
+      --list-bg: #f5f5f7; /* neutral */
+      --list-bg-hover: #efeff1; /* neutral */
+      --link-hover: #2b2b2b; /* neutral */
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, var(--radial-a) 0%, rgba(238, 243, 255, 0) 60%), radial-gradient(1200px 600px at 110% 10%, var(--radial-b) 0%, rgba(230, 240, 255, 0) 60%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 0;
+    }
+    .container {
+      background: var(--card-bg);
+      margin: 56px 0 0 0;
+      padding: 40px 32px 32px 32px;
+      border-radius: 18px;
+      box-shadow: 0 4px 32px 0 rgba(17, 24, 39, 0.08), 0 1.5px 6px 0 rgba(17, 24, 39, 0.06);
+      max-width: 820px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .theme-switch {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 14px auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 10px 0;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--muted-text);
+      text-align: center;
+      margin-bottom: 28px;
+      margin-top: 0;
+    }
+    hr {
+      border: none;
+      border-top: 1.5px solid var(--border);
+      margin: 28px 0;
+    }
+    section {
+      margin-bottom: 18px;
+    }
+    h2 {
+      font-size: 1.3rem;
+      color: var(--text);
+      font-weight: 700;
+      margin-bottom: 10px;
+      margin-top: 0;
+      letter-spacing: 0.5px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      background: var(--list-bg);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* Product-specific layout */
+    .product-item { align-items: flex-start; gap: 12px; }
+    .product-icon { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; flex: 0 0 28px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+    .product-content { display: flex; flex-direction: column; gap: 6px; }
+    .product-name { color: var(--text); text-decoration: none; }
+    .product-name:hover { color: var(--link-hover); text-decoration: underline; }
+    .product-desc { margin: 0; color: var(--muted-text); font-size: 0.98rem; line-height: 1.4; }
+    li:hover {
+      background: var(--list-bg-hover);
+      box-shadow: 0 6px 16px rgba(17, 24, 39, 0.12);
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+    li strong {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.08em;
+    }
+    a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      word-break: break-all;
+    }
+    a:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+    .footer {
+      margin-top: 32px;
+      font-size: 0.98rem;
+      color: var(--footer-text);
+      text-align: center;
+    }
+    .footer strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .info-list {
+      margin: 18px 0 0 0;
+      padding: 0;
+      list-style: none;
+      font-size: 0.98rem;
+      color: var(--text);
+    }
+    .info-list li {
+      margin-bottom: 7px;
+      background: none;
+      padding: 0;
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 24px 8px 18px 8px;
+        margin: 16px 0 0 0;
+        max-width: 98vw;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #fbbc05; /* brand accent kept for non-text */
+        --accent: #fbbc05; /* brand accent kept for non-text */
+        --bg: #141416; /* darker background for stronger contrast */
+        --text: #FAFAFA; /* brighter grayscale text */
+        --card-bg: #232325; /* colorScheme.surface */
+        --border: #2C2C2E; /* colorScheme.outline */
+        --radial-a: rgba(251, 188, 5, 0.22);
+        --radial-b: rgba(251, 188, 5, 0.14);
+        --muted-text: #EFEFF2; /* brighter for readability */
+        --footer-text: #BDBDC2; /* slightly brighter */
+        --list-bg: #2A2A2B; /* neutral */
+        --list-bg-hover: #353536; /* neutral */
+        --link-hover: #f0f0f0;
+      }
+      html, body {
+        color: var(--text);
+      }
+      .logo {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+    }
+    /* Manual dark override via data-theme */
+    [data-theme="dark"] {
+      --primary: #fbbc05;
+      --accent: #fbbc05;
+      --bg: #141416;
+      --text: #FAFAFA;
+      --card-bg: #232325;
+      --border: #2C2C2E;
+      --radial-a: rgba(251, 188, 5, 0.22);
+      --radial-b: rgba(251, 188, 5, 0.14);
+      --muted-text: #EFEFF2;
+      --footer-text: #BDBDC2;
+      --list-bg: #2A2A2B;
+      --list-bg-hover: #353536;
+      --link-hover: #f0f0f0;
+    }
+    /* Manual light override via data-theme */
+    [data-theme="light"] {
+      --primary: #4DC1F7;
+      --accent: #fbbc05;
+      --bg: #F5F7FB;
+      --text: #1a1a1a;
+      --card-bg: #FFFFFF;
+      --border: #EBEBED;
+      --radial-a: #ffe8b3;
+      --radial-b: #ffd685;
+      --muted-text: #555;
+      --footer-text: #666;
+      --list-bg: #f5f5f7;
+      --list-bg-hover: #efeff1;
+      --link-hover: #2b2b2b;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-switch" aria-label="Toggle theme" title="Toggle theme">Dark</button>
+  <div class="container">
+    <img class="logo" src="https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo/wave.png" alt="WAVE Corp logo">
+    <h1>WAVE Corp.</h1>
+    <p class="subtitle">We are a team dedicated to developing mind-blowing products.</p>
+    <hr>
+    <section>
+      <h2>Our Products</h2>
+      <ul>
+        <li class="product-item">
+          <img class="product-icon" src="https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo/taskey.png" alt="Taskey logo">
+          <div class="product-content">
+            <a class="product-name" href="https://taskey.work" target="_blank" rel="noopener"><strong>Taskey</strong></a>
+            <p class="product-desc">Integration-based task management tool. We treat email and work chat as a unified inbox that turns messages into actionable tasks. Handle everything from inbox to reply in a single screen, reducing the number of daily productivity tools you need.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+    <hr>
+    <div class="footer">
+      <div>
+        &copy; <strong>WAVE Corporation</strong> 2024. All Rights Reserved.
+      </div>
+      <ul class="info-list">
+        <li>
+          <strong>Business Registration Number:</strong> 197-87-00381
+        </li>
+        <li>
+          <strong>CEO:</strong> Sungho Lee &nbsp;|&nbsp; <strong>Email:</strong>
+          <a href="mailto:support@wavetogether.com">support@wavetogether.com</a>
+        </li>
+        <li>
+          <strong>Address:</strong> [06733] #1424, 11, Seoun-ro, Seocho-dong, Seocho-gu, Seoul, South Korea
+        </li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    (function() {
+      const storageKey = 'theme-preference';
+      const btn = document.querySelector('.theme-switch');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function systemTheme() {
+        return prefersDark.matches ? 'dark' : 'light';
+      }
+
+      function getStored() {
+        return localStorage.getItem(storageKey);
+      }
+
+      function applyTheme(mode) {
+        const root = document.documentElement;
+        if (mode === 'light' || mode === 'dark') {
+          root.setAttribute('data-theme', mode);
+        } else {
+          root.removeAttribute('data-theme');
+          mode = systemTheme();
+        }
+        btn.textContent = mode === 'dark' ? 'Light' : 'Dark';
+      }
+
+      function init() {
+        const stored = getStored();
+        applyTheme(stored || 'system');
+      }
+
+      btn.addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme') || systemTheme();
+        const next = current === 'dark' ? 'light' : 'dark';
+        localStorage.setItem(storageKey, next);
+        applyTheme(next);
+      });
+
+      prefersDark.addEventListener('change', function() {
+        if (!getStored()) {
+          applyTheme('system');
+        }
+      });
+
+      init();
+    })();
+  </script>
+</body>
+</html>

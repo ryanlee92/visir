@@ -1,0 +1,2654 @@
+[
+  {
+    "date": "2025-07-02T00:00:00",
+    "list": [
+      {
+        "count": 19,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7027.39726
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 2876.949153
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 3974.224138
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5400.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 3838.723404
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2550.893617
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 2890.8
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2327.657143
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4457.87234
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 3962.553191
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4104.878049
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2234.878049
+      }
+    ]
+  },
+  {
+    "date": "2025-07-09T00:00:00",
+    "list": [
+      {
+        "count": 20,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7473.417722
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3224.246154
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4486.671875
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 6147.09375
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4185.0
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2781.0
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3198.461538
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2575.384615
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4860.0
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4320.0
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4140.0
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2254.0
+      }
+    ]
+  },
+  {
+    "date": "2025-07-16T00:00:00",
+    "list": [
+      {
+        "count": 20,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7484.210526
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3062.709677
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4193.015873
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5788.952381
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4188.039216
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2783.019608
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3201.578947
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2577.894737
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4863.529412
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4323.137255
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4464.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2430.4
+      }
+    ]
+  },
+  {
+    "date": "2025-07-23T00:00:00",
+    "list": [
+      {
+        "count": 18,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 6670.588235
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 2855.172414
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 3941.37931
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5400.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 3841.304348
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2552.608696
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 2890.8
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2327.657143
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4460.869565
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 3965.217391
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 3735.0
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2033.5
+      }
+    ]
+  },
+  {
+    "date": "2025-07-30T00:00:00",
+    "list": [
+      {
+        "count": 19,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7117.297297
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3064.655738
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4230.557377
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5796.196721
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4194.489796
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2787.306122
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3163.243243
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2547.027027
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4871.020408
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4329.795918
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4098.139535
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2231.209302
+      }
+    ]
+  },
+  {
+    "date": "2025-08-06T00:00:00",
+    "list": [
+      {
+        "count": 20,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7433.766234
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3224.246154
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4484.076923
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 6143.538462
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4146.25
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2755.25
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3158.974359
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2543.589744
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4815.0
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4280.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4464.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2430.4
+      }
+    ]
+  },
+  {
+    "date": "2025-08-13T00:00:00",
+    "list": [
+      {
+        "count": 20,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7433.766234
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3250.1875
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4486.671875
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 6147.09375
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4188.039216
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2783.019608
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3201.578947
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2577.894737
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4863.529412
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4323.137255
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4464.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2430.4
+      }
+    ]
+  },
+  {
+    "date": "2025-08-20T00:00:00",
+    "list": [
+      {
+        "count": 19,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7027.39726
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3064.655738
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4230.557377
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5796.196721
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4191.2
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2785.12
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 2887.5
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2325.0
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4867.2
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4326.4
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4098.139535
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2231.209302
+      }
+    ]
+  },
+  {
+    "date": "2025-08-27T00:00:00",
+    "list": [
+      {
+        "count": 18,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 6662.535211
+      },
+      {
+        "count": 15,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 2876.949153
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4199.466667
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5753.6
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 3878.297872
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2577.191489
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 2887.5
+      },
+      {
+        "count": 9,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2325.0
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4503.829787
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4003.404255
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4054.285714
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2207.333333
+      }
+    ]
+  },
+  {
+    "date": "2025-09-03T00:00:00",
+    "list": [
+      {
+        "count": 19,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7121.09589
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3040.52459
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4233.333333
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5800.0
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4194.489796
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2787.306122
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3163.243243
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2547.027027
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4871.020408
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4329.795918
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4098.139535
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2231.209302
+      }
+    ]
+  },
+  {
+    "date": "2025-09-10T00:00:00",
+    "list": [
+      {
+        "count": 21,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7793.333333
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3222.787879
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4448.848485
+      },
+      {
+        "count": 17,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 6095.272727
+      },
+      {
+        "count": 14,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4462.830189
+      },
+      {
+        "count": 14,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2965.622642
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3157.0
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2542.0
+      },
+      {
+        "count": 14,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 5182.641509
+      },
+      {
+        "count": 14,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4606.792453
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4507.826087
+      },
+      {
+        "count": 12,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2454.26087
+      }
+    ]
+  },
+  {
+    "date": "2025-09-17T00:00:00",
+    "list": [
+      {
+        "count": 19,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_0",
+          "created_at": "2024-09-01T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_0",
+          "created_at": "2024-09-01T09:00:00Z"
+        },
+        "total_low_focus_duration": 7113.6
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_1",
+          "created_at": "2024-09-02T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_1",
+          "created_at": "2024-09-02T09:00:00Z"
+        },
+        "total_low_focus_duration": 3060.825397
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_prev_2",
+          "created_at": "2024-09-03T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_2",
+          "created_at": "2024-09-03T09:00:00Z"
+        },
+        "total_low_focus_duration": 4227.870968
+      },
+      {
+        "count": 16,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_3",
+          "created_at": "2024-09-04T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "taskey",
+          "id": "message_slack_taskey_next_3",
+          "created_at": "2024-09-04T09:00:00Z"
+        },
+        "total_low_focus_duration": 5792.516129
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_4",
+          "created_at": "2024-09-05T08:55:00Z"
+        },
+        "next_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_next_4",
+          "created_at": "2024-09-05T09:00:00Z"
+        },
+        "total_low_focus_duration": 4150.9
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "task",
+          "o_auth_type": null,
+          "identifier": "task",
+          "id": "task__task_prev_5",
+          "created_at": "2024-09-06T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_5",
+          "created_at": "2024-09-06T09:00:00Z"
+        },
+        "total_low_focus_duration": 2758.34
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_prev_6",
+          "created_at": "2024-09-07T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_next_6",
+          "created_at": "2024-09-07T09:00:00Z"
+        },
+        "total_low_focus_duration": 3161.052632
+      },
+      {
+        "count": 10,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "mail_microsoft_alex@wavetogether.com_prev_7",
+          "created_at": "2024-09-08T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "microsoft",
+          "identifier": "alex@wavetogether.com",
+          "id": "calendar_microsoft_alex@wavetogether.com_next_7",
+          "created_at": "2024-09-08T09:00:00Z"
+        },
+        "total_low_focus_duration": 2545.263158
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_prev_8",
+          "created_at": "2024-09-09T08:55:00Z"
+        },
+        "next_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_next_8",
+          "created_at": "2024-09-09T09:00:00Z"
+        },
+        "total_low_focus_duration": 4820.4
+      },
+      {
+        "count": 13,
+        "prev_action": {
+          "type": "mail",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "mail_google_alex@taskey.work_prev_9",
+          "created_at": "2024-09-10T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "engineering",
+          "id": "message_slack_engineering_next_9",
+          "created_at": "2024-09-10T09:00:00Z"
+        },
+        "total_low_focus_duration": 4284.8
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_prev_10",
+          "created_at": "2024-09-11T08:55:00Z"
+        },
+        "next_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_next_10",
+          "created_at": "2024-09-11T09:00:00Z"
+        },
+        "total_low_focus_duration": 4095.0
+      },
+      {
+        "count": 11,
+        "prev_action": {
+          "type": "calendar",
+          "o_auth_type": "google",
+          "identifier": "alex@taskey.work",
+          "id": "calendar_google_alex@taskey.work_prev_11",
+          "created_at": "2024-09-12T08:55:00Z"
+        },
+        "next_action": {
+          "type": "message",
+          "o_auth_type": "slack",
+          "identifier": "sales",
+          "id": "message_slack_sales_next_11",
+          "created_at": "2024-09-12T09:00:00Z"
+        },
+        "total_low_focus_duration": 2229.5
+      }
+    ]
+  }
+]

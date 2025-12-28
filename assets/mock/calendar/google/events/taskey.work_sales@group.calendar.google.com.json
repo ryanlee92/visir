@@ -1,0 +1,564 @@
+[
+  {
+    "kind": "calendar#event",
+    "etag": "\"9a6faa396e\"",
+    "id": "242e5aff43b241febb100e85",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=242e5aff43b241febb100e85",
+    "created": "2025-08-30T20:23:39.969703+09:00",
+    "updated": "2025-09-02T22:14:39.969703+09:00",
+    "summary": "OKR Retro",
+    "description": "Office hours; bring blockers and metrics.",
+    "location": "Daejeon",
+    "colorId": "8",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "date": "2025-09-06",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "date": "2025-09-07",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "242e5aff43b241febb100e85@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "mia.lopez@testdomain.com",
+        "displayName": "Mia Lopez",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "needsAction"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 30
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/rmbvtywuiv",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"fa8e3ec1bc\"",
+    "id": "b0a0c1d7a50541478f3de617",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=b0a0c1d7a50541478f3de617",
+    "created": "2025-08-21T16:15:00+09:00",
+    "updated": "2025-08-24T19:39:00+09:00",
+    "summary": "Customer Demo",
+    "description": "Sync to align on priorities and unblock owners.",
+    "location": "San Francisco (virtual)",
+    "colorId": "11",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "dateTime": "2025-08-31T16:15:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-08-31T17:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "b0a0c1d7a50541478f3de617@google.com",
+    "sequence": 0,
+    "attendees": [
+      {
+        "email": "noah.jones@testdomain.com",
+        "displayName": "Noah Jones",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "sophia.davis@testdomain.com",
+        "displayName": "Sophia Davis",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "needsAction"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/lrzajzmdtt",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"d9fb7e4b19\"",
+    "id": "4e10592ffbf94213ab06c444",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=4e10592ffbf94213ab06c444",
+    "created": "2025-09-28T11:30:00+09:00",
+    "updated": "2025-09-28T12:03:00+09:00",
+    "summary": "OKR Retro",
+    "description": "Walkthrough of design and API surfaces with open Q&A.",
+    "location": "San Francisco (virtual)",
+    "colorId": "7",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "dateTime": "2025-09-30T11:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-30T13:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "4e10592ffbf94213ab06c444@google.com",
+    "sequence": 2,
+    "attendees": [
+      {
+        "email": "liam.williams@testdomain.com",
+        "displayName": "Liam Williams",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "mia.lopez@testdomain.com",
+        "displayName": "Mia Lopez",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "ava.garcia@testdomain.com",
+        "displayName": "Ava Garcia",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "needsAction"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 10
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/nyalajspbn",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"8e8691c780\"",
+    "id": "00341043162240678d591b5d",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=00341043162240678d591b5d",
+    "created": "2025-09-18T20:23:39.969703+09:00",
+    "updated": "2025-09-22T23:54:39.969703+09:00",
+    "summary": "Budget Checkpoint",
+    "description": "Customer-facing session; confirm agenda and roles beforehand.",
+    "location": "Seoul",
+    "colorId": "10",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "date": "2025-09-30",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "date": "2025-10-01",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "00341043162240678d591b5d@google.com",
+    "sequence": 2,
+    "attendees": [
+      {
+        "email": "isabella.martinez@testdomain.com",
+        "displayName": "Isabella Martinez",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "elijah.miller@testdomain.com",
+        "displayName": "Elijah Miller",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "needsAction"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 5
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"e6a0078c38\"",
+    "id": "350114eb348f45c7b034a5e8",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=350114eb348f45c7b034a5e8",
+    "created": "2025-09-15T09:15:00+09:00",
+    "updated": "2025-09-16T12:47:00+09:00",
+    "summary": "Design Review",
+    "description": "Internal planning; collect action items and owners.",
+    "location": "Daejeon",
+    "colorId": "5",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "dateTime": "2025-09-23T09:15:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-23T09:45:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "350114eb348f45c7b034a5e8@google.com",
+    "sequence": 0,
+    "attendees": [
+      {
+        "email": "mia.lopez@testdomain.com",
+        "displayName": "Mia Lopez",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 30
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/hopbkgowxu",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"b83b42502d\"",
+    "id": "b859d46265af4946a7e9d2c0",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=ed215cc1b2d441a5be35cdaa",
+    "created": "2025-08-11T15:00:00+09:00",
+    "updated": "2025-08-11T18:16:00+09:00",
+    "summary": "(Moved) Monthly Sync",
+    "description": "Sync to align on priorities and unblock owners.",
+    "location": "Busan",
+    "colorId": "3",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "dateTime": "2025-09-01T16:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-01T17:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "ed215cc1b2d441a5be35cdaa@google.com",
+    "sequence": 2,
+    "attendees": [
+      {
+        "email": "elijah.miller@testdomain.com",
+        "displayName": "Elijah Miller",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "emma.brown@testdomain.com",
+        "displayName": "Emma Brown",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "olivia.johnson@testdomain.com",
+        "displayName": "Olivia Johnson",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "liam.williams@testdomain.com",
+        "displayName": "Liam Williams",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 5
+        }
+      ]
+    },
+    "recurringEventId": "ed215cc1b2d441a5be35cdaa",
+    "originalStartTime": {
+      "dateTime": "2025-08-25T15:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"2c457f0333\"",
+    "id": "d6c13331350b4806a33aadc2",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=d6c13331350b4806a33aadc2",
+    "created": "2025-09-22T20:23:39.969703+09:00",
+    "updated": "2025-09-26T22:33:39.969703+09:00",
+    "summary": "Release Cut",
+    "description": "Internal planning; collect action items and owners.",
+    "location": "Busan",
+    "colorId": "4",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "date": "2025-09-26",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "date": "2025-09-27",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "d6c13331350b4806a33aadc2@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "mia.lopez@testdomain.com",
+        "displayName": "Mia Lopez",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "olivia.johnson@testdomain.com",
+        "displayName": "Olivia Johnson",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 5
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/pyvxfhzihb",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"2bbee374a5\"",
+    "id": "7f8596ce97ba430cbdccd01c",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=7f8596ce97ba430cbdccd01c",
+    "created": "2025-08-25T10:30:00+09:00",
+    "updated": "2025-08-27T13:33:00+09:00",
+    "summary": "Sprint Planning",
+    "description": "Customer-facing session; confirm agenda and roles beforehand.",
+    "location": "Daejeon",
+    "colorId": "11",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "taskey.work_sales@group.calendar.google.com",
+      "displayName": "Visir — Sales & Customers"
+    },
+    "start": {
+      "dateTime": "2025-09-11T10:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-11T11:15:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "7f8596ce97ba430cbdccd01c@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "ava.garcia@testdomain.com",
+        "displayName": "Ava Garcia",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "olivia.johnson@testdomain.com",
+        "displayName": "Olivia Johnson",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "needsAction"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 5
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/ugwafjfoum",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  }
+]

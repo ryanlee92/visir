@@ -1,0 +1,71 @@
+{
+  "id": "m_0091_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-28T19:01:48.978000+00:00",
+  "sentDateTime": "2025-08-28T19:01:39.996000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<7487723431.636203@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Mateo Jones <mateo.jones+19@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Bug report: CSV import fails"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-28T19:01:39.996000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<7487723431.636203@testdomain.com>"
+    }
+  ],
+  "subject": "Bug report: CSV import fails",
+  "bodyPreview": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. - Scope: finalize API contract (au",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0091",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": false,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Mateo Jones",
+      "address": "mateo.jones+19@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Mateo Jones",
+      "address": "mateo.jones+19@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

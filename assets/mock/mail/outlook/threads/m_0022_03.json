@@ -1,0 +1,71 @@
+{
+  "id": "m_0022_03",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-04T07:45:12.626000+00:00",
+  "sentDateTime": "2025-08-04T07:45:05.622000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1282865099.800622@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Dylan Thompson <dylan.thompson+08@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Re: Product roadmap sync"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-04T07:45:05.622000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1282865099.800622@testdomain.com>"
+    }
+  ],
+  "subject": "Re: Product roadmap sync",
+  "bodyPreview": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. - Scope: finalize A",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p><br>On 2025-08-04T07:22:54.160000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; Good morning,<br>&gt; <br>&gt; Appreciate the context \u2014 adding specifics.<br>&gt; <br>&gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; <br>&gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Happy to jump on a quick call later today.<br>&gt; <br>&gt; \u2014 Alex<br>&gt; <br>&gt; On 2025-08-04T06:49:25.717000+00:00, Riley Taylor &lt;riley.taylor+34@testdomain.com&gt; wrote:<br>&gt; &gt; Hello,<br>&gt; &gt; <br>&gt; &gt; Following up with a few details from our chat.<br>&gt; &gt; <br>&gt; &gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; &gt; <br>&gt; &gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; &gt; <br>&gt; &gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; &gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; &gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; &gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; &gt; <br>&gt; &gt; Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0022",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Dylan Thompson",
+      "address": "dylan.thompson+08@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Dylan Thompson",
+      "address": "dylan.thompson+08@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

@@ -1,0 +1,47 @@
+{
+  "id": "t_0193",
+  "historyId": "797618",
+  "messages": [
+    {
+      "id": "m_0193_01",
+      "threadId": "t_0193",
+      "labelIds": [
+        "TRASH"
+      ],
+      "snippet": "Good afternoon, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track err\u2026",
+      "historyId": "374610",
+      "internalDate": "1755128148790",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Dylan Thompson <dylan.thompson+47@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Your order has shipped"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 13 Aug 2025 23:35:48 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9088185115.144082@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 533,
+          "data": "R29vZCBhZnRlcm5vb24sCgpGb2xsb3dpbmcgdXAgd2l0aCBhIGZldyBkZXRhaWxzIGZyb20gb3VyIGNoYXQuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpJ4oCZbGwgcG9zdCBhIGJyaWVmIHVwZGF0ZSBpbiBTbGFjayBhZnRlciBJIHB1c2ggdGhlIGJyYW5jaC4="
+        }
+      },
+      "sizeEstimate": 833
+    }
+  ],
+  "snippet": "Good afternoon, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track err\u2026"
+}

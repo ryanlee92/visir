@@ -1,0 +1,87 @@
+{
+  "id": "t_0117",
+  "historyId": "1784667",
+  "messages": [
+    {
+      "id": "m_0117_01",
+      "threadId": "t_0117",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hello, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, an\u2026",
+      "historyId": "419985",
+      "internalDate": "1755857668085",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Daniel White <daniel.white+12@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "One-pager for review"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 22 Aug 2025 10:14:28 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<4827629492.102664@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 506,
+          "data": "SGVsbG8sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCi0gU2NvcGU6IGZpbmFsaXplIEFQSSBjb250cmFjdCAoYXV0aCwgcGFnaW5hdGlvbiwgZXJyb3JzKQotIFJpc2tzOiByYXRlIGxpbWl0aW5nIGR1cmluZyBvbmJvYXJkaW5nLCBDU1YgaW1wb3J0IG1lbW9yeSBzcGlrZXMKLSBUaW1lbGluZTogY3V0IGJldGEgYnkgbmV4dCBXZWRuZXNkYXksIEdBIGluIHR3byB3ZWVrcwotIE93bmVyczogYmFja2VuZCDigJQgbWU7IGZyb250ZW5kIOKAlCBwYWlyaW5nIHdpdGggZGVzaWduCgpUaGFua3MgYWdhaW4g4oCUIHRoaXMgdW5ibG9ja3MgdGhlIHJlc3Qgb2YgdGhlIHNwcmludC4="
+        }
+      },
+      "sizeEstimate": 806
+    },
+    {
+      "id": "m_0117_02",
+      "threadId": "t_0117",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Hi, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019\u2026",
+      "historyId": "261433",
+      "internalDate": "1755863062891",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Mateo Jones <mateo.jones+19@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "One-pager for review"
+          },
+          {
+            "name": "Date",
+            "value": "Fri, 22 Aug 2025 11:44:22 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1668690615.787149@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 506,
+          "data": "SGksCgpBcHByZWNpYXRlIHRoZSBjb250ZXh0IOKAlCBhZGRpbmcgc3BlY2lmaWNzLgoKSSByZWZhY3RvcmVkIGEgY291cGxlIG9mIGhlbHBlcnMgdG8gbWFrZSB0aGUgaW50ZXJmYWNlIGNsZWFuZXIg4oCUIHNob3VsZG7igJl0IGFmZmVjdCB5b3VyIHNpZGUsIGJ1dCBjYWxsIGl0IG91dCBpZiBhbnl0aGluZyBzdXJwcmlzZXMgeW91LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCknigJlsbCBwb3N0IGEgYnJpZWYgdXBkYXRlIGluIFNsYWNrIGFmdGVyIEkgcHVzaCB0aGUgYnJhbmNoLgoK4oCUIEJyYW5kb24="
+        }
+      },
+      "sizeEstimate": 806
+    }
+  ],
+  "snippet": "Hi, Appreciate the context \u2014 adding specifics. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019\u2026"
+}

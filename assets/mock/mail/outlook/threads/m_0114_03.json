@@ -1,0 +1,71 @@
+{
+  "id": "m_0114_03",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-09-03T13:49:29.064000+00:00",
+  "sentDateTime": "2025-09-03T13:49:18.674000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<4406476165.328535@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "One-pager for review"
+    },
+    {
+      "name": "Date",
+      "value": "2025-09-03T13:49:18.674000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<4406476165.328535@testdomain.com>"
+    }
+  ],
+  "subject": "One-pager for review",
+  "bodyPreview": "Hey, Thanks for the quick turnaround on this. I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you. - Scope: finalize API contract (auth, pagination, errors) - Risks: rate l",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hey,</p>\n<p>Thanks for the quick turnaround on this.</p>\n<p>I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p><br>On 2025-09-03T13:19:57.381000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; Hello,<br>&gt; <br>&gt; Thanks for the quick turnaround on this.<br>&gt; <br>&gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; I\u2019ll post a brief update in Slack after I push the branch.<br>&gt; <br>&gt; \u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0114",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": false,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Paisley Garcia",
+      "address": "paisley.garcia+59@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Paisley Garcia",
+      "address": "paisley.garcia+59@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

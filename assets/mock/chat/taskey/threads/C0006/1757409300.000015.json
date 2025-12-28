@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "C0006",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757409300.000020",
+      "thread_ts": "1757409300.000015",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — adding context (re: context)."
+          }
+        }
+      ]
+    }
+  ]
+}

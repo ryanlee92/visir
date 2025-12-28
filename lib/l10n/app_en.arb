@@ -1,0 +1,1612 @@
+{
+  "sign_in": "Sign In",
+  "search": "Search",
+  "going_question": "Going?",
+  "add_organization": "Add Organization",
+  "create": "Create",
+  "cancel": "Cancel",
+  "add": "Add",
+  "ok": "OK",
+  "edit": "Edit",
+  "window": "Window",
+  "view": "View",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "yesterday_short": "Yest.",
+  "tomorrow": "Tomorrow",
+  "tab_calendar": "Calendar",
+  "tab_home": "Home",
+  "tab_board": "Board",
+  "tab_chat": "Chat",
+  "tab_mail": "Mail",
+  "tab_settings": "Pref",
+  "tab_inbox": "Inbox",
+  "tab_task": "Task",
+  "general_title": "General",
+  "agent_pref_title": "Agent",
+  "agent_pref_api_key": "API Key",
+  "agent_pref_openai_api_key": "OpenAI API Key",
+  "agent_pref_api_key_hint": "Enter your OpenAI API key",
+  "agent_pref_provider_openai": "OpenAI",
+  "agent_pref_provider_anthropic": "Anthropic",
+  "agent_pref_provider_google": "Google",
+  "agent_pref_api_key_hint_anthropic": "Enter your Anthropic API key",
+  "agent_pref_api_key_hint_google": "Enter your Google AI API key",
+  "agent_pref_description": "We never log your data or engage in any activity that could threaten your privacy. However, if you want to use your own AI provider API directly, you can enter your API key here. With an API key, you can directly command or chat with AI even with a Pro subscription.",
+  "agent_pref_default_ai_provider": "Default Agent AI Provider",
+  "agent_pref_default_ai_provider_description": "Default inbox suggestions and next schedule summary features will use the API key you've entered.",
+  "agent_pref_no_api_keys": "No API keys configured. Please add an API key above.",
+  "agent_pref_none": "None",
+  "agent_pref_additional_tokens": "Additional Tokens",
+  "agent_pref_current_tokens": "Current: {credits}",
+  "@agent_pref_current_tokens": {
+    "placeholders": {
+      "credits": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_pref_additional_tokens_description": "Purchase additional AI tokens for AI-based orders and summaries. Tokens are used when you don't provide your own API key.",
+  "agent_pref_system_prompt": "System Prompt",
+  "agent_pref_system_prompt_description": "Customize the system prompt that will be used for all agent actions. This prompt will be prepended to the default system message.",
+  "agent_pref_system_prompt_hint": "Enter your custom system prompt (optional)",
+  "general_theme_title": "Theme",
+  "general_text_size": "Text size",
+  "general_theme_system": "System",
+  "general_theme_light": "Light",
+  "general_theme_dark": "Dark",
+  "general_pref_appearance": "Appearance",
+  "general_pref_tab_bar_display": "Tab bar display",
+  "general_pref_tab_bar_standard": "Standard",
+  "general_pref_tab_bar_always_collapsed": "Always collapsed",
+  "general_pref_hide_unread_indicator": "Tab icon badge",
+  "account_title": "Account",
+  "account_sign_out": "Sign Out",
+  "account_delete": "Delete Account",
+  "version_title": "Version",
+  "version_check_for_updates": "Check for Updates",
+  "version_update_version": "Get latest version",
+  "version_up_to_date_title" : "Up to date",
+  "version_up_to_date_description" : "You’re running the latest version. No action needed.",
+  "version_up_to_date_confirm" : "Got it",
+  "version_new_version_ready_title" : "New version ready",
+  "version_new_version_ready_description" : "A newer version is available. Update now for the best Visir experience.",
+  "version_new_version_ready_confirm" : "Update in Store",
+  "calendar_pref_title": "Calendar",
+  "calendar_pref_start_title": "Start week on",
+  "calendar_pref_week_title": "Week view start day",
+  "calendar_pref_default": "Default calendar",
+  "calendar_pref_duration": "Default event duration",
+  "calendar_pref_last_used": "Last used",
+  "calendar_pref_event_reminder": "Default event reminders",
+  "calendar_pref_event_reminder_body": "To update your preferences, access “Settings for my calendars” → “Event notifications” as you would in ",
+  "calendar_pref_event_reminder_link": "Google Calendar",
+  "calendar_pref_include_conference_link" : "Add conference",
+  "calendar_list_title": "Calendar Lists",
+  "calendar_simple_add_location": "Add Location",
+  "calendar_connect_to_create": "Connect Calendar to create events",
+  "integrate": "Integrate",
+  "chat_pref_title": "Chat",
+  "chat_display_preferences": "Display Preferences",
+  "chat_chat_lists": "Chat Lists",
+  "chat_show_channels": "Show channels",
+  "chat_show_dms": "Show DMs",
+  "chat_sort_channels": "Sort",
+  "chat_all": "All",
+  "chat_unread_only": "Unread only",
+  "chat_alphabetically": "Alphabetically",
+  "chat_most_recent": "Most recent",
+  "channel_list_search": "Search channels",
+  "channel_list_channels": "Channels",
+  "channel_list_unlisted_channels": "Hidden channels",
+  "channel_list_all_channels": "All channels",
+  "channel_list_hide_channel": "Hide channel",
+  "chat_search_emoji": "Search emoji",
+  "chat_chats": "Chats",
+  "chat_message": "Add message",
+  "chat_focus_last_message": "(Press {shortcut} to focus the last message)",
+  "chat_replies": "replies",
+  "chat_thread": "Thread",
+  "chat_reply_thread": "Reply thread",
+  "chat_control_edit_channel_list_of": "Edit channel list of",
+  "chat_control_edit_channel_lists": "Edit channel lists",
+  "chat_control_manage_integrations": "Manage Integrations",
+  "chat_control_unread": "Unread",
+  "chat_toast_downloaded": "Downloaded",
+  "chat_toast_download_failed": "Download failed",
+  "chat_toast_show_in_folder": "Show in folder",
+  "chat_toast_open": "Open",
+  "chat_toast_download_from_link": "Download from link",
+  "chat_integrate_empty_title": "Access and manage your Slack",
+  "chat_integrate_empty_description": "Read, reply, and track important conversations in one place.",
+  "chat_integrate_chat_button": "Connect chat providers",
+  "chat_edit_channel_list_of": "Edit channel list of",
+  "chat_edit_channel_list": "Edit channel list",
+  "chat_emoji_category_frequently_used": "Frequently Used",
+  "chat_emoji_category_smiley_and_people": "Smiley & People",
+  "chat_emoji_category_animals_and_nature": "Animals & Nature",
+  "chat_emoji_category_food_and_drink": "Food & Drink",
+  "chat_emoji_category_travel_and_places": "Travel & Places",
+  "chat_emoji_category_activities": "Activities",
+  "chat_emoji_category_objects": "Objects",
+  "chat_emoji_category_symbols": "Symbols",
+  "chat_emoji_category_flags": "Flags",
+  "chat_emoji_category_custom": "Custom",
+  "chat_emoji_search_result": "Search result",
+  "chat_formatted_message_user_joines": "joined",
+  "chat_formatted_message_user_archived": "archived",
+  "chat_formatted_message_user_archived_description": "The contents will still be browsable and available in search.",
+  "chat_formatted_message_user_unarchived": "unarchived",
+  "chat_formatted_message_user_left": "left",
+  "chat_message_edited": "edited",
+  "chat_channel_you_are_viewing": "You are viewing",
+  "chat_channel_archived": ", an archived channel",
+  "chat_channel_viewing_dm_with_deactivated_account": "You are viewing the archives of a deactivated account",
+  "chat_block_check_this_message_on_slack": "Check this message on Slack",
+  "chat_block_go_to_slack": "Go to Slack",
+  "chat_settings": "Settings",
+  "chat_upload": "Upload",
+  "chat_photo_or_video": "Photo or Video",
+  "chat_file": "File",
+  "chat_this_is_the_very_beginning": "This is the very beginning of the",
+  "chat_channel": "Channel",
+  "chat_this_is_the_very_beginning_of_dm_with": "This is the very beginning of your direct message history with",
+  "chat_channels": "Channel",
+  "chat_dms": "DM",
+  "chat_reaction_you": "You",
+  "chat_new": "New",
+  "chat_read_all": "Read All",
+  "chat_app": "Bot",
+  "file_options": "File Options",
+  "file_options_download": "Download",
+  "file_options_share": "Share",
+  "add_reaction": "Add reaction",
+  "create_task": "Create task",
+  "integration_pref_title": "Integrations",
+  "integration_calendars": "Calendars",
+  "integration_emails": "Mails",
+  "integration_messengers": "Chats",
+  "integration_others": "Others",
+  "notification_pref_title": "Notifications",
+  "notification_pref_description": "Notification preferences are applied separately for each device.",
+  "notification_tasks": "Tasks",
+  "notification_calendars": "Calendars",
+  "notification_mails": "Mails",
+  "notification_messengers": "Chats",
+  "notification_task_reminders": "Task reminders",
+  "notification_mails_notifications": "Notifications",
+  "notification_message_notifications": "Notifications",
+  "notification_mail_description": "Only receive notifications based on your preferences.",
+  "notification_message_description": "Only receive notifications based on your preferences.",
+  "home_pref_title": "Task",
+  "home_pref_task_preference": "Task Preference",
+  "home_pref_default_task_color": "Default color",
+  "home_pref_default_task_duration": "Default duration",
+  "home_pref_double_click_action": "Double click action",
+  "home_pref_drag_action": "Drag action",
+  "home_pref_floating_button_action": "Floating button action",
+  "home_pref_default_task_reminder": "Default reminder",
+  "home_pref_default_all_day_task_reminder": "Default all-day reminder",
+  "home_pref_home_calendar": "Home Calendar",
+  "inbox_double_click_action_calendar_event": "Calendar Event",
+  "inbox_double_click_action_task": "Task",
+  "inbox_double_click_action_last_created": "Last Created",
+  "preferences_title": "Preference",
+  "preference_integration": "Integration",
+  "preference_home": "Home",
+  "preference_chat": "Chat",
+  "preference_mail": "Mail",
+  "preference_calendar": "Calendar",
+  "preference_customize_tabs": "Tabs",
+  "preference_terms": "Terms",
+  "preference_privacy": "Privacy",
+  "task_no_task_selected": "No task selected",
+  "integration_connect": "Connect",
+  "integration_gmail": "Gmail",
+  "integration_outlook": "Outlook",
+  "integration_gcal": "Google Calendar",
+  "integration_outlook_cal": "Outlook Calendar",
+  "integration_slack": "Slack",
+  "integration_discord": "Discord",
+  "calendar_title": "Calendar",
+  "sign_out": "Sign Out",
+  "calendar_configuration_day": "Day",
+  "calendar_configuration_2_days": "2 Days",
+  "calendar_configuration_3_days": "3 Days",
+  "calendar_configuration_4_days": "4 Days",
+  "calendar_configuration_5_days": "5 Days",
+  "calendar_configuration_6_days": "6 Days",
+  "calendar_configuration_week": "Week",
+  "calendar_configuration_month": "Month",
+  "calendar_configuration_list": "Schedule",
+  "calendar_event_edit_title": "Edit Event",
+  "calendar_event_create_title": "Create Event",
+  "calendar_event_edit_repeat": "Repeat",
+  "calendar_event_edit_datetime": "Date & Time",
+  "select_all": "Select all",
+  "deselect_all": "Deselect all",
+  "save": "Save",
+  "all_day": "All day",
+  "repeat_never": "Never",
+  "select_date": "Select date",
+  "type_description": "+ Add description",
+  "type_title": "Enter title",
+  "type_location": "+ Add location",
+  "type_attendee": "+ Add guests",
+  "add_reminder": "Add reminder",
+  "event_title": "Event title",
+  "location": "Location",
+  "description": "Description",
+  "to": "to",
+  "add_guest": "Add guest",
+  "minutes": "Minutes",
+  "hours": "Hours",
+  "days": "Days",
+  "weeks": "Weeks",
+  "mail": "Mail",
+  "push_notification": "Push Notification",
+  "before": "before",
+  "on_day_of_event_at": "On day of event at {time}",
+  "week_before_at": "{week} week before at {time}",
+  "day_before_at": "{day} day before at {time}",
+  "reminder_minute": "1 minute",
+  "reminder_minutes": "{minute} minutes",
+  "reminder_hour": "1 hour",
+  "reminder_hours": "{hour} hour",
+  "at_start_event": "At the start of event",
+  "does_not_repeat": "Does not repeat",
+  "none": "None",
+  "annualy_on": "Annualy on",
+  "every_weekday_monday_to_friday": "Every weekday (Monday to Friday)",
+  "every_weekend_saturday_to_sunday": "Every weekend (Saturday to Sunday)",
+  "custom_reminder": "Custom...",
+  "custom_reminder_title": "Custom reminder",
+  "custom_recurrence_title": "Custom recurrence",
+  "add_conference": "Add conference link",
+  "add_attachment": "Add attachment",
+  "edit_recurring_event": "Edit recurring event",
+  "delete_recurring_event": "Delete recurring event",
+  "edit_recurring_task": "Edit recurring task",
+  "delete_recurring_task": "Delete recurring task",
+  "this_event_only": "This event only",
+  "all_events": "All events",
+  "this_and_following_events": "This and following events",
+  "this_task_only": "This task only",
+  "this_and_following_tasks": "This and following tasks",
+  "all_tasks": "All tasks",
+  "yes": "Yes",
+  "no": "No",
+  "awaiting": "Awaiting",
+  "accept": "Accept",
+  "decline": "Decline",
+  "maybe": "Maybe",
+  "are_you_sure": "Are you sure?",
+  "are_you_sure_body": "By pressing ok button, your action will be applied and you will not be able to revert it.",
+  "email_address_copied_to_clipboard": "Email address copied to clipboard",
+  "calendar_reminder_before": "Before",
+  "calendar_reminder_at": "At",
+  "calendar_reminder_by": "By",
+  "calendar_recurrence_every": "Every",
+  "calendar_recurrence_ends": "Ends",
+  "calendar_recurrence_on": "On",
+  "calendar_recurrence_daily": "Day",
+  "calendar_recurrence_weekly": "Week",
+  "calendar_recurrence_monthly": "Month",
+  "calendar_recurrence_yearly": "Year",
+  "calendar_recurrence_ends_never": "Never",
+  "calendar_recurrence_ends_after": "Ends after",
+  "calendar_recurrence_ends_on_date": "Ends on date",
+  "calendar_recurrence_count_times": "{number} times",
+  "link_copied_to_clipboard": "Link copied to clipboard",
+  "image_copied_to_clipboard": "Image copied to clipboard",
+  "first": "1st",
+  "second": "2nd",
+  "third": "3rd",
+  "number": "{number}th",
+  "today": "Today",
+  "sunday": "Sunday",
+  "monday": "Monday",
+  "hour": "Hour",
+  "minute": "Minute",
+  "more_options": "More options",
+  "go_to_day_view": "Go to Day View",
+  "new_event": "New Event",
+  "new_task": "New Task",
+  "mail_compose": "Compose",
+  "mail_reply": "Reply",
+  "mail_reply_all": "Reply All",
+  "mail_forward": "Forward",
+  "mail_attachments": "Attachments",
+  "mail_download_all": "Download all",
+  "mail_detail_tooltip_close": "Close",
+  "mail_detail_tooltip_mark_as_read": "Mark as read",
+  "mail_detail_tooltip_mark_as_unread": "Mark as unread",
+  "mail_detail_tooltip_pin": "Pin",
+  "mail_detail_tooltip_unpin": "Unpin",
+  "mail_detail_tooltip_task": "Create task",
+  "mail_detail_tooltip_archive": "Archive",
+  "mail_detail_tooltip_unarchive": "Unarchive",
+  "mail_detail_tooltip_delete": "Delete",
+  "mail_detail_tooltip_delete_forever": "Delete forever",
+  "mail_detail_tooltip_undelete": "Move back to inbox",
+  "mail_detail_tooltip_report_spam": "Report spam",
+  "mail_detail_tooltip_not_spam": "Not spam",
+  "mail_detail_tooltip_report_unspam": "Remove from spam",
+  "mail_detail_tooltip_move_to_inbox": "Move to Inbox",
+  "mail_label_inbox": "Inbox",
+  "mail_label_pinned": "Pinned",
+  "mail_label_unread": "Unread",
+  "mail_label_draft": "Draft",
+  "mail_label_sent": "Sent",
+  "mail_label_spam": "Spam",
+  "mail_label_trash": "Trash",
+  "mail_label_archive": "Archive",
+  "mail_label_more": "More",
+  "mail_label_less": "Less",
+  "mail_label_all": "All Mail",
+  "mail_new_message": "New Message",
+  "mail_to": "To",
+  "mail_from": "From",
+  "mail_cc": "Cc",
+  "mail_bcc": "Bcc",
+  "mail_subject": "Subject",
+  "mail_body_placeholder": "Write your message here...",
+  "mail_send": "Send",
+  "mail_toolbar_font_size_small": "Small",
+  "mail_toolbar_font_size_normal": "Normal",
+  "mail_toolbar_font_size_large": "Large",
+  "mail_toolbar_font_size_huge": "Huge",
+  "mail_toolbar_color_picker_reset_to_default": "Reset to default",
+  "mail_toolbar_color_picker_font_color": "Font color",
+  "mail_toolbar_color_picker_background_color": "Background color",
+  "mail_toolbar_align_tooltips": "Align",
+  "mail_toolbar_align_justify": "Justify",
+  "mail_toolbar_align_left": "Left",
+  "mail_toolbar_align_center": "Center",
+  "mail_toolbar_align_right": "Right",
+  "mail_color_picker_background": "Background color",
+  "mail_color_picker_text": "Text color",
+  "mail_toolbar_tooltip_attachments": "Attachments",
+  "mail_toolbar_tooltip_signatures": "Signatures",
+  "mail_pref_title": "Mail",
+  "mail_pref_account_color": "Account color",
+  "mail_pref_account_color_red": "Red",
+  "mail_pref_account_color_deep_orange": "Deep Orange",
+  "mail_pref_account_color_orange": "Orange",
+  "mail_pref_account_color_yellow": "Yellow",
+  "mail_pref_account_color_light_green": "Light Green",
+  "mail_pref_account_color_green": "Green",
+  "mail_pref_account_color_teal": "Teal",
+  "mail_pref_account_color_light_blue": "Light Blue",
+  "mail_pref_account_color_indigo": "Indigo",
+  "mail_pref_account_color_deep_purple": "Deep Purple",
+  "mail_pref_account_color_purple": "Purple",
+  "mail_pref_account_color_brown": "Brown",
+  "mail_pref_signature_list": "Signatures",
+  "mail_pref_default_signature": "Default signature",
+  "mail_pref_signature_list_select": "Select signature",
+  "mail_pref_signature_create_new": "+ Create new",
+  "mail_pref_signature_number": "Signature {number}",
+  "mail_pref_signature_placeholder": "Write signature...",
+  "mail_pref_signature_delete": "Delete Signature",
+  "mail_pref_signature_none": "None",
+  "mail_pref_swipe_actions": "Swipe Actions",
+  "mail_pref_swipe_right": "Swipe right",
+  "mail_pref_swipe_left": "Swipe left",
+  "mail_pref_swipe_none": "None",
+  "mail_pref_swipe_read_unread": "Read / Unread",
+  "mail_pref_swipe_read": "Read",
+  "mail_pref_swipe_unread": "Unread",
+  "mail_pref_swipe_pin_unpin": "Pin / Unpin",
+  "mail_pref_swipe_pin": "Pin",
+  "mail_pref_swipe_unpin": "Unpin",
+  "mail_pref_swipe_create_task": "Create task",
+  "mail_pref_swipe_archive": "Archive",
+  "mail_pref_swipe_delete": "Delete",
+  "mail_pref_swipe_report_spam": "Report spam",
+  "mail_pref_appearance": "Appearance",
+  "mail_pref_email_content_theme": "Email content theme",
+  "mail_pref_email_theme_follow_taskey_theme": "Follow app",
+  "mail_pref_email_theme_light": "Light",
+  "mail_pref_email_theme_dark": "Dark",
+  "mail_write_signature": "Signature",
+  "mail_write_message": "Write your message here...",
+  "mail_sent": "Mail sent",
+  "mail_toast_undo": "Undo",
+  "mail_reply_to": "Reply to {name}", 
+  "mail_forward": "Forward",
+  "mail_empty_trash": "Empty Trash",
+  "mail_empty_spam": "Empty Spam",
+  "mail_toast_archive": "Mail archived",
+  "mail_toast_trash": "Mail moved to trash",
+  "mail_toast_trashs": "{number} mails moved to trash",
+  "mail_toast_spam": "Mail marked as spam",
+  "mail_search_placeholder": "Search...",
+  "mail_empty_description": "This will remove all messages in the folder, but it won’t delete messages from Outlook permanently.",
+  "inbox_filter_all": "All",
+  "inbox_filter_unread": "Unread",
+  "inbox_filter_pinned": "Pinned",
+  "inbox_filter_chat": "Chat",
+  "inbox_filter_mail": "Mail",
+  "inbox_filter_deleted": "Deleted",
+  "inbox_drag_event": "Event",
+  "inbox_drag_task": "Task",
+  "inbox_task_title": "Task title",
+  "show_next_message": "Show next message",
+  "mail_pref_filter_inbox_filter": "Inbox Filter",
+  "mail_pref_filter_inbox_filter_description": "Use Inbox Filter to control which mails appear in your Inbox.",
+  "mail_pref_filter_mails": "Mails",
+  "mail_pref_filter_none": "None",
+  "mail_pref_filter_with_specific_labels": "With specific labels",
+  "mail_pref_filter_all": "All",
+  "mail_pref_filter_labels": "Labels",
+  "mail_pref_filter_with_labels": "With labels",
+  "mail_pref_filter_all_mails": "All mails",
+  "message_pref_filter_inbox_filter": "Inbox Filter",
+  "message_pref_filter_inbox_filter_description": "Use Inbox Filter to control which messages appear in your Inbox.",
+  "message_pref_filter_direct_messages": "DMs",
+  "message_pref_filter_mentions_from_direct_messages": "Mentions from DMs",
+  "message_pref_filter_channels": "Channels",
+  "message_pref_filter_mentions_from_channels": "Mentions from channels",
+  "message_pref_filter_none": "None",
+  "message_pref_filter_mentions": "Mentions",
+  "message_pref_filter_all": "All",
+  "message_forwarded_posted_in_channel": "Posted in # {channelName}",
+  "message_forwarded_thread_in_channel": "Thread in # {channelName}",
+  "message_forwarded_direct_message": "Direct Message",
+  "message_forwarded_view_message": "View Message",
+  "message_forwarded_view_conversation": "View Conversation",
+  "task_action_duplicate": "Duplicate",
+  "task_action_delete": "Delete",
+  "task_action_copy_link": "Copy link",
+  "task_action_delete_link": "Delete link",
+  "delete_message": "Delete message",
+  "edit_message": "Edit message",
+  "show_tasks": "Show tasks",
+  "set_different_end_date": "Set Different End Date",
+  "guests": "Guests",
+  "reminder": "Reminder",
+  "conference": "Conference",
+  "mobile_task_edit_create_task": "Create Task",
+  "mobile_task_edit_edit_task": "Edit Task",
+  "delete_event_confirm_popup_title": "Are you sure?",
+  "delete_event_confirm_popup_description": "This will delete the event and cannot be undone.",
+  "delete_event_confirm_popup_cancel": "Cancel",
+  "delete_event_confirm_popup_delete": "Delete",
+  "message_loaded_until": "loaded until {date}",
+  "message_load_more": "load more",
+  "mail_integration_empty_title": "Access and manage your emails",
+  "mail_integration_empty_description": "Read, reply, forward, compose, search, and archive your emails.",
+  "mail_integration_empty_button": "Connect Mail",
+  "calendar_integration_empty_title": "Connect your Calendar to begin",
+  "calendar_integration_empty_description": "Sync with Calendar to bring in your schedule and stay organized.",
+  "calendar_integration_empty_button": "Connect Calendar",
+  "mail_actions": "Mail actions",
+  "mark_done": "Mark done",
+  "mark_undone": "Mark undone",
+  "mail_no_recepients": "No Recipients",
+  "mail_no_subject": "No Subject",
+  "mail_no_content": "No Content",
+  "home_pref_task_completion_sound": "Task completion sound",
+  "home_pref_completed_tasks": "Completed tasks",
+  "home_pref_completed_tasks_show": "Show",
+  "home_pref_completed_tasks_hide": "Hide",
+  "home_pref_completed_tasks_delete": "Delete",
+  "mail_google_api_limit_reached": "Gmail API limit reached. Try again later",
+  "calendar_google_api_limit_reached": "Google Calendar API limit reached. Try again later",
+  "message_slack_api_limit_reached": "Slack API limit reached. Try again later",
+  "inbox_drop_to_cancel": "Drop to cancel",
+  "inbox_drop_to_edit_details": "Drop to edit details",
+  "inbox_you_are_all_set": "You're all set!",
+  "inbox_no_issues_for_this_day": "No issues for this day.",
+  "inbox_no_search_results": "No search results",
+  "task_created": "Task created",
+  "task_edited": "Task edited",
+  "task_created_undo": "Undo",
+  "event_created": "Event created",
+  "event_created_undo": "Undo",
+  "mail_empty_subject": "(No Subject)",
+  "mail_no_email_selected": "No email selected.",
+  "mail_no_search_results": "No search results",
+  "mail_no_email_inbox": "No emails in your inbox.",
+  "mail_no_email_unread": "No unread emails.",
+  "mail_no_email_pinned": "No pinned emails.",
+  "mail_no_email_draft": "No draft emails.",
+  "mail_no_email_sent": "No sent emails.",
+  "mail_no_email_spam": "No spam emails.",
+  "mail_no_email_trash": "No emails in trash.",
+  "mail_me": "me",
+  "mail_drop_to_attach": "Drop to Attach",
+  "file_uploading_message_error": "File uploading. Please wait to send your message.",
+  "mail_discard_drafts": "Discard Drafts",
+  "mail_discard_draft": "Discard Draft",
+  "mail_discard_drafts_description": "This will discard all drafts and cannot be undone.",
+  "mail_organizer": "Organizer",
+  "feedback": "Feedback",
+  "feedback_send": "Send",
+  "feedback_sent_successfully": "Feedback sent successfully",
+  "feedback_sent_wrong": "Something went wrong. Try again later",
+  "feedback_write_your_feedback": "Write your feedback...",
+  "feedback_can_not_open_slack_app": "Can't open Slack app",
+  "signup_warning": "By signing in, I accept to the terms of service and privacy policy of Visir",
+  "pref_privacy": "Privacy Policy",
+  "pref_terms": "Terms of Service",
+  "pref_subscription": "Subscription",
+  "pref_download": "Download App",
+  "task_unscheduled": "Unscheduled",
+  "task_overdue": "Overdue",
+  "task_add_task": "Add task",
+  "task_to": "to",
+  "task_color": "Task color",
+  "task_set_date": "Set date",
+  "task_set_time": "Set time",
+  "task_label_all": "All Tasks",
+  "task_label_today": "Today",
+  "task_label_completed": "Completed",
+  "task_label_overdue": "Overdue",
+  "task_label_unscheduled": "Unscheduled",
+  "task_label_upcoming": "Upcoming",
+  "task_label_this_week": "This Week",
+  "task_label_this_month": "This Month",
+  "task_label_more": "More",
+  "task_label_less": "Less",
+  "task_no_tasks_today": "No tasks today",
+  "task_no_completed_tasks": "No completed tasks",
+  "task_no_unscheduled_tasks": "No unscheduled tasks",
+  "task_no_title": "No title",
+  "task_save_recurring_changes" : "Save recurring changes",
+  "onboarding_description": "Manage all your emails, tasks, calendars, and chats in one place.\nSimplify your workflow and save time.",
+  "onboarding_continue_with_google": "Continue with Google",
+  "onboarding_continue_with_apple": "Continue with Apple",
+  "onboarding_continue_with_email": "Continue with email",
+  "onboarding_signin_with_google": "Sign in with Google",
+  "onboarding_signin_with_apple": "Sign in with Apple",
+  "onboarding_signin_with_email": "Sign in with email",
+  "onboarding_by_registering": "By registering, you agree to the ",
+  "onboarding_terms_of_service": "terms of service",
+  "onboarding_and": " and",
+  "onboarding_privacy_policy": " privacy policy",
+  "onboarding_of_taskey": " of Visir.",
+  "onboarding_enter_your_email": "Enter your email",
+  "onboarding_enter_your_password": "Enter your password",
+  "onboarding_log_in": "Log in",
+  "onboarding_sign_up": "Sign Up",
+  "onboarding_send_password_reset_email": "Send password reset email",
+  "onboarding_return_to_login_options": "Return to login options",
+  "onboarding_forgot_your_password": "Forgot your password?",
+  "onboarding_do_not_have_an_account": "Don’t have an account? Sign up.",
+  "onboarding_already_have_an_account": "Already have an account? Sign in.",
+  "onboarding_email": "Email",
+  "onboarding_password": "Password",
+  "onboarding_username": "Username",
+  "onboarding_password_reset_email_sent": "A password reset email has been sent.",
+  "onboarding_password_reset_email_failed": "The email address is not registered. Please try again with a valid address.",
+  "onboarding_back_to_sign_in": "Back to Sign in",
+  "onboarding_please_enter_a_username": "Please enter a username.",
+  "onboarding_please_enter_a_valid_email_address": "Please enter a valid email address.",
+  "onboarding_please_enter_a_long_password": "Please enter a password that is at least 6 characters long.",
+  "onboarding_invalid_username_or_password": "Invalid username or password. Please try again.",
+  "onboarding_email_sign_up_failed": "An unexpected error occurred. Please try again.",
+  "onboarding_email_sign_up_failed_email_address_invalid": "Please enter a valid email address.",
+  "onboarding_email_sign_up_failed_email_exists": "This email address is already in use. Please log in.",
+  "onboarding_email_sign_up_failed_email_not_confirmed": "This email address is pending confirmation. Please check your inbox or resend the confirmation email.",
+  "onboarding_email_sign_up_failed_over_email_send_rate_limit": "Too many requests. Please wait a moment and try again.",
+  "onboarding_email_not_registered": "The email address is not registered. Please try again with a valid address.",
+  "onboarding_email_sending_error": "An error occurred while sending the email. Please try again later.",
+  "onboarding_waiting_for_confirm_email": "Waiting for confirmation email",
+  "time_saved_todo": "Todo",
+  "time_saved_load_more": "load more",
+  "time_saved_most_frequent_transitions": "Most Frequent Transitions",
+  "time_saved_according_to_research": "According to research conducted by Qatalog in collaboration with Cornell University’s Ellis Idea Lab",
+  "time_saved_based_on_our": "Based on our internal experiments",
+  "time_saved_calendars_are_not_separated": "Calendars are not separated by account because they can be used without switching apps through subscription or sharing features.",
+  "time_saved_hourly_wage_only_device": "The hourly wage is stored only on this device and is not saved anywhere else, ensuring your data remains secure.",
+  "time_saved_button_title": "Saved ${number}",
+  "time_saved_button_tooltip": "Saved in {month}",
+  "time_saved_screen_title": "Time Saved",
+  "time_saved_your_savings": "Your Savings",
+  "time_saved_time_saved": "Time Saved",
+  "time_saved_money_saved": "Money Saved",
+  "time_saved_hour_per_week": "h / week",
+  "time_saved_based_on_your_last_week_data": "*based on the last 7 days of data",
+  "time_saved_based_on_your_hourly_wage": "*based on your hourly wage",
+  "time_saved_hourly_wage": "Hourly Wage",
+  "time_saved_per_hour": "/ hr",
+  "time_saved_time_spent_on_app_switching": "Time Spent on App Switching (Direct)",
+  "time_saved_focus_lost_from_app_switching": "Focus Lost from App Switching (Indirect)",
+  "time_saved_seconds": "seconds",
+  "time_saved_app_switches": "App Switches",
+  "time_saved_time_per_switch": "Time Per Switch",
+  "time_saved_time_wasted": "Time Wasted",
+  "time_saved_hours_in_low_focus": "Hours in Low Focus",
+  "time_saved_productivity_loss": "Productivity Loss",
+  "time_saved_calculation_method": "Calculation Method",
+  "time_saved_hidden_coast": "The Hidden Cost of App Switching",
+  "time_saved_opening_apps_title": "Time Wasted Searching for and Opening Apps",
+  "time_saved_opening_apps_description": "Switching between apps takes time to locate and open each tool, with every transition taking an average of 9 seconds. These small delays accumulate, creating unnecessary interruptions and slowing down your workflow.",
+  "time_saved_ease_switch_title": "Productivity Loss After Each Switch",
+  "time_saved_ease_switch_description": "After switching apps, it takes an average of 9.5 minutes to regain focus and return to a productive state. This repeated loss of focus leads to significant wasted time each week, impacting your overall efficiency.",
+  "time_saved_how_solved_title": "How Visir Solves This",
+  "time_saved_how_solved_description": "With Visir, all your apps are accessible and manageable in one place. By eliminating app switching, Visir saves you time and helps you maintain focus, ensuring your productivity remains uninterrupted.",
+  "time_saved_projection_description_first" : "You've been using Visir for ",
+  "time_saved_projection_days" : "{count} days",
+  "time_saved_projection_description_second" : " and have reduced ",
+  "time_saved_projection_app_switches" : "{count} app switches",
+  "time_saved_projection_description_third" : " so far. This saved you a total of ",
+  "time_saved_projection_hours" : "{count} hours",
+  "time_saved_projection_description_fourth" : ", which equals ",
+  "time_saved_projection_description_fifth" : " based on your hourly wage. If this pace continues, your projected annual savings are ",
+  "time_saved_productive_hours_reclaimed" : "Productive Hours Reclaimed",
+  "time_saved_most_frequent_switch" : "Most Frequent Switch",
+  "time_saved_wasted_switching" : "Wasted Switching",
+  "time_saved_wasted_regaining_focus" : "Wasted Regaining Focus",
+  "time_saved_last_7_days" : "Last 7 days",
+  "time_saved_last_14_days" : "Last 14 days",
+  "time_saved_last_28_days" : "Last 28 days",
+  "time_saved_last_12_weeks" : "Last 12 weeks",
+  "time_saved_last_12_months" : "Last 12 months",
+  "time_saved_this_week" : "This Week",
+  "time_saved_this_month" : "This Month",
+  "time_saved_this_year" : "This Year",
+  "time_saved_total" : "Total",
+  "time_saved_trend" : "Savings Trend",
+  "time_saved_times" : "times",
+  "time_saved_savings_with" : "Savings with",
+  "time_saved_switches_avoided" : "Switches Avoided",
+  "time_saved_that_is_equivalent_to" : "That's equivalent to",
+  "time_saved_how_i_did_it" : "How I did it",
+  "time_saved_watching" : "Watching",
+  "time_saved_episodes" : "episodes",
+  "time_saved_buy" : "Buy",
+  "time_saved_burgers" : "burgers",
+  "time_saved_start_using_taskey" : "Start using Visir to see your savings",
+  "time_saved_share" : "Share",
+  "time_saved_download_image" : "Download Image",
+  "time_saved_share_tutorial_title" : "Image copied to clipboard",
+  "time_saved_share_tutorial_description" : "Click Continue to open {platform}, then paste the image",
+  "time_saved_share_tutorial_button" : "Continue",
+  "time_saved_saved" : "Saved",
+  "time_saved_saved_in" : "Saved in",
+  "time_saved_saved_in_the" : "Saved in the",
+  "time_saved_taskey_helped_you_save" : "Visir helped you save {hours} hours and ${money}",
+  "time_saved_in" : "in {viewType}",
+  "time_saved_in_the" : "in the {viewType}",
+  "time_saved_taskey_helped_you_save_total" : "Congrats 🎉🎉 ${money} saved so far.",
+  "time_saved_total_share_text" : "🙌 Only {days} days with Visir and I've already saved {hours} hours and ${money}! Give it a try!",
+  "time_saved_check_out_taskey_here" : "✨ Check out Visir here : {url}",
+  "subscription_visir_pro" : "Pro Plan",
+  "subscription_unlimited_integrations" : "Unlimited integrations",
+  "subscription_ai_suggestion" : "AI Suggestions and more AI features",
+  "subscription_pro_ai_based_inbox_summary" : "AI based inbox suggestions",
+  "subscription_pro_next_schedule_summary" : "Next schedule summary",
+  "subscription_all_features" : "All features",
+  "subscription_priority_support" : "Priority support",
+  "subscription_continuous_update" : "Continuous updates, no price increase",
+  "subscription_visir_ultra" : "Ultra Plan",
+  "subscription_ultra" : "Ultra",
+  "subscription_ultra_best_value" : "Best Value",
+  "subscription_ultra_all_pro_features" : "All features in Pro",
+  "subscription_ultra_500k_ai_tokens" : "500K AI tokens monthly for AI-based orders and summaries",
+  "subscription_ultra_advanced_ai_features" : "Advanced AI features and unlimited AI requests",
+  "subscription_ultra_priority_support" : "Priority support",
+  "subscription_ultra_continuous_update" : "Continuous updates, no price increase",
+  "subscription_monthly" : "Monthly",
+  "subscription_yearly" : "Yearly",
+  "subscription_early_access_discout" : "Early Access Discount",
+  "subscription_active" : "Active",
+  "subscription_manage_billing" : "Manage billing",
+  "subscription_switch_subscription" : "Switch plan",
+  "subscription_per_month" : " /mo",
+  "subscription_next_billing_date" : "Next bill on",
+  "subscription_subscription_ends" : "Subscription ends on",
+  "subscription_free_trial_ends" : "Free trial ends on",
+  "subscription_upgrade_to_pro" : "Choose this plan",
+  "subscription_save_two_months_more" : "Save 2-months more",
+  "subscription_billed_annualy" : "Billed annually",
+  "subscription_restore_subscription" : "Restore subscription",
+  "subscription_contact_billing_support" : "Contact billing support",
+  "subscription_your_savings_tooptip_desktop" : "The range you choose here also updates the Saved amount in the app’s top right corner.",
+  "subscription_your_savings_tooptip_mobile" : "The range you choose here also updates the Saved amount below the settings icon in the bottom-right corner.",
+  "update_required_title": "Update Required",
+  "update_required_body": "This version is no longer supported. Please update to continue.",
+  "update_required_button": "Update",
+  "delete_confirm_text": "Are you sure you want to proceed? Deleting your account will permanently remove all your task data and account information from our system. This action is irreversible.",
+  "delete_confirm_title": "Delete",
+  "join_community": "Join community",
+  "join_slack_community": "Join Slack community",
+  "download_for_mobile" : "Download for mobile",
+  "webview2_required_title": "Need WebView2 Runtime",
+  "webview2_required_body": "To view and edit emails in Visir, you need the WebView2 Runtime. You can get it from the official Microsoft website.",
+  "webview2_required_button": "Download",
+  "error_message_dont_have_permission": "You don't have permissions to do this action",
+  "n_selected": "{count} Selected",
+  "mail_options": "Options",
+  "mail_options_title": "Reply & More",
+  "download_button": "Download native Visir app",
+  "search_inbox": "Search inbox",
+  "tooltip_prev_day": "Previous day",
+  "tooltip_next_day": "Next day",
+  "tooltip_prev_n_day": "Previous {count} days",
+  "tooltip_next_n_day": "Next {count} days",
+  "tooltip_prev_week": "Previous week",
+  "tooltip_next_week": "Next week",
+  "tooltip_prev_month": "Previous month",
+  "tooltip_next_month": "Next month",
+  "refresh": "Refresh",
+  "show_hide_calendars" :"Show / Hide calendars",
+  "tooltip_view_range": "View range",
+  "tooltip_view_range_shortcut_to_week": "1~7, W",
+  "tooltip_view_range_shortcut_to_month": "1~7, W, M",
+  "confirm": "Confirm",
+  "quick_view": "Quick view",
+  "open_in": "Open in {provider}",
+  "remove_from_inbox": "Remove from inbox",
+  "open_in_chat_tab": "Open in chat tab",
+  "open_in_mail_tab": "Open in mail tab",
+  "disconnect":"Disconnect",
+  "inbox_filter": "Inbox filter",
+  "notification_preference": "Notification perferences",
+  "chat_preference": "Chat perferences",
+  "join_conference": "Join",
+  "play": "Play",
+  "pause": "Pause",
+  "mute":"Mute",
+  "unmute":"Unmute",
+  "close":"Close",
+  "go_back" : "Go back",
+  "delete": "Delete",
+  "duplicate": "Dupliacte",
+  "search_mail":"Search mail",
+  "search_channels":"Search channels",
+  "collapse": "Collapse",
+  "expand": "Expand",
+  "cancel_search": "Cancel search",
+  "reaction": "Reaction",
+  "reply_in_thread":"Reply in thread",
+  "more_actions": "More actions",
+  "attach": "Attach",
+  "drag_and_drop": "Drag & drop",
+  "send": "Send",
+  "quick_link_hint_link": "Link",
+  "quick_link_hint_title": "Title (Optional)",
+  "quick_link_add": "Add quick link",
+  "quick_link_more": "More quick links",
+  "copy_message": "Copy message",
+  "text_copied_to_clipboard": "Message copied to clipboard",
+  "tutorial_welcome_to_taskey" : "Welcome to Visir!",
+  "tutorial_connect_apps" : "Connect Mail, Calendar, and Slack.",
+  "tutorial_keep_everything_organized" : "Keep everything organized and reclaim your time.",
+  "tutorial_get_started" : "Get started",
+  "feature_tutorial_inbox_integration_title" : "This is your Inbox",
+  "feature_tutorial_inbox_integration_description" : "This is where all your messages from Mail and Chats come together.",
+  "feature_tutorial_inbox_integration_button" : "Set up integrations",
+  "feature_tutorial_inbox_drag_and_drop_title" : "Drag and drop task creation",
+  "feature_tutorial_inbox_drag_and_drop_description" : "Drag an issue from your Inbox to create a task or event instantly.",
+  "feature_tutorial_inbox_drag_and_drop_button" : "Got it",
+  "feature_tutorial_mobile_inbox_drag_and_drop_title" : "Long press task creation",
+  "feature_tutorial_mobile_inbox_drag_and_drop_description" : "Tap and hold an item in your Inbox to create a task or event.",
+  "feature_tutorial_time_saved_title" : "Switch less. Save more.",
+  "feature_tutorial_time_saved_description" : "Every context switch drains focus and costs about 9.5 minutes and real dollars. Stay inside Visir and watch minutes and money stack up in Time Saved.",
+  "feature_tutorial_time_saved_button" : "Show my savings",
+  "feature_tutorial_create_task_from_mail_title" : "Turn mails into tasks",
+  "feature_tutorial_create_task_from_mail_description" : "Use the Create task button to directly create a task from Mail.",
+  "feature_tutorial_create_task_from_mail_button" : "Got it",
+  "google_calendar_permission_title" : "Grant full access to sync your calendar",
+  "google_calendar_permission_description" : "On the next screen, make sure to check all permission boxes. These permissions are required to manage your calendar events in Taskey.",
+  "google_calendar_permission_button" : "Continue",
+  "google_mail_permission_title" : "Grant full access to connect your Gmail",
+  "google_mail_permission_description" : "On the next screen, make sure to check all permission boxes. These permissions are required to manage your emails in Taskey.",
+  "google_mail_permission_button" : "Continue",
+  "inbox_filter_tutorial_title" : "Control what appears in your Inbox",
+  "inbox_filter_tutorial_description" : "Use inbox filter to choose which messages show up.",
+  "inbox_filter_tutorial_button" : "Got it",
+  "download_mobile_app_popup_title" : "Get Taskey on mobile",
+  "download_mobile_app_popup_description" : "Scan this QR code to download the app for iOS or Android. Taskey on mobile offers the same full functionality as desktop.",
+  "download_mobile_app_popup_button" : "Close",
+  "download_for_desktop" : "Download for desktop",
+  "reacting_members": "Reacting members",
+  "system": "System",
+  "launch_at_startup": "Launch at startup",
+  "ai_suggestion_section": "Suggestion",
+  "ai_suggestion": "Suggested",
+  "ai_suggestion_urgency_urgent": "Urgent",
+  "ai_suggestion_urgency_important": "Important",
+  "ai_suggestion_urgency_action_required": "Action Required",
+  "ai_suggestion_urgency_need_review": "Need Review",
+  "ai_suggestion_reason_meeting_invitation": "Meeting Invitation",
+  "ai_suggestion_reason_meeting_followup": "Meeting Follow-up",
+  "ai_suggestion_reason_meeting_notes": "Meeting Notes",
+  "ai_suggestion_reason_task_assignment": "Task Assignment",
+  "ai_suggestion_reason_task_status_update": "Task Update",
+  "ai_suggestion_reason_scheduling_request": "Scheduling Request",
+  "ai_suggestion_reason_scheduling_confirmation": "Scheduling Confirmation",
+  "ai_suggestion_reason_document_review": "Document Review",
+  "ai_suggestion_reason_code_review": "Code Review",
+  "ai_suggestion_reason_approval_request": "Approval Request",
+  "ai_suggestion_reason_question": "Question",
+  "ai_suggestion_reason_information_sharing": "Info Sharing",
+  "ai_suggestion_reason_announcement": "Announcement",
+  "ai_suggestion_reason_system_notification": "System Notification",
+  "ai_suggestion_reason_cold_contact": "Cold Contact",
+  "ai_suggestion_reason_customer_contact": "Customer Contact",
+  "ai_suggestion_reason_other": "Other",
+  "ai_suggestion_due": "Due: {due}",
+  "ai_suggestion_due_asap": "ASAP",
+  "ai_suggestion_duration": "{mininutes} min",
+  "ai_thinking": "Thinking...",
+  "inbox_sort_and_filter": "Sort & Filter",
+  "inbox_sort_section": "Sorting",
+  "inbox_sort_recent": "Sort by recent",
+  "inbox_sort_due": "Sort by due",
+  "inbox_sort_importnace": "Sort by importance",
+  "inbox_filter_section": "Filter",
+  "inbox_filter_all": "Show all",
+  "inbox_filter_urgent": "Urgent only",
+  "inbox_filter_important": "Important or higher",
+  "inbox_filter_action_required": "Action Required or higher",
+  "inbox_filter_hide_all": "Hide all",
+  "inbox_right_click_option_read": "Read",
+  "inbox_right_click_option_unread": "Unread",
+  "inbox_right_click_option_pin": "Pin",
+  "inbox_right_click_option_unpin": "Unpin",
+  "inbox_right_click_option_delete": "Delete",
+  "inbox_right_click_option_undelete": "Move back to inbox",
+  "failed_to_send_mail": "Failed to send mail",
+  "retry_to_send_mail": "Retry sending mail",
+  "select_prev": "Select previous",
+  "select_next": "Select next",
+  "new_message": "New Message",
+  "new_messages": "{count} Messages",
+  "ask_taskey": "Search anything",
+  "command_bar_hint": "Search for tasks, events, commands, and more…",
+  "command_search_in_all": "Search{query} everywhere",
+  "command_search_in_mail": "Search{query} in emails",
+  "command_search_in_event": "Search{query} in calendar events",
+  "command_search_in_task": "Search{query} in tasks",
+  "command_search_in_chat": "Search{query} in chats",
+  "command_create_task": "Create task {title}",
+  "command_edit_task": "Edit task {title}",
+  "command_delete_task": "Delete task {title}",
+  "command_mark_as_done_task": "Mark as done {title}",
+  "command_mark_as_undone_task": "Mark as undone {title}",
+  "command_create_event": "Create calendar event {title}",
+  "command_edit_event": "Edit calendar event {title}",
+  "command_delete_event": "Delete calendar event {title}",
+  "command_chat_open_channel": "Open channel {title}",
+  "command_chat_send_message": "Send message {title}",
+  "command_chat_show_channel": "Show channel {title}",
+  "command_chat_hide_channel": "Hide channel {title}",
+  "command_argument_title": "Title",
+  "command_arguemnt_message": "Message",
+  "command_argument_description": "Description",
+  "command_argument_rrule": "Recurrence rule",
+  "command_argument_at": "At",
+  "command_argument_recurring": "Every",
+  "command_argument_reminder": "Reminder",
+  "command_argument_location": "Location",
+  "command_argument_attendee": "Attendee",
+  "command_argument_calendar": "Calendar",
+  "command_argument_color": "Color",
+  "command_argument_channel": "Channel",
+  "command_suggestion": "Suggestions",
+  "command_results": "Results",
+  "command_argument_with": "with ",
+  "command_argument_and": "and ",
+  "command_argument_add_flag": "Add {flag}",
+  "command_argument_set_flag": "Set {flag}: {value}",
+  "command_argument_marked_done": "which marked as done",
+  "command_results": "Results",
+  "subscription_done_title" : "Welcome to Visir Pro",
+  "subscription_done_description" : "Manage all your emails, chats, calendars, and tasks in one place, simplify your workflow, and reclaim time for the work that matters.",
+  "subscription_done_button" : "Get started",
+  "early_access_done_title" : "Introducing Visir Pro",
+  "early_access_done_description" : "Free Early Access ends on August 30, continue with our discounted Early Access pricing after that.",
+  "early_access_done_button" : "Got it",
+  "upgrade_to_taskey_pro_title" : "Upgrade to Visir Pro",
+  "upgrade_to_taskey_pro_button" : "View plans",
+  "expired_title" : "Your subscription is expired",
+  "expired_title_ios" : "This account doesn't currently have access to Visir",
+  "expired_title_mobile" : "Visir Pro needed",
+  "expired_description" : "Upgrade to Visir Pro to access every feature, connect your calendars and inboxes, and keep your day organized from one place.",
+  "expired_button" : "View plans",
+  "expired_button_mobile" : "Download for desktop",
+  "expired_you_are_logged_in_as" : "You’re logged in as",
+  "expired_you_are_logged_in_with_apple" : "You’re logged in with Apple",
+  "expired_log_out" : "Log out",
+  "expired_delete_account" : "Delete account",
+  "undo": "Undo",
+  "task_deleted": "Task deleted",
+  "task_undone": "Task marked as undone",
+  "task_done": "Task marked as done",
+  "event_deleted": "Calendar event deleted",
+  "event_edited": "Calendar event edited",
+  "take_a_tour": "See how it works",
+  "tour_inbox_list_title": "Smart Unified Inbox",
+  "tour_inbox_list_description": "Integrated emails and chats are organized by date.\nAI Suggestions highlight what matters most, tagging items as Action Required, Need Review, Important, or Urgent.\nThey’re also classified as Tasks or Calendar Events, with time information extracted automatically.",
+  "tour_inbox_item_title": "Inbox from Mail & Chat",
+  "tour_inbox_item_description": "Your connected emails and chats, all in one place.\nClick to read, Reply to respond, Drag & Drop to turn into tasks or calendar events.",
+  "tour_inbox_item_description_mobile": "Your connected emails and chats, all in one place.\nClick to read, Reply to respond, Long press then Drag & Drop to turn into tasks or calendar events.",
+  "tour_task_calendar_title": "Task & Calendar",
+  "tour_task_calendar_description": "See all your connected calendars and tasks in one view.\nDouble-click anywhere or drag on the screen to create a new task or calendar event instantly.",
+  "tour_task_on_calendar_title": "Inbox Linked Tasks & Events",
+  "tour_task_on_calendar_description": "Any task or calendar event you create from the inbox stays connected.\nYou can always see which mail or chat it came from.",
+  "tour_task_linked_mail_title": "Quick Mail Access",
+  "tour_task_linked_mail_description": "Click the 👁 button to instantly open the linked mail in a popup.",
+  "tour_task_linked_chat_title": "Quick Chat Access",
+  "tour_task_linked_chat_description": "Also, click the 👁 button to instantly open the linked chat in a popup.",
+  "tour_task_linked_mail_detail_title": "Full Mail Experience",
+  "tour_task_linked_mail_detail_description": "Read, reply, forward, and manage your emails.\nAll right from the Home tab.",
+  "tour_task_linked_chat_detail_title": "Full Chat Experience",
+  "tour_task_linked_chat_detail_description": "Read, reply, and keep your conversation context.\nAll without leaving the Home tab.",
+  "tour_task_tab_title": "Task Tab",
+  "tour_task_tab_description": "Manage all your tasks created in Visir with a familiar list view. Use filters like Unscheduled and Today to organize your tasks efficiently.",
+  "tour_mail_tab_title": "Full-Featured Mail Tab",
+  "tour_mail_tab_description": "Access all the essential features of a standard mail app—star, unread, trash, spam, and more—right from the Mail tab.",
+  "tour_chat_tab_title": "Unified Chat Tab",
+  "tour_chat_tab_description": "View and manage channels from multiple workspaces in one place. Stay on top of new messages, reply, and react with ease.",
+  "tour_calendar_tab_title": "Comprehensive Calendar Tab",
+  "tour_calendar_tab_description": "Manage your team’s calendars together and focus on your schedule, even without tasks. Enjoy a full-featured calendar experience.",
+  "tour_chat_create_task_title": "Create Tasks or Events from Chat",
+  "tour_chat_create_task_description": "Turn any chat message into a task or calendar event instantly. Just drag and drop or use the quick action button.",
+  "tour_mail_create_task_title": "Create Tasks or Events from Mail",
+  "tour_mail_create_task_description": "Easily convert any email into a task or calendar event. Stay organized by turning important messages into actionable items.",
+  "tour_inbox_list_subject": "See all your emails and chats together, sorted by date with AI highlights.",
+  "tour_inbox_item_subject": "Quickly access and manage your connected emails and chats in one inbox.",
+  "tour_task_calendar_subject": "View all your calendars and tasks together, create new ones with a click or drag.",
+  "tour_task_on_calendar_subject": "Tasks and events from the inbox stay linked to their original mail or chat.",
+  "tour_task_linked_mail_subject": "Open linked emails instantly from any task or event.",
+  "tour_task_linked_chat_subject": "Open linked chats instantly from any task or event.",
+  "tour_task_linked_mail_detail_subject": "Read, reply, and manage emails directly from Home.",
+  "tour_task_linked_chat_detail_subject": "Read and reply to chats without leaving Home.",
+  "tour_task_tab_subject": "Organize and manage all your Visir tasks with filters and lists.",
+  "tour_mail_tab_subject": "Use all standard mail features—star, unread, trash, spam—in the Mail tab.",
+  "tour_chat_tab_subject": "Manage all your chat channels and messages from every workspace in one place.",
+  "tour_calendar_tab_subject": "See and manage your team’s calendars and events in a full-featured calendar view.",
+  "tour_chat_create_task_subject": "Turn any chat message into a task or event instantly.",
+  "tour_mail_create_task_subject": "Convert any email into a task or event to stay organized.",
+  "tour_list_title": "Play Showcase",
+  "default_task_before_signin_tour_title": "1. Start the Tour 🚀",
+  "default_task_before_signin_tour_desc": "Click the \"See how it works\" button to take a quick tour of Taskey.",
+  "default_task_before_signin_explore_title": "2. Explore the Tabs 🗂️",
+  "default_task_before_signin_explore_desc": "Check out the Home, Calendar, Inbox, and Settings tabs to get familiar with the layout.",
+  "default_task_before_signin_inbox_title": "3. Create a Task from the Inbox ✉️➡️✅",
+  "default_task_before_signin_inbox_desc": "Easily create a task by dragging and dropping directly from the Inbox.",
+  "default_task_before_signin_quickview_title": "4. Open Quick View 👁️",
+  "default_task_before_signin_quickview_desc": "Open your new task in Quick View to review details and reply.",
+  "default_task_before_signin_signin_title": "5. Sign In 🔑",
+  "default_task_before_signin_signin_desc": "Sign in to start using Taskey and unlock all features.",
+  "default_task_after_signin_connect_services_title": "1. Connect Services 🔗",
+  "default_task_after_signin_connect_services_desc": "Link email, Slack, and more to bring everything into Inbox.",
+  "default_task_after_signin_revisit_tabs_title": "2. Revisit Tabs 🗂️",
+  "default_task_after_signin_revisit_tabs_desc": "If you skipped earlier, check each tab now.",
+  "default_task_after_signin_schedule_ai_title": "3. Schedule AI 🤖",
+  "default_task_after_signin_schedule_ai_desc": "Drag an AI suggestion onto your calendar.",
+  "default_task_after_signin_reply_in_quick_view_title": "4. Reply in Quick View 👁️",
+  "default_task_after_signin_reply_in_quick_view_desc": "Reply and manage checklists right inside Quick View.",
+  "default_task_after_signin_create_from_message_title": "5. Create from Message ✉️➡️✅",
+  "default_task_after_signin_create_from_message_desc": "Use Create Task in email/chat to make a task instantly.",
+  "default_task_after_signin_use_free_trial_title": "6. Use Free Trial 🎁",
+  "default_task_after_signin_use_free_trial_desc": "Enjoy all features free for 7 days.",
+  "default_task_near_trial_end_check_time_saved_title": "1. Check Time Saved ⏳",
+  "default_task_near_trial_end_check_time_saved_desc": "Open Time Saved to see how much time you saved.",
+  "default_task_near_trial_end_share_image_title": "2. Share Image 🖼️",
+  "default_task_near_trial_end_share_image_desc": "Generate and share the image on social.",
+  "default_task_near_trial_end_start_subscription_title": "3. Start Subscription 🚀",
+  "default_task_near_trial_end_start_subscription_desc": "Subscribe if it’s boosting your workflow.",
+  "oauth_disconnected_title": "{provider} account disconnected",
+  "oauth_disconnected_description": "Lost access to {provider} account ({email}). Reconnect to continue syncing.",
+  "oauth_disconnected_ignore": "Ignore",
+  "oauth_disconnected_reconnect": "Reconnect",
+  "linked_task_evnet": "Linked tasks / events",
+  "search_timezone": "Search timezone...",
+  "no_selection": "No item selected yet",
+  "no_history": "No history",
+  "no_inbox_matched_with_filter": "No inboxes match your filter",
+  "viewtype_section": "View type",
+  "search_tasks": "Search tasks",
+  "search_events": "Search calendar events",
+  "no_channel_selected": "Select a channel to get started",
+  "muted": "Muted",
+  "emailprovider": "Email & Provider",
+  "manage_account": "Manage account",
+  "current_subscription": "Current subscription",
+  "available_plans": "Available plans",
+  "per_month_billed_monthly": "Per month,\nBilled monthly",
+  "per_month_billed_yearly": "Per month,\nBilled yearly",
+  "no_chat_provider_integrated": "You haven’t connected any chat accounts yet",
+  "last_opened_channel": "Last checked",
+  "suggested_unread_channels": "Last updated & unread",
+  "updated_at": "Updated at {date}",
+  "last_seen_at": "Last check at {date}",
+  "project": "Project",
+  "default_pref": "Defaults",
+  "pref_actions": "Actions",
+  "secondary_timezone": "Secondary timezone",
+  "no_integration_yet_for_inbox": "You haven’t integrated any mail or chat accounts yet. Inbox will display important emails and messages once you connect your accounts.",
+  "integrate_new_accounts": "Connect new accounts",
+  "no_integration_yet_for_mail": "You haven’t connected any mail accounts yet",
+  "need_to_integrate_calendar":"Connect calendars",
+  "opened": "Opened",
+  "home_calendar_default_ratio": "Home calendar split ratio",
+  "create_signautre": "Create new",
+  "create_signature_title": "Create new signature",
+  "edit_signature_title": "Edit signature",
+  "project_pref_title": "Project",
+  "project_pref_structures": "Manage projects",
+  "press_back_button": "Press back button again to exit",
+  "create_new_project": "New project",
+  "create_new_project_description": "Add description",
+  "confirm_delete_project": "Are you sure you want to delete this project? Items under project will be moved to default project.",
+  "default_project": "Default project",
+  "hide_tab": "Hide tab",
+  "task_section_braindump": "Braindump",
+  "task_section_unscheduled": "Unscheduled",
+  "dump_ideas_from_brain": "Capture your thoughts",
+  "add_unscheduled_task": "Add unscheduled task",
+  "agentic_home_hi": "Hello, ",
+  "agentic_home_summary_action_required": "You have {count} inboxes that need action in the last 24 hours",
+  "agentic_home_summary_events": "You have {eventCount} events and {taskCount} tasks in the last 24 hours",
+  "agentic_home_summary_only_events": "You have {eventCount} events in the last 24 hours",
+  "agentic_home_summary_only_tasks": "You have {taskCount} tasks in the last 24 hours",
+  "agentic_home_summary_all_clear": "You're all caught up!",
+  "no_suggested_schedule": "No schedule suggested",
+  "inbox_home_type": "Home Mode",
+  "inbox_agent_type": "Agent",
+  "inbox_manual_type": "Helper",
+  "inbox_agent_loading": "I'm checking your inboxes from the last 24 hours",
+  "inbox_agent_loading_dynamic": "I'm checking your inboxes from the last {duration}",
+  "@inbox_agent_loading_dynamic": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "agentic_home_summary_action_required_dynamic": "You have {count} inboxes that need action in the last {duration}",
+  "@agentic_home_summary_action_required_dynamic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "agentic_home_summary_events_dynamic": "You have {eventCount} events and {taskCount} tasks in the last {duration}",
+  "@agentic_home_summary_events_dynamic": {
+    "placeholders": {
+      "eventCount": {
+        "type": "int"
+      },
+      "taskCount": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "agentic_home_summary_only_events_dynamic": "You have {eventCount} events in the last {duration}",
+  "@agentic_home_summary_only_events_dynamic": {
+    "placeholders": {
+      "eventCount": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "agentic_home_summary_only_tasks_dynamic": "You have {taskCount} tasks in the last {duration}",
+  "@agentic_home_summary_only_tasks_dynamic": {
+    "placeholders": {
+      "taskCount": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_day": "{count} day",
+  "@duration_day": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_days": "{count} days",
+  "@duration_days": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "no_project_suggested": "No Project",
+  "agent_select_model_hint": "Change agent model",
+  "agent_use_taskey_api_key": "With Visir API Key",
+  "agent_use_user_api_key": "With User API Key",
+  "agent_select_project_hint": "Add project based context",
+  "agent_select_project_remove": "Remove project base context",
+  "daily_summary_greeting": "Good {timeOfDay}. Here is your daily summary",
+  "@daily_summary_greeting": {
+    "placeholders": {
+      "timeOfDay": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_project_greeting": "Here is {projectName} summary for today",
+  "@daily_summary_project_greeting": {
+    "placeholders": {
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "morning": "Morning",
+  "afternoon": "Afternoon",
+  "evening": "Evening",
+  "night": "Night",
+  "dawn": "Dawn",
+  "user": "User",
+  "daily_summary_overdue_tasks": "I found {count} overdue task{plural} that need your attention right away",
+  "@daily_summary_overdue_tasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_meeting_invitation": "You've got {count} meeting invitation{plural} waiting for your response",
+  "@daily_summary_meeting_invitation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_meeting_followup": "There {isAre} {count} meeting{plural} that need follow-up",
+  "@daily_summary_meeting_followup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_meeting_notes": "You've got {count} meeting note{plural} to check out",
+  "@daily_summary_meeting_notes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_task_assignment": "There {isAre} {count} task{plural} assigned to you",
+  "@daily_summary_task_assignment": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_task_status_update": "You've got {count} task{plural} with status updates to review",
+  "@daily_summary_task_status_update": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_scheduling_request": "There {isAre} {count} scheduling request{plural} waiting for your decision",
+  "@daily_summary_scheduling_request": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_scheduling_confirmation": "You've got {count} scheduling confirmation{plural} to confirm",
+  "@daily_summary_scheduling_confirmation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_document_review": "There {isAre} {count} document{plural} waiting for you to review",
+  "@daily_summary_document_review": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_code_review": "You've got {count} code review{plural} waiting",
+  "@daily_summary_code_review": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_approval_request": "There {isAre} {count} approval request{plural} that need your sign-off",
+  "@daily_summary_approval_request": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_question": "You've got {count} question{plural} that need{needs} an answer",
+  "@daily_summary_question": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "needs": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_information_sharing": "There {isAre} {count} item{plural} with important info to check out",
+  "@daily_summary_information_sharing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_announcement": "You've got {count} announcement{plural} to check out",
+  "@daily_summary_announcement": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_system_notification": "There {isAre} {count} system notification{plural} that might need your attention",
+  "@daily_summary_system_notification": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_cold_contact": "You've got {count} message{plural} from new contacts",
+  "@daily_summary_cold_contact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_customer_contact": "There {isAre} {count} customer inquiry{plural} that need your response",
+  "@daily_summary_customer_contact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_other": "You've got {count} item{plural} to check out",
+  "@daily_summary_other": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_action_items": "You've got {count} action item{plural} waiting",
+  "@daily_summary_action_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_review_items": "There {isAre} {count} item{plural} for you to review when you have time",
+  "@daily_summary_review_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "plural": {
+        "type": "String"
+      },
+      "isAre": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_schedule_clear": "Your schedule is clear for today",
+  "daily_summary_schedule_today": "Today, you have {eventCount} event{eventPlural} and {taskCount} task{taskPlural} scheduled",
+  "@daily_summary_schedule_today": {
+    "placeholders": {
+      "eventCount": {
+        "type": "int"
+      },
+      "taskCount": {
+        "type": "int"
+      },
+      "eventPlural": {
+        "type": "String"
+      },
+      "taskPlural": {
+        "type": "String"
+      }
+    }
+  },
+  "daily_summary_cross_inbox_highlights": "Cross-Inbox Highlights",
+  "daily_summary_inbox_highlights": "Inbox Highlights",
+  "daily_summary_urgent_overdue": "Urgent & Overdue",
+  "daily_summary_overdue": "Overdue",
+  "daily_summary_no_urgent_items": "No urgent items",
+  "daily_summary_no_actions_pending": "No actions pending",
+  "daily_summary_no_inbox_highlights": "No inbox items need attention yet",
+  "daily_summary_no_inbox_highlights_friendly": "All clear! Nothing needs your attention right now.",
+  "daily_summary_reading_previous_conversations": "Reading previous conversations...",
+  "daily_summary_for_review": "For Review",
+  "daily_summary_nothing_to_review": "Nothing to review",
+  "daily_summary_schedule_overview": "Schedule Overview",
+  "daily_summary_todays_remaining": "Today's Remaining",
+  "daily_summary_no_more_events_today": "No more events today",
+  "daily_summary_check_tomorrow_schedule": "Check your calendar for tomorrow's schedule.",
+  "daily_summary_ai_synthesis": "AI Synthesis",
+  "daily_summary_synthesis_label": "Synthesis: ",
+  "daily_summary_synthesis_urgent": "Your primary focus today should be resolving {overdueCount} overdue tasks and addressing {urgentCount} urgent inbox items.",
+  "@daily_summary_synthesis_urgent": {
+    "placeholders": {
+      "overdueCount": {
+        "type": "int"
+      },
+      "urgentCount": {
+        "type": "int"
+      }
+    }
+  },
+  "daily_summary_synthesis_caught_up": "You are caught up on urgent matters.",
+  "daily_summary_synthesis_events_today": "You have {eventCount} events scheduled today.",
+  "@daily_summary_synthesis_events_today": {
+    "placeholders": {
+      "eventCount": {
+        "type": "int"
+      }
+    }
+  },
+  "daily_summary_synthesis_schedule_clear": "Your schedule is clear today.",
+  "daily_summary_next_schedule": "Next Schedule",
+  "daily_summary_up_next": "Up Next",
+  "daily_summary_previous_context": "Previous Context",
+  "daily_summary_previously_completed_tasks": "Previously Completed Tasks",
+  "daily_summary_anytime": "Anytime",
+  "daily_summary_min": "min",
+  "daily_summary_overdue_task": "Overdue Task",
+  "daily_summary_move_to_today": "Reschedule",
+  "daily_summary_inbox": "Inbox",
+  "daily_summary_unknown": "Unknown",
+  "agent_action_error_occurred": "An error occurred. Please try again.",
+  "agent_action_mail_generation_failed": "Failed to generate email. Please try again.",
+  "agent_action_mail_generated": "Reply email has been generated. Please review and send.",
+  "agent_action_action_not_supported": "This action type is not yet supported.",
+  "agent_action_starting_action": "Starting action.",
+  "agent_action_reply_initial_message": "I'll help you write a reply to the following email. Please tell me how you'd like to respond in natural language.\n\n{contextInfo}\n\nHow would you like to reply? For example:\n- \"Thank them for the email\"\n- \"Let them know I'm available tomorrow at 2 PM\"\n- \"Provide a detailed explanation about the inquiry\"\nPlease make your request in this format.",
+  "@agent_action_reply_initial_message": {
+    "placeholders": {
+      "contextInfo": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_reply_suggested_response": "Here's a suggested reply:\n\n{suggestedResponse}\n\nHow would you like to modify it? For example:\n- \"Make it more formal\"\n- \"Add a question about their availability\"\n- \"Shorten it\"\nPlease tell me how you'd like to adjust the reply.",
+  "@agent_action_reply_suggested_response": {
+    "placeholders": {
+      "suggestedResponse": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_create_task_initial_message": "I'll help you create a task from the following inbox item. Please tell me how you'd like to customize it.\n\n{contextInfo}\n\nHow would you like to create the task? For example:\n- \"Set the due date to tomorrow\"\n- \"Add it to the Marketing project\"\n- \"Make the title more specific\"\nPlease make your request in this format.",
+  "@agent_action_create_task_initial_message": {
+    "placeholders": {
+      "contextInfo": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_create_task_suggested_response": "<div>Here's a suggested task:</div><br>{suggestedTask}<br><div>Would you like to create this task as is, or would you like to make changes? If you'd like to make changes, please tell me what you'd like to modify.</div>",
+  "@agent_action_create_task_suggested_response": {
+    "placeholders": {
+      "suggestedTask": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_task_generation_failed": "Failed to generate task. Please try again.",
+  "agent_action_task_created": "Task has been created successfully.",
+  "agent_action_loading_thinking": "Thinking...",
+  "agent_action_loading_processing_request": "Processing your request...",
+  "agent_action_loading_creating_task": "Creating task...",
+  "agent_action_loading_saving_task_details": "Saving task details...",
+  "agent_action_loading_finalizing_task": "Finalizing task...",
+  "agent_action_loading_updating_task_details": "Updating task details...",
+  "agent_action_loading_modifying_task_info": "Modifying task information...",
+  "agent_action_loading_adjusting_task_params": "Adjusting task parameters...",
+  "agent_action_loading_analyzing_inbox": "Analyzing inbox item...",
+  "agent_action_loading_generating_task_details": "Generating task details...",
+  "agent_action_loading_preparing_task_info": "Preparing task information...",
+  "agent_action_loading_updating_reply_draft": "Updating reply draft...",
+  "agent_action_loading_modifying_email_content": "Modifying email content...",
+  "agent_action_loading_adjusting_response": "Adjusting response...",
+  "agent_action_loading_analyzing_email": "Analyzing email content...",
+  "agent_action_loading_drafting_reply": "Drafting reply...",
+  "agent_action_loading_generating_response": "Generating response...",
+  "agent_action_loading_creating_event": "Creating event...",
+  "agent_action_loading_saving_event_details": "Saving event details...",
+  "agent_action_loading_finalizing_event": "Finalizing event...",
+  "agent_action_loading_updating_event_details": "Updating event details...",
+  "agent_action_loading_modifying_event_info": "Modifying event information...",
+  "agent_action_loading_adjusting_event_params": "Adjusting event parameters...",
+  "agent_action_loading_generating_event_details": "Generating event details...",
+  "agent_action_loading_preparing_event_info": "Preparing event information...",
+  "agent_action_loading_analyzing_info": "Analyzing information...",
+  "ai_credits_title": "AI Credits",
+  "ai_credits_purchase": "Purchase",
+  "ai_credits_history": "History",
+  "ai_credits_current_tokens": "Current Tokens",
+  "ai_credits_purchase_packages": "Credit Packages",
+  "ai_credits_best_value": "Best Value",
+  "ai_credits_tokens": "tokens",
+  "ai_credits_buy": "Buy",
+  "ai_credits_history_empty": "No usage history",
+  "ai_credits_purchase_coming_soon": "Credit purchase will be available soon",
+  "ai_credits_insufficient": "Insufficient credits",
+  "ai_credits_insufficient_message": "You need {required} tokens but only have {available} tokens available.",
+  "@ai_credits_insufficient_message": {
+    "placeholders": {
+      "required": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_credits_purchase_now": "Purchase Credits",
+  "agent_action_task_proposal_message": "I can create a task with the following details:\n\n**Title**: {title}\n{description}**Project**: {project}\n{startTime}\n\nPlease confirm if you'd like me to create this task, or let me know if you'd like to make any changes.",
+  "@agent_action_task_proposal_message": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      },
+      "project": {
+        "type": "String"
+      },
+      "startTime": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_send_initial_message": "Please provide the following information to send an email:\n- To recipients (required)\n- CC recipients (optional)\n- BCC recipients (optional)\n- Subject/title (required)\n- Body/content (required)\n\nYou can provide email addresses or names.",
+  "agent_action_email_thread_summary": "Here's a summary of the email thread:",
+  "agent_action_suggested_reply": "Here's a suggested reply:",
+  "agent_action_send_confirmation": "Would you like to send this as is, or would you like me to modify it?",
+  "agent_action_reply_all_suggestion": "Note: This email has CC recipients. Would you like to use \"Reply All\" instead?",
+  "agent_action_suggested_email": "Here's a suggested email:",
+  "agent_action_see_full_email": "To see full email rather than snippet, click",
+  "agent_action_no_email_account_configured": "No email account configured. Please configure an email account first.",
+  "agent_action_no_email_account_available": "No email account available.",
+  "agent_action_forward_preview": "Here's the forward:",
+  "agent_action_forward_confirmation": "Would you like to forward this email as is, or would you like to add a message? If you'd like to add a message, please let me know what you'd like to include.",
+  "agent_action_forwarding_as_is": "Forwarding the email as is:",
+  "agent_action_send_forward_confirmation": "Would you like to send this forward?",
+  "agent_action_suggested_forward": "Here's a suggested forward:",
+  "agent_tag_section_task": "Task",
+  "agent_tag_section_event": "Event",
+  "agent_tag_section_connections": "Connections",
+  "loading": "Loading...",
+  "chat_history_search_hint": "Search history...",
+  "chat_history_conversation_start": "Conversation start",
+  "chat_history_messages_count": "{count} messages",
+  "@chat_history_messages_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chat_history_load_error": "An error occurred while loading history",
+  "chat_history_filter_all": "All",
+  "chat_history_filter_unknown": "Unknown",
+  "chat_history_sort_updated_desc": "Newest",
+  "chat_history_sort_updated_asc": "Oldest",
+  "chat_history_sort_message_count_desc": "Most messages",
+  "chat_history_sort_message_count_asc": "Fewest messages"
+}

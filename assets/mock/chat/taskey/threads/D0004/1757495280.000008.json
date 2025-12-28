@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "channel": "D0004",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757495280.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll update the timeline and owners."
+          }
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U0005",
+        "U0001"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757495280.000010"
+    },
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1757495280.000009",
+      "thread_ts": "1757495280.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — taking the next step (re: context). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    }
+  ]
+}

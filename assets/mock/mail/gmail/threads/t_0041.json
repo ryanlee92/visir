@@ -1,0 +1,47 @@
+{
+  "id": "t_0041",
+  "historyId": "968897",
+  "messages": [
+    {
+      "id": "m_0041_01",
+      "threadId": "t_0041",
+      "labelIds": [
+        "INBOX"
+      ],
+      "snippet": "Hi, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency,\u2026",
+      "historyId": "125987",
+      "internalDate": "1754454568305",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Paisley Jones <paisley.jones+16@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Notes from user interview"
+          },
+          {
+            "name": "Date",
+            "value": "Wed, 06 Aug 2025 04:29:28 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<9585214942.464350@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 267,
+          "data": "SGksCgpUaGFua3MgZm9yIHRoZSBxdWljayB0dXJuYXJvdW5kIG9uIHRoaXMuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCklmIGFueXRoaW5nIGxvb2tzIG9mZiwgbGV0IG1lIGtub3cgYW5kIEnigJlsbCBhZGp1c3Qu"
+        }
+      },
+      "sizeEstimate": 567
+    }
+  ],
+  "snippet": "Hi, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency,\u2026"
+}

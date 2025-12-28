@@ -1,0 +1,71 @@
+{
+  "id": "m_0002_04",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-24T10:33:16.900000+00:00",
+  "sentDateTime": "2025-08-24T10:33:16.900000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<5770709177.854068@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Aria White <aria.white+53@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Feedback on the new onboarding"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-24T10:33:16.900000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<5770709177.854068@wavetogether.com>"
+    }
+  ],
+  "subject": "Feedback on the new onboarding",
+  "bodyPreview": "Good morning, Appreciate the context \u2014 adding specifics. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. - Scope: finalize A",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-24T09:59:23.664000+00:00, Michael Miller &lt;michael.miller+29@testdomain.com&gt; wrote:<br>&gt; Good afternoon,<br>&gt; <br>&gt; Following up with a few details from our chat.<br>&gt; <br>&gt; For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; Thanks again \u2014 this unblocks the rest of the sprint.<br>&gt; <br>&gt; <br>&gt; On 2025-08-24T09:47:41.535000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; &gt; Hey,<br>&gt; &gt; <br>&gt; &gt; Sharing a summary and next steps below.<br>&gt; &gt; <br>&gt; &gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; &gt; <br>&gt; &gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; &gt; <br>&gt; &gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; &gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; &gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; &gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; &gt; <br>&gt; &gt; Happy to jump on a quick call later today.<br>&gt; &gt; <br>&gt; &gt; \u2014 Alex<br>&gt; &gt; <br>&gt; &gt; On 2025-08-24T08:39:36.712000+00:00, Michael Miller &lt;michael.miller+29@testdomain.com&gt; wrote:<br>&gt; &gt; &gt; Good morning,<br>&gt; &gt; &gt; <br>&gt; &gt; &gt; Following up with a few details from our chat.<br>&gt; &gt; &gt; <br>&gt; &gt; &gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; &gt; &gt; <br>&gt; &gt; &gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; &gt; &gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; &gt; &gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; &gt; &gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; &gt; &gt; <br>&gt; &gt; &gt; Happy to jump on a quick call later today.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0002",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Aria White",
+        "address": "aria.white+53@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

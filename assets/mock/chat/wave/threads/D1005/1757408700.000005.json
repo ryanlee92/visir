@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D1005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757408700.000007",
+      "thread_ts": "1757408700.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — confirming scope (re: context). I'll verify edge cases."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "channel": "C1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756976940.000549",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All-hands today at 3 PM ET. Q&A at the end. Love the pace — keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U1005",
+        "U1007"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1756976940.000551"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1756976940.000550",
+      "thread_ts": "1756976940.000549",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — pairing later today (re: summary). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756976940.000551",
+      "thread_ts": "1756976940.000549",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — syncing offline (re: summary). Nice momentum."
+          }
+        }
+      ]
+    }
+  ]
+}

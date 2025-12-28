@@ -1,0 +1,134 @@
+{
+  "ok": true,
+  "channel": "C0005",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0005",
+      "ts": "1756989120.000753",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — will follow up (re: usability). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989120.000755",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood — logging this (re: mockup). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0004",
+            "U0005",
+            "U0003"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1756989120.000756",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — taking the next step (re: usability). Captured for EOD summary."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989120.000757",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Thanks for flagging — will update the doc (re: usability). Sharing a small mock for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U0003",
+            "U0001",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U0005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0001",
+            "U0003",
+            "U0005"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0004",
+      "ts": "1756989120.000758",
+      "thread_ts": "1756989120.000752",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — confirming scope (re: usability). Sharing a small mock for clarity."
+          }
+        }
+      ]
+    }
+  ]
+}

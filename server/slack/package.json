@@ -1,0 +1,29 @@
+{
+  "name": "slack-rtm-server",
+  "version": "1.0.0",
+  "description": "Slack RTM WebSocket server using Node.js and TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "^4.7.2",
+    "@supabase/supabase-js": "^2.49.4",
+    "apns2": "^12.1.0",
+    "express": "^4.21.2",
+    "firebase-admin": "^12.7.0",
+    "google-auth-library": "^9.0.0",
+    "node-fetch": "^2.7.0",
+    "redis": "^5.0.0",
+    "uuid": "^10.0.0",
+    "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node-fetch": "^2.6.4",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.5",
+    "typescript": "^5.4.5"
+  }
+}

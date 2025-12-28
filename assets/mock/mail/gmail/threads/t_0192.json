@@ -1,0 +1,47 @@
+{
+  "id": "t_0192",
+  "historyId": "560637",
+  "messages": [
+    {
+      "id": "m_0192_01",
+      "threadId": "t_0192",
+      "labelIds": [
+        "TRASH"
+      ],
+      "snippet": "Hi, Circling back with answers inline. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we ca\u2026",
+      "historyId": "169415",
+      "internalDate": "1754767162389",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Liam Lewis <liam.lewis+03@testdomain.com>"
+          },
+          {
+            "name": "To",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "Subject",
+            "value": "Unsubscribe confirmation"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 09 Aug 2025 19:19:22 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<7968278368.648294@testdomain.com>"
+          }
+        ],
+        "body": {
+          "size": 693,
+          "data": "SGksCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpXZSBhbGlnbmVkIG9uIHRoZSBjb3JlIHJlcXVpcmVtZW50cyBhbmQgdHJpbW1lZCBhIGZldyBuaWNl4oCRdG_igJFoYXZlIGl0ZW1zIHNvIHdlIGNhbiBoaXQgdGhlIHRhcmdldCBkYXRlLiBJIGluY2x1ZGVkIGNvbmNyZXRlIGV4YW1wbGVzIGZvciB0aGUgcGF5bG9hZHMgc28gd2UgYXZvaWQgYW1iaWd1aXR5IGxhdGVyLgoKRm9yIHRlc3RpbmcsIEnigJlsbCBzdGFydCB3aXRoIGEgc21hbGwgY29ob3J0IGFuZCB0cmFjayBlcnJvciByYXRlcywgbGF0ZW5jeSwgYW5kIGFjdGl2YXRpb24uIElmIG1ldHJpY3MgbG9vayBzdGFibGUgd2UgY2FuIHJvbGwgb3V0IHRvIGEgbGFyZ2VyIHNsaWNlIGJ5IGVuZCBvZiBkYXkuCgotIFNjb3BlOiBmaW5hbGl6ZSBBUEkgY29udHJhY3QgKGF1dGgsIHBhZ2luYXRpb24sIGVycm9ycykKLSBSaXNrczogcmF0ZSBsaW1pdGluZyBkdXJpbmcgb25ib2FyZGluZywgQ1NWIGltcG9ydCBtZW1vcnkgc3Bpa2VzCi0gVGltZWxpbmU6IGN1dCBiZXRhIGJ5IG5leHQgV2VkbmVzZGF5LCBHQSBpbiB0d28gd2Vla3MKLSBPd25lcnM6IGJhY2tlbmQg4oCUIG1lOyBmcm9udGVuZCDigJQgcGFpcmluZyB3aXRoIGRlc2lnbgoKSeKAmWxsIHBvc3QgYSBicmllZiB1cGRhdGUgaW4gU2xhY2sgYWZ0ZXIgSSBwdXNoIHRoZSBicmFuY2gu"
+        }
+      },
+      "sizeEstimate": 993
+    }
+  ],
+  "snippet": "Hi, Circling back with answers inline. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we ca\u2026"
+}

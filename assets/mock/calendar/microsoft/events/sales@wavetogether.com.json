@@ -1,0 +1,702 @@
+[
+  {
+    "id": "e4ef91c3b82b43f88b9825dc",
+    "subject": "Hiring Screen",
+    "bodyPreview": "Customer-facing. Please confirm speaking roles and demo script beforehand.",
+    "body": {
+      "contentType": "Text",
+      "content": "Customer-facing. Please confirm speaking roles and demo script beforehand."
+    },
+    "start": {
+      "dateTime": "2025-08-14T15:45:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-08-14T16:15:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "busy",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Camila Jones",
+          "address": "camila.jones+58@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Layla Gonzalez",
+          "address": "layla.gonzalez+26@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Wavetogether HQ — Conf A"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-07-29T15:45:00",
+    "lastModifiedDateTime": "2025-08-10T15:45:00"
+  },
+  {
+    "id": "0503190a51af4e0fa6f511a5",
+    "subject": "Design Review",
+    "bodyPreview": "Office hours — drop in with metrics or questions.",
+    "body": {
+      "contentType": "Text",
+      "content": "Office hours — drop in with metrics or questions."
+    },
+    "start": {
+      "dateTime": "2025-09-08T10:45:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-08T11:45:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "free",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Dylan Thompson",
+          "address": "dylan.thompson+08@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Wavetogether HQ — Conf A"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-08-21T10:45:00",
+    "lastModifiedDateTime": "2025-09-04T10:45:00"
+  },
+  {
+    "id": "9ef90604173d452da1e29465",
+    "subject": "Budget Checkpoint",
+    "bodyPreview": "Office hours — drop in with metrics or questions.",
+    "body": {
+      "contentType": "Text",
+      "content": "Office hours — drop in with metrics or questions."
+    },
+    "start": {
+      "dateTime": "2025-09-20T10:15:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-20T11:15:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "free",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Avery Gonzalez",
+          "address": "avery.gonzalez+55@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Paisley Garcia",
+          "address": "paisley.garcia+59@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Zoom"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-08-31T10:15:00",
+    "lastModifiedDateTime": "2025-09-20T10:15:00"
+  },
+  {
+    "id": "ed2b96f4f25843c7be57c33e",
+    "subject": "Sprint Planning",
+    "bodyPreview": "Agenda: - Priorities - Risks & mitigations - Owners & timelines",
+    "body": {
+      "contentType": "Text",
+      "content": "Agenda:\n- Priorities\n- Risks & mitigations\n- Owners & timelines"
+    },
+    "start": {
+      "dateTime": "2025-09-24T16:45:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-24T17:15:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "busy",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Michael Miller",
+          "address": "michael.miller+29@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Remote"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-09-14T16:45:00",
+    "lastModifiedDateTime": "2025-09-19T16:45:00"
+  },
+  {
+    "id": "344610a9aeea45528451202d",
+    "subject": "Weekly Sync",
+    "bodyPreview": "Customer-facing. Please confirm speaking roles and demo script beforehand.",
+    "body": {
+      "contentType": "Text",
+      "content": "Customer-facing. Please confirm speaking roles and demo script beforehand."
+    },
+    "start": {
+      "dateTime": "2025-08-28T10:00:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-08-28T11:00:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "busy",
+    "type": "seriesMaster",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Ava White",
+          "address": "ava.white+40@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Hannah Martin",
+          "address": "hannah.martin+23@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Julian Lewis",
+          "address": "julian.lewis+44@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Avery Gonzalez",
+          "address": "avery.gonzalez+55@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Microsoft Teams"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-08-13T10:00:00",
+    "lastModifiedDateTime": "2025-08-27T10:00:00",
+    "recurrence": {
+      "pattern": {
+        "type": "weekly",
+        "interval": 1,
+        "daysOfWeek": [
+          "Thursday"
+        ]
+      },
+      "range": {
+        "type": "numbered",
+        "startDate": "2025-08-28",
+        "numberOfOccurrences": 10,
+        "recurrenceTimeZone": "Asia/Seoul"
+      }
+    }
+  },
+  {
+    "id": "57e1d895f27643afb59c93c7",
+    "subject": "Weekly Standup",
+    "bodyPreview": "Internal planning; capture action items and follow-ups in the doc.",
+    "body": {
+      "contentType": "Text",
+      "content": "Internal planning; capture action items and follow-ups in the doc."
+    },
+    "start": {
+      "dateTime": "2025-09-17T15:30:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-17T16:30:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "busy",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Harper Hill",
+          "address": "harper.hill+36@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Avery Sanchez",
+          "address": "avery.sanchez+41@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Camila Jones",
+          "address": "camila.jones+58@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Zoom"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-09-08T15:30:00",
+    "lastModifiedDateTime": "2025-09-17T15:30:00"
+  },
+  {
+    "id": "e762d067ad074dc2b5782ed7",
+    "subject": "Roadmap Review",
+    "bodyPreview": "Agenda: - Priorities - Risks & mitigations - Owners & timelines",
+    "body": {
+      "contentType": "Text",
+      "content": "Agenda:\n- Priorities\n- Risks & mitigations\n- Owners & timelines"
+    },
+    "start": {
+      "dateTime": "2025-08-15T11:30:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-08-15T12:00:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "free",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Liam Lewis",
+          "address": "liam.lewis+03@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Everly Martinez",
+          "address": "everly.martinez+27@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Daniel Hill",
+          "address": "daniel.hill+43@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Remote"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-07-26T11:30:00",
+    "lastModifiedDateTime": "2025-08-12T11:30:00"
+  },
+  {
+    "id": "936ecc77a7ba4bd8b55f3a49",
+    "subject": "1:1 Check-in",
+    "bodyPreview": "Customer-facing. Please confirm speaking roles and demo script beforehand.",
+    "body": {
+      "contentType": "Text",
+      "content": "Customer-facing. Please confirm speaking roles and demo script beforehand."
+    },
+    "start": {
+      "dateTime": "2025-09-11T09:00:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-11T09:45:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "free",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Camila Martinez",
+          "address": "camila.martinez+51@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Liam Young",
+          "address": "liam.young+20@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Abigail Harris",
+          "address": "abigail.harris+56@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "none",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Microsoft Teams"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-09-06T09:00:00",
+    "lastModifiedDateTime": "2025-09-08T09:00:00"
+  },
+  {
+    "id": "7f7fbf49bc8948b6accba505",
+    "subject": "Design Review",
+    "bodyPreview": "We'll walk through the open issues and assign owners. Bring blockers.",
+    "body": {
+      "contentType": "Text",
+      "content": "We'll walk through the open issues and assign owners. Bring blockers."
+    },
+    "start": {
+      "dateTime": "2025-09-12T16:45:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-12T17:30:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "isAllDay": false,
+    "showAs": "tentative",
+    "type": "singleInstance",
+    "isCancelled": false,
+    "importance": "normal",
+    "sensitivity": "normal",
+    "organizer": {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    },
+    "attendees": [
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Avery Gonzalez",
+          "address": "avery.gonzalez+55@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Nora White",
+          "address": "nora.white+22@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Harper Walker",
+          "address": "harper.walker+09@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "accepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Aria White",
+          "address": "aria.white+53@testdomain.com"
+        }
+      },
+      {
+        "type": "required",
+        "status": {
+          "response": "tentativelyAccepted",
+          "time": null
+        },
+        "emailAddress": {
+          "name": "Alex Taylor",
+          "address": "alex@wavetogether.com"
+        }
+      }
+    ],
+    "location": {
+      "displayName": "Zoom"
+    },
+    "calendarId": "sales@wavetogether.com",
+    "createdDateTime": "2025-08-24T16:45:00",
+    "lastModifiedDateTime": "2025-09-10T16:45:00"
+  }
+]

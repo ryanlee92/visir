@@ -1,0 +1,71 @@
+{
+  "id": "m_0019_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-07-30T13:35:32.777000+00:00",
+  "sentDateTime": "2025-07-30T13:35:10.007000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<1660251824.114003@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Daniel White <daniel.white+12@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Follow-up on access request"
+    },
+    {
+      "name": "Date",
+      "value": "2025-07-30T13:35:10.007000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<1660251824.114003@testdomain.com>"
+    }
+  ],
+  "subject": "Follow-up on access request",
+  "bodyPreview": "Hello, Circling back with answers inline. We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later. If anything looks off, let me know",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Circling back with answers inline.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<p>If anything looks off, let me know and I\u2019ll adjust.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0019",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Daniel White",
+      "address": "daniel.white+12@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Daniel White",
+      "address": "daniel.white+12@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

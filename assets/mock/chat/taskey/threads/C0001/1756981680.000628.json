@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "channel": "C0001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Postmortem will be shared tomorrow morning. Love the pace — keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "heart",
+          "users": [
+            "U0004",
+            "U0007",
+            "U0005"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0007"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0002",
+        "U0003"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1756981680.000631"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756981680.000629",
+      "thread_ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — aligning on this (re: action items)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756981680.000630",
+      "thread_ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — will update the doc (re: root cause). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1756981680.000631",
+      "thread_ts": "1756981680.000628",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — logging this (re: timeline). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

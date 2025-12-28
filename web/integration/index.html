@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskey Integration Results</title>
+    <style>
+        :root {
+            --primary-color: #40BBED;
+            --primary-hover: #2EA8D9;
+            --surface-color: #DBDBDD;
+            --text-color: #1C1B1F;
+            --secondary-text-color: #49454F;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #8EC9FF 0%, #D9CCFF 100%);
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .emoji-container {
+            font-size: 3em;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .provider-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            object-fit: cover;
+            background-color: #f5f5f5;
+            padding: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .provider-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--text-color);
+        }
+
+        .account-title {
+            font-size: 1.1em;
+            color: var(--secondary-text-color);
+            margin: 0 0 32px 0;
+        }
+
+        .open-button {
+            display: inline-block;
+            padding: 16px 32px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 1.1em;
+            transition: all 0.2s ease;
+            box-shadow: 
+                0 2px 4px rgba(64, 187, 237, 0.2),
+                0 4px 8px rgba(64, 187, 237, 0.15),
+                0 8px 16px rgba(64, 187, 237, 0.1);
+        }
+
+        .open-button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 8px rgba(64, 187, 237, 0.25),
+                0 8px 16px rgba(64, 187, 237, 0.2),
+                0 16px 24px rgba(64, 187, 237, 0.15);
+        }
+
+        .open-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 4px rgba(64, 187, 237, 0.2),
+                0 4px 8px rgba(64, 187, 237, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result-card">
+            <div class="emoji-container">
+                <span>🔗</span>
+                <span>✅</span>
+            </div>
+            <img id="provider-icon" src="" alt="Provider Icon" class="provider-icon">
+            <h1 id="provider-name" class="provider-name"></h1>
+            <p id="account-title" class="account-title">Successfully linked</p>
+            <a href="/" class="open-button" id="open-button">Open Taskey</a>
+        </div>
+    </div>
+
+    <script>
+        // Function to get query parameters
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            const href =  params.get('href');
+            const urlDecodedHref = decodeURIComponent(href);
+            return {
+                providerName: params.get('provider') || 'Unknown Provider',
+                providerIcon: params.get('icon') || '',
+                href: urlDecodedHref || 'com.wavetogether.fillin://'
+            };
+        }
+
+        // Function to load and display results
+        function loadResults() {
+            const result = getQueryParams();
+
+            // Update the DOM with the result
+            document.getElementById('provider-icon').src = result.providerIcon;
+            document.getElementById('provider-icon').alt = result.providerName;
+            document.getElementById('provider-name').textContent = result.providerName;
+            document.getElementById('open-button').href = result.href;
+        }
+
+        // Load results when the page loads
+        window.addEventListener('load', loadResults);
+    </script>
+
+    <script>
+      window.onload = function() {
+        const result = getQueryParams();
+        window.location.assign(result.href);
+      };
+    </script>
+</body>
+</html>

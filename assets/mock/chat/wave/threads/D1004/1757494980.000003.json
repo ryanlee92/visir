@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D1004",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757494980.000006",
+      "thread_ts": "1757494980.000003",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — aligning on this (re: context). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    }
+  ]
+}

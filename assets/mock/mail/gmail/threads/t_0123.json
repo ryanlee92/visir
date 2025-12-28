@@ -1,0 +1,47 @@
+{
+  "id": "t_0123",
+  "historyId": "1205985",
+  "messages": [
+    {
+      "id": "m_0123_01",
+      "threadId": "t_0123",
+      "labelIds": [
+        "DRAFT"
+      ],
+      "snippet": "Hello, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, an\u2026",
+      "historyId": "37854",
+      "internalDate": "1754756192371",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Mateo Jones <mateo.jones+19@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Draft: Agenda for Monday"
+          },
+          {
+            "name": "Date",
+            "value": "Sat, 09 Aug 2025 16:16:32 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1090731926.684192@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 407,
+          "data": "SGVsbG8sCgpDaXJjbGluZyBiYWNrIHdpdGggYW5zd2VycyBpbmxpbmUuCgpGb3IgdGVzdGluZywgSeKAmWxsIHN0YXJ0IHdpdGggYSBzbWFsbCBjb2hvcnQgYW5kIHRyYWNrIGVycm9yIHJhdGVzLCBsYXRlbmN5LCBhbmQgYWN0aXZhdGlvbi4gSWYgbWV0cmljcyBsb29rIHN0YWJsZSB3ZSBjYW4gcm9sbCBvdXQgdG8gYSBsYXJnZXIgc2xpY2UgYnkgZW5kIG9mIGRheS4KCkkgcmVmYWN0b3JlZCBhIGNvdXBsZSBvZiBoZWxwZXJzIHRvIG1ha2UgdGhlIGludGVyZmFjZSBjbGVhbmVyIOKAlCBzaG91bGRu4oCZdCBhZmZlY3QgeW91ciBzaWRlLCBidXQgY2FsbCBpdCBvdXQgaWYgYW55dGhpbmcgc3VycHJpc2VzIHlvdS4KCkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5LgoK4oCUIEJyYW5kb24="
+        }
+      },
+      "sizeEstimate": 707
+    }
+  ],
+  "snippet": "Hello, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, an\u2026"
+}

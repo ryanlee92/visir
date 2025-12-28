@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "C1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756983300.000656",
+      "thread_ts": "1756983300.000655",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — aligning on this (re: Q&A). Nice momentum."
+          }
+        }
+      ]
+    }
+  ]
+}

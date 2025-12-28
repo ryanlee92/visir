@@ -1,0 +1,671 @@
+[
+  {
+    "kind": "calendar#event",
+    "etag": "\"5f487a4e40\"",
+    "id": "6ec409ed915146df8923f0da",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=6ec409ed915146df8923f0da",
+    "created": "2025-08-28T11:00:00+09:00",
+    "updated": "2025-09-02T14:41:00+09:00",
+    "summary": "Team Standup",
+    "description": "Daily team sync meeting",
+    "location": "",
+    "colorId": "9",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "start": {
+      "dateTime": "2025-12-12T11:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-12-12T11:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "6ec409ed915146df8923f0da@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "sophia.davis@testdomain.com",
+        "displayName": "Sophia Davis",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "lucas.rodriguez@testdomain.com",
+        "displayName": "Lucas Rodriguez",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "liam.williams@testdomain.com",
+        "displayName": "Liam Williams",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex",
+        "self": true,
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "michael@testdomain.com",
+        "displayName": "Michael (CTO)",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "sarah@testdomain.com",
+        "displayName": "Sarah (Design Lead)",
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"c97500c4b8\"",
+    "id": "5863f9850bf040c186941f15",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=5863f9850bf040c186941f15",
+    "created": "2025-09-03T10:15:00+09:00",
+    "updated": "2025-09-03T11:10:00+09:00",
+    "summary": "Lunch with Mentor",
+    "description": "Catch up and discuss career growth",
+    "location": "",
+    "colorId": "5",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "start": {
+      "dateTime": "2025-12-12T12:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-12-12T13:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "5863f9850bf040c186941f15@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "emma.brown@testdomain.com",
+        "displayName": "Emma Brown",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "ava.garcia@testdomain.com",
+        "displayName": "Ava Garcia",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"b6da73e907\"",
+    "id": "f9f742732f37472dbbf9f931",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=f9f742732f37472dbbf9f931",
+    "created": "2025-08-07T11:45:00+09:00",
+    "updated": "2025-08-08T14:30:00+09:00",
+    "summary": "Product Strategy Meeting",
+    "description": "Finalize feature set for upcoming sprint",
+    "location": "Zoom",
+    "colorId": "4",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "start": {
+      "dateTime": "2025-12-12T14:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-12-12T15:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "f9f742732f37472dbbf9f931@google.com",
+    "sequence": 1,
+    "attendees": [
+      {
+        "email": "mason.hernandez@testdomain.com",
+        "displayName": "Mason Hernandez",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex",
+        "self": true,
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "michael@testdomain.com",
+        "displayName": "Michael (CTO)",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "sarah@testdomain.com",
+        "displayName": "Sarah (Design Lead)",
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 10
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/cgecqsqjgg",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"6330f4bccc\"",
+    "id": "268d452dde61482597758b4f",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=268d452dde61482597758b4f",
+    "created": "2025-09-05T09:00:00+09:00",
+    "updated": "2025-09-07T12:38:00+09:00",
+    "summary": "Deep Work: Coding",
+    "description": "Focused coding session",
+    "location": "",
+    "colorId": "7",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "start": {
+      "dateTime": "2025-12-12T16:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-12-12T18:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "268d452dde61482597758b4f@google.com",
+    "sequence": 1,
+    "attendees": [
+      {
+        "email": "mason.hernandez@testdomain.com",
+        "displayName": "Mason Hernandez",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 10
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"e01f2e4e55\"",
+    "id": "18ba1a49b05e4d05ac8f6441",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=18ba1a49b05e4d05ac8f6441",
+    "created": "2025-08-11T20:23:39.969703+09:00",
+    "updated": "2025-08-13T21:39:39.969703+09:00",
+    "summary": "Data Deep-dive",
+    "description": "Internal planning; collect action items and owners.",
+    "location": "Daejeon",
+    "colorId": "1",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex — Primary"
+    },
+    "start": {
+      "date": "2025-08-12",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "date": "2025-08-13",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "18ba1a49b05e4d05ac8f6441@google.com",
+    "sequence": 1,
+    "attendees": [
+      {
+        "email": "noah.jones@testdomain.com",
+        "displayName": "Noah Jones",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "olivia.johnson@testdomain.com",
+        "displayName": "Olivia Johnson",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "lucas.rodriguez@testdomain.com",
+        "displayName": "Lucas Rodriguez",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "sophia.davis@testdomain.com",
+        "displayName": "Sophia Davis",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"39df2890fe\"",
+    "id": "b35d9425bda24824961c7e87",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=b35d9425bda24824961c7e87",
+    "created": "2025-09-12T15:45:00+09:00",
+    "updated": "2025-09-14T18:19:00+09:00",
+    "summary": "Roadmap Review",
+    "description": "Internal planning; collect action items and owners.",
+    "location": "San Francisco (virtual)",
+    "colorId": "3",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex — Primary"
+    },
+    "start": {
+      "dateTime": "2025-09-19T15:45:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-19T16:30:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "b35d9425bda24824961c7e87@google.com",
+    "sequence": 2,
+    "attendees": [
+      {
+        "email": "isabella.martinez@testdomain.com",
+        "displayName": "Isabella Martinez",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "tentative"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 5
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"42918c66a0\"",
+    "id": "0dd63788803e48ad888bb25c",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=0dd63788803e48ad888bb25c",
+    "created": "2025-08-23T16:45:00+09:00",
+    "updated": "2025-08-24T19:41:00+09:00",
+    "summary": "Partner Sync",
+    "description": "Customer-facing session; confirm agenda and roles beforehand.",
+    "location": "Daejeon",
+    "colorId": "11",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex — Primary"
+    },
+    "start": {
+      "dateTime": "2025-09-08T16:45:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-08T17:15:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "0dd63788803e48ad888bb25c@google.com",
+    "sequence": 1,
+    "attendees": [
+      {
+        "email": "liam.williams@testdomain.com",
+        "displayName": "Liam Williams",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "olivia.johnson@testdomain.com",
+        "displayName": "Olivia Johnson",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "noah.jones@testdomain.com",
+        "displayName": "Noah Jones",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "mason.hernandez@testdomain.com",
+        "displayName": "Mason Hernandez",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "tentative"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"de5ff46282\"",
+    "id": "ae36d1134bb742bcb9abda76",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=ae36d1134bb742bcb9abda76",
+    "created": "2025-09-27T14:00:00+09:00",
+    "updated": "2025-09-30T17:00:00+09:00",
+    "summary": "Dinner with Global Team",
+    "description": "Team dinner and networking",
+    "location": "",
+    "colorId": "8",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex"
+    },
+    "start": {
+      "dateTime": "2025-12-12T19:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-12-12T21:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "ae36d1134bb742bcb9abda76@google.com",
+    "sequence": 2,
+    "attendees": [
+      {
+        "email": "olivia.johnson@testdomain.com",
+        "displayName": "Olivia Johnson",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "isabella.martinez@testdomain.com",
+        "displayName": "Isabella Martinez",
+        "responseStatus": "needsAction"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex",
+        "self": true,
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "michael@testdomain.com",
+        "displayName": "Michael (CTO)",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "sarah@testdomain.com",
+        "displayName": "Sarah (Design Lead)",
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ]
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"2a86f6e640\"",
+    "id": "ae9d70e73a314de58ecd7b2a",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=ae9d70e73a314de58ecd7b2a",
+    "created": "2025-09-08T10:15:00+09:00",
+    "updated": "2025-09-10T12:32:00+09:00",
+    "summary": "Partner Sync",
+    "description": "Internal planning; collect action items and owners.",
+    "location": "San Francisco (virtual)",
+    "colorId": "2",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex — Primary"
+    },
+    "start": {
+      "dateTime": "2025-09-27T10:15:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-09-27T11:00:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "ae9d70e73a314de58ecd7b2a@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "liam.williams@testdomain.com",
+        "displayName": "Liam Williams",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex Taylor",
+        "self": true,
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 30
+        }
+      ]
+    },
+    "conferenceData": {
+      "entryPoints": [
+        {
+          "entryPointType": "video",
+          "uri": "https://meet.google.com/abphtdklbk",
+          "label": "Google Meet"
+        }
+      ],
+      "conferenceSolution": {
+        "name": "Google Meet"
+      }
+    }
+  },
+  {
+    "kind": "calendar#event",
+    "etag": "\"b0f84e8412\"",
+    "id": "78d6136547b84b5fb581246d",
+    "status": "confirmed",
+    "htmlLink": "https://www.google.com/calendar/event?eid=78d6136547b84b5fb581246d",
+    "created": "2025-08-07T09:45:00+09:00",
+    "updated": "2025-08-11T12:37:00+09:00",
+    "summary": "User Interview",
+    "description": "Walkthrough of design and API surfaces with open Q&A.",
+    "location": "Seoul",
+    "colorId": "5",
+    "creator": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex Taylor"
+    },
+    "organizer": {
+      "email": "alex@taskey.work",
+      "displayName": "Alex — Primary"
+    },
+    "start": {
+      "dateTime": "2025-08-24T09:45:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "end": {
+      "dateTime": "2025-08-24T10:45:00+09:00",
+      "timeZone": "Asia/Seoul"
+    },
+    "endTimeUnspecified": false,
+    "recurrence": null,
+    "iCalUID": "78d6136547b84b5fb581246d@google.com",
+    "sequence": 3,
+    "attendees": [
+      {
+        "email": "ava.garcia@testdomain.com",
+        "displayName": "Ava Garcia",
+        "responseStatus": "tentative"
+      },
+      {
+        "email": "sophia.davis@testdomain.com",
+        "displayName": "Sophia Davis",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "alex@taskey.work",
+        "displayName": "Alex",
+        "self": true,
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "michael@testdomain.com",
+        "displayName": "Michael (CTO)",
+        "responseStatus": "accepted"
+      },
+      {
+        "email": "sarah@testdomain.com",
+        "displayName": "Sarah (Design Lead)",
+        "responseStatus": "accepted"
+      }
+    ],
+    "reminders": {
+      "useDefault": false,
+      "overrides": [
+        {
+          "method": "popup",
+          "minutes": 10
+        }
+      ]
+    }
+  }
+]

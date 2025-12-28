@@ -1,0 +1,71 @@
+{
+  "id": "m_0098_04",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-26T08:09:07.943000+00:00",
+  "sentDateTime": "2025-08-26T08:09:07.943000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<4359774893.894311@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Paisley Garcia <paisley.garcia+59@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Updated SOW attached"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-26T08:09:07.943000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<4359774893.894311@wavetogether.com>"
+    }
+  ],
+  "subject": "Updated SOW attached",
+  "bodyPreview": "Hello, Thanks for the quick turnaround on this. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. - Scope: finalize API contract (auth, pagin",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hello,</p>\n<p>Thanks for the quick turnaround on this.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Happy to jump on a quick call later today.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-26T07:39:45.012000+00:00, Julian Lee &lt;julian.lee+32@testdomain.com&gt; wrote:<br>&gt; Good afternoon,<br>&gt; <br>&gt; Appreciate the context \u2014 adding specifics.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; <br>&gt; If anything looks off, let me know and I\u2019ll adjust.<br>&gt; <br>&gt; <br>&gt; On 2025-08-26T07:20:37.929000+00:00, Alex Taylor &lt;alex@wavetogether.com&gt; wrote:<br>&gt; &gt; Hi,<br>&gt; &gt; <br>&gt; &gt; Appreciate the context \u2014 adding specifics.<br>&gt; &gt; <br>&gt; &gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; &gt; <br>&gt; &gt; I refactored a couple of helpers to make the interface cleaner \u2014 shouldn\u2019t affect your side, but call it out if anything surprises you.<br>&gt; &gt; <br>&gt; &gt; - Scope: finalize API contract (auth, pagination, errors)<br>&gt; &gt; - Risks: rate limiting during onboarding, CSV import memory spikes<br>&gt; &gt; - Timeline: cut beta by next Wednesday, GA in two weeks<br>&gt; &gt; - Owners: backend \u2014 me; frontend \u2014 pairing with design<br>&gt; &gt; <br>&gt; &gt; I\u2019ll post a brief update in Slack after I push the branch.<br>&gt; &gt; <br>&gt; &gt; \u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0098",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Paisley Garcia",
+        "address": "paisley.garcia+59@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

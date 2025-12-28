@@ -1,0 +1,71 @@
+{
+  "id": "m_0197_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-09-03T12:41:03.915000+00:00",
+  "sentDateTime": "2025-09-03T12:40:36.154000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<4836058657.448140@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Liam Lewis <liam.lewis+03@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Re: Availability this week"
+    },
+    {
+      "name": "Date",
+      "value": "2025-09-03T12:40:36.154000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<4836058657.448140@testdomain.com>"
+    }
+  ],
+  "subject": "Re: Availability this week",
+  "bodyPreview": "Hi, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. We aligned on the core requirements and ",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hi,</p>\n<p>Following up with a few details from our chat.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "deleteditems",
+  "conversationId": "cv_0197",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Liam Lewis",
+      "address": "liam.lewis+03@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Liam Lewis",
+      "address": "liam.lewis+03@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

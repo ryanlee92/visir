@@ -1,0 +1,71 @@
+{
+  "id": "m_0001_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-09-06T19:07:09.556000+00:00",
+  "sentDateTime": "2025-09-06T19:07:00.913000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<8143657258.554265@testdomain.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Riley Taylor <riley.taylor+34@testdomain.com>"
+    },
+    {
+      "name": "To",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Notes from user interview"
+    },
+    {
+      "name": "Date",
+      "value": "2025-09-06T19:07:00.913000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<8143657258.554265@testdomain.com>"
+    }
+  ],
+  "subject": "Notes from user interview",
+  "bodyPreview": "Good afternoon, Circling back with answers inline. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. - Scope: finalize API contract (auth, pa",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good afternoon,</p>\n<p>Circling back with answers inline.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Feel free to comment directly in the doc; I\u2019m tracking notifications.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "inbox",
+  "conversationId": "cv_0001",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Riley Taylor",
+      "address": "riley.taylor+34@testdomain.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Riley Taylor",
+      "address": "riley.taylor+34@testdomain.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Alex Taylor",
+        "address": "alex@wavetogether.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

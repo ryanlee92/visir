@@ -1,0 +1,674 @@
+{
+  "ok": true,
+  "channel": "G1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757408640.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. Noted."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "rocket",
+          "users": [
+            "U1002",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1002",
+        "U1006",
+        "U1001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1757408640.000007"
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757408640.000005",
+      "thread_ts": "1757408640.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call \u2014 confirming scope (re: context)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757408640.000006",
+      "thread_ts": "1757408640.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged \u2014 capturing action items (re: context). I'll verify edge cases."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1002",
+            "U1006"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001",
+            "U1006"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757409900.000025",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good \u2014 I\u2019m on it. \u2014 notes; Capturing action items now."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1002",
+            "U1006",
+            "U1001"
+          ],
+          "count": 3
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1001",
+        "U1002"
+      ],
+      "reply_users_count": 2,
+      "latest_reply": "1757409900.000028"
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757409900.000027",
+      "thread_ts": "1757409900.000025",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call \u2014 logging this (re: context)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757410680.000038",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted \u2014 I\u2019ll take it from here. \u2014 handoff; Capturing action items now."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "curl -X POST https://api.example.com/login \\\n  -H 'Authorization: Bearer <token>' \\\n  -d '{\"email\":\"user@example.com\",\"password\":\"***\"}'"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1006"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757410920.000042",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria?. Noted. \u2014 alignment; Will confirm once verified."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757411100.000045",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> I'll pick up the remaining items. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757411880.000058",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll validate edge cases and upload screenshots. \u2014 alignment; Logging this in the doc."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1002"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1001",
+            "U1006"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757412240.000064",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> Added notes to the doc \u2014 please review. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757412720.000072",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood; I\u2019ll handle the next step. \u2014 alignment; Circling back after standup."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1006",
+            "U1001"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757413020.000077",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Can we align on acceptance criteria? I'll validate edge cases and upload screenshots. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757413200.000080",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> I'll update the doc with notes. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757413500.000085",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> Let's sync at 2 PM to unblock the review. I'll validate edge cases and upload screenshots. \u2014 alignment; Logging this in the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757413860.000091",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Got it \u2014 following up shortly. \u2014 alignment; Capturing action items now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757414280.000098",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll validate edge cases and upload screenshots. \u2014 notes; Sharing updates in-thread."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757414940.000109",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood; I\u2019ll handle the next step. \u2014 alignment; Logging this in the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757415420.000117",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1002> I'll pick up the remaining items. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757417040.000144",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted \u2014 I\u2019ll take it from here. \u2014 notes; Circling back after standup."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757417340.000149",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll validate edge cases and upload screenshots. Flagging in the board."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1001",
+            "U1002",
+            "U1006"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757417760.000156",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Pushing a patch now; ETA 20 min. I'll validate edge cases and upload screenshots. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757418120.000162",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> Can we align on acceptance criteria? I'll validate edge cases and upload screenshots."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1006",
+            "U1001"
+          ],
+          "count": 2
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002",
+            "U1006",
+            "U1001"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757418360.000166",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll write test cases for that. Noted. \u2014 notes; Will confirm once verified."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757418540.000169",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. Noted. \u2014 notes; Capturing action items now."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757495940.000019",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> I'll pick up the remaining items. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757496960.000036",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1001> Pushing a patch now; ETA 20 min. Noted."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757498100.000055",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. Noted. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757498580.000063",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1002> I'll update the doc with notes. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1002"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757498820.000067",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1006> Pushing a patch now; ETA 20 min. I'll validate edge cases and upload screenshots."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757499060.000071",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll update the doc with notes. I'll validate edge cases and upload screenshots. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757499900.000085",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. I'll validate edge cases and upload screenshots. \u2014 notes; Will confirm once verified."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757500500.000095",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Added notes to the doc \u2014 please review. Noted. Nudging owners."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757500980.000103",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "I'll write test cases for that. Noted. Quick heads-up saved."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1757502060.000121",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Let's sync at 2 PM to unblock the review. Noted. Adding to the doc."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1001",
+      "ts": "1757502660.000131",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "<@U1002> Can we align on acceptance criteria? I'll summarize action items by EOD."
+          }
+        },
+        {
+          "type": "rich_text",
+          "elements": [
+            {
+              "type": "rich_text_preformatted",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "curl -X GET https://api.example.com/data \\\n  -H \"Authorization: Bearer token\" "
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

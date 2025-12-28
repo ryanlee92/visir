@@ -1,0 +1,173 @@
+{
+  "ok": true,
+  "channel": "C1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756981200.000620",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Postmortem will be shared tomorrow morning. I'll push a branch so you can review headers and error codes."
+          }
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1005",
+        "U1003",
+        "U1007"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756981200.000624"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1756981200.000621",
+      "thread_ts": "1756981200.000620",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — aligning on this (re: root cause). I'll reflect this in owners/timeline."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "tada",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1004",
+            "U1003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "heart",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1003",
+            "U1004"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1756981200.000622",
+      "thread_ts": "1756981200.000620",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — confirming scope (re: timeline). I'll reflect this in owners/timeline."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1003",
+            "U1007",
+            "U1004"
+          ],
+          "count": 3
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1006",
+            "U1003",
+            "U1007"
+          ],
+          "count": 3
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002",
+            "U1006",
+            "U1007"
+          ],
+          "count": 3
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756981200.000623",
+      "thread_ts": "1756981200.000620",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — logging this (re: root cause). I'll push a quick branch for review."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756981200.000624",
+      "thread_ts": "1756981200.000620",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Makes sense — confirming scope (re: review). Nice momentum."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "eyes",
+          "users": [
+            "U1002",
+            "U1003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

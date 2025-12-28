@@ -1,0 +1,98 @@
+{
+  "ok": true,
+  "channel": "C1001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1756978080.000568",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Welcome our new teammate starting next week 🎉 Love the pace — keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "clap",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 4,
+      "reply_users": [
+        "U1002",
+        "U1003",
+        "U1001"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756978080.000572"
+    },
+    {
+      "type": "message",
+      "user": "U1002",
+      "ts": "1756978080.000569",
+      "thread_ts": "1756978080.000568",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — confirming scope (re: standup)."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "tada",
+          "users": [
+            "U1005"
+          ],
+          "count": 1
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1004"
+          ],
+          "count": 1
+        },
+        {
+          "name": "heart",
+          "users": [
+            "U1003"
+          ],
+          "count": 1
+        },
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1002",
+            "U1006"
+          ],
+          "count": 2
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1003",
+      "ts": "1756978080.000570",
+      "thread_ts": "1756978080.000568",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — will follow up (re: standup). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

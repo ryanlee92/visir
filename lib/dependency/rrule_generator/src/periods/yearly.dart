@@ -1,0 +1,342 @@
+import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
+import 'package:ficonsax/ficonsax.dart';
+import 'package:flutter/material.dart';
+
+import '../../localizations/text_delegate.dart';
+import '../pickers/helpers.dart';
+import '../rrule_generator_config.dart';
+import './period.dart';
+
+class Yearly extends StatelessWidget implements Period {
+  @override
+  final RRuleGeneratorConfig config;
+  @override
+  final RRuleTextDelegate textDelegate;
+  @override
+  final void Function() onChange;
+  @override
+  final String initialRRule;
+  @override
+  final DateTime initialDate;
+
+  final monthTypeNotifier = ValueNotifier(0);
+  final monthDayNotifier = ValueNotifier(1);
+  final weekdayNotifier = ValueNotifier(0);
+  final monthNotifier = ValueNotifier(DateTime.now().month);
+  final dayNotifier = ValueNotifier(DateTime.now().day);
+
+  Yearly(this.config, this.textDelegate, this.onChange, this.initialRRule, this.initialDate, {super.key}) {
+    if (initialRRule.contains('YEARLY')) {
+      handleInitialRRule();
+    } else {
+      dayNotifier.value = initialDate.day;
+      weekdayNotifier.value = initialDate.weekday - 1;
+      monthNotifier.value = initialDate.month;
+    }
+  }
+
+  @override
+  void handleInitialRRule() {
+    if (initialRRule.contains('BYMONTHDAY')) {
+      monthTypeNotifier.value = 1;
+      final dayIndex = initialRRule.indexOf('BYMONTHDAY=') + 11;
+      final day = initialRRule.substring(dayIndex, dayIndex + (initialRRule.length > dayIndex + 1 ? 2 : 1));
+      if (day.length == 1 || day[1] != ';') {
+        dayNotifier.value = int.parse(day);
+      } else {
+        dayNotifier.value = int.parse(day[0]);
+      }
+    } else {
+      monthTypeNotifier.value = 0;
+
+      if (initialRRule.contains('BYSETPOS=')) {
+        final monthDayIndex = initialRRule.indexOf('BYSETPOS=') + 9;
+        final monthDay = initialRRule.substring(monthDayIndex, monthDayIndex + 1);
+
+        if (monthDay == '-') {
+          monthDayNotifier.value = 4;
+        } else {
+          monthDayNotifier.value = int.parse(monthDay) - 1;
+        }
+      }
+
+      if (initialRRule.contains('BYDAY=')) {
+        final weekdayIndex = initialRRule.indexOf('BYDAY=') + 6;
+        final weekday = initialRRule.substring(weekdayIndex, weekdayIndex + 2);
+
+        weekdayNotifier.value = weekdaysShort.indexOf(weekday);
+      }
+    }
+
+    if (initialRRule.contains('BYMONTH=')) {
+      final monthIndex = initialRRule.indexOf('BYMONTH=') + 8;
+      final month = initialRRule.substring(monthIndex, monthIndex + (initialRRule.length > monthIndex + 1 ? 2 : 1));
+      if (month.length == 1 || month[1] != ';') {
+        monthNotifier.value = int.parse(month);
+      } else {
+        monthNotifier.value = int.parse(month[0]);
+      }
+    }
+  }
+
+  @override
+  String getRRule() {
+    if (monthTypeNotifier.value == 1) {
+      final byMonth = monthNotifier.value;
+      final byMonthDay = dayNotifier.value;
+      return 'FREQ=YEARLY;BYMONTH=$byMonth;BYMONTHDAY=$byMonthDay';
+    } else {
+      final byMonth = monthNotifier.value;
+      final byDay = weekdaysShort[weekdayNotifier.value];
+      final bySetPos = (monthDayNotifier.value < 4) ? monthDayNotifier.value + 1 : -1;
+      return 'FREQ=YEARLY;BYMONTH=$byMonth;BYDAY=$byDay;BYSETPOS=$bySetPos';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: monthTypeNotifier,
+      builder: (context, monthType, _) => Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
+                  child: Text(
+                    textDelegate.byDayInMonth,
+                    style: config.textStyle,
+                  ),
+                ),
+              ),
+              Switch(
+                value: monthType == 0,
+                activeColor: context.onPrimary,
+                activeTrackColor: context.primary,
+                inactiveTrackColor: context.primary,
+                inactiveThumbColor: context.onPrimary,
+                trackOutlineWidth: WidgetStateProperty.all(0),
+                trackOutlineColor: WidgetStateProperty.all(context.primary),
+                thumbIcon: WidgetStateProperty.all(Icon(Icons.add, size: 16, color: Colors.transparent)),
+                onChanged: (selected) {
+                  monthTypeNotifier.value = selected ? 0 : 1;
+                  onChange();
+                },
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
+                  child: Text(
+                    textDelegate.byNthDayInMonth,
+                    style: config.textStyle,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6),
+          if (monthType == 1)
+            Row(
+              children: [
+                Expanded(
+                  child: buildDropdown(
+                    context: context,
+                    child: ValueListenableBuilder(
+                      valueListenable: monthNotifier,
+                      builder: (context, month, _) => DropdownButton(
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Icon(IconsaxOutline.arrow_down_1),
+                        ),
+                        iconSize: 16,
+                        dropdownColor: context.surfaceVariant,
+                        enableFeedback: true,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        focusColor: Colors.transparent,
+                        elevation: 0,
+                        value: month,
+                        onChanged: (newMonth) {
+                          monthNotifier.value = newMonth!;
+                          onChange();
+                        },
+                        items: List.generate(
+                          12,
+                          (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text(
+                              textDelegate.allMonths[index],
+                              style: config.textStyle,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: buildDropdown(
+                    context: context,
+                    child: ValueListenableBuilder(
+                      valueListenable: dayNotifier,
+                      builder: (context, day, _) => DropdownButton(
+                        icon: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Icon(IconsaxOutline.arrow_down_1),
+                        ),
+                        iconSize: 16,
+                        dropdownColor: context.surfaceVariant,
+                        enableFeedback: true,
+                        borderRadius: BorderRadius.circular(20),
+                        isExpanded: true,
+                        focusColor: Colors.transparent,
+                        elevation: 0,
+                        value: day,
+                        onChanged: (newDay) {
+                          dayNotifier.value = newDay!;
+                          onChange();
+                        },
+                        items: List.generate(
+                          31,
+                          (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text(
+                              '${index + 1}.',
+                              style: config.textStyle,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          if (monthType == 0)
+            Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: buildDropdown(
+                        context: context,
+                        child: ValueListenableBuilder(
+                          valueListenable: monthDayNotifier,
+                          builder: (context, dayInMonth, _) => DropdownButton(
+                            icon: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: Icon(IconsaxOutline.arrow_down_1),
+                            ),
+                            iconSize: 16,
+                            dropdownColor: context.surfaceVariant,
+                            enableFeedback: true,
+                            borderRadius: BorderRadius.circular(20),
+                            isExpanded: true,
+                            focusColor: Colors.transparent,
+                            elevation: 0,
+                            value: dayInMonth,
+                            onChanged: (dayInMonth) {
+                              monthDayNotifier.value = dayInMonth!;
+                              onChange();
+                            },
+                            items: List.generate(
+                              5,
+                              (index) => DropdownMenuItem(
+                                value: index,
+                                child: Text(
+                                  textDelegate.daysInMonth[index],
+                                  style: config.textStyle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Expanded(
+                      child: buildDropdown(
+                        context: context,
+                        child: ValueListenableBuilder(
+                          valueListenable: weekdayNotifier,
+                          builder: (context, weekday, _) => DropdownButton(
+                            icon: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: Icon(IconsaxOutline.arrow_down_1),
+                            ),
+                            iconSize: 16,
+                            dropdownColor: context.surfaceVariant,
+                            enableFeedback: true,
+                            borderRadius: BorderRadius.circular(20),
+                            isExpanded: true,
+                            focusColor: Colors.transparent,
+                            elevation: 0,
+                            value: weekday,
+                            onChanged: (newWeekday) {
+                              weekdayNotifier.value = newWeekday!;
+                              onChange();
+                            },
+                            items: List.generate(
+                              7,
+                              (index) => DropdownMenuItem(
+                                value: index,
+                                child: Text(
+                                  textDelegate.weekdays[index].toString(),
+                                  style: config.textStyle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                buildDropdown(
+                  context: context,
+                  child: ValueListenableBuilder(
+                    valueListenable: monthNotifier,
+                    builder: (context, month, _) => DropdownButton(
+                      icon: Icon(IconsaxOutline.arrow_down_1),
+                      iconSize: 16,
+                      dropdownColor: context.surfaceVariant,
+                      enableFeedback: true,
+                      borderRadius: BorderRadius.circular(20),
+                      isExpanded: true,
+                      focusColor: Colors.transparent,
+                      elevation: 0,
+                      value: month,
+                      onChanged: (newMonth) {
+                        monthNotifier.value = newMonth!;
+                        onChange();
+                      },
+                      items: List.generate(
+                        12,
+                        (index) => DropdownMenuItem(
+                          value: index + 1,
+                          child: Text(
+                            textDelegate.allMonths[index],
+                            style: config.textStyle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}

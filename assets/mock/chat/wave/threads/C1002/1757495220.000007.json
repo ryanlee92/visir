@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "channel": "C1002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1004",
+      "ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Coffee break anyone? ☕ Sharing a quick mockup for clarity."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U1004",
+            "U1003"
+          ],
+          "count": 2
+        },
+        {
+          "name": "clap",
+          "users": [
+            "U1006"
+          ],
+          "count": 1
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U1005",
+        "U1007",
+        "U1006"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1757495220.000010"
+    },
+    {
+      "type": "message",
+      "user": "U1005",
+      "ts": "1757495220.000008",
+      "thread_ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Understood — logging this (re: break). I'll reflect this in owners/timeline."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1007",
+      "ts": "1757495220.000009",
+      "thread_ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — logging this (re: break). Nice momentum."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U1006",
+      "ts": "1757495220.000010",
+      "thread_ts": "1757495220.000007",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Noted — logging this (re: meme). I'll verify edge cases."
+          }
+        }
+      ]
+    }
+  ]
+}

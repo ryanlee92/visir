@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D0002",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0003",
+      "ts": "1757408880.000011",
+      "thread_ts": "1757408880.000008",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Copy that — capturing action items (re: context). I'll push a quick branch for review."
+          }
+        }
+      ]
+    }
+  ]
+}

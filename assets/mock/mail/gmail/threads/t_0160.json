@@ -1,0 +1,47 @@
+{
+  "id": "t_0160",
+  "historyId": "798702",
+  "messages": [
+    {
+      "id": "m_0160_01",
+      "threadId": "t_0160",
+      "labelIds": [
+        "SENT"
+      ],
+      "snippet": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rat\u2026",
+      "historyId": "363849",
+      "internalDate": "1756599096574",
+      "payload": {
+        "mimeType": "text/plain",
+        "headers": [
+          {
+            "name": "From",
+            "value": "Alex Taylor <alex@taskey.work>"
+          },
+          {
+            "name": "To",
+            "value": "Aria Davis <aria.davis+49@testdomain.com>"
+          },
+          {
+            "name": "Subject",
+            "value": "Intro: connecting you two"
+          },
+          {
+            "name": "Date",
+            "value": "Sun, 31 Aug 2025 00:11:36 GMT"
+          },
+          {
+            "name": "Message-ID",
+            "value": "<1717605305.887311@taskey.work>"
+          }
+        ],
+        "body": {
+          "size": 524,
+          "data": "R29vZCBtb3JuaW5nLAoKQXBwcmVjaWF0ZSB0aGUgY29udGV4dCDigJQgYWRkaW5nIHNwZWNpZmljcy4KCkZvciB0ZXN0aW5nLCBJ4oCZbGwgc3RhcnQgd2l0aCBhIHNtYWxsIGNvaG9ydCBhbmQgdHJhY2sgZXJyb3IgcmF0ZXMsIGxhdGVuY3ksIGFuZCBhY3RpdmF0aW9uLiBJZiBtZXRyaWNzIGxvb2sgc3RhYmxlIHdlIGNhbiByb2xsIG91dCB0byBhIGxhcmdlciBzbGljZSBieSBlbmQgb2YgZGF5LgoKLSBTY29wZTogZmluYWxpemUgQVBJIGNvbnRyYWN0IChhdXRoLCBwYWdpbmF0aW9uLCBlcnJvcnMpCi0gUmlza3M6IHJhdGUgbGltaXRpbmcgZHVyaW5nIG9uYm9hcmRpbmcsIENTViBpbXBvcnQgbWVtb3J5IHNwaWtlcwotIFRpbWVsaW5lOiBjdXQgYmV0YSBieSBuZXh0IFdlZG5lc2RheSwgR0EgaW4gdHdvIHdlZWtzCi0gT3duZXJzOiBiYWNrZW5kIOKAlCBtZTsgZnJvbnRlbmQg4oCUIHBhaXJpbmcgd2l0aCBkZXNpZ24KCkhhcHB5IHRvIGp1bXAgb24gYSBxdWljayBjYWxsIGxhdGVyIHRvZGF5LgoK4oCUIEJyYW5kb24="
+        }
+      },
+      "sizeEstimate": 824
+    }
+  ],
+  "snippet": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rat\u2026"
+}

@@ -1,0 +1,43 @@
+{
+  "name": "functions",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@google-cloud/pubsub": "^4.7.2",
+    "@googleapis/gmail": "^12.0.0",
+    "@supabase/supabase-js": "^2.38.4",
+    "apns2": "^12.1.0-beta.2",
+    "firebase-admin": "^12.1.0",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "cors-anywhere": "^0.4.4",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.13",
+    "firebase-functions": "^6.0.1",
+    "firebase-tools": "^13.7.5",
+    "google-auth-library": "^9.11.0",
+    "html-escaper": "^3.0.3",
+    "i": "^0.3.7",
+    "node-fetch": "^2.7.0",
+    "npm": "^10.9.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/html-escaper": "^3.0.2",
+    "@types/node-fetch": "^2.6.12",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^4.6.4"
+  },
+  "private": true
+}

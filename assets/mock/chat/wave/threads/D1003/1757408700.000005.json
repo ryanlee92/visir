@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D1003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U1001",
+      "ts": "1757408700.000008",
+      "thread_ts": "1757408700.000005",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Sounds good — will follow up, keeping this in scope (re: context). Captured for EOD summary."
+          }
+        }
+      ]
+    }
+  ]
+}

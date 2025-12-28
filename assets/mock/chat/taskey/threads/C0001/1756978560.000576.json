@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "channel": "C0001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756978560.000576",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All-hands today at 3 PM ET. Q&A at the end. Love the pace — keep it rolling."
+          }
+        }
+      ],
+      "reactions": [
+        {
+          "name": "thumbsup",
+          "users": [
+            "U0004",
+            "U0002"
+          ],
+          "count": 2
+        }
+      ],
+      "reply_count": 3,
+      "reply_users": [
+        "U0002",
+        "U0001",
+        "U0007"
+      ],
+      "reply_users_count": 3,
+      "latest_reply": "1756978560.000579"
+    },
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1756978560.000577",
+      "thread_ts": "1756978560.000576",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "All clear — confirming scope (re: Q&A)."
+          }
+        }
+      ]
+    },
+    {
+      "type": "message",
+      "user": "U0007",
+      "ts": "1756978560.000579",
+      "thread_ts": "1756978560.000576",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Tracking — syncing offline (re: recording). Nice momentum."
+          }
+        }
+      ]
+    }
+  ]
+}

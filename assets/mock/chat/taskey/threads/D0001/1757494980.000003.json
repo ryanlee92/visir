@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "channel": "D0001",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0002",
+      "ts": "1757494980.000005",
+      "thread_ts": "1757494980.000003",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Good call — taking the next step (re: context)."
+          }
+        }
+      ]
+    }
+  ]
+}

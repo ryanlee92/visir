@@ -1,0 +1,71 @@
+{
+  "id": "m_0045_02",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-17T16:42:16.220000+00:00",
+  "sentDateTime": "2025-08-17T16:42:16.220000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<8472124815.344327@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Michael Young <michael.young+60@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Quick question about billing"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-17T16:42:16.220000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<8472124815.344327@wavetogether.com>"
+    }
+  ],
+  "subject": "Quick question about billing",
+  "bodyPreview": "Good morning, Appreciate the context \u2014 adding specifics. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. We aligned on the core requirement",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Good morning,</p>\n<p>Appreciate the context \u2014 adding specifics.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<p>We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.</p>\n<ul><li>Scope: finalize API contract (auth, pagination, errors)</li><li>Risks: rate limiting during onboarding, CSV import memory spikes</li><li>Timeline: cut beta by next Wednesday, GA in two weeks</li><li>Owners: backend \u2014 me; frontend \u2014 pairing with design</li></ul>\n<p>Thanks again \u2014 this unblocks the rest of the sprint.</p>\n<p>\u2014 Alex</p>\n<p>On 2025-08-17T15:23:36.733000+00:00, Zoey Johnson &lt;zoey.johnson+35@testdomain.com&gt; wrote:<br>&gt; Good morning,<br>&gt; <br>&gt; Circling back with answers inline.<br>&gt; <br>&gt; We aligned on the core requirements and trimmed a few nice\u2011to\u2011have items so we can hit the target date. I included concrete examples for the payloads so we avoid ambiguity later.<br>&gt; <br>&gt; I\u2019ll post a brief update in Slack after I push the branch.</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "sentitems",
+  "conversationId": "cv_0045",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": false,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Michael Young",
+        "address": "michael.young+60@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "channel": "D0003",
+  "messages": [
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757495040.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Quick update. I'll summarize action items by EOD. — follow-up; Sharing updates in-thread."
+          }
+        }
+      ],
+      "reply_count": 2,
+      "reply_users": [
+        "U0001"
+      ],
+      "reply_users_count": 1,
+      "latest_reply": "1757495040.000006"
+    },
+    {
+      "type": "message",
+      "user": "U0001",
+      "ts": "1757495040.000005",
+      "thread_ts": "1757495040.000004",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Acknowledged — will follow up (re: context). Captured for EOD summary."
+          }
+        }
+      ]
+    }
+  ]
+}

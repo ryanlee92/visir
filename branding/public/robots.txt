@@ -1,0 +1,63 @@
+User-agent: *
+Allow: /
+
+# AI Crawlers - Allow access for training and indexing
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: ChatGPT-User
+Allow: /
+Crawl-delay: 1
+
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 1
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 1
+
+User-agent: Claude-Web
+Allow: /
+Crawl-delay: 1
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Applebot-Extended
+Allow: /
+Crawl-delay: 1
+
+# Disallow login and signup pages from search engines
+Disallow: /login
+Disallow: /signup
+
+# Allow all other pages
+Allow: /blog
+Allow: /pricing
+Allow: /download
+Allow: /integrations
+Allow: /founders
+Allow: /developers
+Allow: /managers
+Allow: /personal
+Allow: /community
+Allow: /help
+Allow: /changelog
+Allow: /roadmap
+Allow: /feature-requests
+Allow: /privacy
+Allow: /terms
+
+# Sitemap location
+Sitemap: https://visir.pro/sitemap.xml
+
+# Crawl delay (optional, adjust as needed)
+Crawl-delay: 1
+

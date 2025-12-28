@@ -1,0 +1,71 @@
+{
+  "id": "m_0140_01",
+  "createdDateTime": null,
+  "lastModifiedDateTime": null,
+  "changeKey": null,
+  "categories": [],
+  "receivedDateTime": "2025-08-11T14:12:21.478000+00:00",
+  "sentDateTime": "2025-08-11T14:12:21.478000+00:00",
+  "hasAttachments": false,
+  "internetMessageId": "<7187036598.394515@wavetogether.com>",
+  "internetMessageHeaders": [
+    {
+      "name": "From",
+      "value": "Alex Taylor <alex@wavetogether.com>"
+    },
+    {
+      "name": "To",
+      "value": "Zoey Miller <zoey.miller+45@testdomain.com>"
+    },
+    {
+      "name": "Subject",
+      "value": "Draft: Feedback on contract redlines"
+    },
+    {
+      "name": "Date",
+      "value": "2025-08-11T14:12:21.478000+00:00"
+    },
+    {
+      "name": "Message-ID",
+      "value": "<7187036598.394515@wavetogether.com>"
+    }
+  ],
+  "subject": "Draft: Feedback on contract redlines",
+  "bodyPreview": "Hey, Following up with a few details from our chat. For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day. Happy to jump on a quick call later tod",
+  "body": {
+    "contentType": "HTML",
+    "content": "<html><body><p>Hey,</p>\n<p>Following up with a few details from our chat.</p>\n<p>For testing, I\u2019ll start with a small cohort and track error rates, latency, and activation. If metrics look stable we can roll out to a larger slice by end of day.</p>\n<p>Happy to jump on a quick call later today.</p>\n<p>\u2014 Alex</p></body></html>"
+  },
+  "importance": "normal",
+  "parentFolderId": "drafts",
+  "conversationId": "cv_0140",
+  "conversationIndex": null,
+  "isDeliveryReceiptRequested": false,
+  "isReadReceiptRequested": false,
+  "isRead": true,
+  "isDraft": true,
+  "from": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "sender": {
+    "emailAddress": {
+      "name": "Alex Taylor",
+      "address": "alex@wavetogether.com"
+    }
+  },
+  "toRecipients": [
+    {
+      "emailAddress": {
+        "name": "Zoey Miller",
+        "address": "zoey.miller+45@testdomain.com"
+      }
+    }
+  ],
+  "ccRecipients": [],
+  "bccRecipients": [],
+  "replyTo": [],
+  "webLink": null
+}

@@ -1,0 +1,50 @@
+# AI.txt - AI Crawler Instructions for Visir
+
+# About Visir
+Visir is a unified productivity platform that combines email, calendar, and chat into one intelligent timeline. Our AI-powered assistant helps professionals manage their workflow more efficiently.
+
+# Allowed AI Crawlers
+# We welcome AI crawlers that respect our content and provide value to users.
+
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: ChatGPT-User
+Allow: /
+Crawl-delay: 1
+
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 1
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 1
+
+User-agent: Claude-Web
+Allow: /
+Crawl-delay: 1
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Applebot-Extended
+Allow: /
+Crawl-delay: 1
+
+# Disallowed Paths
+Disallow: /login
+Disallow: /signup
+
+# Contact
+# For questions about AI crawling, contact: support@visir.pro
+
+# Last Updated
+# 2025-01-17
+
