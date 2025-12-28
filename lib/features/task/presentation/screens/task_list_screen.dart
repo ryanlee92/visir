@@ -298,48 +298,87 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
     ref.watch(taskListControllerProvider);
     final projectHide = ref.watch(projectHideProvider(tabType));
     final projects = ref.watch(projectListControllerProvider);
-    final tasksOnView = ref.watch(
-      taskListControllerProvider.select(
-        (v) => v.tasksOnView.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !projectHide.contains(t.projectId) && !t.isEventDummyTask).toList(),
-      ),
-    );
-    final taskDates = ref.watch(taskListControllerProvider.select((v) => v.taskDates));
-    List<TaskEntity> filteredTasks;
-
     final completedTaskOptionType = ref.watch(authControllerProvider.select((e) => e.requireValue.userCompletedTaskOptionType));
     final currentTaskLabel = ref.watch(taskLabelProvider);
+    final taskDates = ref.watch(taskListControllerProvider.select((v) => v.taskDates));
+
+    // Optimization: Combine filtering and selection in a single select to avoid multiple rebuilds
+    // This reduces the number of times tasksOnView is filtered
+    final tasksOnViewRaw = ref.watch(taskListControllerProvider.select((v) => v.tasksOnView));
+
+    // Optimization: Pre-filter tasksOnView once with common filters
+    // Use Set for O(1) lookup instead of List.contains() which is O(n)
+    final projectHideSet = Set<String>.from(projectHide);
+    final tasksOnView = <TaskEntity>[];
+    for (final t in tasksOnViewRaw) {
+      if (!t.isCancelled && !t.isOriginalRecurrenceTask && !projectHideSet.contains(t.projectId) && !t.isEventDummyTask) {
+        tasksOnView.add(t);
+      }
+    }
+
+    List<TaskEntity> filteredTasks;
 
     switch (currentTaskLabel.type) {
       case TaskLabelType.all:
-        filteredTasks = tasksOnView.where((t) => completedTaskOptionType == CompletedTaskOptionType.show ? true : t.status == TaskStatus.none).toList()
-          ..sort((a, b) => taskSorter(a: a, b: b));
-        if (completedTaskOptionType == CompletedTaskOptionType.show) {
-          filteredTasks.removeWhere((e) => e.isOverdue && e.status == TaskStatus.done);
+        // Optimization: Single pass filtering instead of where().toList()
+        filteredTasks = <TaskEntity>[];
+        for (final t in tasksOnView) {
+          if (completedTaskOptionType == CompletedTaskOptionType.show ? true : t.status == TaskStatus.none) {
+            if (completedTaskOptionType == CompletedTaskOptionType.show && t.isOverdue && t.status == TaskStatus.done) {
+              continue;
+            }
+            filteredTasks.add(t);
+          }
         }
+        filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
       case TaskLabelType.today:
-        filteredTasks =
-            tasksOnView
-                .where((t) => t.status == TaskStatus.none && !t.isOverdue && t.editedStartTime != null && t.editedStartDateOnly == DateUtils.dateOnly(DateTime.now()))
-                .toList()
-              ..sort((a, b) => taskSorter(a: a, b: b));
+        final today = DateUtils.dateOnly(DateTime.now());
+        filteredTasks = <TaskEntity>[];
+        for (final t in tasksOnView) {
+          if (t.status == TaskStatus.none && !t.isOverdue && t.editedStartTime != null && t.editedStartDateOnly == today) {
+            filteredTasks.add(t);
+          }
+        }
+        filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
       case TaskLabelType.completed:
         // updated_at descending으로 정렬 (최신부터)
-        filteredTasks = tasksOnView.where((t) => t.status == TaskStatus.done).toList()
-          ..sort((a, b) => (b.updatedAt ?? b.createdAt ?? DateTime(1000)).compareTo(a.updatedAt ?? a.createdAt ?? DateTime(1000)));
+        filteredTasks = <TaskEntity>[];
+        for (final t in tasksOnView) {
+          if (t.status == TaskStatus.done) {
+            filteredTasks.add(t);
+          }
+        }
+        filteredTasks.sort((a, b) => (b.updatedAt ?? b.createdAt ?? DateTime(1000)).compareTo(a.updatedAt ?? a.createdAt ?? DateTime(1000)));
         break;
       case TaskLabelType.overdue:
-        filteredTasks = tasksOnView.where((t) => t.status == TaskStatus.none && t.isOverdue && !t.isUnscheduled).toList()..sort((a, b) => taskSorter(a: a, b: b));
+        filteredTasks = <TaskEntity>[];
+        for (final t in tasksOnView) {
+          if (t.status == TaskStatus.none && t.isOverdue && !t.isUnscheduled) {
+            filteredTasks.add(t);
+          }
+        }
+        filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
       case TaskLabelType.unscheduled:
-        filteredTasks = tasksOnView.where((t) => t.status == TaskStatus.none && t.isUnscheduled).toList()..sort((a, b) => taskSorter(a: a, b: b));
+        filteredTasks = <TaskEntity>[];
+        for (final t in tasksOnView) {
+          if (t.status == TaskStatus.none && t.isUnscheduled) {
+            filteredTasks.add(t);
+          }
+        }
+        filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
       case TaskLabelType.upcoming:
         final now = DateUtils.dateOnly(DateTime.now());
-        filteredTasks =
-            tasksOnView.where((t) => t.status == TaskStatus.none && !t.isOverdue && !t.isUnscheduled && t.editedStartTime != null && t.editedStartDateOnly.isAfter(now)).toList()
-              ..sort((a, b) => taskSorter(a: a, b: b));
+        filteredTasks = <TaskEntity>[];
+        for (final t in tasksOnView) {
+          if (t.status == TaskStatus.none && !t.isOverdue && !t.isUnscheduled && t.editedStartTime != null && t.editedStartDateOnly.isAfter(now)) {
+            filteredTasks.add(t);
+          }
+        }
+        filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
     }
 

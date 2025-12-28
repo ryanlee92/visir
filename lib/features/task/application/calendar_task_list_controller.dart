@@ -1127,13 +1127,48 @@ class CalendarTaskResultEntity {
   DateTime get fetchedUntil => endDateTime;
   DateTime get fetchedFrom => startDateTime;
 
+  /// Check if rrule-related fields are equal (excluding status, updatedAt, etc.)
+  bool _isRruleEqual(TaskEntity a, TaskEntity b) {
+    return a.id == b.id &&
+        a.rrule == b.rrule &&
+        a.startAt == b.startAt &&
+        a.endAt == b.endAt &&
+        a.recurrenceEndAt == b.recurrenceEndAt &&
+        a.excludedRecurrenceDate == b.excludedRecurrenceDate &&
+        a.editedRecurrenceTaskIds == b.editedRecurrenceTaskIds;
+  }
+
   void updateTasksOnView() {
     cachedRecurrenceInstances = {};
-    List<TaskEntity> nonRecurringTasks = tasks.where((e) => e.rrule == null).toList().map((e) => e.copyWith(editedStartTime: e.startAt, editedEndTime: e.endAt)).toList();
+    
+    // Optimization: Single pass to filter and map non-recurring tasks
+    // Avoids creating intermediate lists (where().toList().map().toList())
+    final nonRecurringTasks = <TaskEntity>[];
+    for (final e in tasks) {
+      if (e.rrule == null) {
+        nonRecurringTasks.add(e.copyWith(editedStartTime: e.startAt, editedEndTime: e.endAt));
+      }
+    }
 
-    List<TaskEntity> originalRecurringTasks = tasks.where((e) => e.isOriginalRecurrenceTask).toList();
+    // Optimization: Convert to Map for O(1) lookup instead of O(n) firstWhereOrNull
+    final nonRecurringTasksByDateAndRecurringId = <String, TaskEntity>{};
+    for (final task in nonRecurringTasks) {
+      if (task.recurringTaskId != null) {
+        final key = '${task.recurringTaskId}_${DateUtils.dateOnly(task.startDate).millisecondsSinceEpoch}';
+        nonRecurringTasksByDateAndRecurringId[key] = task;
+      }
+    }
 
-    List<TaskEntity> _tasks = [];
+    // Optimization: Single pass to filter original recurring tasks
+    // Avoids creating intermediate list with where().toList()
+    final originalRecurringTasks = <TaskEntity>[];
+    for (final e in tasks) {
+      if (e.isOriginalRecurrenceTask) {
+        originalRecurringTasks.add(e);
+      }
+    }
+
+    final _tasks = <TaskEntity>[];
 
     originalRecurringTasks.forEach((t) {
       if (t.startAt == null) return;
@@ -1147,11 +1182,11 @@ class CalendarTaskResultEntity {
 
       final excludedRecurrenceDates = [...exceptionTasks.map((e) => e.startAt?.dateOnly).whereType<DateTime>().toList(), ...(t.excludedRecurrenceDate ?? [])].unique();
 
-      // Optimization: Reuse previous instances if available and valid
-      // Check if task itself hasn't changed AND excludedRecurrenceDates haven't changed
+      // Optimization: Reuse previous instances if rrule-related fields haven't changed
+      // This allows cache reuse even when status or updatedAt changes
       if (previousTasks != null && previousCachedRecurrenceInstances != null && previousFetchedUntil == fetchedUntil) {
         final previousTask = previousTasks!.firstWhereOrNull((e) => e.id == t.id);
-        if (previousTask != null && previousTask == t) {
+        if (previousTask != null && _isRruleEqual(previousTask, t)) {
           // Check if excludedRecurrenceDates have changed by comparing with previousTasksOnView
           final previousExceptionTasks = previousTasksOnView?.where((i) => i.recurringTaskId == t.id).toList() ?? [];
           final previousExcludedRecurrenceDates = [
@@ -1181,31 +1216,48 @@ class CalendarTaskResultEntity {
       }
 
       dates?.where((date) => !excludedRecurrenceDates.any((d) => d == date.dateOnly)).forEach((date) {
-        TaskEntity? recurringTaskOnDate = nonRecurringTasks.firstWhereOrNull((task) => task.startDateOnly == DateUtils.dateOnly(date) && task.recurringTaskId == t.id);
+        final dateOnly = DateUtils.dateOnly(date);
+        final lookupKey = '${t.id}_${dateOnly.millisecondsSinceEpoch}';
+        TaskEntity? recurringTaskOnDate = nonRecurringTasksByDateAndRecurringId[lookupKey];
 
         if (recurringTaskOnDate == null) {
           _tasks.add(t.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration)));
-        } else if (recurringTaskOnDate.isDone) {
-          nonRecurringTasks.remove(recurringTaskOnDate);
-          _tasks.add(recurringTaskOnDate.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration)));
-        } else if (recurringTaskOnDate.isCancelled) {
-          // Cancelled tasks are excluded from tasksOnView
-          nonRecurringTasks.remove(recurringTaskOnDate);
         } else {
+          // Remove from map and list
+          nonRecurringTasksByDateAndRecurringId.remove(lookupKey);
           nonRecurringTasks.remove(recurringTaskOnDate);
-          _tasks.add(
-            recurringTaskOnDate.copyWith(
-              id: recurringTaskOnDate.id,
-              recurringTaskId: recurringTaskOnDate.recurringTaskId,
-              editedStartTime: date,
-              editedEndTime: date.add(taskDuration),
-            ),
-          );
+          
+          if (recurringTaskOnDate.isDone) {
+            _tasks.add(recurringTaskOnDate.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration)));
+          } else if (recurringTaskOnDate.isCancelled) {
+            // Cancelled tasks are excluded from tasksOnView
+          } else {
+            _tasks.add(
+              recurringTaskOnDate.copyWith(
+                id: recurringTaskOnDate.id,
+                recurringTaskId: recurringTaskOnDate.recurringTaskId,
+                editedStartTime: date,
+                editedEndTime: date.add(taskDuration),
+              ),
+            );
+          }
         }
       });
     });
-    // Filter out cancelled tasks from tasksOnView
-    tasksOnView = [...nonRecurringTasks, ..._tasks].where((task) => !task.isCancelled).toList();
+    
+    // Optimization: Use List.from and addAll instead of spread operator
+    // Filter out cancelled tasks in a single pass
+    tasksOnView = <TaskEntity>[];
+    for (final task in nonRecurringTasks) {
+      if (!task.isCancelled) {
+        tasksOnView.add(task);
+      }
+    }
+    for (final task in _tasks) {
+      if (!task.isCancelled) {
+        tasksOnView.add(task);
+      }
+    }
   }
 
   CalendarTaskResultEntity({

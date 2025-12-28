@@ -117,10 +117,14 @@ class TaskListController extends _$TaskListController {
 
     // 데이터 합치기
     final taskListResultFinal = taskListResult ?? TaskListResultEntity(tasks: [], taskDates: []);
-    final allTasks = [...taskListResultFinal.tasks, ...calendarTasks]..unique((e) => e.id);
+    // Optimization: Use List.from and addAll instead of spread operator to reduce allocations
+    final allTasks = List<TaskEntity>.from(taskListResultFinal.tasks);
+    allTasks.addAll(calendarTasks);
+    allTasks.unique((e) => e.id);
 
     // loadedMonths에 속한 모든 날짜를 taskDates에 추가 (오늘 이후 날짜만)
-    List<DateTime?> mergedTaskDates = List.from(taskListResultFinal.taskDates);
+    // Optimization: Reuse existing list when possible
+    final mergedTaskDates = List<DateTime?>.from(taskListResultFinal.taskDates);
     final today = DateUtils.dateOnly(DateTime.now());
 
     // overdue 태스크가 있으면 DateTime(1000) 추가
@@ -1545,13 +1549,51 @@ class TaskListResultEntity {
     );
   }
 
+  /// Check if rrule-related fields are equal (excluding status, updatedAt, etc.)
+  bool _isRruleEqual(TaskEntity a, TaskEntity b) {
+    return a.id == b.id &&
+        a.rrule == b.rrule &&
+        a.startAt == b.startAt &&
+        a.endAt == b.endAt &&
+        a.recurrenceEndAt == b.recurrenceEndAt &&
+        a.excludedRecurrenceDate == b.excludedRecurrenceDate &&
+        a.editedRecurrenceTaskIds == b.editedRecurrenceTaskIds;
+  }
+
   void updateTasksOnView() {
     cachedRecurrenceInstances = {};
-    List<TaskEntity> nonRecurringTasks = tasks.where((e) => e.rrule == null).toList().map((e) => e.copyWith(editedStartTime: e.startAt, editedEndTime: e.endAt)).toList();
+    
+    // Optimization: Single pass to filter and map non-recurring tasks
+    // Avoids creating intermediate lists (where().toList().map().toList())
+    final nonRecurringTasks = <TaskEntity>[];
+    for (final e in tasks) {
+      if (e.rrule == null) {
+        nonRecurringTasks.add(e.copyWith(editedStartTime: e.startAt, editedEndTime: e.endAt));
+      }
+    }
 
-    List<TaskEntity> originalRecurringTasks = tasks.where((e) => e.isOriginalRecurrenceTask).toList();
+    // Optimization: Convert to Map for O(1) lookup instead of O(n) firstWhereOrNull
+    // Index by date and recurringTaskId for faster lookup
+    final nonRecurringTasksByDateAndRecurringId = <String, TaskEntity>{};
+    for (final task in nonRecurringTasks) {
+      if (task.recurringTaskId != null) {
+        final key = '${task.recurringTaskId}_${DateUtils.dateOnly(task.startDate).millisecondsSinceEpoch}';
+        nonRecurringTasksByDateAndRecurringId[key] = task;
+      }
+    }
 
-    List<TaskEntity> _tasks = [];
+    // Optimization: Single pass to filter original recurring tasks
+    // Avoids creating intermediate list with where().toList()
+    final originalRecurringTasks = <TaskEntity>[];
+    for (final e in tasks) {
+      if (e.isOriginalRecurrenceTask) {
+        originalRecurringTasks.add(e);
+      }
+    }
+
+    final _tasks = <TaskEntity>[];
+    // Optimization: Use Map for O(1) lookup instead of O(n) where().firstOrNull
+    final _tasksByRecurringIdAndDate = <String, TaskEntity>{};
 
     originalRecurringTasks.forEach((t) {
       if (taskFetchedUntil == null) return;
@@ -1560,10 +1602,11 @@ class TaskListResultEntity {
 
       List<DateTime>? dates;
 
-      // Optimization: Reuse previous instances if available and valid
+      // Optimization: Reuse previous instances if rrule-related fields haven't changed
+      // This allows cache reuse even when status or updatedAt changes
       if (previousTasks != null && previousCachedRecurrenceInstances != null && previousTaskFetchedUntil == taskFetchedUntil) {
         final previousTask = previousTasks!.firstWhereOrNull((e) => e.id == t.id);
-        if (previousTask != null && previousTask == t) {
+        if (previousTask != null && _isRruleEqual(previousTask, t)) {
           dates = previousCachedRecurrenceInstances![t.id];
         }
       }
@@ -1584,42 +1627,53 @@ class TaskListResultEntity {
       final taskDuration = t.startAt != null && t.endAt != null ? t.endAt!.difference(t.startAt!) : Duration(days: 1);
 
       dates?.forEach((date) {
-        TaskEntity? recurringTaskOnDate = nonRecurringTasks.firstWhereOrNull((task) => task.startDateOnly == DateUtils.dateOnly(date) && task.recurringTaskId == t.id);
+        final dateOnly = DateUtils.dateOnly(date);
+        final lookupKey = '${t.id}_${dateOnly.millisecondsSinceEpoch}';
+        TaskEntity? recurringTaskOnDate = nonRecurringTasksByDateAndRecurringId[lookupKey];
 
         // Check excluded recurrence dates - compare dates only, not time
-        bool isExcludedDate = t.excludedRecurrenceDate?.any((excludedDate) => DateUtils.dateOnly(excludedDate) == DateUtils.dateOnly(date)) ?? false;
+        bool isExcludedDate = t.excludedRecurrenceDate?.any((excludedDate) => DateUtils.dateOnly(excludedDate) == dateOnly) ?? false;
 
         if (isExcludedDate) return;
 
         if (recurringTaskOnDate == null) {
-          TaskEntity? existTask = _tasks.where((task) => task.recurringTaskId == t.id && task.editedStartTime == date && task.editedEndTime == date.add(taskDuration)).firstOrNull;
-          _tasks.add(
-            t.copyWith(
-              id: existTask?.id ?? Uuid().v4(),
-              recurringTaskId: t.id,
-              editedStartTime: date,
-              editedEndTime: date.add(taskDuration),
-              excludedRecurrenceDate: [],
-              editedRecurrenceTaskIds: [],
-            ),
+          final existTaskKey = '${t.id}_${date.millisecondsSinceEpoch}';
+          TaskEntity? existTask = _tasksByRecurringIdAndDate[existTaskKey];
+          final newTask = t.copyWith(
+            id: existTask?.id ?? Uuid().v4(),
+            recurringTaskId: t.id,
+            editedStartTime: date,
+            editedEndTime: date.add(taskDuration),
+            excludedRecurrenceDate: [],
+            editedRecurrenceTaskIds: [],
           );
-        } else if (recurringTaskOnDate.isCancelled || recurringTaskOnDate.isDone) {
-          nonRecurringTasks.remove(recurringTaskOnDate);
-          _tasks.add(recurringTaskOnDate.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration)));
+          _tasks.add(newTask);
+          if (newTask.id != null) {
+            _tasksByRecurringIdAndDate[existTaskKey] = newTask;
+          }
         } else {
+          // Remove from map and list
+          nonRecurringTasksByDateAndRecurringId.remove(lookupKey);
           nonRecurringTasks.remove(recurringTaskOnDate);
-          _tasks.add(
-            recurringTaskOnDate.copyWith(
-              id: recurringTaskOnDate.id,
-              recurringTaskId: recurringTaskOnDate.recurringTaskId,
-              editedStartTime: date,
-              editedEndTime: date.add(taskDuration),
-            ),
-          );
+          
+          final updatedTask = recurringTaskOnDate.isCancelled || recurringTaskOnDate.isDone
+              ? recurringTaskOnDate.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration))
+              : recurringTaskOnDate.copyWith(
+                  id: recurringTaskOnDate.id,
+                  recurringTaskId: recurringTaskOnDate.recurringTaskId,
+                  editedStartTime: date,
+                  editedEndTime: date.add(taskDuration),
+                );
+          _tasks.add(updatedTask);
         }
       });
     });
-    tasksOnView = [...nonRecurringTasks, ..._tasks];
+    
+    // Optimization: Use List.from with capacity hint and addAll instead of spread operator
+    // This reduces memory allocations compared to [...nonRecurringTasks, ..._tasks]
+    tasksOnView = List.from(nonRecurringTasks, growable: true);
+    tasksOnView.addAll(_tasks);
+    
     taskLabelList = [
       TaskLabelEntity(type: TaskLabelType.all),
       TaskLabelEntity(type: TaskLabelType.today),
