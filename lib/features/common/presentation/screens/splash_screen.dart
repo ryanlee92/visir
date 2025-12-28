@@ -135,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       SizedBox(width: 12),
                     ],
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 12),
 
                   // Typing animation text
                   _SequentialTypingAnimation(isDark: isDark),
