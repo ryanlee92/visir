@@ -66,6 +66,13 @@ pubspec.lock
 **/supabase/.env
 **/node_modules/
 
+# Secrets and credentials
+**/firebase.json
+**/credentials.json
+server/slack/firebase.json
+functions/lib/credentials.json
+functions/src/credentials.json
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
