@@ -2642,254 +2642,250 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       },
       child: isEmpty
           ? const SizedBox.shrink(key: ValueKey('empty'))
-          : Transform.translate(
-              offset: Offset(0, PlatformX.isMobileView ? 0 : 0),
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                clipBehavior: Clip.none,
-                child: Container(
-                  height: widget.maxHeight - (PlatformX.isMobileView ? 0 : 0),
-                  margin: EdgeInsets.only(top: PlatformX.isMobileView ? 0 : 0),
-                  decoration: BoxDecoration(
-                    color: context.background,
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 6, offset: Offset(0, 4), spreadRadius: 0)],
-                    border: PlatformX.isMobileView ? null : Border.all(color: context.outline.withValues(alpha: 0.3), width: 1),
-                    borderRadius: borderRadius,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: borderRadius,
-                    child: SelectionArea(
-                      child: Container(
-                        color: context.surface.withValues(alpha: 0.25),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Action title and close button at the top
-                            Padding(
-                              padding: const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  if (agentAction.actionType != null)
-                                    Expanded(
-                                      child: _buildActionButtonText(context, (
-                                        actionType: agentAction.actionType,
-                                        inbox: agentAction.inbox,
-                                        conversationSummary: agentAction.conversationSummary,
-                                      )),
-                                    )
-                                  else if (agentAction.conversationSummary != null && agentAction.conversationSummary!.isNotEmpty)
-                                    Expanded(
-                                      child: Text(
-                                        agentAction.conversationSummary!,
-                                        style: context.titleMedium?.copyWith(color: context.onSurface, fontWeight: FontWeight.bold),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    )
-                                  else
-                                    const Spacer(),
-                                  const SizedBox(width: 8),
-                                  VisirButton(
-                                    type: VisirButtonAnimationType.scaleAndOpacity,
-                                    style: VisirButtonStyle(padding: EdgeInsets.all(4), borderRadius: BorderRadius.circular(6)),
-                                    onTap: () => controller.cancelAction(),
-                                    child: VisirIcon(type: VisirIconType.close, size: 18, color: context.onSurfaceVariant, isSelected: true),
-                                    options: VisirButtonOptions(
-                                      tabType: TabType.home,
-                                      bypassTextField: true,
-                                      shortcuts: [
-                                        VisirButtonKeyboardShortcut(message: context.tr.cancel, keys: [LogicalKeyboardKey.escape]),
-                                      ],
+          : AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              clipBehavior: Clip.none,
+              child: Container(
+                height: widget.maxHeight,
+                decoration: BoxDecoration(
+                  color: context.background,
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 6, offset: Offset(0, 4), spreadRadius: 0)],
+                  border: PlatformX.isMobileView ? null : Border.all(color: context.outline.withValues(alpha: 0.3), width: 1),
+                  borderRadius: borderRadius,
+                ),
+                child: ClipRRect(
+                  borderRadius: borderRadius,
+                  child: SelectionArea(
+                    child: Container(
+                      color: context.surface.withValues(alpha: 0.25),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Action title and close button at the top
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (agentAction.actionType != null)
+                                  Expanded(
+                                    child: _buildActionButtonText(context, (
+                                      actionType: agentAction.actionType,
+                                      inbox: agentAction.inbox,
+                                      conversationSummary: agentAction.conversationSummary,
+                                    )),
+                                  )
+                                else if (agentAction.conversationSummary != null && agentAction.conversationSummary!.isNotEmpty)
+                                  Expanded(
+                                    child: Text(
+                                      agentAction.conversationSummary!,
+                                      style: context.titleMedium?.copyWith(color: context.onSurface, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
+                                  )
+                                else
+                                  const Spacer(),
+                                const SizedBox(width: 8),
+                                VisirButton(
+                                  type: VisirButtonAnimationType.scaleAndOpacity,
+                                  style: VisirButtonStyle(padding: EdgeInsets.all(4), borderRadius: BorderRadius.circular(6)),
+                                  onTap: () => controller.cancelAction(),
+                                  child: VisirIcon(type: VisirIconType.close, size: 18, color: context.onSurfaceVariant, isSelected: true),
+                                  options: VisirButtonOptions(
+                                    tabType: TabType.home,
+                                    bypassTextField: true,
+                                    shortcuts: [
+                                      VisirButtonKeyboardShortcut(message: context.tr.cancel, keys: [LogicalKeyboardKey.escape]),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              child: ListView.builder(
-                                controller: _scrollController,
-                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
-                                itemBuilder: (context, index) {
-                                  final state = ref.watch(agentActionControllerProvider);
-                                  final pendingCalls = state.pendingFunctionCalls ?? [];
-                                  final isLoading = state.isLoading;
-                                  final writeActions = pendingCalls.where((call) {
-                                    final functionName = call['function_name'] as String? ?? '';
-                                    return _isWriteAction(functionName);
-                                  }).toList();
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                final state = ref.watch(agentActionControllerProvider);
+                                final pendingCalls = state.pendingFunctionCalls ?? [];
+                                final isLoading = state.isLoading;
+                                final writeActions = pendingCalls.where((call) {
+                                  final functionName = call['function_name'] as String? ?? '';
+                                  return _isWriteAction(functionName);
+                                }).toList();
 
-                                  final messagesLength = agentAction.messages.length;
+                                final messagesLength = agentAction.messages.length;
 
-                                  // Regular message items
-                                  if (index == messagesLength) {
-                                    return Container(
-                                      margin: const EdgeInsets.only(top: 6, bottom: 6, left: 0, right: 0),
-                                      padding: const EdgeInsets.all(12),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: AnimatedTextKit(
-                                              animatedTexts: _getLoadingMessages(context, agentAction.actionType, agentAction.pendingTaskInfo)
-                                                  .map(
-                                                    (text) => TypewriterAnimatedText(
-                                                      text,
-                                                      textStyle: context.bodyLarge?.textColor(context.onSurfaceVariant),
-                                                      speed: const Duration(milliseconds: 100),
-                                                    ),
-                                                  )
-                                                  .toList(),
-                                              repeatForever: true,
-                                              pause: const Duration(milliseconds: 500),
-                                              displayFullTextOnTap: true,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-
-                                  final message = agentAction.messages[index];
-                                  final isUser = message.role == 'user';
-
-                                  final taggedProjects = _extractTaggedProjects(message.content);
-                                  final isLastMessage = index == agentAction.messages.length - 1;
-
-                                  final writeActionsForMessage = <Map<String, dynamic>>[];
-                                  final seenActionIds = <String>{};
-                                  final seenFunctionSignatures = <String>{};
-                                  for (final call in pendingCalls) {
-                                    final functionName = call['function_name'] as String? ?? '';
-                                    final actionId = call['action_id'] as String? ?? '';
-                                    final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
-                                    final messageIndex = call['message_index'] as int?;
-
-                                    // 이 메시지에 속한 write action만 표시
-                                    if (_isWriteAction(functionName) && actionId.isNotEmpty && messageIndex == index) {
-                                      String signature = functionName;
-                                      if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
-                                        final title = functionArgs['title'] as String? ?? '';
-                                        final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
-                                        final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
-                                        signature = '$functionName|$title|$startAt|$endAt';
-                                      }
-
-                                      if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
-                                        seenActionIds.add(actionId);
-                                        seenFunctionSignatures.add(signature);
-                                        writeActionsForMessage.add(call);
-                                      }
-                                    }
-                                  }
-
+                                // Regular message items
+                                if (index == messagesLength) {
                                   return Container(
-                                    margin: EdgeInsets.only(top: 6, bottom: isLastMessage && writeActionsForMessage.isNotEmpty ? 0 : 6, left: 0, right: 0),
+                                    margin: const EdgeInsets.only(top: 6, bottom: 6, left: 0, right: 0),
                                     padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
-                                    child: Column(
+                                    child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        // Display project tags if any
-                                        if (taggedProjects.isNotEmpty)
-                                          Wrap(
-                                            spacing: 6,
-                                            runSpacing: 6,
-                                            children: taggedProjects.map((projectData) => _buildProjectTagWidget(context, projectData, isUser)).toList(),
-                                          ),
-                                        if (taggedProjects.isNotEmpty) const SizedBox(height: 8),
-                                        // Message content
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true), const SizedBox(width: 8)],
-                                            Expanded(child: _buildMessageContent(context, message.content, isUser)),
-                                          ],
-                                        ),
-                                        if (writeActionsForMessage.isNotEmpty) ...[
-                                          const SizedBox(height: 12),
-                                          ...writeActionsForMessage.asMap().entries.map((entry) {
-                                            final index = entry.key;
-                                            final call = entry.value;
-                                            final isLast = index == writeActionsForMessage.length - 1;
-                                            final functionName = call['function_name'] as String? ?? '';
-                                            final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
-                                            final actionId = call['action_id'] as String? ?? '';
-
-                                            if (functionName == 'createTask' || functionName == 'updateTask') {
-                                              return Padding(
-                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                                child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
-                                              );
-                                            } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
-                                              return Padding(
-                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                                child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
-                                              );
-                                            } else {
-                                              return Padding(
-                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                                child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
-                                              );
-                                            }
-                                          }),
-                                          // Confirm 버튼을 첫 번째 메시지(또는 task block이 있는 메시지)에만 표시
-                                          // 로딩 중이 아니고 writeActions가 있고, 이 메시지가 마지막 메시지일 때만 표시
-                                          if (writeActions.isNotEmpty && !isLoading && isLastMessage) ...[
-                                            Container(
-                                              margin: const EdgeInsets.only(top: 12, bottom: 12),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  IntrinsicWidth(
-                                                    child: VisirButton(
-                                                      type: VisirButtonAnimationType.scaleAndOpacity,
-                                                      style: VisirButtonStyle(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                        backgroundColor: context.primary,
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                      options: VisirButtonOptions(
-                                                        bypassTextField: true,
-                                                        shortcuts: [
-                                                          VisirButtonKeyboardShortcut(
-                                                            keys: [
-                                                              if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                                              if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                                              LogicalKeyboardKey.enter,
-                                                            ],
-                                                            message: context.tr.confirm,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      onTap: () async {
-                                                        final controller = ref.read(agentActionControllerProvider.notifier);
-                                                        // 모든 write action을 한번에 처리
-                                                        final actionIds = writeActions.map((call) => call['action_id'] as String? ?? '').where((id) => id.isNotEmpty).toList();
-                                                        if (actionIds.isNotEmpty) {
-                                                          await controller.confirmActions(actionIds: actionIds);
-                                                        }
-                                                      },
-                                                      child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                                                    ),
+                                        VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: AnimatedTextKit(
+                                            animatedTexts: _getLoadingMessages(context, agentAction.actionType, agentAction.pendingTaskInfo)
+                                                .map(
+                                                  (text) => TypewriterAnimatedText(
+                                                    text,
+                                                    textStyle: context.bodyLarge?.textColor(context.onSurfaceVariant),
+                                                    speed: const Duration(milliseconds: 100),
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ],
+                                                )
+                                                .toList(),
+                                            repeatForever: true,
+                                            pause: const Duration(milliseconds: 500),
+                                            displayFullTextOnTap: true,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   );
-                                },
-                              ),
+                                }
+
+                                final message = agentAction.messages[index];
+                                final isUser = message.role == 'user';
+
+                                final taggedProjects = _extractTaggedProjects(message.content);
+                                final isLastMessage = index == agentAction.messages.length - 1;
+
+                                final writeActionsForMessage = <Map<String, dynamic>>[];
+                                final seenActionIds = <String>{};
+                                final seenFunctionSignatures = <String>{};
+                                for (final call in pendingCalls) {
+                                  final functionName = call['function_name'] as String? ?? '';
+                                  final actionId = call['action_id'] as String? ?? '';
+                                  final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                                  final messageIndex = call['message_index'] as int?;
+
+                                  // 이 메시지에 속한 write action만 표시
+                                  if (_isWriteAction(functionName) && actionId.isNotEmpty && messageIndex == index) {
+                                    String signature = functionName;
+                                    if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
+                                      final title = functionArgs['title'] as String? ?? '';
+                                      final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
+                                      final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
+                                      signature = '$functionName|$title|$startAt|$endAt';
+                                    }
+
+                                    if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
+                                      seenActionIds.add(actionId);
+                                      seenFunctionSignatures.add(signature);
+                                      writeActionsForMessage.add(call);
+                                    }
+                                  }
+                                }
+
+                                return Container(
+                                  margin: EdgeInsets.only(top: 6, bottom: isLastMessage && writeActionsForMessage.isNotEmpty ? 0 : 6, left: 0, right: 0),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Display project tags if any
+                                      if (taggedProjects.isNotEmpty)
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 6,
+                                          children: taggedProjects.map((projectData) => _buildProjectTagWidget(context, projectData, isUser)).toList(),
+                                        ),
+                                      if (taggedProjects.isNotEmpty) const SizedBox(height: 8),
+                                      // Message content
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true), const SizedBox(width: 8)],
+                                          Expanded(child: _buildMessageContent(context, message.content, isUser)),
+                                        ],
+                                      ),
+                                      if (writeActionsForMessage.isNotEmpty) ...[
+                                        const SizedBox(height: 12),
+                                        ...writeActionsForMessage.asMap().entries.map((entry) {
+                                          final index = entry.key;
+                                          final call = entry.value;
+                                          final isLast = index == writeActionsForMessage.length - 1;
+                                          final functionName = call['function_name'] as String? ?? '';
+                                          final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                                          final actionId = call['action_id'] as String? ?? '';
+
+                                          if (functionName == 'createTask' || functionName == 'updateTask') {
+                                            return Padding(
+                                              padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
+                                              child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
+                                            );
+                                          } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
+                                            return Padding(
+                                              padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
+                                              child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
+                                            );
+                                          } else {
+                                            return Padding(
+                                              padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
+                                              child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
+                                            );
+                                          }
+                                        }),
+                                        // Confirm 버튼을 첫 번째 메시지(또는 task block이 있는 메시지)에만 표시
+                                        // 로딩 중이 아니고 writeActions가 있고, 이 메시지가 마지막 메시지일 때만 표시
+                                        if (writeActions.isNotEmpty && !isLoading && isLastMessage) ...[
+                                          Container(
+                                            margin: const EdgeInsets.only(top: 12, bottom: 12),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                IntrinsicWidth(
+                                                  child: VisirButton(
+                                                    type: VisirButtonAnimationType.scaleAndOpacity,
+                                                    style: VisirButtonStyle(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                      backgroundColor: context.primary,
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                    options: VisirButtonOptions(
+                                                      bypassTextField: true,
+                                                      shortcuts: [
+                                                        VisirButtonKeyboardShortcut(
+                                                          keys: [
+                                                            if (PlatformX.isApple) LogicalKeyboardKey.meta,
+                                                            if (!PlatformX.isApple) LogicalKeyboardKey.control,
+                                                            LogicalKeyboardKey.enter,
+                                                          ],
+                                                          message: context.tr.confirm,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    onTap: () async {
+                                                      final controller = ref.read(agentActionControllerProvider.notifier);
+                                                      // 모든 write action을 한번에 처리
+                                                      final actionIds = writeActions.map((call) => call['action_id'] as String? ?? '').where((id) => id.isNotEmpty).toList();
+                                                      if (actionIds.isNotEmpty) {
+                                                        await controller.confirmActions(actionIds: actionIds);
+                                                      }
+                                                    },
+                                                    child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

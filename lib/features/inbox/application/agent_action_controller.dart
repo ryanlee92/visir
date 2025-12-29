@@ -12,7 +12,6 @@ import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
-import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/domain/entities/agent_model_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
@@ -174,7 +173,7 @@ class AgentActionController extends _$AgentActionController {
     final sessionId = const Uuid().v4();
 
     // Set state with actionType first
-      state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
+    state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
 
     // 각 actionType에 맞는 첫 메시지 생성
     String autoMessage = '';
@@ -188,7 +187,7 @@ class AgentActionController extends _$AgentActionController {
         if (inbox != null) {
           autoMessage = Utils.mainContext.tr.agent_action_reply_request_message;
           inboxesForContext = [inbox];
-      } else {
+        } else {
           autoMessage = Utils.mainContext.tr.agent_action_reply_request_message_no_inbox;
         }
         break;
@@ -196,7 +195,7 @@ class AgentActionController extends _$AgentActionController {
         if (inbox != null) {
           autoMessage = Utils.mainContext.tr.agent_action_forward_request_message;
           inboxesForContext = [inbox];
-      } else {
+        } else {
           autoMessage = Utils.mainContext.tr.agent_action_forward_request_message_no_inbox;
         }
         break;
@@ -204,7 +203,7 @@ class AgentActionController extends _$AgentActionController {
         if (inbox != null) {
           autoMessage = Utils.mainContext.tr.agent_action_create_task_request_message;
           inboxesForContext = [inbox];
-            } else {
+        } else {
           autoMessage = Utils.mainContext.tr.agent_action_create_task_request_message_no_inbox;
         }
         break;
@@ -586,66 +585,66 @@ class AgentActionController extends _$AgentActionController {
             // 그룹 내부 함수들을 병렬로 실행
             final groupResults = await Future.wait(
               group.map((functionCall) async {
-            final functionName = functionCall['function'] as String;
-            var functionArgs = functionCall['arguments'] as Map<String, dynamic>;
+                final functionName = functionCall['function'] as String;
+                var functionArgs = functionCall['arguments'] as Map<String, dynamic>;
 
-            // 태그된 항목들을 자동으로 파라미터에 추가
-            functionArgs = _enrichFunctionArgsWithTaggedItems(
-              functionName: functionName,
-              args: functionArgs,
-              taggedTasks: updatedTaggedTasks,
-              taggedEvents: updatedTaggedEvents,
-              taggedConnections: taggedConnections,
-              availableInboxes: updatedAvailableInboxes,
-            );
+                // 태그된 항목들을 자동으로 파라미터에 추가
+                functionArgs = _enrichFunctionArgsWithTaggedItems(
+                  functionName: functionName,
+                  args: functionArgs,
+                  taggedTasks: updatedTaggedTasks,
+                  taggedEvents: updatedTaggedEvents,
+                  taggedConnections: taggedConnections,
+                  availableInboxes: updatedAvailableInboxes,
+                );
 
-            // 크레딧 정보를 함수 인자에 추가하여 크레딧을 넘기는 작업 방지
-            functionArgs['_remaining_credits'] = remainingCredits;
+                // 크레딧 정보를 함수 인자에 추가하여 크레딧을 넘기는 작업 방지
+                functionArgs['_remaining_credits'] = remainingCredits;
 
-            // 확인이 필요한 함수인지 체크
-            final requiresConfirmation = functionsRequiringConfirmation.contains(functionName);
+                // 확인이 필요한 함수인지 체크
+                final requiresConfirmation = functionsRequiringConfirmation.contains(functionName);
 
-            if (requiresConfirmation) {
-              // 확인이 필요한 함수는 실행하지 않고 pendingFunctionCalls에 저장
-              // actionId 생성
-              final actionId = const Uuid().v4();
+                if (requiresConfirmation) {
+                  // 확인이 필요한 함수는 실행하지 않고 pendingFunctionCalls에 저장
+                  // actionId 생성
+                  final actionId = const Uuid().v4();
 
-              // pendingFunctionCalls에 추가
-              final pendingCalls = state.pendingFunctionCalls ?? [];
-              // assistant 메시지가 추가될 인덱스 저장 (entity block을 어느 메시지에 표시할지 결정)
-              // messages에는 아직 assistant 메시지가 추가되지 않았으므로, 추가될 인덱스는 messages.length
-              // 하지만 함수 호출이 처리되는 시점에서는 이미 user 메시지가 추가된 상태이므로, assistant 메시지 인덱스는 messages.length
-              final targetMessageIndex = messages.length;
-              pendingCalls.add({
-                'action_id': actionId,
-                'function_name': functionName,
-                'function_args': functionArgs,
-                'index': functionCalls.indexOf(functionCall),
-                'message_index': targetMessageIndex, // 메시지 인덱스 저장
-                'updated_tagged_tasks': updatedTaggedTasks,
-                'updated_tagged_events': updatedTaggedEvents,
-                'tagged_connections': taggedConnections,
-                'updated_available_inboxes': updatedAvailableInboxes,
-                'remaining_credits': remainingCredits,
-              });
+                  // pendingFunctionCalls에 추가
+                  final pendingCalls = state.pendingFunctionCalls ?? [];
+                  // assistant 메시지가 추가될 인덱스 저장 (entity block을 어느 메시지에 표시할지 결정)
+                  // messages에는 아직 assistant 메시지가 추가되지 않았으므로, 추가될 인덱스는 messages.length
+                  // 하지만 함수 호출이 처리되는 시점에서는 이미 user 메시지가 추가된 상태이므로, assistant 메시지 인덱스는 messages.length
+                  final targetMessageIndex = messages.length;
+                  pendingCalls.add({
+                    'action_id': actionId,
+                    'function_name': functionName,
+                    'function_args': functionArgs,
+                    'index': functionCalls.indexOf(functionCall),
+                    'message_index': targetMessageIndex, // 메시지 인덱스 저장
+                    'updated_tagged_tasks': updatedTaggedTasks,
+                    'updated_tagged_events': updatedTaggedEvents,
+                    'tagged_connections': taggedConnections,
+                    'updated_available_inboxes': updatedAvailableInboxes,
+                    'remaining_credits': remainingCredits,
+                  });
 
-              state = state.copyWith(pendingFunctionCalls: pendingCalls);
+                  state = state.copyWith(pendingFunctionCalls: pendingCalls);
 
                   // 확인이 필요한 함수는 null 반환 (나중에 처리)
                   return null;
-            }
+                }
 
                 // 함수 실행
-            final result = await executor.executeFunction(
-              functionName,
-              functionArgs,
-              tabType: TabType.home,
-              availableTasks: updatedTaggedTasks,
-              availableEvents: updatedTaggedEvents,
-              availableConnections: taggedConnections,
-              availableInboxes: updatedAvailableInboxes,
-              remainingCredits: remainingCredits,
-            );
+                final result = await executor.executeFunction(
+                  functionName,
+                  functionArgs,
+                  tabType: TabType.home,
+                  availableTasks: updatedTaggedTasks,
+                  availableEvents: updatedTaggedEvents,
+                  availableConnections: taggedConnections,
+                  availableInboxes: updatedAvailableInboxes,
+                  remainingCredits: remainingCredits,
+                );
 
                 return {'functionCall': functionCall, 'result': result, 'functionName': functionName};
               }),
@@ -664,106 +663,106 @@ class AgentActionController extends _$AgentActionController {
               final result = groupResult['result'] as Map<String, dynamic>;
               final functionName = groupResult['functionName'] as String;
 
-            results.add(result);
+              results.add(result);
 
-            // 검색 함수 결과 처리
-            if (result['success'] == true && result['results'] != null) {
-              final searchResults = result['results'] as List<dynamic>?;
+              // 검색 함수 결과 처리
+              if (result['success'] == true && result['results'] != null) {
+                final searchResults = result['results'] as List<dynamic>?;
 
-              if (functionName == 'searchInbox' && searchResults != null) {
-                // 검색된 inbox 처리
-                final searchResultInboxes = <InboxEntity>[];
-                final searchResultNumbers = <int>{};
+                if (functionName == 'searchInbox' && searchResults != null) {
+                  // 검색된 inbox 처리
+                  final searchResultInboxes = <InboxEntity>[];
+                  final searchResultNumbers = <int>{};
 
-                for (final resultItem in searchResults) {
-                  if (resultItem is Map<String, dynamic>) {
-                    final inboxId = resultItem['id'] as String?;
-                    final inboxNumber = resultItem['number'] as int?;
+                  for (final resultItem in searchResults) {
+                    if (resultItem is Map<String, dynamic>) {
+                      final inboxId = resultItem['id'] as String?;
+                      final inboxNumber = resultItem['number'] as int?;
 
-                    if (inboxId != null) {
-                      // 기존 inboxes에서 찾기
-                      final foundInbox = updatedAvailableInboxes?.firstWhereOrNull((inbox) => inbox.id == inboxId);
+                      if (inboxId != null) {
+                        // 기존 inboxes에서 찾기
+                        final foundInbox = updatedAvailableInboxes?.firstWhereOrNull((inbox) => inbox.id == inboxId);
 
-                      if (foundInbox != null) {
-                        searchResultInboxes.add(foundInbox);
-                        if (inboxNumber != null) {
-                          searchResultNumbers.add(inboxNumber);
+                        if (foundInbox != null) {
+                          searchResultInboxes.add(foundInbox);
+                          if (inboxNumber != null) {
+                            searchResultNumbers.add(inboxNumber);
+                          }
                         }
                       }
                     }
                   }
-                }
 
-                // 검색된 inbox를 availableInboxes에 추가 (중복 제거)
-                if (searchResultInboxes.isNotEmpty) {
-                  final existingIds = updatedAvailableInboxes?.map((e) => e.id).toSet() ?? {};
-                  final newInboxes = searchResultInboxes.where((e) => !existingIds.contains(e.id)).toList();
-                  updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
-                  updatedLoadedInboxNumbers = {...updatedLoadedInboxNumbers, ...searchResultNumbers};
-                }
-              } else if (functionName == 'searchTask' && searchResults != null) {
-                // 검색된 task 처리
-                final searchResultTasks = <TaskEntity>[];
+                  // 검색된 inbox를 availableInboxes에 추가 (중복 제거)
+                  if (searchResultInboxes.isNotEmpty) {
+                    final existingIds = updatedAvailableInboxes?.map((e) => e.id).toSet() ?? {};
+                    final newInboxes = searchResultInboxes.where((e) => !existingIds.contains(e.id)).toList();
+                    updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
+                    updatedLoadedInboxNumbers = {...updatedLoadedInboxNumbers, ...searchResultNumbers};
+                  }
+                } else if (functionName == 'searchTask' && searchResults != null) {
+                  // 검색된 task 처리
+                  final searchResultTasks = <TaskEntity>[];
 
-                for (final resultItem in searchResults) {
-                  if (resultItem is Map<String, dynamic>) {
-                    final taskId = resultItem['id'] as String?;
+                  for (final resultItem in searchResults) {
+                    if (resultItem is Map<String, dynamic>) {
+                      final taskId = resultItem['id'] as String?;
 
-                    if (taskId != null) {
-                      // task_list_controller에서 찾기
-                      final allTasks = ref.read(taskListControllerProvider).tasks;
-                      final foundTask = allTasks.firstWhereOrNull((task) => task.id == taskId);
+                      if (taskId != null) {
+                        // task_list_controller에서 찾기
+                        final allTasks = ref.read(taskListControllerProvider).tasks;
+                        final foundTask = allTasks.firstWhereOrNull((task) => task.id == taskId);
 
-                      if (foundTask != null && !foundTask.isEventDummyTask) {
-                        searchResultTasks.add(foundTask);
+                        if (foundTask != null && !foundTask.isEventDummyTask) {
+                          searchResultTasks.add(foundTask);
+                        }
                       }
                     }
                   }
-                }
 
-                // 검색된 task를 taggedTasks에 추가 (중복 제거)
-                if (searchResultTasks.isNotEmpty) {
-                  final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
-                  final newTasks = searchResultTasks.where((e) => !existingIds.contains(e.id)).toList();
-                  updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
-                }
-              } else if (functionName == 'searchCalendarEvent' && searchResults != null) {
-                // 검색된 event 처리
-                final searchResultEvents = <EventEntity>[];
+                  // 검색된 task를 taggedTasks에 추가 (중복 제거)
+                  if (searchResultTasks.isNotEmpty) {
+                    final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
+                    final newTasks = searchResultTasks.where((e) => !existingIds.contains(e.id)).toList();
+                    updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
+                  }
+                } else if (functionName == 'searchCalendarEvent' && searchResults != null) {
+                  // 검색된 event 처리
+                  final searchResultEvents = <EventEntity>[];
 
-                for (final resultItem in searchResults) {
-                  if (resultItem is Map<String, dynamic>) {
-                    final eventId = resultItem['id'] as String?;
-                    final uniqueId = resultItem['uniqueId'] as String?;
+                  for (final resultItem in searchResults) {
+                    if (resultItem is Map<String, dynamic>) {
+                      final eventId = resultItem['id'] as String?;
+                      final uniqueId = resultItem['uniqueId'] as String?;
 
-                    if (eventId != null || uniqueId != null) {
-                      // calendar_event_list_controller에서 찾기
-                      final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
-                      final foundEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == uniqueId);
+                      if (eventId != null || uniqueId != null) {
+                        // calendar_event_list_controller에서 찾기
+                        final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+                        final foundEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == uniqueId);
 
-                      if (foundEvent != null) {
-                        searchResultEvents.add(foundEvent);
+                        if (foundEvent != null) {
+                          searchResultEvents.add(foundEvent);
+                        }
                       }
                     }
                   }
+
+                  // 검색된 event를 taggedEvents에 추가 (중복 제거)
+                  if (searchResultEvents.isNotEmpty) {
+                    final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+                    final newEvents = searchResultEvents.where((e) => !existingIds.contains(e.uniqueId)).toList();
+                    updatedTaggedEvents = [...(updatedTaggedEvents ?? []), ...newEvents];
+                  }
                 }
 
-                // 검색된 event를 taggedEvents에 추가 (중복 제거)
-                if (searchResultEvents.isNotEmpty) {
-                  final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
-                  final newEvents = searchResultEvents.where((e) => !existingIds.contains(e.uniqueId)).toList();
-                  updatedTaggedEvents = [...(updatedTaggedEvents ?? []), ...newEvents];
-                }
-              }
-
                 final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-              successMessages.add(successMessage);
-            } else if (result['success'] == true) {
+                successMessages.add(successMessage);
+              } else if (result['success'] == true) {
                 final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-              successMessages.add(successMessage);
-            } else {
+                successMessages.add(successMessage);
+              } else {
                 final errorMessage = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
-              errorMessages.add('$functionName: $errorMessage');
+                errorMessages.add('$functionName: $errorMessage');
               }
             }
           }
@@ -793,10 +792,10 @@ class AgentActionController extends _$AgentActionController {
                   resultMessage = 'A new event has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your calendar.';
                 } else if (pendingFunctionNames.contains('sendMail') || pendingFunctionNames.contains('replyMail') || pendingFunctionNames.contains('forwardMail')) {
                   resultMessage = 'A new email has been prepared and is waiting for your confirmation. Once you confirm, it will be sent.';
-            } else {
+                } else {
                   resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
-            }
-          } else {
+                }
+              } else {
                 resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
               }
             } else if (errorMessages.isEmpty) {
@@ -844,58 +843,58 @@ class AgentActionController extends _$AgentActionController {
           // AI 응답에서 need_more_action 태그 파싱 (재귀 호출이 아닌 경우에만)
           if (!isRecursiveCall) {
             print('[AI_AGENT] Checking need_more_action tag - isRecursiveCall: $isRecursiveCall');
-          final needMoreActionData = _parseNeedMoreActionTag(aiMessage);
+            final needMoreActionData = _parseNeedMoreActionTag(aiMessage);
 
-          if (needMoreActionData != null && inboxes != null && inboxes.isNotEmpty) {
+            if (needMoreActionData != null && inboxes != null && inboxes.isNotEmpty) {
               print('[AI_AGENT] need_more_action tag found: $needMoreActionData');
-            // 태그에서 inbox 번호 추출
-            Set<int> allRequestedNumbers = needMoreActionData['inbox_numbers'] as Set<int>? ?? {};
+              // 태그에서 inbox 번호 추출
+              Set<int> allRequestedNumbers = needMoreActionData['inbox_numbers'] as Set<int>? ?? {};
 
-            // 번호가 없으면 사용자 메시지에서 자동 감지 시도
-            if (allRequestedNumbers.isEmpty) {
-              allRequestedNumbers = _detectInboxesFromUserQuery(userMessage, inboxes);
+              // 번호가 없으면 사용자 메시지에서 자동 감지 시도
+              if (allRequestedNumbers.isEmpty) {
+                allRequestedNumbers = _detectInboxesFromUserQuery(userMessage, inboxes);
                 print('[AI_AGENT] Auto-detected inbox numbers: $allRequestedNumbers');
-            }
+              }
 
-            if (allRequestedNumbers.isNotEmpty) {
-              // 요청된 inbox 번호가 유효한지 확인 (1부터 inboxes.length까지)
-              final validNumbers = allRequestedNumbers.where((num) => num > 0 && num <= inboxes.length).toSet();
+              if (allRequestedNumbers.isNotEmpty) {
+                // 요청된 inbox 번호가 유효한지 확인 (1부터 inboxes.length까지)
+                final validNumbers = allRequestedNumbers.where((num) => num > 0 && num <= inboxes.length).toSet();
                 print('[AI_AGENT] Valid numbers: $validNumbers, current loaded: ${state.loadedInboxNumbers}');
 
-              // 이미 로드한 inbox는 제외
-              final newNumbers = validNumbers.difference(state.loadedInboxNumbers);
+                // 이미 로드한 inbox는 제외
+                final newNumbers = validNumbers.difference(state.loadedInboxNumbers);
                 print('[AI_AGENT] New numbers to load: $newNumbers');
 
-              if (newNumbers.isNotEmpty) {
+                if (newNumbers.isNotEmpty) {
                   print('[AI_AGENT] REQUESTING RECURSIVE CALL - newNumbers: $newNumbers');
-                // 요청된 inbox의 전체 내용을 포함하여 재요청
-                final updatedLoadedNumbers = {...state.loadedInboxNumbers, ...newNumbers};
+                  // 요청된 inbox의 전체 내용을 포함하여 재요청
+                  final updatedLoadedNumbers = {...state.loadedInboxNumbers, ...newNumbers};
                   // 첫 번째 응답 메시지는 아직 state에 저장하지 않음 (재귀 호출에서 최종 메시지로 대체될 예정)
                   state = state.copyWith(loadedInboxNumbers: updatedLoadedNumbers, isLoading: true);
 
-                // 재요청 (같은 사용자 메시지로, _generateGeneralChat 직접 호출)
-                await _generateGeneralChat(
-                  userMessage,
-                  selectedProject: selectedProject,
+                  // 재요청 (같은 사용자 메시지로, _generateGeneralChat 직접 호출)
+                  await _generateGeneralChat(
+                    userMessage,
+                    selectedProject: selectedProject,
                     updatedMessages: updatedMessagesWithResponse, // 첫 번째 응답 포함하여 재귀 호출에 전달
-                  taggedTasks: taggedTasks,
-                  taggedEvents: taggedEvents,
-                  taggedConnections: taggedConnections,
-                  taggedChannels: taggedChannels,
-                  taggedProjects: taggedProjects,
-                  inboxes: inboxes, // 같은 인박스 목록 사용 (전체 내용 포함)
+                    taggedTasks: taggedTasks,
+                    taggedEvents: taggedEvents,
+                    taggedConnections: taggedConnections,
+                    taggedChannels: taggedChannels,
+                    taggedProjects: taggedProjects,
+                    inboxes: inboxes, // 같은 인박스 목록 사용 (전체 내용 포함)
                     isRecursiveCall: true, // 재귀 호출 플래그 설정
-                );
+                  );
                   print('[AI_AGENT] RECURSIVE CALL COMPLETED - returning from first call');
                   // 재귀 호출 완료 후 첫 번째 호출 종료
                   // 재귀 호출에서 이미 최종 메시지가 state에 저장되었으므로 추가 작업 불필요
-                return;
+                  return;
                 } else {
                   print('[AI_AGENT] No new numbers to load - skipping recursive call');
-              }
+                }
               } else {
                 print('[AI_AGENT] No valid numbers found');
-            }
+              }
             } else {
               print('[AI_AGENT] No need_more_action tag or no inboxes');
             }
@@ -907,7 +906,7 @@ class AgentActionController extends _$AgentActionController {
           if (isRecursiveCall) {
             print('[AI_AGENT] _generateGeneralChat END (recursive) - isRecursiveCall: $isRecursiveCall, messagesCount: ${updatedMessagesWithResponse.length}');
             // 재귀 호출 완료 시 로딩 상태 해제
-          state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
+            state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
             return;
           }
 
@@ -1099,43 +1098,6 @@ class AgentActionController extends _$AgentActionController {
     }
 
     return buffer.toString();
-  }
-
-  /// 함수 실행 전 확인 메시지를 생성합니다.
-  String _getFunctionConfirmationMessage(String functionName, Map<String, dynamic> args) {
-    switch (functionName) {
-      case 'sendMail':
-        return Utils.mainContext.tr.agent_action_confirm_send_mail;
-      case 'replyMail':
-        return Utils.mainContext.tr.agent_action_confirm_reply_mail;
-      case 'forwardMail':
-        return Utils.mainContext.tr.agent_action_confirm_forward_mail;
-      case 'deleteTask':
-        return Utils.mainContext.tr.agent_action_confirm_delete_task;
-      case 'deleteEvent':
-        return Utils.mainContext.tr.agent_action_confirm_delete_event;
-      case 'deleteMail':
-        return Utils.mainContext.tr.agent_action_confirm_delete_mail;
-      case 'updateTask':
-        return Utils.mainContext.tr.agent_action_confirm_update_task;
-      case 'updateEvent':
-        return Utils.mainContext.tr.agent_action_confirm_update_event;
-      case 'markMailAsRead':
-        return Utils.mainContext.tr.agent_action_confirm_mark_mail_read;
-      case 'markMailAsUnread':
-        return Utils.mainContext.tr.agent_action_confirm_mark_mail_unread;
-      case 'archiveMail':
-        return Utils.mainContext.tr.agent_action_confirm_archive_mail;
-      case 'responseCalendarInvitation':
-        final response = args['response'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_response_calendar_invitation(response);
-      case 'createTask':
-        return Utils.mainContext.tr.agent_action_confirm_create_task;
-      case 'createEvent':
-        return Utils.mainContext.tr.agent_action_confirm_create_event;
-      default:
-        return Utils.mainContext.tr.agent_action_confirm_execute_action;
-    }
   }
 
   /// 함수 호출 인자를 태그된 항목들로 자동 보강합니다.
@@ -1688,7 +1650,7 @@ class AgentActionController extends _$AgentActionController {
         final message = inbox.linkedMessage!;
         buffer.writeln('- Type: Message');
         buffer.writeln('- Channel: ${message.channelName}');
-        buffer.writeln('- From: ${message.userName ?? 'Unknown'}');
+        buffer.writeln('- From: ${message.userName}');
         buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
 
         if (shouldIncludeFullContent) {
@@ -1745,67 +1707,6 @@ class AgentActionController extends _$AgentActionController {
       // JSON 파싱 실패 시 null 반환
       return null;
     }
-  }
-
-  /// AI 응답에서 특정 inbox 번호를 요청하는 것을 감지하고 번호를 추출합니다.
-  /// 예: "read inbox item 1", "show me inbox item 5", "인박스 3번 보여줘" 등
-  Set<int> _extractRequestedInboxNumbers(String aiResponse) {
-    final requestedNumbers = <int>{};
-    final lowerResponse = aiResponse.toLowerCase();
-
-    // 다양한 패턴으로 inbox 번호 추출
-    // 영어 패턴
-    final englishPatterns = [
-      RegExp(r'inbox\s*item\s*(\d+)', caseSensitive: false),
-      RegExp(r'item\s*(\d+)', caseSensitive: false),
-      RegExp(r'inbox\s*(\d+)', caseSensitive: false),
-      RegExp(r'email\s*(\d+)', caseSensitive: false),
-      RegExp(r'message\s*(\d+)', caseSensitive: false),
-      RegExp(r'read\s*(\d+)', caseSensitive: false),
-      RegExp(r'show\s*.*?(\d+)', caseSensitive: false),
-    ];
-
-    // 한국어 패턴
-    final koreanPatterns = [
-      RegExp(r'인박스\s*(\d+)', caseSensitive: false),
-      RegExp(r'메일\s*(\d+)', caseSensitive: false),
-      RegExp(r'메시지\s*(\d+)', caseSensitive: false),
-      RegExp(r'(\d+)\s*번', caseSensitive: false),
-      RegExp(r'(\d+)\s*번째', caseSensitive: false),
-    ];
-
-    // 모든 패턴에서 번호 추출
-    for (final pattern in [...englishPatterns, ...koreanPatterns]) {
-      final matches = pattern.allMatches(lowerResponse);
-      for (final match in matches) {
-        final numberStr = match.group(1);
-        if (numberStr != null) {
-          final number = int.tryParse(numberStr);
-          if (number != null && number > 0) {
-            requestedNumbers.add(number);
-          }
-        }
-      }
-    }
-
-    return requestedNumbers;
-  }
-
-  /// AI 응답이 inbox 관련 질문인지 확인합니다.
-  bool _isInboxRelatedQuestion(String aiResponse) {
-    final lowerResponse = aiResponse.toLowerCase();
-    final inboxKeywords = ['inbox', 'email', 'message', 'mail', '인박스', '메일', '메시지', '이메일'];
-
-    return inboxKeywords.any((keyword) => lowerResponse.contains(keyword));
-  }
-
-  /// AI 응답에서 inbox를 읽어야 한다는 표현이 있는지 확인합니다.
-  /// 예: "읽어야 합니다", "열어볼까요", "읽어볼게요", "전체를 읽어야" 등
-  bool _detectNeedsToReadInbox(String aiResponse) {
-    final lowerResponse = aiResponse.toLowerCase();
-    final readPatterns = ['읽어야', '읽어볼', '열어볼', '전체를', '본문 전체', '내용 전체', 'full content', 'read the', 'open the', 'need to read', 'should read'];
-
-    return readPatterns.any((pattern) => lowerResponse.contains(pattern));
   }
 
   /// 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 관련 inbox를 자동으로 감지합니다.
@@ -1870,70 +1771,15 @@ class AgentActionController extends _$AgentActionController {
       // Message인 경우 sender 이름 확인
       if (inbox.linkedMessage != null) {
         final message = inbox.linkedMessage!;
-        final userName = (message.userName ?? '').toLowerCase();
+        final userName = message.userName.toLowerCase();
 
         if (userName.length >= 2 && lowerQuery.contains(userName) && hasActionRequest) {
           detectedNumbers.add(itemNumber);
           continue;
         }
 
-        final channelName = (message.channelName ?? '').toLowerCase();
+        final channelName = message.channelName.toLowerCase();
         if (channelName.length >= 2 && lowerQuery.contains(channelName) && hasActionRequest) {
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
-      }
-    }
-
-    return detectedNumbers;
-  }
-
-  /// AI 응답에서 언급된 sender나 키워드를 기반으로 관련 inbox를 자동으로 감지합니다.
-  Set<int> _autoDetectRelevantInboxes(String aiResponse, List<InboxEntity> inboxes) {
-    final detectedNumbers = <int>{};
-    final lowerResponse = aiResponse.toLowerCase();
-
-    // AI가 특정 sender를 언급했는지 확인
-    for (int i = 0; i < inboxes.length; i++) {
-      final inbox = inboxes[i];
-      final itemNumber = i + 1;
-
-      // 이미 전체 내용을 보낸 inbox는 제외
-      if (state.loadedInboxNumbers.contains(itemNumber)) {
-        continue;
-      }
-
-      // Email인 경우 sender 이름 확인
-      if (inbox.linkedMail != null) {
-        final mail = inbox.linkedMail!;
-        final senderName = mail.fromName.toLowerCase();
-
-        // AI 응답에 sender 이름이 포함되어 있는지 확인 (최소 3글자 이상)
-        if (senderName.length >= 3 && lowerResponse.contains(senderName)) {
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
-
-        // 제목이나 설명에 키워드가 있는지 확인
-        final title = inbox.title.toLowerCase();
-        if (title.length >= 3 && lowerResponse.contains(title.substring(0, title.length > 20 ? 20 : title.length))) {
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
-      }
-
-      // Message인 경우 sender 이름 확인
-      if (inbox.linkedMessage != null) {
-        final message = inbox.linkedMessage!;
-        final userName = (message.userName ?? '').toLowerCase();
-
-        if (userName.length >= 3 && lowerResponse.contains(userName)) {
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
-
-        final channelName = (message.channelName ?? '').toLowerCase();
-        if (channelName.length >= 3 && lowerResponse.contains(channelName)) {
           detectedNumbers.add(itemNumber);
           continue;
         }
@@ -2032,12 +1878,12 @@ class AgentActionController extends _$AgentActionController {
     final callsToExecute = <Map<String, dynamic>>[];
     final seenActionIds = <String>{};
     final seenFunctionSignatures = <String>{};
-    
+
     for (final call in filteredCalls) {
       final functionName = call['function_name'] as String? ?? '';
       final actionId = call['action_id'] as String? ?? '';
       final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
-      
+
       // signature 생성 (UI에서 사용하는 것과 동일한 로직)
       String signature = functionName;
       if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
@@ -2046,7 +1892,7 @@ class AgentActionController extends _$AgentActionController {
         final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
         signature = '$functionName|$title|$startAt|$endAt';
       }
-      
+
       // action_id와 signature 모두 확인하여 중복 제거
       if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
         seenActionIds.add(actionId);
@@ -2068,55 +1914,43 @@ class AgentActionController extends _$AgentActionController {
 
     // 각 액션을 순차적으로 실행 (의존성 고려)
     for (final pendingCall in callsToExecute) {
-    // 타입 안전하게 데이터 추출
-    final functionName = pendingCall['function_name'] as String?;
-    final functionArgs = pendingCall['function_args'] as Map<String, dynamic>?;
+      // 타입 안전하게 데이터 추출
+      final functionName = pendingCall['function_name'] as String?;
+      final functionArgs = pendingCall['function_args'] as Map<String, dynamic>?;
 
-    if (functionName == null || functionArgs == null) {
+      if (functionName == null || functionArgs == null) {
         continue;
-    }
+      }
 
-    // 타입 안전하게 컨텍스트 데이터 추출
-    final updatedTaggedTasks = pendingCall['updated_tagged_tasks'] as List<TaskEntity>?;
-    final updatedTaggedEvents = pendingCall['updated_tagged_events'] as List<EventEntity>?;
-    final taggedConnections = pendingCall['tagged_connections'] as List<ConnectionEntity>?;
-    final updatedAvailableInboxes = pendingCall['updated_available_inboxes'] as List<InboxEntity>?;
-    final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
+      // 타입 안전하게 컨텍스트 데이터 추출
+      final updatedTaggedTasks = pendingCall['updated_tagged_tasks'] as List<TaskEntity>?;
+      final updatedTaggedEvents = pendingCall['updated_tagged_events'] as List<EventEntity>?;
+      final taggedConnections = pendingCall['tagged_connections'] as List<ConnectionEntity>?;
+      final updatedAvailableInboxes = pendingCall['updated_available_inboxes'] as List<InboxEntity>?;
+      final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
 
-    try {
-      // 함수 실행
-      final result = await executor.executeFunction(
-        functionName,
-        functionArgs,
-        tabType: TabType.home,
-        availableTasks: updatedTaggedTasks,
-        availableEvents: updatedTaggedEvents,
-        availableConnections: taggedConnections,
-        availableInboxes: updatedAvailableInboxes,
-        remainingCredits: remainingCredits,
-      );
+      try {
+        // 함수 실행
+        final result = await executor.executeFunction(
+          functionName,
+          functionArgs,
+          tabType: TabType.home,
+          availableTasks: updatedTaggedTasks,
+          availableEvents: updatedTaggedEvents,
+          availableConnections: taggedConnections,
+          availableInboxes: updatedAvailableInboxes,
+          remainingCredits: remainingCredits,
+        );
 
         if (result['success'] == true) {
           final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-          functionResults.add({
-            'function_name': functionName,
-            'success': true,
-            'message': message,
-          });
+          functionResults.add({'function_name': functionName, 'success': true, 'message': message});
         } else {
           final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
-          functionResults.add({
-            'function_name': functionName,
-            'success': false,
-            'error': error,
-          });
+          functionResults.add({'function_name': functionName, 'success': false, 'error': error});
         }
       } catch (e) {
-        functionResults.add({
-          'function_name': functionName,
-          'success': false,
-          'error': e.toString(),
-        });
+        functionResults.add({'function_name': functionName, 'success': false, 'error': e.toString()});
       }
     }
 
@@ -2128,7 +1962,7 @@ class AgentActionController extends _$AgentActionController {
     for (final result in functionResults) {
       final functionName = result['function_name'] as String? ?? '';
       final success = result['success'] as bool? ?? false;
-      
+
       if (success) {
         final message = result['message'] as String? ?? '';
         if (message.isNotEmpty) {
@@ -2141,7 +1975,7 @@ class AgentActionController extends _$AgentActionController {
         functionResultsSummary.add('$functionName: failed - $error');
       }
     }
-    
+
     // 실제 실행된 함수 호출 개수를 명확히 전달
     final executedCount = functionResults.length;
     final successCount = functionResults.where((r) => r['success'] == true).length;
@@ -2169,7 +2003,7 @@ class AgentActionController extends _$AgentActionController {
           final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
           final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
           apiKey = env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null;
-    } catch (e) {
+        } catch (e) {
           // 환경 변수 읽기 실패
         }
       }
@@ -2232,13 +2066,13 @@ class AgentActionController extends _$AgentActionController {
 
     final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage);
     final updatedMessages = [...state.messages, assistantMessage];
-    
+
     // pendingFunctionCalls에서 실행된 항목 제거 (entity block은 유지)
     final updatedPendingCalls = pendingCalls.where((call) {
       final callActionId = call['action_id'] as String?;
       return callActionId == null || !actionIds.contains(callActionId);
     }).toList();
-    
+
     state = state.copyWith(messages: updatedMessages, pendingFunctionCalls: updatedPendingCalls.isEmpty ? null : updatedPendingCalls, isLoading: false);
 
     // 히스토리 저장
@@ -2618,76 +2452,5 @@ AI: $cleanAssistantMessage
     } catch (e) {
       // Supabase 저장 실패는 무시
     }
-  }
-
-  /// AI를 사용하여 사용자의 확인 상태를 판단합니다.
-  /// conversation history와 user request를 기반으로 사용자가 action을 진행할 의사가 있는지 확인합니다.
-  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
-  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
-  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
-  Future<bool> checkConfirmationFromAI({
-    required LinkedMailEntity linkedMail,
-    required String content,
-    required String userRequest,
-    required List<Map<String, dynamic>> conversationHistory,
-    String? previousContent,
-    required String model,
-  }) async {
-    // 더 이상 특화된 AI 호출을 사용하지 않음
-    // 확인은 MCP 함수 호출 시 자동으로 처리됨
-    return false;
-  }
-
-  /// Mail action을 위한 confirmation 체크 (reply, send 등)
-  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
-  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
-  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
-  Future<bool> checkMailConfirmation({
-    required LinkedMailEntity linkedMail,
-    required String content,
-    required String userRequest,
-    required List<AgentActionMessage> conversationHistory,
-    String? previousContent,
-    required String model,
-  }) async {
-    // 더 이상 특화된 AI 호출을 사용하지 않음
-    return false;
-  }
-
-  /// Task action을 위한 confirmation 체크
-  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
-  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
-  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
-  Future<bool> checkTaskConfirmation({required Map<String, dynamic> taskInfo}) async {
-    // 더 이상 특화된 AI 호출을 사용하지 않음
-    return false;
-  }
-
-  /// Event action을 위한 confirmation 체크
-  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
-  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
-  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
-  Future<bool> checkEventConfirmation({required Map<String, dynamic> eventInfo}) async {
-    // 더 이상 특화된 AI 호출을 사용하지 않음
-    return false;
-  }
-
-  /// 모든 action에 공통적으로 적용되는 confirmation 체크
-  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
-  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
-  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
-  Future<bool> checkActionConfirmation({
-    required AgentActionType actionType,
-    Map<String, dynamic>? actionInfo,
-    LinkedMailEntity? linkedMail,
-    String? content,
-    String? userRequest,
-    List<AgentActionMessage>? conversationHistory,
-    String? previousContent,
-    required String model,
-  }) async {
-    // 더 이상 특화된 AI 호출을 사용하지 않음
-    // 확인은 MCP 함수 호출 시 자동으로 처리됨
-        return false;
   }
 }
