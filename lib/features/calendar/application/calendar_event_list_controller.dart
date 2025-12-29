@@ -91,6 +91,7 @@ class CalendarEventListController extends _$CalendarEventListController {
       return CalendarEventResultEntity(events: [], startDateTime: startDateTime, endDateTime: endDateTime);
     }
 
+    ref.watch(localPrefControllerProvider.select((v) => v.value?.calendarOAuths?.map((e) => e.uniqueId).toList()));
     ref.watch(calendarDisplayDateProvider(tabType).select((v) => DateFormat.yM().format(v[displayType] ?? DateTime.now())));
     final targetMonth = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[displayType] ?? DateTime.now()));
     final prevMonth = DateTime(targetMonth.year, targetMonth.month - 1);
@@ -99,14 +100,6 @@ class CalendarEventListController extends _$CalendarEventListController {
     final newLoadedMonth = [DateFormat.yM().format(targetMonth), DateFormat.yM().format(prevMonth), DateFormat.yM().format(nextMonth)];
     final requireLoadMonth = newLoadedMonth.where((e) => !loadedMonth.contains(e)).toList();
     loadedMonth = newLoadedMonth;
-
-    ref.watch(
-      localPrefControllerProvider.select((v) {
-        final uniqueIds = v.value?.calendarOAuths?.map((e) => e.uniqueId).toList() ?? [];
-        uniqueIds.sort();
-        return uniqueIds.join(',');
-      }),
-    );
 
     _controllers.clear();
 
@@ -136,7 +129,6 @@ class CalendarEventListController extends _$CalendarEventListController {
       });
 
       final uniqueEvents = allEvents.unique((e) => e.uniqueId);
-
       updateState(events: uniqueEvents, startDateTime: startDateTime, endDateTime: endDateTime);
     }
 
