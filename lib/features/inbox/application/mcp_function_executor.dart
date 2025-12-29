@@ -468,13 +468,21 @@ class McpFunctionExecutor {
       });
     }
 
-    // If projectId is not provided, try to get it from inbox suggestion
+    // If projectId is not provided, try to get it from inbox suggestion, then lastUsedProject, then defaultProject
     if (projectId == null || projectId.isEmpty) {
       if (matchingInbox != null) {
         final suggestion = matchingInbox.suggestion;
         if (suggestion != null && suggestion.project_id != null && suggestion.project_id!.isNotEmpty) {
           projectId = suggestion.project_id;
         }
+      }
+
+      // If still no projectId, use lastUsedProject or defaultProject (same logic as _executeCreateEvent)
+      if (projectId == null || projectId.isEmpty) {
+        final lastUsedProjectId = ref.read(lastUsedProjectIdProvider).firstOrNull;
+        final lastUsedProject = lastUsedProjectId == null ? null : ref.read(projectListControllerProvider).firstWhereOrNull((e) => e.isPointedProjectId(lastUsedProjectId));
+        final defaultProject = ref.read(projectListControllerProvider).firstWhereOrNull((e) => e.isDefault);
+        projectId = lastUsedProject?.uniqueId ?? defaultProject?.uniqueId;
       }
     }
 
