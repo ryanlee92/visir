@@ -797,8 +797,7 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    final taskMonth = task.startAt?.month ?? targetDate.month;
-    if (targetTab != tabType || taskMonth != targetDate.month) return list;
+    if (targetTab != tabType || targetDate.year != targetYear || targetDate.month != targetMonth) return list;
     if (ref.read(shouldUseMockDataProvider)) return list;
 
     final eventResult = await _taskRepository.saveTask(task: task);
@@ -852,8 +851,7 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    final taskMonth = task.startAt?.month ?? targetDate.month;
-    if (targetTab != tabType || taskMonth != targetDate.month) return list;
+    if (targetTab != tabType || targetDate.year != targetYear || targetDate.month != targetMonth) return list;
     if (!isSignedIn) return list;
     if (ref.read(shouldUseMockDataProvider)) return list;
 
