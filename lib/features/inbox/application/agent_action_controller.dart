@@ -241,7 +241,6 @@ class AgentActionController extends _$AgentActionController {
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
   }) async {
-    print('[AI_AGENT] handleMessageWithoutAction CALLED');
     if (userMessage.trim().isEmpty) return;
 
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
@@ -278,7 +277,6 @@ class AgentActionController extends _$AgentActionController {
 
   /// agentAction 시작 시 첫 메시지를 자동으로 보냅니다.
   Future<void> _sendAutoMessage(String autoMessage, {List<InboxEntity>? inboxes, AgentActionType? actionType}) async {
-    print('[AI_AGENT] _sendAutoMessage CALLED');
     if (autoMessage.trim().isEmpty) return;
 
     // createTask나 createEvent의 경우, 제공된 inbox를 자동으로 로드
@@ -286,7 +284,6 @@ class AgentActionController extends _$AgentActionController {
       // 제공된 inbox 번호들을 loadedInboxNumbers에 추가하여 전체 내용이 포함되도록 함
       final inboxNumbers = {for (int i = 0; i < inboxes.length; i++) i + 1};
       state = state.copyWith(loadedInboxNumbers: {...state.loadedInboxNumbers, ...inboxNumbers});
-      print('[AI_AGENT] Auto-loading inbox numbers for $actionType: $inboxNumbers');
     }
 
     // 사용자 메시지로 추가 (자동 메시지)
@@ -297,7 +294,6 @@ class AgentActionController extends _$AgentActionController {
       // generalChat으로 처리
       await _generateGeneralChat(autoMessage, updatedMessages: updatedMessages, inboxes: inboxes);
     } catch (e) {
-      print('[AI_AGENT] _sendAutoMessage ERROR: $e');
       state = state.copyWith(messages: updatedMessages, isLoading: false);
     }
   }
@@ -315,10 +311,6 @@ class AgentActionController extends _$AgentActionController {
     List<InboxEntity>? inboxes,
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
   }) async {
-    print(
-      '[AI_AGENT] _generateGeneralChat START - isRecursiveCall: $isRecursiveCall, userMessage: ${userMessage.substring(0, userMessage.length > 50 ? 50 : userMessage.length)}...',
-    );
-
     // updatedMessages가 제공되지 않으면 새로 생성
     final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: userMessage)];
 
@@ -493,7 +485,6 @@ class AgentActionController extends _$AgentActionController {
 
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
-        print('[AI_AGENT] AI Response received - isRecursiveCall: $isRecursiveCall, messageLength: ${aiMessage.length}');
 
         // 첫 메시지인 경우 응답에서 제목 추출
         if (isFirstMessage && state.conversationSummary == null && state.actionType == null) {
@@ -515,7 +506,6 @@ class AgentActionController extends _$AgentActionController {
         // MCP 함수 호출 감지 및 실행
         final executor = McpFunctionExecutor(ref);
         final functionCalls = executor.parseFunctionCalls(aiMessage);
-        print('[AI_AGENT] Function calls detected: ${functionCalls.length}, isRecursiveCall: $isRecursiveCall');
 
         // 함수 호출 태그를 제거한 메시지 추출 (AI가 생성한 메시지 부분)
         String aiMessageWithoutFunctionCalls = aiMessage;
@@ -828,7 +818,6 @@ class AgentActionController extends _$AgentActionController {
           }
 
           state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
-          print('[AI_AGENT] _generateGeneralChat END (with function calls) - isRecursiveCall: $isRecursiveCall, messagesCount: ${updatedMessagesWithResponse.length}');
 
           // 첫 메시지인 경우 (user + assistant만 있는 경우) 제목 생성
           if (state.conversationSummary == null && updatedMessagesWithResponse.length == 2) {
@@ -854,31 +843,25 @@ class AgentActionController extends _$AgentActionController {
 
           // AI 응답에서 need_more_action 태그 파싱 (재귀 호출이 아닌 경우에만)
           if (!isRecursiveCall) {
-            print('[AI_AGENT] Checking need_more_action tag - isRecursiveCall: $isRecursiveCall');
             final needMoreActionData = _parseNeedMoreActionTag(aiMessage);
 
             if (needMoreActionData != null && inboxes != null && inboxes.isNotEmpty) {
-              print('[AI_AGENT] need_more_action tag found: $needMoreActionData');
               // 태그에서 inbox 번호 추출
               Set<int> allRequestedNumbers = needMoreActionData['inbox_numbers'] as Set<int>? ?? {};
 
               // 번호가 없으면 사용자 메시지에서 자동 감지 시도
               if (allRequestedNumbers.isEmpty) {
                 allRequestedNumbers = _detectInboxesFromUserQuery(userMessage, inboxes);
-                print('[AI_AGENT] Auto-detected inbox numbers: $allRequestedNumbers');
               }
 
               if (allRequestedNumbers.isNotEmpty) {
                 // 요청된 inbox 번호가 유효한지 확인 (1부터 inboxes.length까지)
                 final validNumbers = allRequestedNumbers.where((num) => num > 0 && num <= inboxes.length).toSet();
-                print('[AI_AGENT] Valid numbers: $validNumbers, current loaded: ${state.loadedInboxNumbers}');
 
                 // 이미 로드한 inbox는 제외
                 final newNumbers = validNumbers.difference(state.loadedInboxNumbers);
-                print('[AI_AGENT] New numbers to load: $newNumbers');
 
                 if (newNumbers.isNotEmpty) {
-                  print('[AI_AGENT] REQUESTING RECURSIVE CALL - newNumbers: $newNumbers');
                   // 요청된 inbox의 전체 내용을 포함하여 재요청
                   final updatedLoadedNumbers = {...state.loadedInboxNumbers, ...newNumbers};
                   // 첫 번째 응답 메시지는 아직 state에 저장하지 않음 (재귀 호출에서 최종 메시지로 대체될 예정)
@@ -899,26 +882,16 @@ class AgentActionController extends _$AgentActionController {
                     inboxes: inboxes, // 같은 인박스 목록 사용 (전체 내용 포함)
                     isRecursiveCall: true, // 재귀 호출 플래그 설정
                   );
-                  print('[AI_AGENT] RECURSIVE CALL COMPLETED - returning from first call');
                   // 재귀 호출 완료 후 첫 번째 호출 종료
                   // 재귀 호출에서 이미 최종 메시지가 state에 저장되었으므로 추가 작업 불필요
                   return;
-                } else {
-                  print('[AI_AGENT] No new numbers to load - skipping recursive call');
                 }
-              } else {
-                print('[AI_AGENT] No valid numbers found');
               }
-            } else {
-              print('[AI_AGENT] No need_more_action tag or no inboxes');
             }
-          } else {
-            print('[AI_AGENT] Skipping need_more_action check - isRecursiveCall: $isRecursiveCall');
           }
 
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
           if (isRecursiveCall) {
-            print('[AI_AGENT] _generateGeneralChat END (recursive) - isRecursiveCall: $isRecursiveCall, messagesCount: ${updatedMessagesWithResponse.length}');
             // 재귀 호출 완료 시 로딩 상태 해제
             // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
             // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
@@ -935,7 +908,6 @@ class AgentActionController extends _$AgentActionController {
           }
 
           state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
-          print('[AI_AGENT] _generateGeneralChat END - isRecursiveCall: $isRecursiveCall, messagesCount: ${updatedMessagesWithResponse.length}');
 
           // 첫 메시지이고 actionType이 있으면 제목 생성
           if (state.conversationSummary == null && updatedMessagesWithResponse.length == 2 && state.actionType != null) {
@@ -1824,7 +1796,6 @@ class AgentActionController extends _$AgentActionController {
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
   }) async {
-    print('[AI_AGENT] sendMessage CALLED');
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
     final messageWithTags = _buildMessageWithTaggedItems(
       userMessage: userMessage,
@@ -1855,7 +1826,6 @@ class AgentActionController extends _$AgentActionController {
         inboxes: inboxes,
       );
     } catch (e) {
-      print('[AI_AGENT] sendMessage ERROR: $e');
       state = state.copyWith(
         messages: [
           ...updatedMessages,
