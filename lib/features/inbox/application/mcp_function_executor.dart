@@ -29,6 +29,7 @@ import 'package:Visir/features/chat/actions.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
+import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/actions.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
@@ -50,15 +51,7 @@ import 'package:uuid/uuid.dart';
 
 /// MCP 함수 호출을 파싱하고 실행하는 클래스
 class McpFunctionExecutor {
-  // WidgetRef도 받을 수 있도록 dynamic으로 선언
-  final dynamic ref;
-
-  McpFunctionExecutor(this.ref);
-
-  // WidgetRef도 받을 수 있도록 factory 생성자 추가
-  factory McpFunctionExecutor.fromWidgetRef(WidgetRef widgetRef) {
-    return McpFunctionExecutor(widgetRef);
-  }
+  WidgetRef get ref => Utils.ref;
 
   /// AI 응답에서 함수 호출을 파싱합니다.
   /// OpenAI의 function calling 형식 또는 커스텀 JSON 형식을 지원합니다.
@@ -470,10 +463,14 @@ class McpFunctionExecutor {
 
     // If projectId is not provided, try to get it from inbox suggestion, then lastUsedProject, then defaultProject
     if (projectId == null || projectId.isEmpty) {
-      if (matchingInbox != null) {
-        final suggestion = matchingInbox.suggestion;
-        if (suggestion != null && suggestion.project_id != null && suggestion.project_id!.isNotEmpty) {
-          projectId = suggestion.project_id;
+      // First, try to get projectId from any inbox suggestion in availableInboxes
+      if (availableInboxes != null && availableInboxes.isNotEmpty) {
+        for (final inbox in availableInboxes) {
+          final suggestion = inbox.suggestion;
+          if (suggestion != null && suggestion.project_id != null && suggestion.project_id!.isNotEmpty) {
+            projectId = suggestion.project_id;
+            break; // Use the first found projectId from suggestion
+          }
         }
       }
 
@@ -1628,25 +1625,18 @@ class McpFunctionExecutor {
 
     try {
       final channelList = ref.read(chatChannelListControllerProvider);
-      final channel = channelList.values.expand((channels) => channels).firstWhereOrNull((c) => c.id == channelId);
+      final allChannels = channelList.values.expand((e) => e.channels).toList();
+      final channel = allChannels.firstWhereOrNull((c) => c.id == channelId);
 
       if (channel == null) {
         return {'success': false, 'error': 'Channel not found'};
       }
 
-      final members = ref.read(chatMemberListControllerProvider);
-      final groups = ref.read(chatGroupListControllerProvider);
-      final emojis = ref.read(chatEmojiListControllerProvider);
+      final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+      final groups = ref.read(chatGroupListControllerProvider(tabType: tabType)).groups;
+      final emojis = ref.read(chatEmojiListControllerProvider(tabType: tabType)).emojis;
 
-      final result = await MessageAction.postMessage(
-        html: text,
-        channel: channel,
-        channels: channelList.values.expand((channels) => channels).toList(),
-        members: members.values.expand((members) => members).toList(),
-        groups: groups.values.expand((groups) => groups).toList(),
-        emojis: emojis.values.expand((emojis) => emojis).toList(),
-        tabType: tabType,
-      );
+      final result = await MessageAction.postMessage(html: text, channel: channel, channels: allChannels, members: members, groups: groups, emojis: emojis, tabType: tabType);
 
       return result ? {'success': true, 'message': 'Message sent successfully'} : {'success': false, 'error': 'Failed to send message'};
     } catch (e) {
@@ -1673,18 +1663,19 @@ class McpFunctionExecutor {
         return {'success': false, 'error': 'Channel not found'};
       }
 
-      final members = ref.read(chatMemberListControllerProvider);
-      final groups = ref.read(chatGroupListControllerProvider);
-      final emojis = ref.read(chatEmojiListControllerProvider);
+      final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+      final groups = ref.read(chatGroupListControllerProvider(tabType: tabType)).groups;
+      final emojis = ref.read(chatEmojiListControllerProvider(tabType: tabType)).emojis;
+      final allChannels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
 
       final result = await MessageAction.postReply(
         id: null,
         html: text,
         channel: channel,
-        channels: ref.read(chatChannelListControllerProvider).values.expand((channels) => channels).toList(),
-        members: members.values.expand((members) => members).toList(),
-        groups: groups.values.expand((groups) => groups).toList(),
-        emojis: emojis.values.expand((emojis) => emojis).toList(),
+        channels: allChannels,
+        members: members,
+        groups: groups,
+        emojis: emojis,
         threadId: threadId,
         tabType: tabType,
       );
@@ -1714,18 +1705,19 @@ class McpFunctionExecutor {
         return {'success': false, 'error': 'Channel not found'};
       }
 
-      final members = ref.read(chatMemberListControllerProvider);
-      final groups = ref.read(chatGroupListControllerProvider);
-      final emojis = ref.read(chatEmojiListControllerProvider);
+      final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+      final groups = ref.read(chatGroupListControllerProvider(tabType: tabType)).groups;
+      final emojis = ref.read(chatEmojiListControllerProvider(tabType: tabType)).emojis;
+      final allChannels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
 
       final result = await MessageAction.postMessage(
         id: messageId,
         html: text,
         channel: channel,
-        channels: ref.read(chatChannelListControllerProvider).values.expand((channels) => channels).toList(),
-        members: members.values.expand((members) => members).toList(),
-        groups: groups.values.expand((groups) => groups).toList(),
-        emojis: emojis.values.expand((emojis) => emojis).toList(),
+        channels: allChannels,
+        members: members,
+        groups: groups,
+        emojis: emojis,
         tabType: tabType,
       );
 
@@ -1811,7 +1803,7 @@ class McpFunctionExecutor {
       final oauth = oauths.first;
 
       final repository = ref.read(chatRepositoryProvider);
-      final result = await repository.addReaction(oauth: oauth, channelId: channel.id, messageId: messageId, emoji: emoji);
+      final result = await repository.addReaction(type: channel.type, oauth: oauth, channelId: channel.id, messageId: messageId, emoji: emoji);
 
       if (result.fold((l) => false, (r) => r)) {
         // Update local state
@@ -1864,7 +1856,7 @@ class McpFunctionExecutor {
       final oauth = oauths.first;
 
       final repository = ref.read(chatRepositoryProvider);
-      final result = await repository.removeReaction(oauth: oauth, channelId: channel.id, messageId: messageId, emoji: emoji);
+      final result = await repository.removeReaction(type: channel.type, oauth: oauth, channelId: channel.id, messageId: messageId, emoji: emoji);
 
       if (result.fold((l) => false, (r) => r)) {
         // Update local state
@@ -1899,18 +1891,28 @@ class McpFunctionExecutor {
         return {'success': false, 'error': 'Message not found'};
       }
 
+      final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+      final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+
+      final userId = message.userId;
+      final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
+      final userName = member?.displayName ?? userId ?? 'Unknown user';
+
+      final channelId = message.channelId;
+      final channel = channelId != null ? channels.firstWhereOrNull((c) => c.id == channelId) : null;
+
       return {
         'success': true,
         'result': {
           'id': message.id,
           'text': message.text,
           'userId': message.userId,
-          'userName': message.userName,
+          'userName': userName,
           'createdAt': message.createdAt?.toIso8601String(),
           'threadId': message.threadId,
           'replyCount': message.replyCount,
           'hasFiles': message.files?.isNotEmpty ?? false,
-          'reactions': message.reactions?.map((r) => {'emoji': r.emoji, 'users': r.users}).toList() ?? [],
+          'reactions': message.reactions?.map((r) => {'emoji': r.name ?? '', 'users': r.users}).toList() ?? [],
         },
         'message': '메시지 정보를 가져왔습니다.',
       };
@@ -1949,12 +1951,18 @@ class McpFunctionExecutor {
         messages = messages.take(limit).toList();
       }
 
+      final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+
       final results = messages.map((message) {
+        final userId = message.userId;
+        final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
+        final userName = member?.displayName ?? userId ?? '알 수 없는 사용자';
+
         return {
           'id': message.id,
           'text': message.text,
           'userId': message.userId,
-          'userName': message.userName,
+          'userName': userName,
           'createdAt': message.createdAt?.toIso8601String(),
           'threadId': message.threadId,
           'replyCount': message.replyCount,
@@ -1989,22 +1997,34 @@ class McpFunctionExecutor {
       List<MessageChannelEntity>? channels;
       if (channelId != null) {
         final channelList = ref.read(chatChannelListControllerProvider);
-        final channel = channelList.values.expand((channels) => channels).firstWhereOrNull((c) => c.id == channelId);
+        final allChannels = channelList.values.expand((e) => e.channels).toList();
+        final channel = allChannels.firstWhereOrNull((c) => c.id == channelId);
         channels = channel != null ? [channel] : null;
       }
 
       final result = await repository.searchMessage(oauth: oauth, user: user, q: query, channels: channels);
 
       return result.fold((l) => {'success': false, 'error': 'Failed to search messages'}, (r) {
+        final allChannels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+        final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+
         final results = r.messages.map((message) {
+          final userId = message.userId;
+          final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
+          final userName = member?.displayName ?? userId ?? '알 수 없는 사용자';
+
+          final channelId = message.channelId;
+          final channel = channelId != null ? allChannels.firstWhereOrNull((c) => c.id == channelId) : null;
+          final channelName = channel?.displayName ?? channel?.name ?? '알 수 없는 채널';
+
           return {
             'id': message.id,
             'text': message.text,
             'userId': message.userId,
-            'userName': message.userName,
+            'userName': userName,
             'createdAt': message.createdAt?.toIso8601String(),
             'channelId': message.channelId,
-            'channelName': message.channelName,
+            'channelName': channelName,
           };
         }).toList();
 
@@ -2247,8 +2267,11 @@ class McpFunctionExecutor {
       }
 
       final duplicatedEvent = event.copyWith(
-        eventId: const Uuid().v4(),
+        id: Utils.generateBase32HexStringFromTimestamp(),
         rrule: null, // 복제 시 반복 규칙 제거
+        removeRecurrence: true,
+        removeICalUID: true,
+        removeRecurringId: true,
       );
 
       await CalendarAction.editCalendarEvent(
@@ -2319,8 +2342,8 @@ class McpFunctionExecutor {
           'title': event.title,
           'description': event.description,
           'calendarId': event.calendarId,
-          'startAt': event.startAt?.toIso8601String(),
-          'endAt': event.endAt?.toIso8601String(),
+          'startAt': event.startDate.toIso8601String(),
+          'endAt': event.endDate.toIso8601String(),
           'isAllDay': event.isAllDay,
           'location': event.location,
         };
@@ -2391,8 +2414,8 @@ class McpFunctionExecutor {
           'title': event.title,
           'description': event.description,
           'calendarId': event.calendarId,
-          'startAt': event.startAt?.toIso8601String(),
-          'endAt': event.endAt?.toIso8601String(),
+          'startAt': event.startDate.toIso8601String(),
+          'endAt': event.endDate.toIso8601String(),
           'isAllDay': event.isAllDay,
           'location': event.location,
         };
@@ -3099,7 +3122,13 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'Project not found'};
     }
 
-    final updatedProject = project.copyWith(name: name ?? project.name, description: description ?? project.description, updatedAt: DateTime.now());
+    final updatedProject = project.copyWith(
+      parentId: project.parentId,
+      icon: project.icon,
+      name: name ?? project.name,
+      description: description ?? project.description,
+      updatedAt: DateTime.now(),
+    );
 
     await ref.read(projectListControllerProvider.notifier).addProject(updatedProject);
 
@@ -3297,8 +3326,8 @@ class McpFunctionExecutor {
           'title': event.title,
           'description': event.description,
           'calendarId': event.calendarId,
-          'startAt': event.startAt?.toIso8601String(),
-          'endAt': event.endAt?.toIso8601String(),
+          'startAt': event.startDate.toIso8601String(),
+          'endAt': event.endDate.toIso8601String(),
           'isAllDay': event.isAllDay,
           'location': event.location,
         };
@@ -3384,8 +3413,8 @@ class McpFunctionExecutor {
           'title': event.title,
           'description': event.description,
           'calendarId': event.calendarId,
-          'startAt': event.startAt?.toIso8601String(),
-          'endAt': event.endAt?.toIso8601String(),
+          'startAt': event.startDate.toIso8601String(),
+          'endAt': event.endDate.toIso8601String(),
           'isAllDay': event.isAllDay,
           'location': event.location,
         },
@@ -3503,14 +3532,16 @@ class McpFunctionExecutor {
 
       // Format results
       final results = limitedResults.map((inbox) {
+        final sender = inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName ?? '';
+        final sourceType = inbox.linkedMail?.type ?? inbox.linkedMessage?.type;
+
         return {
           'id': inbox.id,
-          'number': inbox.number,
           'title': inbox.title ?? '',
           'description': inbox.description ?? '',
-          'sender': inbox.sender ?? '',
+          'sender': sender,
           'inboxDatetime': inbox.inboxDatetime.toIso8601String(),
-          'sourceType': inbox.sourceType?.name ?? '',
+          'sourceType': sourceType?.name ?? '',
         };
       }).toList();
 
@@ -3972,7 +4003,16 @@ class McpFunctionExecutor {
         return {'success': false, 'error': 'Event not found'};
       }
 
-      final updatedEvent = event.copyWith(calendarId: calendarId);
+      // Find calendar by calendarId
+      final calendarList = ref.read(calendarListControllerProvider);
+      final allCalendars = calendarList.values.expand((e) => e).toList();
+      final targetCalendar = allCalendars.firstWhereOrNull((c) => c.id == calendarId || c.uniqueId == calendarId);
+
+      if (targetCalendar == null) {
+        return {'success': false, 'error': 'Calendar not found'};
+      }
+
+      final updatedEvent = event.copyWith(calendar: targetCalendar);
       await CalendarAction.editCalendarEvent(
         tabType: tabType,
         originalEvent: event,

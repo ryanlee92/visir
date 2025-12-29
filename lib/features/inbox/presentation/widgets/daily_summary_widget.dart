@@ -253,7 +253,7 @@ class DailySummaryWidget extends ConsumerWidget {
                                                       if (tasksToReschedule.isEmpty) return;
 
                                                       // Use MCP reschedule function to intelligently schedule tasks
-                                                      final executor = McpFunctionExecutor.fromWidgetRef(Utils.ref);
+                                                      final executor = McpFunctionExecutor();
                                                       final taskIds = tasksToReschedule.map((task) => task.id).toList();
 
                                                       final result = await executor.executeFunction(
@@ -526,7 +526,7 @@ class DailySummaryWidget extends ConsumerWidget {
                                                             if (tasksToReschedule.isEmpty) return;
 
                                                             // Use MCP reschedule function to intelligently schedule tasks
-                                                            final executor = McpFunctionExecutor.fromWidgetRef(Utils.ref);
+                                                            final executor = McpFunctionExecutor();
                                                             final taskIds = tasksToReschedule.map((task) => task.id).toList();
 
                                                             final result = await executor.executeFunction(

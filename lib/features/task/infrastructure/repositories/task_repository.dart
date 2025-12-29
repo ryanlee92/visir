@@ -7,6 +7,7 @@ import 'package:Visir/features/task/domain/datasources/task_datasource.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_search_result_entity.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TaskRepository {
@@ -138,12 +139,17 @@ class TaskRepository {
   }
 
   Future<Either<Failure, TaskEntity>> saveTask({required TaskEntity task}) async {
+    debugPrint('[TaskRepository] saveTask 시작: task.id=${task.id}, task.title=${task.title}');
     try {
       final list = remoteDatasourceTypes.map((d) => datasources[d]?.saveTask(task: task)).whereType<Future<TaskEntity>>();
+      debugPrint('[TaskRepository] saveTask: datasource 호출 전, datasourceCount=${list.length}');
       await Future.wait(list);
+      debugPrint('[TaskRepository] saveTask: datasource 호출 완료');
       sendTaskOrEventChangeFcm(task: task, action: 'save');
+      debugPrint('[TaskRepository] saveTask: 성공, task.id=${task.id}');
       return right(task);
     } catch (e) {
+      debugPrint('[TaskRepository] saveTask: 실패, 에러=$e');
       return Utils.debugLeft(e);
     }
   }

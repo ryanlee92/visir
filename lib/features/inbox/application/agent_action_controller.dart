@@ -504,7 +504,7 @@ class AgentActionController extends _$AgentActionController {
         }
 
         // MCP 함수 호출 감지 및 실행
-        final executor = McpFunctionExecutor(ref);
+        final executor = McpFunctionExecutor();
         final functionCalls = executor.parseFunctionCalls(aiMessage);
 
         // 함수 호출 태그를 제거한 메시지 추출 (AI가 생성한 메시지 부분)
@@ -2022,7 +2022,7 @@ class AgentActionController extends _$AgentActionController {
     // 로딩 상태 시작 - entity block은 유지하고 로딩 메시지만 표시
     state = state.copyWith(isLoading: true);
 
-    final executor = McpFunctionExecutor(ref);
+    final executor = McpFunctionExecutor();
     // 각 함수 호출의 결과를 직접 추적
     final functionResults = <Map<String, dynamic>>[];
 
