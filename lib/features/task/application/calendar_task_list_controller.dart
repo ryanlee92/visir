@@ -228,6 +228,7 @@ class CalendarTaskListController extends _$CalendarTaskListController {
     bool? updateTaskStatus,
     required TabType targetTab,
   }) async {
+    print('[CalendarTaskListController] saveTask called with targetTab: $targetTab, tabType: $tabType, newTask.id: ${newTask?.id}, newTask.startAt: ${newTask?.startAt}');
     if (ref.read(shouldUseMockDataProvider)) {
       if (newTask == null) return;
       state = CalendarTaskResultEntity(tasks: [...(state.tasks), newTask], startDateTime: state.startDateTime, endDateTime: state.endDateTime);
@@ -797,9 +798,18 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    if (targetTab != tabType || targetMonth != targetDate.month) return list;
+    print(
+      '[CalendarTaskListController] _upsertTask: targetTab=$targetTab, tabType=$tabType, targetMonth=$targetMonth, targetDate.month=${targetDate.month}, task.startAt=${task.startAt}',
+    );
+    if (targetTab != tabType || targetMonth != targetDate.month) {
+      print(
+        '[CalendarTaskListController] _upsertTask: Early return - targetTab != tabType: ${targetTab != tabType}, targetMonth != targetDate.month: ${targetMonth != targetDate.month}',
+      );
+      return list;
+    }
     if (ref.read(shouldUseMockDataProvider)) return list;
 
+    print('[CalendarTaskListController] _upsertTask: Saving task to remote repository');
     final eventResult = await _taskRepository.saveTask(task: task);
 
     return eventResult.fold(

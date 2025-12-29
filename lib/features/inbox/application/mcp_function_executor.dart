@@ -119,7 +119,9 @@ class McpFunctionExecutor {
                   results.add({'function': 'createTask', 'arguments': taskArgs});
                 }
                 // Event 형식 확인: title, startAt, endAt, calendarId 등이 있으면 event로 간주
-                else if (item.containsKey('title') && (item.containsKey('startAt') || item.containsKey('start_at')) && (item.containsKey('calendarId') || item.containsKey('calendar_id'))) {
+                else if (item.containsKey('title') &&
+                    (item.containsKey('startAt') || item.containsKey('start_at')) &&
+                    (item.containsKey('calendarId') || item.containsKey('calendar_id'))) {
                   final eventArgs = <String, dynamic>{
                     'title': item['title'] as String? ?? '',
                     'description': item['description'] as String?,
@@ -151,10 +153,7 @@ class McpFunctionExecutor {
         if (functionName != null && argumentsJson != null) {
           try {
             final arguments = jsonDecode(argumentsJson) as Map<String, dynamic>;
-            final functionCall = <String, dynamic>{
-              'function': functionName,
-              'arguments': arguments,
-            };
+            final functionCall = <String, dynamic>{'function': functionName, 'arguments': arguments};
             // can_parallelize 필드는 커스텀 태그 형식에서는 기본값 사용
             final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
             functionCall['can_parallelize'] = searchFunctions.contains(functionName);
@@ -201,10 +200,7 @@ class McpFunctionExecutor {
         if (functionName != null && argumentsJson != null) {
           try {
             final arguments = jsonDecode(argumentsJson) as Map<String, dynamic>;
-            final functionCall = <String, dynamic>{
-              'function': functionName,
-              'arguments': arguments,
-            };
+            final functionCall = <String, dynamic>{'function': functionName, 'arguments': arguments};
             // can_parallelize 필드가 없으면 기본값 설정
             // 정규식으로 파싱한 경우 전체 JSON을 다시 파싱해서 can_parallelize 확인 시도
             try {
@@ -446,6 +442,7 @@ class McpFunctionExecutor {
 
   // Task execution methods
   Future<Map<String, dynamic>> _executeCreateTask(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
+    print('[MCP] _executeCreateTask called with tabType: $tabType');
     final user = ref.read(authControllerProvider).requireValue;
     final title = args['title'] as String?;
     if (title == null || title.isEmpty) {
@@ -502,7 +499,7 @@ class McpFunctionExecutor {
       // Default to today
       final now = DateTime.now();
       startAt = isAllDay ? DateTime(now.year, now.month, now.day) : now;
-      
+
       // If inbox suggestion has target_date, use it
       if (matchingInbox != null) {
         final suggestion = matchingInbox.suggestion;
@@ -582,6 +579,7 @@ class McpFunctionExecutor {
       status: status,
     );
 
+    print('[MCP] Calling TaskAction.upsertTask with tabType: $tabType, task.isUnscheduled: ${task.isUnscheduled}');
     await TaskAction.upsertTask(task: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
 
     return {'success': true, 'taskId': task.id, 'message': 'Task created successfully'};
@@ -1559,7 +1557,7 @@ class McpFunctionExecutor {
 
     try {
       final mailList = ref.read(mailListControllerProvider);
-      
+
       var allMails = <MailEntity>[];
       mailList.mails.forEach((key, value) {
         if (email == null || key == email) {
@@ -1605,11 +1603,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 메일을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 메일을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list mails: ${e.toString()}'};
     }
@@ -1962,11 +1956,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 메시지를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 메시지를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list messages: ${e.toString()}'};
     }
@@ -1999,28 +1989,21 @@ class McpFunctionExecutor {
 
       final result = await repository.searchMessage(oauth: oauth, user: user, q: query, channels: channels);
 
-      return result.fold(
-        (l) => {'success': false, 'error': 'Failed to search messages'},
-        (r) {
-          final results = r.messages.map((message) {
-            return {
-              'id': message.id,
-              'text': message.text,
-              'userId': message.userId,
-              'userName': message.userName,
-              'createdAt': message.createdAt?.toIso8601String(),
-              'channelId': message.channelId,
-              'channelName': message.channelName,
-            };
-          }).toList();
-
+      return result.fold((l) => {'success': false, 'error': 'Failed to search messages'}, (r) {
+        final results = r.messages.map((message) {
           return {
-            'success': true,
-            'results': results,
-            'message': '${results.length}개의 메시지를 찾았습니다.',
+            'id': message.id,
+            'text': message.text,
+            'userId': message.userId,
+            'userName': message.userName,
+            'createdAt': message.createdAt?.toIso8601String(),
+            'channelId': message.channelId,
+            'channelName': message.channelName,
           };
-        },
-      );
+        }).toList();
+
+        return {'success': true, 'results': results, 'message': '${results.length}개의 메시지를 찾았습니다.'};
+      });
     } catch (e) {
       return {'success': false, 'error': 'Failed to search messages: ${e.toString()}'};
     }
@@ -2092,7 +2075,12 @@ class McpFunctionExecutor {
     return {'success': true, 'taskId': updatedTask.id, 'message': 'Due date set successfully'};
   }
 
-  Future<Map<String, dynamic>> _executeSetReminder(Map<String, dynamic> args, {required TabType tabType, List<TaskEntity>? availableTasks, List<EventEntity>? availableEvents}) async {
+  Future<Map<String, dynamic>> _executeSetReminder(
+    Map<String, dynamic> args, {
+    required TabType tabType,
+    List<TaskEntity>? availableTasks,
+    List<EventEntity>? availableEvents,
+  }) async {
     final taskId = args['taskId'] as String?;
     final eventId = args['eventId'] as String?;
     final minutes = args['minutes'] as int?;
@@ -2143,7 +2131,12 @@ class McpFunctionExecutor {
     }
   }
 
-  Future<Map<String, dynamic>> _executeSetRecurrence(Map<String, dynamic> args, {required TabType tabType, List<TaskEntity>? availableTasks, List<EventEntity>? availableEvents}) async {
+  Future<Map<String, dynamic>> _executeSetRecurrence(
+    Map<String, dynamic> args, {
+    required TabType tabType,
+    List<TaskEntity>? availableTasks,
+    List<EventEntity>? availableEvents,
+  }) async {
     final taskId = args['taskId'] as String?;
     final eventId = args['eventId'] as String?;
     final rruleStr = args['rrule'] as String?; // RRULE 형식 문자열 (예: "FREQ=DAILY;INTERVAL=1")
@@ -2224,13 +2217,7 @@ class McpFunctionExecutor {
         status: TaskStatus.none,
       );
 
-      await TaskAction.upsertTask(
-        task: duplicatedTask,
-        originalTask: null,
-        calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag,
-        tabType: tabType,
-        showToast: false,
-      );
+      await TaskAction.upsertTask(task: duplicatedTask, originalTask: null, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
 
       return {'success': true, 'taskId': duplicatedTask.id, 'message': 'Task duplicated successfully'};
     } catch (e) {
@@ -2301,11 +2288,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '오늘 ${results.length}개의 작업이 있습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '오늘 ${results.length}개의 작업이 있습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get today tasks: ${e.toString()}'};
     }
@@ -2337,11 +2320,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '오늘 ${results.length}개의 일정이 있습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '오늘 ${results.length}개의 일정이 있습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get today events: ${e.toString()}'};
     }
@@ -2378,11 +2357,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '다가오는 작업 ${results.length}개를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '다가오는 작업 ${results.length}개를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get upcoming tasks: ${e.toString()}'};
     }
@@ -2417,11 +2392,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '다가오는 일정 ${results.length}개를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '다가오는 일정 ${results.length}개를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get upcoming events: ${e.toString()}'};
     }
@@ -2448,11 +2419,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '지연된 작업 ${results.length}개를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '지연된 작업 ${results.length}개를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get overdue tasks: ${e.toString()}'};
     }
@@ -2478,11 +2445,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '스케줄되지 않은 작업 ${results.length}개를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '스케줄되지 않은 작업 ${results.length}개를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get unscheduled tasks: ${e.toString()}'};
     }
@@ -2513,17 +2476,18 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '완료된 작업 ${results.length}개를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '완료된 작업 ${results.length}개를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get completed tasks: ${e.toString()}'};
     }
   }
 
-  Future<Map<String, dynamic>> _executeRemoveReminder(Map<String, dynamic> args, {required TabType tabType, List<TaskEntity>? availableTasks, List<EventEntity>? availableEvents}) async {
+  Future<Map<String, dynamic>> _executeRemoveReminder(
+    Map<String, dynamic> args, {
+    required TabType tabType,
+    List<TaskEntity>? availableTasks,
+    List<EventEntity>? availableEvents,
+  }) async {
     final taskId = args['taskId'] as String?;
     final eventId = args['eventId'] as String?;
 
@@ -2570,7 +2534,12 @@ class McpFunctionExecutor {
     }
   }
 
-  Future<Map<String, dynamic>> _executeRemoveRecurrence(Map<String, dynamic> args, {required TabType tabType, List<TaskEntity>? availableTasks, List<EventEntity>? availableEvents}) async {
+  Future<Map<String, dynamic>> _executeRemoveRecurrence(
+    Map<String, dynamic> args, {
+    required TabType tabType,
+    List<TaskEntity>? availableTasks,
+    List<EventEntity>? availableEvents,
+  }) async {
     final taskId = args['taskId'] as String?;
     final eventId = args['eventId'] as String?;
 
@@ -2689,11 +2658,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 인박스를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 인박스를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list inboxes: ${e.toString()}'};
     }
@@ -2962,7 +2927,6 @@ class McpFunctionExecutor {
       }
     }
 
-
     // Sort tasks by priority/duration (shorter tasks first for better scheduling)
     tasksToReschedule.sort((a, b) {
       final aDuration = (a.endAt ?? a.startAt?.add(const Duration(hours: 1)) ?? today.add(const Duration(hours: 1))).difference(a.startAt ?? today);
@@ -3033,7 +2997,6 @@ class McpFunctionExecutor {
         if (searchTime.isBefore(now)) {
           searchTime = now.roundUp(delta: const Duration(minutes: 15));
         }
-
 
         while (searchTime.isBefore(endOfDay)) {
           final endTime = searchTime.add(finalDuration);
@@ -3131,11 +3094,7 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'Project not found'};
     }
 
-    final updatedProject = project.copyWith(
-      name: name ?? project.name,
-      description: description ?? project.description,
-      updatedAt: DateTime.now(),
-    );
+    final updatedProject = project.copyWith(name: name ?? project.name, description: description ?? project.description, updatedAt: DateTime.now());
 
     await ref.read(projectListControllerProvider.notifier).addProject(updatedProject);
 
@@ -3171,23 +3130,18 @@ class McpFunctionExecutor {
     final projects = ref.read(projectListControllerProvider);
     final queryLower = query.toLowerCase();
 
-    final results = projects.where((project) {
-      final nameMatch = project.name.toLowerCase().contains(queryLower);
-      final descriptionMatch = project.description?.toLowerCase().contains(queryLower) ?? false;
-      return nameMatch || descriptionMatch;
-    }).map((project) {
-      return {
-        'id': project.uniqueId,
-        'name': project.name,
-        'description': project.description,
-      };
-    }).toList();
+    final results = projects
+        .where((project) {
+          final nameMatch = project.name.toLowerCase().contains(queryLower);
+          final descriptionMatch = project.description?.toLowerCase().contains(queryLower) ?? false;
+          return nameMatch || descriptionMatch;
+        })
+        .map((project) {
+          return {'id': project.uniqueId, 'name': project.name, 'description': project.description};
+        })
+        .toList();
 
-    return {
-      'success': true,
-      'results': results,
-      'message': '${results.length}개의 프로젝트를 찾았습니다.',
-    };
+    return {'success': true, 'results': results, 'message': '${results.length}개의 프로젝트를 찾았습니다.'};
   }
 
   Future<Map<String, dynamic>> _executeListTasks(Map<String, dynamic> args, {required TabType tabType}) async {
@@ -3274,11 +3228,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 작업을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 작업을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list tasks: ${e.toString()}'};
     }
@@ -3349,11 +3299,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 일정을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 일정을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list events: ${e.toString()}'};
     }
@@ -3364,19 +3310,10 @@ class McpFunctionExecutor {
       final projects = ref.read(projectListControllerProvider);
 
       final results = projects.map((project) {
-        return {
-          'id': project.uniqueId,
-          'name': project.name,
-          'description': project.description,
-          'parentId': project.parentId,
-        };
+        return {'id': project.uniqueId, 'name': project.name, 'description': project.description, 'parentId': project.parentId};
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 프로젝트를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 프로젝트를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list projects: ${e.toString()}'};
     }
@@ -3460,20 +3397,10 @@ class McpFunctionExecutor {
       final allCalendars = calendarMap.values.expand((e) => e).toList();
 
       final results = allCalendars.map((calendar) {
-        return {
-          'id': calendar.uniqueId,
-          'name': calendar.name,
-          'email': calendar.email,
-          'owned': calendar.owned,
-          'modifiable': calendar.modifiable,
-        };
+        return {'id': calendar.uniqueId, 'name': calendar.name, 'email': calendar.email, 'owned': calendar.owned, 'modifiable': calendar.modifiable};
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 캘린더를 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 캘린더를 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get calendar list: ${e.toString()}'};
     }
@@ -3582,12 +3509,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'count': results.length,
-        'message': '${results.length}개의 인박스 항목을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 인박스 항목을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
@@ -3609,17 +3531,9 @@ class McpFunctionExecutor {
       }
 
       final taskRepository = ref.read(taskRepositoryProvider);
-      final searchResult = await taskRepository.searchTasks(
-        query: query,
-        pref: pref,
-        userId: user.id,
-        isDone: isDone,
-      );
+      final searchResult = await taskRepository.searchTasks(query: query, pref: pref, userId: user.id, isDone: isDone);
 
-      final tasks = searchResult.fold(
-        (failure) => <TaskEntity>[],
-        (result) => result.tasks.values.expand((e) => e).toList(),
-      );
+      final tasks = searchResult.fold((failure) => <TaskEntity>[], (result) => result.tasks.values.expand((e) => e).toList());
 
       // Limit results to 20
       final limitedTasks = tasks.take(20).toList();
@@ -3638,12 +3552,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'count': results.length,
-        'message': '${results.length}개의 작업을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 작업을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
@@ -3686,12 +3595,7 @@ class McpFunctionExecutor {
 
             if (calendars.isEmpty) return;
 
-            final eventResult = await calendarRepository.searchEventLists(
-              query: query,
-              oauth: oauth,
-              calendars: calendars,
-              nextPageTokens: null,
-            );
+            final eventResult = await calendarRepository.searchEventLists(query: query, oauth: oauth, calendars: calendars, nextPageTokens: null);
 
             await eventResult.fold(
               (failure) async {
@@ -3727,12 +3631,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'count': results.length,
-        'message': '${results.length}개의 일정을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 일정을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
@@ -3831,7 +3730,7 @@ class McpFunctionExecutor {
         // For other labels, use mailListController's addLabelsLocal/removeLabelsLocal
         final mailListController = ref.read(mailListControllerProvider.notifier);
         final mailLabelListController = ref.read(mailLabelListControllerProvider.notifier);
-        
+
         final currentLabels = mails.first.labelIds ?? [];
         final removeLabels = <String>[];
         final addLabels = <String>[labelId];
@@ -3843,7 +3742,7 @@ class McpFunctionExecutor {
 
         mailLabelListController.addLabelsLocal(mails, addLabels);
         mailListController.addLabelsLocal(mails, addLabels);
-        
+
         if (removeLabels.isNotEmpty) {
           mailLabelListController.removeLabelsLocal(mails, removeLabels);
           mailListController.removeLabelsLocal(mails, removeLabels);
@@ -3872,21 +3771,11 @@ class McpFunctionExecutor {
       final results = <Map<String, dynamic>>[];
       labels.forEach((email, labelList) {
         for (final label in labelList) {
-          results.add({
-            'id': label.id,
-            'name': label.name,
-            'email': email,
-            'messagesTotal': label.total,
-            'messagesUnread': label.unread,
-          });
+          results.add({'id': label.id, 'name': label.name, 'email': email, 'messagesTotal': label.total, 'messagesUnread': label.unread});
         }
       });
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 라벨을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 라벨을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get mail labels: ${e.toString()}'};
     }
@@ -4112,11 +4001,7 @@ class McpFunctionExecutor {
       }
 
       // Tasks don't currently have attachments in the entity
-      return {
-        'success': true,
-        'results': [],
-        'message': 'Task attachments feature not yet implemented',
-      };
+      return {'success': true, 'results': [], 'message': 'Task attachments feature not yet implemented'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get task attachments: ${e.toString()}'};
     }
@@ -4138,11 +4023,7 @@ class McpFunctionExecutor {
       }
 
       // Events don't currently have attachments in the entity
-      return {
-        'success': true,
-        'results': [],
-        'message': 'Event attachments feature not yet implemented',
-      };
+      return {'success': true, 'results': [], 'message': 'Event attachments feature not yet implemented'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get event attachments: ${e.toString()}'};
     }
@@ -4172,11 +4053,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {
-        'success': true,
-        'results': results,
-        'message': '${results.length}개의 첨부파일을 찾았습니다.',
-      };
+      return {'success': true, 'results': results, 'message': '${results.length}개의 첨부파일을 찾았습니다.'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get mail attachments: ${e.toString()}'};
     }
@@ -4192,11 +4069,7 @@ class McpFunctionExecutor {
     try {
       // Messages don't currently have attachments in the entity
       // This is a placeholder implementation
-      return {
-        'success': true,
-        'results': [],
-        'message': 'Message attachments feature not yet implemented',
-      };
+      return {'success': true, 'results': [], 'message': 'Message attachments feature not yet implemented'};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get message attachments: ${e.toString()}'};
     }
