@@ -454,8 +454,8 @@ class McpFunctionExecutor {
 
     final description = args['description'] as String?;
     var projectId = args['projectId'] as String?;
-    final startAtStr = args['startAt'] as String?;
-    final endAtStr = args['endAt'] as String?;
+    final startAtStr = args['startAt'] as String? ?? args['start_at'] as String?;
+    final endAtStr = args['endAt'] as String? ?? args['end_at'] as String?;
     var isAllDay = args['isAllDay'] as bool? ?? false;
     final statusStr = args['status'] as String? ?? 'none';
 

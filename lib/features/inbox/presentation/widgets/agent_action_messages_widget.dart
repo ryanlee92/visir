@@ -910,7 +910,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     final isHtml = htmlTagRegex.hasMatch(cleanedContent) || hasInappActionConfirm;
 
     // Check if content is Markdown (contains Markdown patterns)
-    final isMarkdown = _isMarkdownContent(cleanedContent);
+    // If hasInappActionConfirm, don't treat as markdown (force HTML rendering)
+    final isMarkdown = hasInappActionConfirm ? false : _isMarkdownContent(cleanedContent);
 
     // If both HTML and Markdown are present, convert Markdown parts to HTML
     String finalContent = cleanedContent;
