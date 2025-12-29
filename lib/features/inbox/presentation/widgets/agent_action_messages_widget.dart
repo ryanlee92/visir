@@ -2341,7 +2341,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   // Regular message items
                                   if (index == messagesLength) {
                                     return Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+                                      margin: const EdgeInsets.only(top: 6, bottom: 6, left: 0, right: 0),
                                       padding: const EdgeInsets.all(12),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
