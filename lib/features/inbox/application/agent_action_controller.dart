@@ -1994,6 +1994,12 @@ class AgentActionController extends _$AgentActionController {
 
   /// 확인이 필요한 함수 호출을 실행합니다.
   Future<void> confirmAction({required String actionId}) async {
+    // 유저가 confirm 메시지를 보낸 것처럼 처리 (AI에게는 보내지 않음)
+    final confirmMessage = AgentActionMessage(role: 'user', content: Utils.mainContext.tr.confirm);
+    final updatedMessages = [...state.messages, confirmMessage];
+    state = state.copyWith(messages: updatedMessages);
+
+    // 함수 실행
     await confirmActions(actionIds: [actionId]);
   }
 

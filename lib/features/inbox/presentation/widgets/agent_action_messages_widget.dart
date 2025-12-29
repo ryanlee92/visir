@@ -2643,6 +2643,38 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
       return const SizedBox.shrink();
     }
 
+    // 현재 메시지가 마지막 메시지인지 확인
+    final messages = state.messages;
+    if (messages.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // 마지막 메시지에서 현재 actionId를 가진 inapp_action_confirm 태그가 있는지 확인
+    final lastMessage = messages.last;
+    bool isLastMessage = false;
+
+    if (lastMessage.content.contains('inapp_action_confirm')) {
+      try {
+        final regex = RegExp(r'<inapp_action_confirm>([\s\S]*?)</inapp_action_confirm>');
+        final matches = regex.allMatches(lastMessage.content);
+        for (final match in matches) {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            final actionId = jsonData['action_id'] as String? ?? '';
+            if (actionId == widget.actionId) {
+              isLastMessage = true;
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        // 파싱 에러 무시
+      }
+    }
+
+    // 마지막 메시지가 아니면 버튼만 숨김 (위젯은 표시)
+
     return Focus(
       focusNode: _focusNode,
       autofocus: false,
@@ -2684,32 +2716,29 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ],
             const SizedBox(height: 12),
-            // Confirm button
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (!_isProcessing)
-                  VisirButton(
-                    type: VisirButtonAnimationType.scaleAndOpacity,
-                    style: VisirButtonStyle(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      backgroundColor: context.primary,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    options: VisirButtonOptions(
-                      bypassTextField: true,
-                      shortcuts: [
-                        VisirButtonKeyboardShortcut(
-                          keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
-                          message: context.tr.confirm,
-                        ),
-                      ],
-                    ),
-                    onTap: _handleConfirm,
-                    child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+            // Confirm button - 마지막 메시지인 경우에만 표시
+            if (isLastMessage && !_isProcessing)
+              IntrinsicWidth(
+                child: VisirButton(
+                  type: VisirButtonAnimationType.scaleAndOpacity,
+                  style: VisirButtonStyle(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    backgroundColor: context.primary,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-              ],
-            ),
+                  options: VisirButtonOptions(
+                    bypassTextField: true,
+                    shortcuts: [
+                      VisirButtonKeyboardShortcut(
+                        keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
+                        message: context.tr.confirm,
+                      ),
+                    ],
+                  ),
+                  onTap: _handleConfirm,
+                  child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+                ),
+              ),
           ],
         ),
       ),
