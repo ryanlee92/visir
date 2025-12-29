@@ -242,11 +242,15 @@ class McpFunctionExecutor {
     List<InboxEntity>? availableInboxes,
     double? remainingCredits,
   }) async {
+    debugPrint('[MCP] executeFunction 시작: functionName=$functionName, arguments=$arguments, tabType=$tabType');
     try {
       switch (functionName) {
         // Task Actions
         case 'createTask':
-          return await _executeCreateTask(arguments, tabType: tabType, availableInboxes: availableInboxes);
+          debugPrint('[MCP] createTask 호출됨, arguments=$arguments');
+          final result = await _executeCreateTask(arguments, tabType: tabType, availableInboxes: availableInboxes);
+          debugPrint('[MCP] createTask 결과: $result');
+          return result;
         case 'updateTask':
           return await _executeUpdateTask(arguments, tabType: tabType, availableTasks: availableTasks);
         case 'deleteTask':
@@ -433,20 +437,27 @@ class McpFunctionExecutor {
           return await _executeSearchCalendarEvent(arguments, tabType: tabType);
 
         default:
+          debugPrint('[MCP] executeFunction: Unknown function: $functionName');
           return {'success': false, 'error': 'Unknown function: $functionName'};
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('[MCP] executeFunction 전체 에러: functionName=$functionName, error=$e');
+      debugPrint('[MCP] executeFunction 전체 StackTrace: $stackTrace');
       return {'success': false, 'error': 'Execution error: ${e.toString()}'};
     }
   }
 
   // Task execution methods
   Future<Map<String, dynamic>> _executeCreateTask(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
+    debugPrint('[MCP] _executeCreateTask 시작: args=$args, tabType=$tabType');
     final user = ref.read(authControllerProvider).requireValue;
+    debugPrint('[MCP] _executeCreateTask: user.id=${user.id}');
     final title = args['title'] as String?;
     if (title == null || title.isEmpty) {
+      debugPrint('[MCP] _executeCreateTask 실패: Title is required');
       return {'success': false, 'error': 'Title is required'};
     }
+    debugPrint('[MCP] _executeCreateTask: title=$title');
 
     final description = args['description'] as String?;
     var projectId = args['projectId'] as String?;
@@ -578,8 +589,18 @@ class McpFunctionExecutor {
       status: status,
     );
 
-    await TaskAction.upsertTask(task: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
+    debugPrint('[MCP] _executeCreateTask: TaskEntity 생성 완료, task.id=${task.id}, task.title=${task.title}');
+    debugPrint('[MCP] _executeCreateTask: TaskAction.upsertTask 호출 전');
+    try {
+      await TaskAction.upsertTask(task: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
+      debugPrint('[MCP] _executeCreateTask: TaskAction.upsertTask 호출 완료');
+    } catch (e, stackTrace) {
+      debugPrint('[MCP] _executeCreateTask: TaskAction.upsertTask 에러 발생: $e');
+      debugPrint('[MCP] _executeCreateTask: StackTrace: $stackTrace');
+      return {'success': false, 'error': 'Failed to save task: ${e.toString()}'};
+    }
 
+    debugPrint('[MCP] _executeCreateTask: 성공, taskId=${task.id}');
     return {'success': true, 'taskId': task.id, 'message': 'Task created successfully'};
   }
 

@@ -797,10 +797,22 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    if (targetTab != tabType || targetMonth != targetDate.month) return list;
-    if (ref.read(shouldUseMockDataProvider)) return list;
+    final taskMonth = task.startAt?.month ?? targetDate.month;
+    debugPrint('[CalendarTaskListController] _upsertTask: targetTab=$targetTab, tabType=$tabType, taskMonth=$taskMonth, targetDate.month=${targetDate.month}');
+    if (targetTab != tabType || taskMonth != targetDate.month) {
+      debugPrint(
+        '[CalendarTaskListController] _upsertTask: Early return! 저장하지 않음. targetTab=$targetTab != tabType=$tabType 또는 taskMonth=$taskMonth != targetDate.month=${targetDate.month}',
+      );
+      return list;
+    }
+    if (ref.read(shouldUseMockDataProvider)) {
+      debugPrint('[CalendarTaskListController] _upsertTask: Mock data 사용 중이므로 저장하지 않음');
+      return list;
+    }
 
+    debugPrint('[CalendarTaskListController] _upsertTask: _taskRepository.saveTask 호출 전, task.id=${task.id}');
     final eventResult = await _taskRepository.saveTask(task: task);
+    debugPrint('[CalendarTaskListController] _upsertTask: _taskRepository.saveTask 호출 완료, eventResult=$eventResult');
 
     return eventResult.fold(
       (l) {
@@ -851,8 +863,15 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
+    final taskMonth = task.startAt?.month ?? targetDate.month;
+    debugPrint('[CalendarTaskListController] _deleteTask: targetTab=$targetTab, tabType=$tabType, taskMonth=$taskMonth, targetDate.month=${targetDate.month}');
 
-    if (targetTab != tabType || targetMonth != targetDate.month) return list;
+    if (targetTab != tabType || taskMonth != targetDate.month) {
+      debugPrint(
+        '[CalendarTaskListController] _deleteTask: Early return! 저장하지 않음. targetTab=$targetTab != tabType=$tabType 또는 taskMonth=$taskMonth != targetDate.month=${targetDate.month}',
+      );
+      return list;
+    }
     if (!isSignedIn) return list;
     if (ref.read(shouldUseMockDataProvider)) return list;
 

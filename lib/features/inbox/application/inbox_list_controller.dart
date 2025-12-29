@@ -436,7 +436,7 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     // 기존에 등록되지 않은 OAuth만 추가
     final existingMailOAuthIds = _sourceMailControllers.keys.toSet();
     final newMailOAuthIds = mailOAuths.map((e) => e.uniqueId).toSet();
-    
+
     // 제거된 OAuth의 controller 정리
     existingMailOAuthIds.difference(newMailOAuthIds).forEach((removedId) {
       _sourceMailControllers.remove(removedId);
@@ -465,7 +465,7 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     // 기존에 등록되지 않은 OAuth만 추가
     final existingChatOAuthIds = _sourceChatControllers.keys.toSet();
     final newChatOAuthIds = chatOAuths.map((e) => e.uniqueId).toSet();
-    
+
     // 제거된 OAuth의 controller 정리
     existingChatOAuthIds.difference(newChatOAuthIds).forEach((removedId) {
       _sourceChatControllers.remove(removedId);
@@ -658,13 +658,13 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     this.query = query;
     int resultCount = 0;
     final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
-    
+
     // OAuth가 없으면 즉시 완료
     if (totalControllers == 0) {
       completer.complete();
       return completer.future;
     }
-    
+
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
@@ -704,13 +704,13 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     this.query = null;
     int resultCount = 0;
     final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
-    
+
     // OAuth가 없으면 즉시 완료
     if (totalControllers == 0) {
       completer.complete();
       return completer.future;
     }
-    
+
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
@@ -748,13 +748,13 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     Completer<void> completer = Completer<void>();
     int resultCount = 0;
     final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
-    
+
     // OAuth가 없으면 즉시 완료
     if (totalControllers == 0) {
       completer.complete();
       return completer.future;
     }
-    
+
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
@@ -867,13 +867,13 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     this.query = query;
     int resultCount = 0;
     final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
-    
+
     // OAuth가 없으면 즉시 완료
     if (totalControllers == 0) {
       completer.complete();
       return completer.future;
     }
-    
+
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
