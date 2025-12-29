@@ -13,12 +13,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'local_pref_controller.g.dart';
 
 final localPrefControllerProvider = Provider.autoDispose<AsyncValue<LocalPrefEntity>>((ref) {
-  final isSignedIn = ref.watch(authControllerProvider.select((v) => v.value?.isSignedIn ?? false));
+  final isSignedIn = !ref.watch(shouldUseMockDataProvider);
+  if (!isSignedIn) return AsyncValue.data(fakeLocalPref);
   return ref.watch(localPrefControllerInternalProvider(isSignedIn: isSignedIn));
 });
 
 final _localPrefControllerNotifierProvider = Provider.autoDispose<LocalPrefControllerInternal>((ref) {
-  final isSignedIn = ref.watch(authControllerProvider.select((v) => v.value?.isSignedIn ?? false));
+  final isSignedIn = !ref.watch(shouldUseMockDataProvider);
   return ref.watch(localPrefControllerInternalProvider(isSignedIn: isSignedIn).notifier);
 });
 
@@ -32,7 +33,7 @@ class LocalPrefControllerInternal extends _$LocalPrefControllerInternal {
 
   @override
   Future<LocalPrefEntity> build({required bool isSignedIn}) async {
-    if (ref.read(shouldUseMockDataProvider)) return fakeLocalPref;
+    if (!isSignedIn) return fakeLocalPref;
 
     // 순환 의존성 방지를 위해 authControllerProvider를 직접 watch하지 않고
     // isSignedIn 파라미터를 사용하여 userId를 얻기

@@ -183,7 +183,7 @@ class _ExampleAppState extends ConsumerState<ExampleApp> {
     final prefExists = ref.watch(localPrefControllerProvider.select((value) => value.value != null));
 
     // persist가 로딩 중이거나 값이 없으면 splash 화면 표시
-    if (authAsync.isLoading || authAsync.value == null || !prefExists || !initialized) {
+    if (authAsync.isLoading || !prefExists || !initialized) {
       return SplashScreen();
     }
 
