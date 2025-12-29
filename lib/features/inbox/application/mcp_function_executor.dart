@@ -1358,7 +1358,6 @@ class McpFunctionExecutor {
     }
 
     final mail = mails.first;
-    final user = ref.read(authControllerProvider).requireValue;
     final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
     if (oauths.isEmpty) {
       return {'success': false, 'error': 'No email account configured'};
@@ -3035,10 +3034,8 @@ class McpFunctionExecutor {
           searchTime = now.roundUp(delta: const Duration(minutes: 15));
         }
 
-        int searchAttempts = 0;
 
         while (searchTime.isBefore(endOfDay)) {
-          searchAttempts++;
           final endTime = searchTime.add(finalDuration);
           bool isAvailable = true;
 

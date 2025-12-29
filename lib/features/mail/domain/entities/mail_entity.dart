@@ -104,41 +104,29 @@ class MailEntity {
 
   String? get draftSubject => _draftSubject;
 
-  MailEntity.fromGmail({
-    Gmail.Message? message,
-    List<Gmail.Message>? thread,
-    required this.hostEmail,
-    String? pageToken,
-    String? draftId,
-    DateTime? localUpdatedAt,
-  }) : _gmailMessage = message,
-       _gmailThreads = thread,
-       _msMessage = null,
-       _msThreads = null,
-       _pageToken = pageToken,
-       _draftId = draftId,
-       _draftSubject = null,
-       _draftHtml = null,
-       _localUpdatedAt = localUpdatedAt,
-       type = MailEntityType.google;
+  MailEntity.fromGmail({Gmail.Message? message, List<Gmail.Message>? thread, required this.hostEmail, String? pageToken, String? draftId, DateTime? localUpdatedAt})
+    : _gmailMessage = message,
+      _gmailThreads = thread,
+      _msMessage = null,
+      _msThreads = null,
+      _pageToken = pageToken,
+      _draftId = draftId,
+      _draftSubject = null,
+      _draftHtml = null,
+      _localUpdatedAt = localUpdatedAt,
+      type = MailEntityType.google;
 
-  MailEntity.fromOutlook({
-    OutlookMailMessage? message,
-    List<OutlookMailMessage>? thread,
-    required this.hostEmail,
-    String? pageToken,
-    String? draftId,
-    DateTime? localUpdatedAt,
-  }) : _msMessage = message,
-       _msThreads = thread,
-       _gmailMessage = null,
-       _gmailThreads = null,
-       _pageToken = pageToken,
-       _draftId = draftId,
-       _draftSubject = null,
-       _draftHtml = null,
-       _localUpdatedAt = localUpdatedAt,
-       type = MailEntityType.microsoft;
+  MailEntity.fromOutlook({OutlookMailMessage? message, List<OutlookMailMessage>? thread, required this.hostEmail, String? pageToken, String? draftId, DateTime? localUpdatedAt})
+    : _msMessage = message,
+      _msThreads = thread,
+      _gmailMessage = null,
+      _gmailThreads = null,
+      _pageToken = pageToken,
+      _draftId = draftId,
+      _draftSubject = null,
+      _draftHtml = null,
+      _localUpdatedAt = localUpdatedAt,
+      type = MailEntityType.microsoft;
 
   Gmail.Message? get gmailMessage => _gmailMessage;
 
@@ -234,25 +222,177 @@ class MailEntity {
   factory MailEntity.fromJson(Map<String, dynamic> json) {
     MailEntityType mailType = MailEntityType.values.firstWhere((e) => e.name == json['type'], orElse: () => MailEntityType.google);
 
+    // hostEmail 추출
+    String hostEmail = '';
+    if (json['hostEmail'] is String) {
+      hostEmail = json['hostEmail'] as String;
+    } else if (json['from'] is Map) {
+      final fromMap = json['from'] as Map;
+      if (fromMap['email'] is String) {
+        hostEmail = fromMap['email'] as String;
+      }
+    }
+
     if (mailType == MailEntityType.google) {
+      Gmail.Message? gmailMessage;
+      try {
+        if (json['_gmailMessage'] != null && json['_gmailMessage'] is Map) {
+          gmailMessage = Gmail.Message.fromJson(json['_gmailMessage'] as Map<String, dynamic>);
+        } else {
+          // AI가 생성한 간단한 JSON에서 Gmail.Message 생성
+          gmailMessage = _createGmailMessageFromSimpleJson(json);
+        }
+      } catch (e) {
+        // Gmail message 파싱 실패 시 간단한 JSON에서 생성 시도
+        try {
+          gmailMessage = _createGmailMessageFromSimpleJson(json);
+        } catch (e2) {
+          gmailMessage = null;
+        }
+      }
+
+      List<Gmail.Message> gmailThreads = [];
+      try {
+        if (json['_gmailThreads'] != null && json['_gmailThreads'] is List) {
+          gmailThreads = (json['_gmailThreads'] as List).whereType<Map<String, dynamic>>().map((e) => Gmail.Message.fromJson(e)).whereType<Gmail.Message>().toList();
+        }
+      } catch (e) {
+        gmailThreads = [];
+      }
+
       return MailEntity.fromGmail(
-        message: json['_gmailMessage'] == null ? null : Gmail.Message.fromJson(json['_gmailMessage']),
-        thread: (json['_gmailThreads'] ?? []).map((e) => Gmail.Message.fromJson(e)).whereType<Gmail.Message>().toList(),
-        hostEmail: json['hostEmail'],
-        pageToken: json['_pageToken'],
-        draftId: json['_draftId'],
+        message: gmailMessage,
+        thread: gmailThreads.isEmpty ? null : gmailThreads,
+        hostEmail: hostEmail,
+        pageToken: json['_pageToken'] as String?,
+        draftId: json['_draftId'] as String?,
       );
     } else if (mailType == MailEntityType.microsoft) {
+      OutlookMailMessage? msMessage;
+      try {
+        if (json['_msMessage'] != null && json['_msMessage'] is Map) {
+          msMessage = OutlookMailMessage.fromJson(json['_msMessage'] as Map<String, dynamic>);
+        } else {
+          // AI가 생성한 간단한 JSON에서 OutlookMailMessage 생성
+          msMessage = _createOutlookMessageFromSimpleJson(json);
+        }
+      } catch (e) {
+        // Outlook message 파싱 실패 시 간단한 JSON에서 생성 시도
+        try {
+          msMessage = _createOutlookMessageFromSimpleJson(json);
+        } catch (e2) {
+          msMessage = null;
+        }
+      }
+
+      List<OutlookMailMessage> msThreads = [];
+      try {
+        if (json['_msThreads'] != null && json['_msThreads'] is List) {
+          msThreads = (json['_msThreads'] as List).whereType<Map<String, dynamic>>().map((e) => OutlookMailMessage.fromJson(e)).whereType<OutlookMailMessage>().toList();
+        }
+      } catch (e) {
+        msThreads = [];
+      }
+
       return MailEntity.fromOutlook(
-        message: json['_msMessage'] == null ? null : OutlookMailMessage.fromJson(json['_msMessage']),
-        thread: (json['_msThreads'] ?? []).map((e) => OutlookMailMessage.fromJson(e)).whereType<OutlookMailMessage>().toList(),
-        hostEmail: json['hostEmail'],
-        pageToken: json['_pageToken'],
-        draftId: json['_draftId'],
+        message: msMessage,
+        thread: msThreads.isEmpty ? null : msThreads,
+        hostEmail: hostEmail,
+        pageToken: json['_pageToken'] as String?,
+        draftId: json['_draftId'] as String?,
       );
     }
 
     throw UnimplementedError();
+  }
+
+  static Gmail.Message? _createGmailMessageFromSimpleJson(Map<String, dynamic> json) {
+    final id = json['id'] as String?;
+    final threadId = json['threadId'] as String? ?? id;
+    final subject = json['subject'] as String? ?? '';
+    final snippet = json['snippet'] as String? ?? '';
+
+    // 날짜 파싱
+    DateTime? dateTime;
+    if (json['date'] != null) {
+      try {
+        if (json['date'] is String) {
+          dateTime = DateTime.parse(json['date'] as String);
+        } else if (json['date'] is int) {
+          dateTime = DateTime.fromMillisecondsSinceEpoch(json['date'] as int);
+        }
+      } catch (e) {
+        dateTime = null;
+      }
+    }
+    final internalDate = dateTime?.millisecondsSinceEpoch.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+
+    // From 정보 파싱
+    String fromValue = '';
+    if (json['from'] is Map) {
+      final fromMap = json['from'] as Map;
+      final name = fromMap['name'] as String? ?? '';
+      final email = fromMap['email'] as String? ?? '';
+      if (email.isNotEmpty) {
+        fromValue = name.isNotEmpty ? '$name <$email>' : email;
+      }
+    }
+
+    // Headers 생성
+    final headers = <Gmail.MessagePartHeader>[];
+    if (fromValue.isNotEmpty) {
+      headers.add(Gmail.MessagePartHeader(name: 'From', value: fromValue));
+    }
+    if (subject.isNotEmpty) {
+      headers.add(Gmail.MessagePartHeader(name: 'Subject', value: subject));
+    }
+    if (dateTime != null) {
+      headers.add(Gmail.MessagePartHeader(name: 'Date', value: dateTime.toIso8601String()));
+    }
+
+    return Gmail.Message(
+      id: id,
+      threadId: threadId,
+      snippet: snippet,
+      internalDate: internalDate,
+      payload: Gmail.MessagePart(headers: headers, body: Gmail.MessagePartBody(size: 0)),
+    );
+  }
+
+  static OutlookMailMessage? _createOutlookMessageFromSimpleJson(Map<String, dynamic> json) {
+    final id = json['id'] as String?;
+    final threadId = json['threadId'] as String? ?? id;
+    final subject = json['subject'] as String? ?? '';
+    final snippet = json['snippet'] as String? ?? '';
+
+    // 날짜 파싱
+    DateTime? dateTime;
+    if (json['date'] != null) {
+      try {
+        if (json['date'] is String) {
+          dateTime = DateTime.parse(json['date'] as String);
+        } else if (json['date'] is int) {
+          dateTime = DateTime.fromMillisecondsSinceEpoch(json['date'] as int);
+        }
+      } catch (e) {
+        dateTime = null;
+      }
+    }
+
+    // From 정보 파싱
+    Ms.Recipient? fromRecipient;
+    if (json['from'] is Map) {
+      final fromMap = json['from'] as Map;
+      final name = fromMap['name'] as String? ?? '';
+      final email = fromMap['email'] as String? ?? '';
+      if (email.isNotEmpty) {
+        fromRecipient = Ms.Recipient(
+          emailAddress: Ms.EmailAddress(address: email, name: name.isNotEmpty ? name : null),
+        );
+      }
+    }
+
+    return OutlookMailMessage(id: id, conversationId: threadId, subject: subject, bodyPreview: snippet, from: fromRecipient, receivedDateTime: dateTime, sentDateTime: dateTime);
   }
 
   DateTime? get localUpdatedAt => _localUpdatedAt;
@@ -451,8 +591,7 @@ class MailEntity {
   List<MailUserEntity> get threadFrom {
     switch (type) {
       case MailEntityType.google:
-        final mails =
-            _gmailThreads?.map((t) => t.payload?.headers?.where((element) => element.name?.toLowerCase() == 'from').firstOrNull?.value).toList() ?? [];
+        final mails = _gmailThreads?.map((t) => t.payload?.headers?.where((element) => element.name?.toLowerCase() == 'from').firstOrNull?.value).toList() ?? [];
 
         final result = mails
             .map((value) {
@@ -908,15 +1047,7 @@ class MailEntity {
       if (e.body?.attachmentId != null) {
         final cid = e.headers?.where((h) => h.name?.toLowerCase() == 'content-id').firstOrNull?.value ?? '';
 
-        result.add(
-          MailFileEntity(
-            id: e.body!.attachmentId!,
-            cid: cid.replaceAll('<', '').replaceAll('>', ''),
-            name: e.filename ?? '',
-            data: null,
-            mimeType: e.mimeType ?? '',
-          ),
-        );
+        result.add(MailFileEntity(id: e.body!.attachmentId!, cid: cid.replaceAll('<', '').replaceAll('>', ''), name: e.filename ?? '', data: null, mimeType: e.mimeType ?? ''));
       }
 
       if (e.parts != null) result = [...result, ...addAttachments(e.parts!)];
@@ -1156,14 +1287,7 @@ extension MessagePartX on Gmail.MessagePart {
     };
   }
 
-  copyWith({
-    Gmail.MessagePartBody? body,
-    String? filename,
-    List<Gmail.MessagePartHeader>? headers,
-    String? mimeType,
-    String? partId,
-    List<Gmail.MessagePart>? parts,
-  }) {
+  copyWith({Gmail.MessagePartBody? body, String? filename, List<Gmail.MessagePartHeader>? headers, String? mimeType, String? partId, List<Gmail.MessagePart>? parts}) {
     return Gmail.MessagePart(
       body: body ?? this.body,
       filename: filename ?? this.filename,

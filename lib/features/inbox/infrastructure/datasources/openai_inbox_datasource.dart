@@ -2661,7 +2661,7 @@ You can call functions using this format:
 2. The requested item is not found in the current context
 3. You need to find items that match specific criteria that aren't in the current context
 
-After calling a search function, the search results will be automatically added to the context for subsequent function calls and responses.
+After calling a search function, the search results will be automatically added to the context for subsequent function calls and responses. If you need to read the full content of searched inbox items or need more information to complete the user's request, use the <need_more_action> tag to request additional content. Do NOT automatically re-request - only request more content if you actually need it to answer the user's question.
 
 ## Multiple Function Calls and Function Chaining
 

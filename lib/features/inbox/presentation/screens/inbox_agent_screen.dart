@@ -72,7 +72,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
 
   double _agentInputFieldHeight = 0;
   final GlobalKey _agentInputFieldKey = GlobalKey();
-  bool _isBottomSheetOpen = false;
   RefreshController _refreshController = RefreshController();
 
   String getDateString({required DateTime date, bool? forceDate}) {
@@ -83,22 +82,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
     if (date.isBefore(DateUtils.dateOnly(DateTime.now().add(Duration(days: 7)))) && date.isAfter(DateUtils.dateOnly(DateTime.now()))) return DateFormat.E().format(date);
     if (date.year == DateTime.now().year) return DateFormat.MMMd().format(date);
     return DateFormat.yMMMd().format(date);
-  }
-
-  String _getTimeOfDayGreeting(BuildContext context, int hour) {
-    if (hour >= 0 && hour < 5) {
-      return context.tr.dawn;
-    } else if (hour >= 5 && hour < 9) {
-      return context.tr.morning;
-    } else if (hour >= 9 && hour < 12) {
-      return context.tr.morning;
-    } else if (hour >= 12 && hour < 17) {
-      return context.tr.afternoon;
-    } else if (hour >= 17 && hour < 21) {
-      return context.tr.evening;
-    } else {
-      return context.tr.evening;
-    }
   }
 
   @override

@@ -140,7 +140,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     );
   }
 
-  Widget _buildTaskWidget(BuildContext context, TaskEntity task, bool isUser, {bool isSuggested = false}) {
+  Widget _buildTaskWidget(BuildContext context, TaskEntity task, bool isUser) {
     final projects = ref.read(projectListControllerProvider);
     final defaultProject = projects.firstWhere((p) => p.isDefault);
     final project = task.projectId != null ? projects.where((p) => p.uniqueId == task.projectId).firstOrNull : defaultProject;
@@ -275,7 +275,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     };
   }
 
-  Widget _buildEventWidget(BuildContext context, Map<String, dynamic> eventData, bool isUser, {bool isSuggested = false}) {
+  Widget _buildEventWidget(BuildContext context, Map<String, dynamic> eventData, bool isUser) {
     final calendarMap = ref.read(calendarListControllerProvider);
     final calendarList = calendarMap.values.expand((e) => e).toList();
     final calendarId = eventData['calendar_id'] as String?;
@@ -779,50 +779,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     );
   }
 
-  String _getFunctionConfirmationMessageForConfirm(String functionName, Map<String, dynamic> args) {
-    switch (functionName) {
-      case 'sendMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        final subject = args['subject'] as String? ?? '';
-        return '다음 이메일을 전송하시겠습니까?\n\n받는 사람: $to\n제목: $subject';
-      case 'replyMail':
-        final subject = args['subject'] as String? ?? '';
-        return '이메일에 답장을 보내시겠습니까?\n\n제목: $subject';
-      case 'forwardMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        return '이메일을 다음 주소로 전달하시겠습니까?\n\n받는 사람: $to';
-      case 'deleteTask':
-        return '작업을 삭제하시겠습니까?';
-      case 'deleteEvent':
-        return '일정을 삭제하시겠습니까?';
-      case 'deleteMail':
-        return '이메일을 삭제하시겠습니까?';
-      case 'updateTask':
-        final title = args['title'] as String? ?? '';
-        return '작업을 수정하시겠습니까?\n\n제목: $title';
-      case 'updateEvent':
-        final title = args['title'] as String? ?? '';
-        return '일정을 수정하시겠습니까?\n\n제목: $title';
-      case 'markMailAsRead':
-        return '이메일을 읽음으로 표시하시겠습니까?';
-      case 'markMailAsUnread':
-        return '이메일을 읽지 않음으로 표시하시겠습니까?';
-      case 'archiveMail':
-        return '이메일을 보관하시겠습니까?';
-      case 'responseCalendarInvitation':
-        final response = args['response'] as String? ?? '';
-        return '캘린더 초대에 "$response"로 응답하시겠습니까?';
-      case 'createTask':
-        final title = args['title'] as String? ?? '';
-        return '다음 작업을 생성하시겠습니까?\n\n제목: $title';
-      case 'createEvent':
-        final title = args['title'] as String? ?? '';
-        return '다음 일정을 생성하시겠습니까?\n\n제목: $title';
-      default:
-        return '이 작업을 실행하시겠습니까?';
-    }
-  }
-
   Widget _buildMessageContent(BuildContext context, String content, bool isUser) {
     final baseStyle = context.bodyLarge?.textColor(context.onSurfaceVariant);
 
@@ -940,10 +896,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
 
     if (isHtml) {
-      // Check if this is a suggested task/event message
-      final isSuggestedTaskMessage = content.contains('suggested') || content.contains('Would you like to create');
-      final isSuggestedEventMessage = content.contains('suggested') || content.contains('Would you like to create');
-
       // For HTML content, we need to handle @mentions in text nodes
       // HtmlWidget doesn't easily support inline widgets in text, so we'll process the HTML string
       // and replace @mentions with special markers that we can handle in customWidgetBuilder
@@ -1213,9 +1165,11 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   rethrow;
                 }
               }
+
               final mail = MailEntity.fromJson(jsonData);
               return _buildMailEntityWidget(context, mail, isUser);
             } catch (e) {
+              print('[AI_AGENT] Error parsing mail entity: $e');
               return Text('Error parsing mail entity: $e', style: baseStyle?.copyWith(color: context.error));
             }
           }
@@ -1579,9 +1533,23 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                 break;
               case 'inapp_mail_entity':
                 try {
+                  // 필수 필드 체크 및 기본값 설정
+                  if (jsonData['hostEmail'] == null || jsonData['hostEmail'] is! String) {
+                    String? fromEmail;
+                    if (jsonData['from'] is Map) {
+                      final fromMap = jsonData['from'] as Map;
+                      fromEmail = fromMap['email'] is String ? fromMap['email'] as String : null;
+                    }
+                    jsonData['hostEmail'] = fromEmail ?? '';
+                  }
+                  if (jsonData['type'] == null || jsonData['type'] is! String) {
+                    jsonData['type'] = 'google';
+                  }
+
                   final mail = MailEntity.fromJson(jsonData);
                   widget = _buildMailEntityWidget(context, mail, isUser);
                 } catch (e) {
+                  print('[AI_AGENT] Error parsing mail entity in markdown: $e, jsonData: $jsonData');
                   // Skip invalid mail
                 }
                 break;
@@ -2547,7 +2515,6 @@ class _ActionConfirmWidget extends ConsumerStatefulWidget {
 class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
   late final FocusNode _focusNode;
   bool _isProcessing = false;
-  final HtmlUnescape _htmlUnescape = HtmlUnescape();
 
   @override
   void initState() {
@@ -2820,160 +2787,6 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
         Expanded(
           child: Text(recipientTexts, style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
         ),
-      ],
-    );
-  }
-
-  String _getFunctionConfirmationMessageForConfirm(String functionName, Map<String, dynamic> args) {
-    switch (functionName) {
-      case 'sendMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        final subject = args['subject'] as String? ?? '';
-        return '다음 이메일을 전송하시겠습니까?\n\n받는 사람: $to\n제목: $subject';
-      case 'replyMail':
-        final subject = args['subject'] as String? ?? '';
-        return '이메일에 답장을 보내시겠습니까?\n\n제목: $subject';
-      case 'forwardMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        return '이메일을 다음 주소로 전달하시겠습니까?\n\n받는 사람: $to';
-      case 'deleteTask':
-        return '작업을 삭제하시겠습니까?';
-      case 'deleteEvent':
-        return '일정을 삭제하시겠습니까?';
-      case 'deleteMail':
-        return '이메일을 삭제하시겠습니까?';
-      case 'updateTask':
-        final title = args['title'] as String? ?? '';
-        return '작업을 수정하시겠습니까?\n\n제목: $title';
-      case 'updateEvent':
-        final title = args['title'] as String? ?? '';
-        return '일정을 수정하시겠습니까?\n\n제목: $title';
-      case 'markMailAsRead':
-        return '이메일을 읽음으로 표시하시겠습니까?';
-      case 'markMailAsUnread':
-        return '이메일을 읽지 않음으로 표시하시겠습니까?';
-      case 'archiveMail':
-        return '이메일을 보관하시겠습니까?';
-      case 'responseCalendarInvitation':
-        final response = args['response'] as String? ?? '';
-        return '캘린더 초대에 "$response"로 응답하시겠습니까?';
-      case 'createTask':
-        final title = args['title'] as String? ?? '';
-        return '다음 작업을 생성하시겠습니까?\n\n제목: $title';
-      case 'createEvent':
-        final title = args['title'] as String? ?? '';
-        return '다음 일정을 생성하시겠습니까?\n\n제목: $title';
-      default:
-        return '이 작업을 실행하시겠습니까?';
-    }
-  }
-
-  Widget _buildMailActionDetails(BuildContext context, String functionName, Map<String, dynamic> args, bool isUser) {
-    final toList = (args['to'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final ccList = (args['cc'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final bccList = (args['bcc'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final subject = args['subject'] as String? ?? '';
-    final reply = args['reply'] as String? ?? args['message'] as String? ?? '';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (subject.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text('제목: $subject', style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
-          ),
-        ],
-        if (toList.isNotEmpty || ccList.isNotEmpty || bccList.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (toList.isNotEmpty) _buildRecipientRowForConfirm(context, '받는 사람', toList, isUser),
-                if (ccList.isNotEmpty) _buildRecipientRowForConfirm(context, '참조', ccList, isUser),
-                if (bccList.isNotEmpty) _buildRecipientRowForConfirm(context, '숨은 참조', bccList, isUser),
-              ],
-            ),
-          ),
-        ],
-        if (reply.isNotEmpty) ...[
-          Container(height: 1, color: context.outline),
-          const SizedBox(height: 8),
-          Text(
-            reply.replaceAll('\\n', '\n'),
-            style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildTaskActionDetails(BuildContext context, Map<String, dynamic> args, bool isUser) {
-    final title = args['title'] as String? ?? '';
-    final description = args['description'] as String? ?? '';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (title.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              '제목: $title',
-              style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-        if (description.isNotEmpty) ...[
-          Text(
-            description,
-            style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildEventActionDetails(BuildContext context, Map<String, dynamic> args, bool isUser) {
-    final title = args['title'] as String? ?? '';
-    final description = args['description'] as String? ?? '';
-    final startAtStr = args['start_at'] as String?;
-    final endAtStr = args['end_at'] as String?;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (title.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              '제목: $title',
-              style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-        if (startAtStr != null || endAtStr != null) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              '시간: ${startAtStr ?? ''}${endAtStr != null ? ' - $endAtStr' : ''}',
-              style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
-            ),
-          ),
-        ],
-        if (description.isNotEmpty) ...[
-          Text(
-            description,
-            style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
       ],
     );
   }
