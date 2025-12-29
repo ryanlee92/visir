@@ -212,7 +212,7 @@ class InboxEntity {
     return InboxEntity(
       id: InboxEntity.getInboxIdFromMail(e),
       title: e.subject?.isNotEmpty == true ? e.subject! : Utils.mainContext.tr.mail_empty_subject,
-      description: e.snippet,
+      description: e.snippetWithLineBreaks ?? e.snippet, // Use snippetWithLineBreaks for AI actions (longer, preserves line breaks)
       isPinned: e.isPinned,
       config: config ?? InboxConfigEntity(id: InboxEntity.getInboxIdFromMail(e), userId: userId, dateTime: e.date ?? DateTime.now()),
       linkedMail: LinkedMailEntity(

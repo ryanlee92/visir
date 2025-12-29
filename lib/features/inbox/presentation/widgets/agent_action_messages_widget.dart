@@ -794,7 +794,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
       return _buildTaskWidget(context, task, isUser);
     } catch (e) {
-      return Padding(padding: const EdgeInsets.only(top: 8), child: _buildActionConfirmWidget(context, 'createTask', functionArgs, actionId, isUser));
+      return Padding(padding: const EdgeInsets.only(top: 0), child: _buildActionConfirmWidget(context, 'createTask', functionArgs, actionId, isUser));
     }
   }
 
@@ -845,44 +845,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
       return _buildEventWidget(context, eventData, isUser);
     } catch (e) {
-      return Padding(padding: const EdgeInsets.only(top: 8), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
+      return Padding(padding: const EdgeInsets.only(top: 0), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
     }
-  }
-
-  Widget _buildActionConfirmButton(BuildContext context, String actionId, bool isUser) {
-    final state = ref.watch(agentActionControllerProvider);
-    final pendingCalls = state.pendingFunctionCalls ?? [];
-    final isPending = pendingCalls.any((call) => call['action_id'] == actionId);
-
-    if (!isPending) {
-      return const SizedBox.shrink();
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IntrinsicWidth(
-          child: VisirButton(
-            type: VisirButtonAnimationType.scaleAndOpacity,
-            style: VisirButtonStyle(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), backgroundColor: context.primary, borderRadius: BorderRadius.circular(12)),
-            options: VisirButtonOptions(
-              bypassTextField: true,
-              shortcuts: [
-                VisirButtonKeyboardShortcut(
-                  keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
-                  message: context.tr.confirm,
-                ),
-              ],
-            ),
-            onTap: () async {
-              final controller = ref.read(agentActionControllerProvider.notifier);
-              await controller.confirmAction(actionId: actionId);
-            },
-            child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-          ),
-        ),
-      ],
-    );
   }
 
   /// Check if content appears to be Markdown format
@@ -2346,109 +2310,84 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 ],
                               ),
                             ),
-                            // Single confirm button for all pending actions in the last message
-                            Builder(
-                              builder: (context) {
-                                final state = ref.watch(agentActionControllerProvider);
-                                final pendingCalls = state.pendingFunctionCalls ?? [];
-                                final writeActions = pendingCalls.where((call) {
-                                  final functionName = call['function_name'] as String? ?? '';
-                                  return _isWriteAction(functionName);
-                                }).toList();
 
-                                if (writeActions.isEmpty) {
-                                  return const SizedBox.shrink();
-                                }
-
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IntrinsicWidth(
-                                        child: VisirButton(
-                                          type: VisirButtonAnimationType.scaleAndOpacity,
-                                          style: VisirButtonStyle(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                            backgroundColor: context.primary,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          options: VisirButtonOptions(
-                                            bypassTextField: true,
-                                            shortcuts: [
-                                              VisirButtonKeyboardShortcut(
-                                                keys: [
-                                                  if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                                  if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                                  LogicalKeyboardKey.enter,
-                                                ],
-                                                message: context.tr.confirm,
-                                              ),
-                                            ],
-                                          ),
-                                          onTap: () async {
-                                            final controller = ref.read(agentActionControllerProvider.notifier);
-                                            // Confirm all write actions
-                                            for (final call in writeActions) {
-                                              final actionId = call['action_id'] as String? ?? '';
-                                              if (actionId.isNotEmpty) {
-                                                await controller.confirmAction(actionId: actionId);
-                                              }
-                                            }
-                                          },
-                                          child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                            // Removed batch confirmation UI - keeping this comment for reference
-                            Builder(
-                              builder: (context) {
-                                // This builder is intentionally empty - batch confirmation removed
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            Builder(
-                              builder: (context) {
-                                // Removed batch confirmation logic
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            Builder(
-                              builder: (context) {
-                                // Removed checkbox logic
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            Builder(
-                              builder: (context) {
-                                // Removed select all/deselect all logic
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            Builder(
-                              builder: (context) {
-                                // Removed confirm selected button
-                                return const SizedBox.shrink();
-                              },
-                            ),
                             // Removed old batch confirmation UI
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
-                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
+                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0) + 1, // +1 for confirm button
                                 itemBuilder: (context, index) {
-                                  if (index == agentAction.messages.length) {
+                                  // Check if this is the confirm button index
+                                  final state = ref.watch(agentActionControllerProvider);
+                                  final pendingCalls = state.pendingFunctionCalls ?? [];
+                                  final writeActions = pendingCalls.where((call) {
+                                    final functionName = call['function_name'] as String? ?? '';
+                                    return _isWriteAction(functionName);
+                                  }).toList();
+
+                                  final messagesLength = agentAction.messages.length;
+                                  final loadingItemCount = agentAction.isLoading ? 1 : 0;
+                                  final confirmButtonIndex = messagesLength + loadingItemCount;
+
+                                  if (index == confirmButtonIndex) {
+                                    // Render confirm button as last item
+                                    if (writeActions.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+
                                     return Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          IntrinsicWidth(
+                                            child: VisirButton(
+                                              type: VisirButtonAnimationType.scaleAndOpacity,
+                                              style: VisirButtonStyle(
+                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                backgroundColor: context.primary,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              options: VisirButtonOptions(
+                                                bypassTextField: true,
+                                                shortcuts: [
+                                                  VisirButtonKeyboardShortcut(
+                                                    keys: [
+                                                      if (PlatformX.isApple) LogicalKeyboardKey.meta,
+                                                      if (!PlatformX.isApple) LogicalKeyboardKey.control,
+                                                      LogicalKeyboardKey.enter,
+                                                    ],
+                                                    message: context.tr.confirm,
+                                                  ),
+                                                ],
+                                              ),
+                                              onTap: () async {
+                                                final controller = ref.read(agentActionControllerProvider.notifier);
+                                                // Confirm all write actions
+                                                for (final call in writeActions) {
+                                                  final actionId = call['action_id'] as String? ?? '';
+                                                  if (actionId.isNotEmpty) {
+                                                    await controller.confirmAction(actionId: actionId);
+                                                  }
+                                                }
+                                              },
+                                              child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  // Regular message items
+                                  if (index == messagesLength) {
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                                       padding: const EdgeInsets.all(12),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          VisirIcon(type: VisirIconType.agent, size: 20, color: context.primary, isSelected: true),
+                                          VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true),
                                           const SizedBox(width: 8),
                                           Expanded(
                                             child: AnimatedTextKit(
@@ -2478,8 +2417,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   final taggedProjects = _extractTaggedProjects(message.content);
 
                                   // Check for pending write actions related to this message
-                                  final state = ref.watch(agentActionControllerProvider);
-                                  final pendingCalls = state.pendingFunctionCalls ?? [];
                                   final isLastMessage = index == agentAction.messages.length - 1;
 
                                   // Find write actions that need confirmation (remove duplicates by action_id and function args)
@@ -2510,7 +2447,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   }
 
                                   return Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+                                    margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
                                     child: Column(
@@ -2528,13 +2465,13 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                         Row(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 20, color: context.primary, isSelected: true), const SizedBox(width: 8)],
+                                            if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true), const SizedBox(width: 8)],
                                             Expanded(child: _buildMessageContent(context, message.content, isUser)),
                                           ],
                                         ),
                                         // Display write action confirmations for last message (without individual confirm buttons)
                                         if (isLastMessage && writeActionsForMessage.isNotEmpty) ...[
-                                          const SizedBox(height: 12),
+                                          const SizedBox(height: 6),
                                           ...writeActionsForMessage.map((call) {
                                             final functionName = call['function_name'] as String? ?? '';
                                             final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
@@ -2543,18 +2480,18 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             // Render entity widget without confirm button (confirm button is at message level)
                                             if (functionName == 'createTask' || functionName == 'updateTask') {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.only(bottom: 0),
                                                 child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.only(bottom: 0),
                                                 child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else {
                                               // For other write actions, show confirmation widget without button
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.only(bottom: 0),
                                                 child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
                                               );
                                             }
@@ -2566,8 +2503,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 },
                               ),
                             ),
-
-                            SizedBox(height: PlatformX.isMobileView ? 0 : 12),
                           ],
                         ),
                       ),
@@ -2958,7 +2893,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             ] else if (widget.functionName == 'createEvent' || widget.functionName == 'updateEvent') ...[
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: 0),
             // Confirm button - pendingFunctionCalls는 항상 마지막 메시지와 관련되므로 항상 표시
             if (!_isProcessing)
               Row(
@@ -2968,7 +2903,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
                     child: VisirButton(
                       type: VisirButtonAnimationType.scaleAndOpacity,
                       style: VisirButtonStyle(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                         backgroundColor: context.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),

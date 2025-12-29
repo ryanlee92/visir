@@ -1543,6 +1543,13 @@ IMPORTANT: If the user requests to create the task "as is", "as suggested", or s
     final todayStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
     final tomorrowStr = '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
 
+    // Log the snippet being sent to AI
+    print('=== AI Task Creation - Inbox Snippet ===');
+    print('Title: $inboxTitle');
+    print('Description/Snippet:');
+    print(snippet);
+    print('========================================');
+
     final prompt =
         '''
 Please create a task based on the following inbox item and user request.
@@ -2629,6 +2636,13 @@ Return only the JSON object, no additional text or explanations.
       final todayStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
       final tomorrow = now.add(const Duration(days: 1));
       final tomorrowStr = '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
+
+      // Log inbox context if available
+      if (inboxContext != null && inboxContext.isNotEmpty) {
+        print('=== AI General Chat - Inbox Context ===');
+        print(inboxContext);
+        print('========================================');
+      }
 
       systemMessage +=
           '''You are a helpful AI assistant integrated with Visir, a productivity app.
