@@ -2419,7 +2419,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                       if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
                                         final title = functionArgs['title'] as String? ?? '';
                                         final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
-                                        signature = '$functionName|$title|$startAt';
+                                        final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
+                                        signature = '$functionName|$title|$startAt|$endAt';
                                       }
 
                                       if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
