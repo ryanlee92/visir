@@ -188,7 +188,7 @@ class _ExampleAppState extends ConsumerState<ExampleApp> {
     }
 
     final isSignedIn = ref.watch(isSignedInProvider);
-    print('######## 1234 $isSignedIn');
+
     if (!isSignedIn) {
       return Screenshot(
         controller: _screenshotController,
