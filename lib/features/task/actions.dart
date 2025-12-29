@@ -175,12 +175,9 @@ class TaskAction {
     DateTime? startDate,
     bool showToast = true,
   }) async {
-    print('[TaskAction] upsertTask called with tabType: $tabType, task.isUnscheduled: ${task.isUnscheduled}');
     if (task.isUnscheduled) tabType = TabType.task;
-    print('[TaskAction] After unscheduled check, tabType: $tabType');
 
     if (tabType == TabType.task) {
-      print('[TaskAction] Calling taskListControllerProvider.saveTask with targetTab: $tabType');
       await Utils.ref
           .read(taskListControllerProvider.notifier)
           .saveTask(
@@ -191,7 +188,6 @@ class TaskAction {
             selectedEndDate: selectedEndDate ?? originalTask?.endAt?.add(Duration(days: originalTask.isAllDay == true ? 1 : 0)),
           );
     } else {
-      print('[TaskAction] Calling calendarTaskListControllerProvider.saveTask with tabType: $tabType, targetTab: $tabType');
       await Utils.ref
           .read(calendarTaskListControllerProvider(tabType: tabType).notifier)
           .saveTask(

@@ -442,7 +442,6 @@ class McpFunctionExecutor {
 
   // Task execution methods
   Future<Map<String, dynamic>> _executeCreateTask(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
-    print('[MCP] _executeCreateTask called with tabType: $tabType');
     final user = ref.read(authControllerProvider).requireValue;
     final title = args['title'] as String?;
     if (title == null || title.isEmpty) {
@@ -579,7 +578,6 @@ class McpFunctionExecutor {
       status: status,
     );
 
-    print('[MCP] Calling TaskAction.upsertTask with tabType: $tabType, task.isUnscheduled: ${task.isUnscheduled}');
     await TaskAction.upsertTask(task: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
 
     return {'success': true, 'taskId': task.id, 'message': 'Task created successfully'};

@@ -68,7 +68,7 @@ extension RecurringEventEditTypeX on RecurringEventEditType {
 @riverpod
 class CalendarEventListController extends _$CalendarEventListController {
   static String stringKey(TabType tabType) => '${tabType.name}:calendar:events';
-  late List<OAuthEntity> calendarOAuths;
+  List<OAuthEntity> get calendarOAuths => ref.read(localPrefControllerProvider.select((v) => v.value?.calendarOAuths ?? []));
   Map<String, Map<String, CalendarEventListControllerInternal>> _controllers = {};
 
   List<String> loadedMonth = [];
@@ -91,7 +91,6 @@ class CalendarEventListController extends _$CalendarEventListController {
       return CalendarEventResultEntity(events: [], startDateTime: startDateTime, endDateTime: endDateTime);
     }
 
-    ref.watch(localPrefControllerProvider.select((v) => v.value?.calendarOAuths?.map((e) => e.uniqueId).toList()));
     ref.watch(calendarDisplayDateProvider(tabType).select((v) => DateFormat.yM().format(v[displayType] ?? DateTime.now())));
     final targetMonth = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[displayType] ?? DateTime.now()));
     final prevMonth = DateTime(targetMonth.year, targetMonth.month - 1);
@@ -114,7 +113,6 @@ class CalendarEventListController extends _$CalendarEventListController {
       final allEvents = <EventEntity>[];
       _controllers.forEach((oauthUniqueId, oauthControllers) {
         oauthControllers.forEach((monthKey, controller) {
-          // Parse monthKey (format: "yyyy MMM" or similar)
           try {
             final parsedDate = DateFormat.yM().parse(monthKey);
             final controllerState = ref.read(
@@ -132,36 +130,27 @@ class CalendarEventListController extends _$CalendarEventListController {
       updateState(events: uniqueEvents, startDateTime: startDateTime, endDateTime: endDateTime);
     }
 
-    calendarOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.calendarOAuths ?? []));
-    calendarOAuths.forEach((e) {
-      _controllers[e.uniqueId] = {
+    final calendarOAuthIds = ref.watch(localPrefControllerProvider.select((v) => v.value?.calendarOAuths?.map((e) => e.uniqueId).toList()));
+    calendarOAuthIds?.forEach((e) {
+      _controllers[e] = {
         DateFormat.yM().format(targetMonth): ref.watch(
-          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: targetMonth.year, targetMonth: targetMonth.month).notifier,
+          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: targetMonth.year, targetMonth: targetMonth.month).notifier,
         ),
         DateFormat.yM().format(prevMonth): ref.watch(
-          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: prevMonth.year, targetMonth: prevMonth.month).notifier,
+          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: prevMonth.year, targetMonth: prevMonth.month).notifier,
         ),
         DateFormat.yM().format(nextMonth): ref.watch(
-          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: nextMonth.year, targetMonth: nextMonth.month).notifier,
+          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: nextMonth.year, targetMonth: nextMonth.month).notifier,
         ),
       };
 
-      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: targetMonth.year, targetMonth: targetMonth.month), (
-        prev,
-        next,
-      ) {
+      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: targetMonth.year, targetMonth: targetMonth.month), (prev, next) {
         _updateFromInternalControllers();
       });
-      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: prevMonth.year, targetMonth: prevMonth.month), (
-        prev,
-        next,
-      ) {
+      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: prevMonth.year, targetMonth: prevMonth.month), (prev, next) {
         _updateFromInternalControllers();
       });
-      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: nextMonth.year, targetMonth: nextMonth.month), (
-        prev,
-        next,
-      ) {
+      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: nextMonth.year, targetMonth: nextMonth.month), (prev, next) {
         _updateFromInternalControllers();
       });
     });
@@ -528,10 +517,6 @@ class CalendarEventListControllerInternal extends _$CalendarEventListControllerI
     );
 
     if (!ref.watch(shouldUseMockDataProvider)) {
-      // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
-      // 따라서 userId는 안전하게 가져올 수 있습니다
-      final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
-
       await persist(
         ref.watch(storageProvider.future),
         key: '${CalendarEventListController.stringKey(TabType.calendar)}_${isSignedIn}_${oAuthUniqueId}_${targetYear}_${targetMonth}',

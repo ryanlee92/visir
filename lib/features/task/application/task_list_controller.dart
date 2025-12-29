@@ -1006,7 +1006,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
     bool? updateTaskStatus,
     required TabType targetTab,
   }) async {
-    print('[TaskListController] saveTask called with targetTab: $targetTab, tabType: $tabType, newTask.id: ${newTask?.id}');
     BuildContext context = Utils.mainContext;
     String recurrence =
         originalTask?.rrule?.toString(options: RecurrenceRuleToStringOptions(isTimeUtc: true)) ??
@@ -1041,7 +1040,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       }
     } else {
       if (newTask != null) {
-        print('[TaskListController] Calling _upsertTask with targetTab: $targetTab, tabType: $tabType');
         await _upsertTask(task: newTask, originalTask: originalTask, targetTab: targetTab);
       } else if (originalTask != null) {
         await _deleteTask(task: originalTask, targetTab: targetTab);
@@ -1305,7 +1303,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
     List<TaskEntity>? prevState,
     required TabType targetTab,
   }) async {
-    print('[TaskListController] _upsertTask called with targetTab: $targetTab, tabType: $tabType, task.id: ${task.id}');
     final pref = ref.read(localPrefControllerProvider).value;
     if (pref == null) return [];
 
@@ -1323,12 +1320,8 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       _updateState(list: list, updatedTimestamp: updatedTimestamp, isLocalUpdate: true);
     }
 
-    if (targetTab != tabType) {
-      print('[TaskListController] _upsertTask: targetTab ($targetTab) != tabType ($tabType), returning early without saving to remote');
-      return state.value?.tasks ?? [];
-    }
+    if (targetTab != tabType) return state.value?.tasks ?? [];
 
-    print('[TaskListController] _upsertTask: Saving task to remote repository');
     final eventResult = await _taskRepository.saveTask(task: task);
 
     return eventResult.fold(
