@@ -1607,52 +1607,14 @@
   "agent_action_create_event_fallback_no_inbox": "Please create an event.",
   "agent_action_create_event_request_message": "Create an event from this inbox item",
   "agent_action_create_event_request_message_no_inbox": "Create an event",
-  "agent_action_confirm_send_mail": "Would you like to send the following email?\n\nTo: {to}\nSubject: {subject}",
-  "@agent_action_confirm_send_mail": {
-    "placeholders": {
-      "to": {
-        "type": "String"
-      },
-      "subject": {
-        "type": "String"
-      }
-    }
-  },
-  "agent_action_confirm_reply_mail": "Would you like to send a reply to this email?\n\nSubject: {subject}",
-  "@agent_action_confirm_reply_mail": {
-    "placeholders": {
-      "subject": {
-        "type": "String"
-      }
-    }
-  },
-  "agent_action_confirm_forward_mail": "Would you like to forward this email to the following address?\n\nTo: {to}",
-  "@agent_action_confirm_forward_mail": {
-    "placeholders": {
-      "to": {
-        "type": "String"
-      }
-    }
-  },
+  "agent_action_confirm_send_mail": "Would you like to send the following email?",
+  "agent_action_confirm_reply_mail": "Would you like to send a reply to this email?",
+  "agent_action_confirm_forward_mail": "Would you like to forward this email?",
   "agent_action_confirm_delete_task": "Would you like to delete this task?",
   "agent_action_confirm_delete_event": "Would you like to delete this event?",
   "agent_action_confirm_delete_mail": "Would you like to delete this email?",
-  "agent_action_confirm_update_task": "Would you like to update this task?\n\nTitle: {title}",
-  "@agent_action_confirm_update_task": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
-  "agent_action_confirm_update_event": "Would you like to update this event?\n\nTitle: {title}",
-  "@agent_action_confirm_update_event": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
+  "agent_action_confirm_update_task": "Would you like to update this task?",
+  "agent_action_confirm_update_event": "Would you like to update this event?",
   "agent_action_confirm_mark_mail_read": "Would you like to mark this email as read?",
   "agent_action_confirm_mark_mail_unread": "Would you like to mark this email as unread?",
   "agent_action_confirm_archive_mail": "Would you like to archive this email?",
@@ -1664,23 +1626,31 @@
       }
     }
   },
-  "agent_action_confirm_create_task": "Would you like to create the following task?\n\nTitle: {title}",
-  "@agent_action_confirm_create_task": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
-  "agent_action_confirm_create_event": "Would you like to create the following event?\n\nTitle: {title}",
-  "@agent_action_confirm_create_event": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
+  "agent_action_confirm_create_task": "Would you like to create the following task?",
+  "agent_action_confirm_create_event": "Would you like to create the following event?",
   "agent_action_confirm_execute_action": "Would you like to execute this action?",
+  "agent_action_confirm_title": "Title: {title}",
+  "@agent_action_confirm_title": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_time": "Time: {startTime}{endTime}",
+  "@agent_action_confirm_time": {
+    "placeholders": {
+      "startTime": {
+        "type": "String"
+      },
+      "endTime": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_recipient_to": "To",
+  "agent_action_confirm_recipient_cc": "CC",
+  "agent_action_confirm_recipient_bcc": "BCC",
   "agent_action_task_completed": "Task completed successfully.",
   "agent_action_error_occurred_during_execution": "An error occurred during task execution.",
   "agent_action_error_occurred_during_execution_with_function": "{functionName}: An error occurred during task execution: {error}",

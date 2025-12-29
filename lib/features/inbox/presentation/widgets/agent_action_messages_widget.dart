@@ -630,40 +630,36 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
   String _getFunctionConfirmationMessage(String functionName, Map<String, dynamic> args) {
     switch (functionName) {
       case 'sendMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        final subject = args['subject'] as String? ?? '';
-        return '다음 이메일을 전송하시겠습니까?\n\n받는 사람: $to\n제목: $subject';
+        return Utils.mainContext.tr.agent_action_confirm_send_mail;
       case 'replyMail':
-        final subject = args['subject'] as String? ?? '';
-        return '이메일에 답장을 보내시겠습니까?\n\n제목: $subject';
+        return Utils.mainContext.tr.agent_action_confirm_reply_mail;
       case 'forwardMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        return '이메일을 다음 주소로 전달하시겠습니까?\n\n받는 사람: $to';
+        return Utils.mainContext.tr.agent_action_confirm_forward_mail;
       case 'deleteTask':
-        return '작업을 삭제하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_delete_task;
       case 'deleteEvent':
-        return '일정을 삭제하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_delete_event;
       case 'deleteMail':
-        return '이메일을 삭제하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_delete_mail;
       case 'updateTask':
-        return '작업을 수정하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_update_task;
       case 'updateEvent':
-        return '일정을 수정하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_update_event;
       case 'markMailAsRead':
-        return '이메일을 읽음으로 표시하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_mark_mail_read;
       case 'markMailAsUnread':
-        return '이메일을 읽지 않음으로 표시하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_mark_mail_unread;
       case 'archiveMail':
-        return '이메일을 보관하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_archive_mail;
       case 'responseCalendarInvitation':
         final response = args['response'] as String? ?? '';
-        return '캘린더 초대에 "$response"로 응답하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_response_calendar_invitation(response);
       case 'createTask':
-        return '다음 작업을 생성하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_create_task;
       case 'createEvent':
-        return '다음 일정을 생성하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_create_event;
       default:
-        return '이 작업을 실행하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_execute_action;
     }
   }
 
@@ -2696,22 +2692,21 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
                   VisirButton(
                     type: VisirButtonAnimationType.scaleAndOpacity,
                     style: VisirButtonStyle(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       backgroundColor: context.primary,
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    onTap: _handleConfirm,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(context.tr.ok, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                        const SizedBox(width: 4),
-                        Text(
-                          PlatformX.isApple ? '⌘⏎' : 'Ctrl+Enter',
-                          style: context.bodySmall?.copyWith(color: context.onPrimary.withValues(alpha: 0.7), fontSize: (context.bodySmall?.fontSize ?? 12) * 0.9),
+                    options: VisirButtonOptions(
+                      bypassTextField: true,
+                      shortcuts: [
+                        VisirButtonKeyboardShortcut(
+                          keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
+                          message: context.tr.confirm,
                         ),
                       ],
                     ),
+                    onTap: _handleConfirm,
+                    child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
                   ),
               ],
             ),
@@ -2734,7 +2729,10 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
         if (subject.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('제목: $subject', style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
+            child: Text(
+              Utils.mainContext.tr.agent_action_confirm_title(subject),
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+            ),
           ),
         ],
         if (toList.isNotEmpty || ccList.isNotEmpty || bccList.isNotEmpty) ...[
@@ -2743,9 +2741,9 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (toList.isNotEmpty) _buildRecipientRowForConfirm(context, '받는 사람', toList, isUser),
-                if (ccList.isNotEmpty) _buildRecipientRowForConfirm(context, '참조', ccList, isUser),
-                if (bccList.isNotEmpty) _buildRecipientRowForConfirm(context, '숨은 참조', bccList, isUser),
+                if (toList.isNotEmpty) _buildRecipientRowForConfirm(context, Utils.mainContext.tr.agent_action_confirm_recipient_to, toList, isUser),
+                if (ccList.isNotEmpty) _buildRecipientRowForConfirm(context, Utils.mainContext.tr.agent_action_confirm_recipient_cc, ccList, isUser),
+                if (bccList.isNotEmpty) _buildRecipientRowForConfirm(context, Utils.mainContext.tr.agent_action_confirm_recipient_bcc, bccList, isUser),
               ],
             ),
           ),
@@ -2775,7 +2773,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              '제목: $title',
+              Utils.mainContext.tr.agent_action_confirm_title(title),
               style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
             ),
           ),
@@ -2803,7 +2801,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              '제목: $title',
+              Utils.mainContext.tr.agent_action_confirm_title(title),
               style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
             ),
           ),
@@ -2818,7 +2816,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              '시간: ${startAtStr ?? ''}${endAtStr != null ? ' - $endAtStr' : ''}',
+              Utils.mainContext.tr.agent_action_confirm_time(startAtStr ?? '', endAtStr != null ? ' - $endAtStr' : ''),
               style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
             ),
           ),

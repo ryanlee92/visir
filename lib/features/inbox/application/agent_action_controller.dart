@@ -1091,15 +1091,11 @@ class AgentActionController extends _$AgentActionController {
   String _getFunctionConfirmationMessage(String functionName, Map<String, dynamic> args) {
     switch (functionName) {
       case 'sendMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        final subject = args['subject'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_send_mail(to, subject);
+        return Utils.mainContext.tr.agent_action_confirm_send_mail;
       case 'replyMail':
-        final subject = args['subject'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_reply_mail(subject);
+        return Utils.mainContext.tr.agent_action_confirm_reply_mail;
       case 'forwardMail':
-        final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_forward_mail(to);
+        return Utils.mainContext.tr.agent_action_confirm_forward_mail;
       case 'deleteTask':
         return Utils.mainContext.tr.agent_action_confirm_delete_task;
       case 'deleteEvent':
@@ -1107,11 +1103,9 @@ class AgentActionController extends _$AgentActionController {
       case 'deleteMail':
         return Utils.mainContext.tr.agent_action_confirm_delete_mail;
       case 'updateTask':
-        final title = args['title'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_update_task(title);
+        return Utils.mainContext.tr.agent_action_confirm_update_task;
       case 'updateEvent':
-        final title = args['title'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_update_event(title);
+        return Utils.mainContext.tr.agent_action_confirm_update_event;
       case 'markMailAsRead':
         return Utils.mainContext.tr.agent_action_confirm_mark_mail_read;
       case 'markMailAsUnread':
@@ -1122,11 +1116,9 @@ class AgentActionController extends _$AgentActionController {
         final response = args['response'] as String? ?? '';
         return Utils.mainContext.tr.agent_action_confirm_response_calendar_invitation(response);
       case 'createTask':
-        final title = args['title'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_create_task(title);
+        return Utils.mainContext.tr.agent_action_confirm_create_task;
       case 'createEvent':
-        final title = args['title'] as String? ?? '';
-        return Utils.mainContext.tr.agent_action_confirm_create_event(title);
+        return Utils.mainContext.tr.agent_action_confirm_create_event;
       default:
         return Utils.mainContext.tr.agent_action_confirm_execute_action;
     }

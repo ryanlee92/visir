@@ -7344,20 +7344,20 @@ abstract class AppLocalizations {
   /// No description provided for @agent_action_confirm_send_mail.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to send the following email?\n\nTo: {to}\nSubject: {subject}'**
-  String agent_action_confirm_send_mail(String to, String subject);
+  /// **'Would you like to send the following email?'**
+  String get agent_action_confirm_send_mail;
 
   /// No description provided for @agent_action_confirm_reply_mail.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to send a reply to this email?\n\nSubject: {subject}'**
-  String agent_action_confirm_reply_mail(String subject);
+  /// **'Would you like to send a reply to this email?'**
+  String get agent_action_confirm_reply_mail;
 
   /// No description provided for @agent_action_confirm_forward_mail.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to forward this email to the following address?\n\nTo: {to}'**
-  String agent_action_confirm_forward_mail(String to);
+  /// **'Would you like to forward this email?'**
+  String get agent_action_confirm_forward_mail;
 
   /// No description provided for @agent_action_confirm_delete_task.
   ///
@@ -7380,14 +7380,14 @@ abstract class AppLocalizations {
   /// No description provided for @agent_action_confirm_update_task.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to update this task?\n\nTitle: {title}'**
-  String agent_action_confirm_update_task(String title);
+  /// **'Would you like to update this task?'**
+  String get agent_action_confirm_update_task;
 
   /// No description provided for @agent_action_confirm_update_event.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to update this event?\n\nTitle: {title}'**
-  String agent_action_confirm_update_event(String title);
+  /// **'Would you like to update this event?'**
+  String get agent_action_confirm_update_event;
 
   /// No description provided for @agent_action_confirm_mark_mail_read.
   ///
@@ -7416,20 +7416,50 @@ abstract class AppLocalizations {
   /// No description provided for @agent_action_confirm_create_task.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to create the following task?\n\nTitle: {title}'**
-  String agent_action_confirm_create_task(String title);
+  /// **'Would you like to create the following task?'**
+  String get agent_action_confirm_create_task;
 
   /// No description provided for @agent_action_confirm_create_event.
   ///
   /// In en, this message translates to:
-  /// **'Would you like to create the following event?\n\nTitle: {title}'**
-  String agent_action_confirm_create_event(String title);
+  /// **'Would you like to create the following event?'**
+  String get agent_action_confirm_create_event;
 
   /// No description provided for @agent_action_confirm_execute_action.
   ///
   /// In en, this message translates to:
   /// **'Would you like to execute this action?'**
   String get agent_action_confirm_execute_action;
+
+  /// No description provided for @agent_action_confirm_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title: {title}'**
+  String agent_action_confirm_title(String title);
+
+  /// No description provided for @agent_action_confirm_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time: {startTime}{endTime}'**
+  String agent_action_confirm_time(String startTime, String endTime);
+
+  /// No description provided for @agent_action_confirm_recipient_to.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get agent_action_confirm_recipient_to;
+
+  /// No description provided for @agent_action_confirm_recipient_cc.
+  ///
+  /// In en, this message translates to:
+  /// **'CC'**
+  String get agent_action_confirm_recipient_cc;
+
+  /// No description provided for @agent_action_confirm_recipient_bcc.
+  ///
+  /// In en, this message translates to:
+  /// **'BCC'**
+  String get agent_action_confirm_recipient_bcc;
 
   /// No description provided for @agent_action_task_completed.
   ///

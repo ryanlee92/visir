@@ -4083,19 +4083,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Create an event';
 
   @override
-  String agent_action_confirm_send_mail(String to, String subject) {
-    return 'Would you like to send the following email?\n\nTo: $to\nSubject: $subject';
-  }
+  String get agent_action_confirm_send_mail =>
+      'Would you like to send the following email?';
 
   @override
-  String agent_action_confirm_reply_mail(String subject) {
-    return 'Would you like to send a reply to this email?\n\nSubject: $subject';
-  }
+  String get agent_action_confirm_reply_mail =>
+      'Would you like to send a reply to this email?';
 
   @override
-  String agent_action_confirm_forward_mail(String to) {
-    return 'Would you like to forward this email to the following address?\n\nTo: $to';
-  }
+  String get agent_action_confirm_forward_mail =>
+      'Would you like to forward this email?';
 
   @override
   String get agent_action_confirm_delete_task =>
@@ -4110,14 +4107,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Would you like to delete this email?';
 
   @override
-  String agent_action_confirm_update_task(String title) {
-    return 'Would you like to update this task?\n\nTitle: $title';
-  }
+  String get agent_action_confirm_update_task =>
+      'Would you like to update this task?';
 
   @override
-  String agent_action_confirm_update_event(String title) {
-    return 'Would you like to update this event?\n\nTitle: $title';
-  }
+  String get agent_action_confirm_update_event =>
+      'Would you like to update this event?';
 
   @override
   String get agent_action_confirm_mark_mail_read =>
@@ -4137,18 +4132,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String agent_action_confirm_create_task(String title) {
-    return 'Would you like to create the following task?\n\nTitle: $title';
-  }
+  String get agent_action_confirm_create_task =>
+      'Would you like to create the following task?';
 
   @override
-  String agent_action_confirm_create_event(String title) {
-    return 'Would you like to create the following event?\n\nTitle: $title';
-  }
+  String get agent_action_confirm_create_event =>
+      'Would you like to create the following event?';
 
   @override
   String get agent_action_confirm_execute_action =>
       'Would you like to execute this action?';
+
+  @override
+  String agent_action_confirm_title(String title) {
+    return 'Title: $title';
+  }
+
+  @override
+  String agent_action_confirm_time(String startTime, String endTime) {
+    return 'Time: $startTime$endTime';
+  }
+
+  @override
+  String get agent_action_confirm_recipient_to => 'To';
+
+  @override
+  String get agent_action_confirm_recipient_cc => 'CC';
+
+  @override
+  String get agent_action_confirm_recipient_bcc => 'BCC';
 
   @override
   String get agent_action_task_completed => 'Task completed successfully.';
