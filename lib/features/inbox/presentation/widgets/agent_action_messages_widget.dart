@@ -1375,12 +1375,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                 }
               }
 
-              // Parse mail data - reply 필드 또는 message 필드 모두 지원 (forward는 message, reply는 reply)
-              // 빈 문자열도 허용 (forward의 경우 메시지 없이 포워딩 가능)
-
-              // Always use jsonData as mailData (it contains reply/message, to, cc, bcc, suggest_reply_all)
               final mailData = jsonData;
-              // reply 필드가 없으면 message 필드를 reply로 사용
               if (mailData['reply'] == null && mailData['message'] != null) {
                 mailData['reply'] = mailData['message'];
               }
@@ -2310,14 +2305,11 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 ],
                               ),
                             ),
-
-                            // Removed old batch confirmation UI
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
-                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0) + 1, // +1 for confirm button
+                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0) + 1,
                                 itemBuilder: (context, index) {
-                                  // Check if this is the confirm button index
                                   final state = ref.watch(agentActionControllerProvider);
                                   final pendingCalls = state.pendingFunctionCalls ?? [];
                                   final writeActions = pendingCalls.where((call) {
@@ -2330,7 +2322,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   final confirmButtonIndex = messagesLength + loadingItemCount;
 
                                   if (index == confirmButtonIndex) {
-                                    // Render confirm button as last item
                                     if (writeActions.isEmpty) {
                                       return const SizedBox.shrink();
                                     }
@@ -2363,7 +2354,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                               ),
                                               onTap: () async {
                                                 final controller = ref.read(agentActionControllerProvider.notifier);
-                                                // Confirm all write actions
                                                 for (final call in writeActions) {
                                                   final actionId = call['action_id'] as String? ?? '';
                                                   if (actionId.isNotEmpty) {
@@ -2413,23 +2403,18 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   final message = agentAction.messages[index];
                                   final isUser = message.role == 'user';
 
-                                  // Extract tagged projects for this message
                                   final taggedProjects = _extractTaggedProjects(message.content);
-
-                                  // Check for pending write actions related to this message
                                   final isLastMessage = index == agentAction.messages.length - 1;
 
-                                  // Find write actions that need confirmation (remove duplicates by action_id and function args)
                                   final writeActionsForMessage = <Map<String, dynamic>>[];
                                   final seenActionIds = <String>{};
-                                  final seenFunctionSignatures = <String>{}; // Track function name + args to prevent true duplicates
+                                  final seenFunctionSignatures = <String>{};
                                   for (final call in pendingCalls) {
                                     final functionName = call['function_name'] as String? ?? '';
                                     final actionId = call['action_id'] as String? ?? '';
                                     final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
 
                                     if (_isWriteAction(functionName) && actionId.isNotEmpty) {
-                                      // Create a signature based on function name and key args (title, startAt for tasks/events)
                                       String signature = functionName;
                                       if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
                                         final title = functionArgs['title'] as String? ?? '';
@@ -2437,7 +2422,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                         signature = '$functionName|$title|$startAt';
                                       }
 
-                                      // Only add if we haven't seen this action_id OR this exact function signature
                                       if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
                                         seenActionIds.add(actionId);
                                         seenFunctionSignatures.add(signature);
@@ -2469,7 +2453,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             Expanded(child: _buildMessageContent(context, message.content, isUser)),
                                           ],
                                         ),
-                                        // Display write action confirmations for last message (without individual confirm buttons)
                                         if (isLastMessage && writeActionsForMessage.isNotEmpty) ...[
                                           const SizedBox(height: 6),
                                           ...writeActionsForMessage.map((call) {
@@ -2477,7 +2460,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
                                             final actionId = call['action_id'] as String? ?? '';
 
-                                            // Render entity widget without confirm button (confirm button is at message level)
                                             if (functionName == 'createTask' || functionName == 'updateTask') {
                                               return Padding(
                                                 padding: const EdgeInsets.only(bottom: 0),
@@ -2489,7 +2471,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                                 child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else {
-                                              // For other write actions, show confirmation widget without button
                                               return Padding(
                                                 padding: const EdgeInsets.only(bottom: 0),
                                                 child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
@@ -2835,23 +2816,18 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // pending 상태 확인
     final state = ref.watch(agentActionControllerProvider);
     final pendingCalls = state.pendingFunctionCalls ?? [];
     final isPending = pendingCalls.any((call) => call['action_id'] == widget.actionId);
 
-    // 이미 확인된 경우 빈 위젯 반환
     if (!isPending) {
       return const SizedBox.shrink();
     }
 
-    // 현재 메시지가 마지막 메시지인지 확인
     final messages = state.messages;
     if (messages.isEmpty) {
       return const SizedBox.shrink();
     }
-
-    // pendingFunctionCalls는 항상 마지막 메시지와 관련되므로 항상 표시
 
     return Focus(
       focusNode: _focusNode,
@@ -2883,9 +2859,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Checkbox for batch selection
             Text(widget.confirmationMessage, style: context.bodyMedium?.copyWith(color: widget.isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5)),
-            // Action details based on function type
             if (widget.functionName == 'sendMail' || widget.functionName == 'replyMail' || widget.functionName == 'forwardMail') ...[
               _buildMailActionDetailsForConfirm(context, widget.functionName, widget.functionArgs, widget.isUser),
             ] else if (widget.functionName == 'createTask' || widget.functionName == 'updateTask') ...[
@@ -2894,7 +2868,6 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ],
             const SizedBox(height: 0),
-            // Confirm button - pendingFunctionCalls는 항상 마지막 메시지와 관련되므로 항상 표시
             if (!_isProcessing)
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
