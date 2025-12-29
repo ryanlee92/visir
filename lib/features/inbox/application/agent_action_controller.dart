@@ -2022,10 +2022,38 @@ class AgentActionController extends _$AgentActionController {
     if (actionIds.isEmpty) return;
 
     final pendingCalls = state.pendingFunctionCalls ?? [];
-    final callsToExecute = pendingCalls.where((call) {
+    // actionIds에 포함된 항목들을 필터링하고 중복 제거
+    final filteredCalls = pendingCalls.where((call) {
       final callActionId = call['action_id'] as String?;
       return callActionId != null && actionIds.contains(callActionId);
     }).toList();
+
+    // 중복 제거: 같은 함수와 인자를 가진 호출은 하나만 실행
+    final callsToExecute = <Map<String, dynamic>>[];
+    final seenActionIds = <String>{};
+    final seenFunctionSignatures = <String>{};
+    
+    for (final call in filteredCalls) {
+      final functionName = call['function_name'] as String? ?? '';
+      final actionId = call['action_id'] as String? ?? '';
+      final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+      
+      // signature 생성 (UI에서 사용하는 것과 동일한 로직)
+      String signature = functionName;
+      if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
+        final title = functionArgs['title'] as String? ?? '';
+        final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
+        final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
+        signature = '$functionName|$title|$startAt|$endAt';
+      }
+      
+      // action_id와 signature 모두 확인하여 중복 제거
+      if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
+        seenActionIds.add(actionId);
+        seenFunctionSignatures.add(signature);
+        callsToExecute.add(call);
+      }
+    }
 
     if (callsToExecute.isEmpty) {
       return;
@@ -2035,8 +2063,8 @@ class AgentActionController extends _$AgentActionController {
     state = state.copyWith(isLoading: true);
 
     final executor = McpFunctionExecutor(ref);
-    final successMessages = <String>[];
-    final errorMessages = <String>[];
+    // 각 함수 호출의 결과를 직접 추적
+    final functionResults = <Map<String, dynamic>>[];
 
     // 각 액션을 순차적으로 실행 (의존성 고려)
     for (final pendingCall in callsToExecute) {
@@ -2070,47 +2098,60 @@ class AgentActionController extends _$AgentActionController {
 
         if (result['success'] == true) {
           final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-          successMessages.add(message);
+          functionResults.add({
+            'function_name': functionName,
+            'success': true,
+            'message': message,
+          });
         } else {
           final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
-          errorMessages.add('$functionName: $error');
+          functionResults.add({
+            'function_name': functionName,
+            'success': false,
+            'error': error,
+          });
         }
       } catch (e) {
-        errorMessages.add(Utils.mainContext.tr.agent_action_error_occurred_during_execution_with_function(functionName, e.toString()));
+        functionResults.add({
+          'function_name': functionName,
+          'success': false,
+          'error': e.toString(),
+        });
       }
     }
 
     // 함수 실행 결과를 AI에게 전달하여 적절한 메시지 생성
     String resultMessage;
 
-    // 함수 실행 결과 요약 생성
+    // 함수 실행 결과 요약 생성 - 실제 실행된 함수 호출 개수와 결과를 정확히 전달
     final functionResultsSummary = <String>[];
-    for (var i = 0; i < callsToExecute.length; i++) {
-      final call = callsToExecute[i];
-      final functionName = call['function_name'] as String? ?? '';
-
-      // 해당 함수의 실행 결과 찾기
-      if (i < successMessages.length) {
-        final message = successMessages[i];
+    for (final result in functionResults) {
+      final functionName = result['function_name'] as String? ?? '';
+      final success = result['success'] as bool? ?? false;
+      
+      if (success) {
+        final message = result['message'] as String? ?? '';
         if (message.isNotEmpty) {
           functionResultsSummary.add('$functionName: $message');
         } else {
           functionResultsSummary.add('$functionName: completed successfully');
         }
       } else {
-        final errorIndex = i - successMessages.length;
-        if (errorIndex < errorMessages.length) {
-          final error = errorMessages[errorIndex];
-          functionResultsSummary.add('$functionName: failed - $error');
-        }
+        final error = result['error'] as String? ?? '';
+        functionResultsSummary.add('$functionName: failed - $error');
       }
     }
+    
+    // 실제 실행된 함수 호출 개수를 명확히 전달
+    final executedCount = functionResults.length;
+    final successCount = functionResults.where((r) => r['success'] == true).length;
+    final errorCount = functionResults.where((r) => r['success'] == false).length;
 
     // 함수 실행 결과를 AI에게 전달하여 메시지 생성
     if (functionResultsSummary.isNotEmpty) {
       final functionResultsText = functionResultsSummary.join('\n');
       final functionResultsPrompt =
-          'The following functions were executed:\n$functionResultsText\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear.';
+          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.';
 
       // 함수 실행 결과를 포함한 메시지로 AI 호출
       final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt)];
@@ -2154,26 +2195,38 @@ class AgentActionController extends _$AgentActionController {
           resultMessage = resultMessage.replaceAll(RegExp(r'<function_call>.*?</function_call>', dotAll: true), '').trim();
         } else {
           // AI 호출 실패 시 기본 메시지 사용
-          if (errorMessages.isEmpty) {
-            resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+          final successResults = functionResults.where((r) => r['success'] == true).toList();
+          final errorResults = functionResults.where((r) => r['success'] == false).toList();
+          if (errorResults.isEmpty) {
+            final messages = successResults.map((r) => r['message'] as String? ?? '').where((m) => m.isNotEmpty).toList();
+            resultMessage = messages.isNotEmpty ? messages.join('\n\n') : '';
           } else {
-            resultMessage = errorMessages.join('\n\n');
+            final errors = errorResults.map((r) => '${r['function_name']}: ${r['error']}').toList();
+            resultMessage = errors.join('\n\n');
           }
         }
       } catch (e) {
         // AI 호출 실패 시 기본 메시지 사용
-        if (errorMessages.isEmpty) {
-          resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+        final successResults = functionResults.where((r) => r['success'] == true).toList();
+        final errorResults = functionResults.where((r) => r['success'] == false).toList();
+        if (errorResults.isEmpty) {
+          final messages = successResults.map((r) => r['message'] as String? ?? '').where((m) => m.isNotEmpty).toList();
+          resultMessage = messages.isNotEmpty ? messages.join('\n\n') : '';
         } else {
-          resultMessage = errorMessages.join('\n\n');
+          final errors = errorResults.map((r) => '${r['function_name']}: ${r['error']}').toList();
+          resultMessage = errors.join('\n\n');
         }
       }
     } else {
       // 함수 실행 결과가 없으면 기본 메시지 사용
-      if (errorMessages.isEmpty) {
-        resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+      final successResults = functionResults.where((r) => r['success'] == true).toList();
+      final errorResults = functionResults.where((r) => r['success'] == false).toList();
+      if (errorResults.isEmpty) {
+        final messages = successResults.map((r) => r['message'] as String? ?? '').where((m) => m.isNotEmpty).toList();
+        resultMessage = messages.isNotEmpty ? messages.join('\n\n') : '';
       } else {
-        resultMessage = errorMessages.join('\n\n');
+        final errors = errorResults.map((r) => '${r['function_name']}: ${r['error']}').toList();
+        resultMessage = errors.join('\n\n');
       }
     }
 
