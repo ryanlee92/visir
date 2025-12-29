@@ -322,6 +322,17 @@ class AgentActionController extends _$AgentActionController {
     // updatedMessages가 제공되지 않으면 새로 생성
     final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: userMessage)];
 
+    // 재귀 호출인 경우, conversation history의 마지막 user 메시지를 사용
+    // (이미 updatedMessages에 첫 번째 응답이 포함되어 있으므로, 같은 userMessage를 다시 추가하지 않음)
+    final actualUserMessage = isRecursiveCall && updatedMessages != null && messages.isNotEmpty
+        ? (messages
+              .lastWhere(
+                (m) => m.role == 'user',
+                orElse: () => AgentActionMessage(role: 'user', content: userMessage),
+              )
+              .content)
+        : userMessage;
+
     // 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 자동으로 로드할 inbox 찾기
     Set<int> autoDetectedFromUserQuery = {};
     if (inboxes != null && inboxes.isNotEmpty) {
@@ -440,8 +451,9 @@ class AgentActionController extends _$AgentActionController {
 
       // 일반적인 AI 응답 생성 (MCP 함수 호출 지원)
       // AI에 전달할 때는 평문이어야 하므로 local: true 사용
+      // 재귀 호출인 경우 conversation history의 마지막 user 메시지를 사용
       final response = await _repository.generateGeneralChat(
-        userMessage: userMessage,
+        userMessage: actualUserMessage,
         conversationHistory: messages.map((m) => m.toJson(local: true)).toList(),
         projectContext: projectContext,
         taggedContext: taggedContext.isNotEmpty ? taggedContext : null,
@@ -873,6 +885,8 @@ class AgentActionController extends _$AgentActionController {
                   state = state.copyWith(loadedInboxNumbers: updatedLoadedNumbers, isLoading: true);
 
                   // 재요청 (같은 사용자 메시지로, _generateGeneralChat 직접 호출)
+                  // 재귀 호출에서는 첫 번째 응답을 포함한 messages를 전달하되,
+                  // 재귀 호출 내부에서는 마지막 user 메시지를 사용하여 AI를 호출
                   await _generateGeneralChat(
                     userMessage,
                     selectedProject: selectedProject,
@@ -906,7 +920,17 @@ class AgentActionController extends _$AgentActionController {
           if (isRecursiveCall) {
             print('[AI_AGENT] _generateGeneralChat END (recursive) - isRecursiveCall: $isRecursiveCall, messagesCount: ${updatedMessagesWithResponse.length}');
             // 재귀 호출 완료 시 로딩 상태 해제
-            state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
+            // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
+            // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
+            // 최종 메시지: [user, assistant(두 번째)]만 남김
+            final finalMessages =
+                updatedMessagesWithResponse.length >= 3 &&
+                    updatedMessagesWithResponse[0].role == 'user' &&
+                    updatedMessagesWithResponse[1].role == 'assistant' &&
+                    updatedMessagesWithResponse[2].role == 'assistant'
+                ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
+                : updatedMessagesWithResponse;
+            state = state.copyWith(messages: finalMessages, isLoading: false);
             return;
           }
 

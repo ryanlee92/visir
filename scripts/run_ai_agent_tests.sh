@@ -60,3 +60,4 @@ if [ "$1" == "--all" ]; then
     flutter test test/features/inbox/
 fi
 
+

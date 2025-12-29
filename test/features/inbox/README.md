@@ -127,3 +127,4 @@ flutter test --coverage test/features/inbox/
 ### Mock 객체 필요 시
 `test/mock_state_notifier.dart`를 참고하여 mock 객체 생성
 
+
