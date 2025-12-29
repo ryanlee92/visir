@@ -1091,34 +1091,146 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     // If both HTML and Markdown are present, convert Markdown parts to HTML
     String finalContent = cleanedContent;
     if (isHtml && isMarkdown) {
-      // Extract HTML tags and their positions
-      final htmlTags = <({int start, int end, String tag})>[];
-      final htmlTagMatches = htmlTagRegex.allMatches(cleanedContent);
+      // Extract HTML tags (both opening and closing) and their positions
+      // This regex matches both opening tags (<tag>) and closing tags (</tag>)
+      // Excludes custom inapp_ and tagged_ tags
+      final htmlTagRegexFull = RegExp(r'</?(?!(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
+
+      // Track HTML tag pairs (opening + closing) to identify HTML content ranges
+      final htmlTagPairs = <({int openStart, int openEnd, int closeStart, int closeEnd, String tagName})>[];
+      final htmlTagMatches = htmlTagRegexFull.allMatches(cleanedContent).toList();
+
+      // Build a stack to track nested HTML tags and find their closing tags
+      final tagStack = <({int start, int end, String tagName})>[];
+      final processedIndices = <int>{};
+
       for (final match in htmlTagMatches) {
-        htmlTags.add((start: match.start, end: match.end, tag: match.group(0)!));
+        if (processedIndices.contains(match.start)) continue;
+
+        final tagContent = match.group(0)!;
+        final isClosingTag = tagContent.startsWith('</');
+
+        if (isClosingTag) {
+          // Find matching opening tag
+          final tagName = tagContent.substring(2, tagContent.length - 1).split(' ')[0].toLowerCase();
+          while (tagStack.isNotEmpty) {
+            final opening = tagStack.removeLast();
+            if (opening.tagName == tagName) {
+              // Found matching pair
+              htmlTagPairs.add((openStart: opening.start, openEnd: opening.end, closeStart: match.start, closeEnd: match.end, tagName: tagName));
+              processedIndices.add(opening.start);
+              processedIndices.add(match.start);
+              break;
+            }
+          }
+        } else {
+          // Opening tag - extract tag name
+          final tagName = tagContent.substring(1, tagContent.length - 1).split(' ')[0].toLowerCase();
+          // Skip self-closing tags (like <br/>, <img/>, etc.)
+          if (!tagContent.endsWith('/>')) {
+            tagStack.add((start: match.start, end: match.end, tagName: tagName));
+          } else {
+            // Self-closing tag - no inner content to process
+            processedIndices.add(match.start);
+          }
+        }
       }
 
-      // Split content by HTML tags and convert markdown parts to HTML
+      // Sort pairs by start position
+      htmlTagPairs.sort((a, b) => a.openStart.compareTo(b.openStart));
+
+      // Process HTML tag pairs in reverse order to maintain positions
       String processedContent = cleanedContent;
 
-      // Find markdown sections (between HTML tags or at start/end)
+      // First, convert markdown inside HTML tags
+      for (final pair in htmlTagPairs.reversed) {
+        // Extract inner content (between opening and closing tags)
+        final innerContent = cleanedContent.substring(pair.openEnd, pair.closeStart);
+
+        if (innerContent.trim().isNotEmpty) {
+          try {
+            // Check if inner content contains markdown patterns
+            final hasMarkdownInInner = _isMarkdownContent(innerContent);
+
+            if (hasMarkdownInInner) {
+              // Convert markdown inside HTML tag to HTML
+              final htmlFromMarkdown = md.markdownToHtml(innerContent);
+              // Clean up the converted HTML (remove outer <p> tags if the parent is already a block element)
+              String cleanedInnerHtml = htmlFromMarkdown;
+
+              // If markdown converter wrapped content in <p> tags, we might want to remove them
+              // for inline elements, but keep them for block elements
+              final blockElements = {'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li'};
+              if (!blockElements.contains(pair.tagName)) {
+                // For inline elements, remove outer <p> tags
+                cleanedInnerHtml = cleanedInnerHtml.replaceAllMapped(RegExp(r'^<p>(.*?)</p>$', dotAll: true), (m) => m.group(1) ?? '');
+              }
+
+              // Replace inner content with converted HTML
+              processedContent = processedContent.substring(0, pair.openEnd) + cleanedInnerHtml + processedContent.substring(pair.closeStart);
+            }
+          } catch (e) {
+            // If conversion fails, keep original inner content
+          }
+        }
+      }
+
+      // Update cleanedContent to reflect inner conversions
+      cleanedContent = processedContent;
+
+      // Now find and convert markdown sections outside HTML tags
+      // Re-extract HTML tag positions after inner conversions
+      final updatedHtmlTagMatches = htmlTagRegexFull.allMatches(cleanedContent).toList();
+      final updatedHtmlRanges = <({int start, int end})>[];
+      final updatedTagStack = <({int start, String tagName})>[];
+      final updatedProcessedIndices = <int>{};
+
+      for (final match in updatedHtmlTagMatches) {
+        if (updatedProcessedIndices.contains(match.start)) continue;
+
+        final tagContent = match.group(0)!;
+        final isClosingTag = tagContent.startsWith('</');
+
+        if (isClosingTag) {
+          final tagName = tagContent.substring(2, tagContent.length - 1).split(' ')[0].toLowerCase();
+          while (updatedTagStack.isNotEmpty) {
+            final opening = updatedTagStack.removeLast();
+            if (opening.tagName == tagName) {
+              updatedHtmlRanges.add((start: opening.start, end: match.end));
+              updatedProcessedIndices.add(opening.start);
+              updatedProcessedIndices.add(match.start);
+              break;
+            }
+          }
+        } else {
+          final tagName = tagContent.substring(1, tagContent.length - 1).split(' ')[0].toLowerCase();
+          if (!tagContent.endsWith('/>')) {
+            updatedTagStack.add((start: match.start, tagName: tagName));
+          } else {
+            updatedHtmlRanges.add((start: match.start, end: match.end));
+            updatedProcessedIndices.add(match.start);
+          }
+        }
+      }
+
+      updatedHtmlRanges.sort((a, b) => a.start.compareTo(b.start));
+
+      // Find markdown sections (outside HTML tags)
       final markdownSections = <({int start, int end})>[];
       int lastEnd = 0;
 
-      for (final htmlTag in htmlTags) {
-        if (htmlTag.start > lastEnd) {
-          // There's text between last HTML tag and this one
-          markdownSections.add((start: lastEnd, end: htmlTag.start));
+      for (final htmlRange in updatedHtmlRanges) {
+        if (htmlRange.start > lastEnd) {
+          markdownSections.add((start: lastEnd, end: htmlRange.start));
         }
-        lastEnd = htmlTag.end;
+        lastEnd = htmlRange.end > lastEnd ? htmlRange.end : lastEnd;
       }
 
-      // Add remaining text after last HTML tag
       if (lastEnd < cleanedContent.length) {
         markdownSections.add((start: lastEnd, end: cleanedContent.length));
       }
 
-      // Convert markdown sections to HTML (in reverse order to maintain positions)
+      // Convert markdown sections outside HTML tags to HTML
       for (final section in markdownSections.reversed) {
         final markdownText = cleanedContent.substring(section.start, section.end);
         if (markdownText.trim().isNotEmpty) {
