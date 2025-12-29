@@ -1948,10 +1948,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             child: isUser
                 ? IntrinsicWidth(
                     child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: context.outline, width: 1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
+                      decoration: BoxDecoration(color: context.primary.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       child: Text.rich(
                         TextSpan(
