@@ -7149,6 +7149,12 @@ abstract class AppLocalizations {
   /// **'Please provide the following information to send an email:\n- To recipients (required)\n- CC recipients (optional)\n- BCC recipients (optional)\n- Subject/title (required)\n- Body/content (required)\n\nYou can provide email addresses or names.'**
   String get agent_action_send_initial_message;
 
+  /// No description provided for @agent_action_send_request_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Send an email'**
+  String get agent_action_send_request_message;
+
   /// No description provided for @agent_action_email_thread_summary.
   ///
   /// In en, this message translates to:
@@ -7239,6 +7245,18 @@ abstract class AppLocalizations {
   /// **'Please write a reply to the email.'**
   String get agent_action_reply_fallback_message_no_inbox;
 
+  /// No description provided for @agent_action_reply_request_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to this email'**
+  String get agent_action_reply_request_message;
+
+  /// No description provided for @agent_action_reply_request_message_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to the email'**
+  String get agent_action_reply_request_message_no_inbox;
+
   /// No description provided for @agent_action_forward_fallback_message.
   ///
   /// In en, this message translates to:
@@ -7250,6 +7268,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please forward the email.'**
   String get agent_action_forward_fallback_message_no_inbox;
+
+  /// No description provided for @agent_action_forward_request_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward this email'**
+  String get agent_action_forward_request_message;
+
+  /// No description provided for @agent_action_forward_request_message_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward the email'**
+  String get agent_action_forward_request_message_no_inbox;
 
   /// No description provided for @agent_action_create_task_fallback_from_mail.
   ///
@@ -7269,6 +7299,18 @@ abstract class AppLocalizations {
   /// **'Please create a task.'**
   String get agent_action_create_task_fallback_no_inbox;
 
+  /// No description provided for @agent_action_create_task_request_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a task from this inbox item'**
+  String get agent_action_create_task_request_message;
+
+  /// No description provided for @agent_action_create_task_request_message_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a task'**
+  String get agent_action_create_task_request_message_no_inbox;
+
   /// No description provided for @agent_action_create_event_fallback_from_mail.
   ///
   /// In en, this message translates to:
@@ -7286,6 +7328,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please create an event.'**
   String get agent_action_create_event_fallback_no_inbox;
+
+  /// No description provided for @agent_action_create_event_request_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an event from this inbox item'**
+  String get agent_action_create_event_request_message;
+
+  /// No description provided for @agent_action_create_event_request_message_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an event'**
+  String get agent_action_create_event_request_message_no_inbox;
 
   /// No description provided for @agent_action_confirm_send_mail.
   ///

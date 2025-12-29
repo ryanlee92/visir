@@ -7,7 +7,6 @@ import 'package:Visir/features/common/presentation/utils/extensions/date_time_ex
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
-import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/dependency/rrule/src/recurrence_rule.dart';
@@ -39,7 +38,7 @@ import 'package:markdown/markdown.dart' as md;
 
 class AgentActionMessagesWidget extends ConsumerStatefulWidget {
   final double maxHeight;
-  AgentActionMessagesWidget({super.key, this.maxHeight = 500});
+  AgentActionMessagesWidget({super.key, this.maxHeight = 600});
 
   @override
   ConsumerState<AgentActionMessagesWidget> createState() => _AgentActionMessagesWidgetState();
@@ -647,11 +646,9 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       case 'deleteMail':
         return '이메일을 삭제하시겠습니까?';
       case 'updateTask':
-        final title = args['title'] as String? ?? '';
-        return '작업을 수정하시겠습니까?\n\n제목: $title';
+        return '작업을 수정하시겠습니까?';
       case 'updateEvent':
-        final title = args['title'] as String? ?? '';
-        return '일정을 수정하시겠습니까?\n\n제목: $title';
+        return '일정을 수정하시겠습니까?';
       case 'markMailAsRead':
         return '이메일을 읽음으로 표시하시겠습니까?';
       case 'markMailAsUnread':
@@ -662,11 +659,9 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         final response = args['response'] as String? ?? '';
         return '캘린더 초대에 "$response"로 응답하시겠습니까?';
       case 'createTask':
-        final title = args['title'] as String? ?? '';
-        return '다음 작업을 생성하시겠습니까?\n\n제목: $title';
+        return '다음 작업을 생성하시겠습니까?';
       case 'createEvent':
-        final title = args['title'] as String? ?? '';
-        return '다음 일정을 생성하시겠습니까?\n\n제목: $title';
+        return '다음 일정을 생성하시겠습니까?';
       default:
         return '이 작업을 실행하시겠습니까?';
     }
@@ -873,17 +868,50 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       }
     }
 
-    // Remove tagged item tags from content for display (but keep @mentions in text)
-    String cleanedContent = content
-        .replaceAll(taggedTaskRegex, '')
-        .replaceAll(taggedEventRegex, '')
-        .replaceAll(taggedConnectionRegex, '')
-        .replaceAll(taggedChannelRegex, '')
-        .replaceAll(taggedProjectRegex, '');
+    // Convert tagged_item tags to inapp_entity tags for UI rendering
+    String cleanedContent = content;
+
+    // Convert all tagged_task to inapp_task (process in reverse order to maintain positions)
+    final taggedTaskMatches = taggedTaskRegex.allMatches(content).toList();
+    for (final match in taggedTaskMatches.reversed) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          // Convert to inapp_task format
+          final inappTaskJson = jsonEncode(jsonData);
+          cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_task>$inappTaskJson</inapp_task>' + cleanedContent.substring(match.end);
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Convert all tagged_event to inapp_event (process in reverse order to maintain positions)
+    final taggedEventMatches = taggedEventRegex.allMatches(cleanedContent).toList();
+    for (final match in taggedEventMatches.reversed) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          // Convert to inapp_event format
+          final inappEventJson = jsonEncode(jsonData);
+          cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_event>$inappEventJson</inapp_event>' + cleanedContent.substring(match.end);
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Keep tagged_connection, tagged_channel, tagged_project for inline badge rendering
+    // They will be handled by HtmlWidget's customWidgetBuilder
+
+    // Check if content contains inapp_action_confirm tags (should be rendered as HTML)
+    final hasInappActionConfirm = RegExp(r'<inapp_action_confirm>', caseSensitive: false).hasMatch(cleanedContent);
 
     // Check if content is HTML (contains HTML tags, but exclude custom inapp tags)
     final htmlTagRegex = RegExp(r'<(?!/?(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
-    final isHtml = htmlTagRegex.hasMatch(cleanedContent);
+    final isHtml = htmlTagRegex.hasMatch(cleanedContent) || hasInappActionConfirm;
 
     // Check if content is Markdown (contains Markdown patterns)
     final isMarkdown = _isMarkdownContent(cleanedContent);
@@ -1654,6 +1682,16 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   // Skip invalid mail reply
                 }
                 break;
+              case 'inapp_action_confirm':
+                try {
+                  final functionName = jsonData['function_name'] as String? ?? '';
+                  final functionArgs = jsonData['function_args'] as Map<String, dynamic>? ?? {};
+                  final actionId = jsonData['action_id'] as String? ?? '';
+                  widget = _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser);
+                } catch (e) {
+                  // Skip invalid action confirm
+                }
+                break;
             }
 
             if (widget != null) {
@@ -1923,7 +1961,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   Flexible(
                     child: Text(
                       displayText,
-                      style: baseStyle?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurface, fontSize: (baseStyle?.fontSize ?? 14)),
+                      style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                        color: isUser ? context.onPrimaryContainer : context.onSurface,
+                        fontSize: (baseStyle?.fontSize ?? 14),
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -2078,14 +2119,14 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       child: isEmpty
           ? const SizedBox.shrink(key: ValueKey('empty'))
           : Transform.translate(
-              offset: Offset(0, PlatformX.isMobileView ? 0 : 12),
+              offset: Offset(0, PlatformX.isMobileView ? 0 : 0),
               child: AnimatedSize(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
                 clipBehavior: Clip.none,
                 child: Container(
-                  height: widget.maxHeight - (PlatformX.isMobileView ? 0 : VisirAppBar.height * 2 / 3 + 12),
-                  margin: EdgeInsets.only(top: PlatformX.isMobileView ? 0 : VisirAppBar.height * 2 / 3 - 12),
+                  height: widget.maxHeight - (PlatformX.isMobileView ? 0 : 0),
+                  margin: EdgeInsets.only(top: PlatformX.isMobileView ? 0 : 0),
                   decoration: BoxDecoration(
                     color: context.background,
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 6, offset: Offset(0, 4), spreadRadius: 0)],
@@ -2096,6 +2137,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                     borderRadius: borderRadius,
                     child: SelectionArea(
                       child: Container(
+                        color: context.surface.withValues(alpha: 0.25),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2479,22 +2521,21 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                 style: context.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : context.onSurface),
               ),
             ),
-          if (startDate != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                children: [
-                  VisirIcon(type: VisirIconType.clock, size: 14, color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
-                  const SizedBox(width: 4),
-                  Text(
-                    isAllDay
-                        ? '${startDate.forceDateString}${endDate != null && endDate != startDate ? ' - ${endDate.forceDateString}' : ''} • ${context.tr.all_day}'
-                        : '${startDate.forceDateTimeString}${endDate != null ? ' - ${endDate.forceDateTimeString}' : ''}',
-                    style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
-                  ),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              children: [
+                VisirIcon(type: VisirIconType.clock, size: 14, color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                const SizedBox(width: 4),
+                Text(
+                  isAllDay
+                      ? '${startDate.forceDateString}${endDate != startDate ? ' - ${endDate.forceDateString}' : ''} • ${context.tr.all_day}'
+                      : '${startDate.forceDateTimeString} - ${endDate.forceDateTimeString}',
+                  style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                ),
+              ],
             ),
+          ),
           if (location.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
@@ -2637,24 +2678,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Checkbox for batch selection
-            Row(
-              children: [
-                Checkbox(
-                  value: state.selectedActionIds.contains(widget.actionId),
-                  onChanged: !_isProcessing
-                      ? (value) {
-                          ref.read(agentActionControllerProvider.notifier).toggleActionSelection(widget.actionId);
-                        }
-                      : null,
-                ),
-                Expanded(
-                  child: Text(
-                    widget.confirmationMessage,
-                    style: context.bodyMedium?.copyWith(color: widget.isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5),
-                  ),
-                ),
-              ],
-            ),
+            Text(widget.confirmationMessage, style: context.bodyMedium?.copyWith(color: widget.isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5)),
             // Action details based on function type
             if (widget.functionName == 'sendMail' || widget.functionName == 'replyMail' || widget.functionName == 'forwardMail') ...[
               _buildMailActionDetailsForConfirm(context, widget.functionName, widget.functionArgs, widget.isUser),
@@ -2752,16 +2776,14 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               '제목: $title',
-              style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
             ),
           ),
         ],
         if (description.isNotEmpty) ...[
-          Text(
-            description,
-            style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(description, style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
           ),
         ],
       ],
@@ -2771,8 +2793,8 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
   Widget _buildEventActionDetailsForConfirm(BuildContext context, Map<String, dynamic> args, bool isUser) {
     final title = args['title'] as String? ?? '';
     final description = args['description'] as String? ?? '';
-    final startAtStr = args['start_at'] as String?;
-    final endAtStr = args['end_at'] as String?;
+    final startAtStr = args['startAt'] as String? ?? args['start_at'] as String?;
+    final endAtStr = args['endAt'] as String? ?? args['end_at'] as String?;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2782,8 +2804,14 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               '제목: $title',
-              style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, fontWeight: FontWeight.bold),
             ),
+          ),
+        ],
+        if (description.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(description, style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
           ),
         ],
         if (startAtStr != null || endAtStr != null) ...[
@@ -2791,16 +2819,8 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               '시간: ${startAtStr ?? ''}${endAtStr != null ? ' - $endAtStr' : ''}',
-              style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
             ),
-          ),
-        ],
-        if (description.isNotEmpty) ...[
-          Text(
-            description,
-            style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ],

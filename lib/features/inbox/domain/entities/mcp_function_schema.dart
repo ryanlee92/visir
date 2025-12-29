@@ -68,6 +68,9 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'endAt', type: 'string', description: '종료 날짜/시간 (ISO 8601 형식, 선택사항)'),
           McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 작업 여부 (기본값: false)'),
           McpFunctionParameter(name: 'status', type: 'string', description: '작업 상태', enumValues: ['none', 'done', 'cancelled']),
+          McpFunctionParameter(name: 'from', type: 'string', description: '작업이 생성된 소스 (예: GitHub, Email 등, 선택사항)'),
+          McpFunctionParameter(name: 'subject', type: 'string', description: '원본 제목 또는 주제 (선택사항)'),
+          McpFunctionParameter(name: 'actionNeeded', type: 'string', description: '필요한 액션 설명 (선택사항)'),
         ],
       ),
       McpFunctionSchema(
@@ -113,6 +116,9 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'location', type: 'string', description: '장소 (선택사항)'),
           McpFunctionParameter(name: 'attendees', type: 'array', description: '참석자 이메일 목록 (선택사항)'),
           McpFunctionParameter(name: 'conferenceLink', type: 'string', description: '화상회의 링크 (선택사항, "added"로 설정하면 자동 생성)'),
+          McpFunctionParameter(name: 'from', type: 'string', description: '일정이 생성된 소스 (예: GitHub, Email 등, 선택사항)'),
+          McpFunctionParameter(name: 'subject', type: 'string', description: '원본 제목 또는 주제 (선택사항)'),
+          McpFunctionParameter(name: 'actionNeeded', type: 'string', description: '필요한 액션 설명 (선택사항)'),
         ],
       ),
       McpFunctionSchema(

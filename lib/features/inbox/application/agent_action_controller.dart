@@ -182,51 +182,38 @@ class AgentActionController extends _$AgentActionController {
 
     switch (actionType) {
       case AgentActionType.send:
-        autoMessage = Utils.mainContext.tr.agent_action_send_initial_message;
+        autoMessage = Utils.mainContext.tr.agent_action_send_request_message;
         break;
       case AgentActionType.reply:
         if (inbox != null) {
-          final autoMsg = Utils.mainContext.tr.agent_action_reply_initial_message('').replaceAll('{contextInfo}', '').trim();
-          autoMessage = autoMsg.isNotEmpty ? autoMsg : Utils.mainContext.tr.agent_action_reply_fallback_message;
+          autoMessage = Utils.mainContext.tr.agent_action_reply_request_message;
           inboxesForContext = [inbox];
         } else {
-          autoMessage = Utils.mainContext.tr.agent_action_reply_fallback_message_no_inbox;
+          autoMessage = Utils.mainContext.tr.agent_action_reply_request_message_no_inbox;
         }
         break;
       case AgentActionType.forward:
         if (inbox != null) {
-          autoMessage = Utils.mainContext.tr.agent_action_forward_fallback_message;
+          autoMessage = Utils.mainContext.tr.agent_action_forward_request_message;
           inboxesForContext = [inbox];
         } else {
-          autoMessage = Utils.mainContext.tr.agent_action_forward_fallback_message_no_inbox;
+          autoMessage = Utils.mainContext.tr.agent_action_forward_request_message_no_inbox;
         }
         break;
       case AgentActionType.createTask:
         if (inbox != null) {
-          final autoMsg = Utils.mainContext.tr.agent_action_create_task_initial_message('').replaceAll('{contextInfo}', '').replaceAll('\n\n\n', '\n\n').trim();
-          autoMessage = autoMsg.isNotEmpty
-              ? autoMsg
-              : (inbox.linkedMail != null ? Utils.mainContext.tr.agent_action_create_task_fallback_from_mail : Utils.mainContext.tr.agent_action_create_task_fallback_from_inbox);
+          autoMessage = Utils.mainContext.tr.agent_action_create_task_request_message;
           inboxesForContext = [inbox];
         } else {
-          autoMessage = Utils.mainContext.tr.agent_action_create_task_fallback_no_inbox;
+          autoMessage = Utils.mainContext.tr.agent_action_create_task_request_message_no_inbox;
         }
         break;
       case AgentActionType.createEvent:
         if (inbox != null) {
-          final autoMsg = Utils.mainContext.tr
-              .agent_action_create_task_initial_message('')
-              .replaceAll('{contextInfo}', '')
-              .replaceAll('\n\n\n', '\n\n')
-              .replaceAll('task', 'event')
-              .replaceAll('Task', 'Event')
-              .trim();
-          autoMessage = autoMsg.isNotEmpty
-              ? autoMsg
-              : (inbox.linkedMail != null ? Utils.mainContext.tr.agent_action_create_event_fallback_from_mail : Utils.mainContext.tr.agent_action_create_event_fallback_from_inbox);
+          autoMessage = Utils.mainContext.tr.agent_action_create_event_request_message;
           inboxesForContext = [inbox];
         } else {
-          autoMessage = Utils.mainContext.tr.agent_action_create_event_fallback_no_inbox;
+          autoMessage = Utils.mainContext.tr.agent_action_create_event_request_message_no_inbox;
         }
         break;
       default:
@@ -239,7 +226,7 @@ class AgentActionController extends _$AgentActionController {
 
     // 첫 메시지를 자동으로 generalChat으로 보냄
     if (autoMessage.isNotEmpty) {
-      await _sendAutoMessage(autoMessage, inboxes: inboxesForContext);
+      await _sendAutoMessage(autoMessage, inboxes: inboxesForContext, actionType: actionType);
     }
   }
 
@@ -291,9 +278,17 @@ class AgentActionController extends _$AgentActionController {
   }
 
   /// agentAction 시작 시 첫 메시지를 자동으로 보냅니다.
-  Future<void> _sendAutoMessage(String autoMessage, {List<InboxEntity>? inboxes}) async {
+  Future<void> _sendAutoMessage(String autoMessage, {List<InboxEntity>? inboxes, AgentActionType? actionType}) async {
     print('[AI_AGENT] _sendAutoMessage CALLED');
     if (autoMessage.trim().isEmpty) return;
+
+    // createTask나 createEvent의 경우, 제공된 inbox를 자동으로 로드
+    if ((actionType == AgentActionType.createTask || actionType == AgentActionType.createEvent) && inboxes != null && inboxes.isNotEmpty) {
+      // 제공된 inbox 번호들을 loadedInboxNumbers에 추가하여 전체 내용이 포함되도록 함
+      final inboxNumbers = {for (int i = 0; i < inboxes.length; i++) i + 1};
+      state = state.copyWith(loadedInboxNumbers: {...state.loadedInboxNumbers, ...inboxNumbers});
+      print('[AI_AGENT] Auto-loading inbox numbers for $actionType: $inboxNumbers');
+    }
 
     // 사용자 메시지로 추가 (자동 메시지)
     final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: autoMessage)];

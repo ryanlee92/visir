@@ -3963,6 +3963,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please provide the following information to send an email:\n- To recipients (required)\n- CC recipients (optional)\n- BCC recipients (optional)\n- Subject/title (required)\n- Body/content (required)\n\nYou can provide email addresses or names.';
 
   @override
+  String get agent_action_send_request_message => 'Send an email';
+
+  @override
   String get agent_action_email_thread_summary =>
       'Here\'s a summary of the email thread:';
 
@@ -4018,12 +4021,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please write a reply to the email.';
 
   @override
+  String get agent_action_reply_request_message => 'Reply to this email';
+
+  @override
+  String get agent_action_reply_request_message_no_inbox =>
+      'Reply to the email';
+
+  @override
   String get agent_action_forward_fallback_message =>
       'Please forward this email.';
 
   @override
   String get agent_action_forward_fallback_message_no_inbox =>
       'Please forward the email.';
+
+  @override
+  String get agent_action_forward_request_message => 'Forward this email';
+
+  @override
+  String get agent_action_forward_request_message_no_inbox =>
+      'Forward the email';
 
   @override
   String get agent_action_create_task_fallback_from_mail =>
@@ -4038,6 +4055,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please create a task.';
 
   @override
+  String get agent_action_create_task_request_message =>
+      'Create a task from this inbox item';
+
+  @override
+  String get agent_action_create_task_request_message_no_inbox =>
+      'Create a task';
+
+  @override
   String get agent_action_create_event_fallback_from_mail =>
       'Please create an event based on this email.';
 
@@ -4048,6 +4073,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get agent_action_create_event_fallback_no_inbox =>
       'Please create an event.';
+
+  @override
+  String get agent_action_create_event_request_message =>
+      'Create an event from this inbox item';
+
+  @override
+  String get agent_action_create_event_request_message_no_inbox =>
+      'Create an event';
 
   @override
   String agent_action_confirm_send_mail(String to, String subject) {
