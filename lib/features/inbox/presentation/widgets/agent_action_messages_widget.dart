@@ -1116,8 +1116,26 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         final markdownText = cleanedContent.substring(section.start, section.end);
         if (markdownText.trim().isNotEmpty) {
           try {
-            final htmlFromMarkdown = md.markdownToHtml(markdownText);
-            processedContent = processedContent.substring(0, section.start) + htmlFromMarkdown + processedContent.substring(section.end);
+            // Check if this section looks like a code block (starts with 4+ spaces or tabs)
+            final isCodeBlock = RegExp(r'^[ \t]{4,}', multiLine: true).hasMatch(markdownText);
+            if (isCodeBlock) {
+              // Skip converting code blocks - keep as plain text wrapped in <p>
+              final escapedText = markdownText.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('\n', '<br>');
+              processedContent = processedContent.substring(0, section.start) + '<p>$escapedText</p>' + processedContent.substring(section.end);
+            } else {
+              final htmlFromMarkdown = md.markdownToHtml(markdownText);
+              // Remove <pre><code> blocks that were incorrectly created from indented text
+              // Convert them to regular paragraphs
+              final cleanedHtml = htmlFromMarkdown.replaceAllMapped(RegExp(r'<pre><code[^>]*>([\s\S]*?)</code></pre>', caseSensitive: false), (match) {
+                final codeContent = match.group(1) ?? '';
+                // Unescape HTML entities and convert to paragraph
+                final unescaped = codeContent.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replaceAll('&quot;', '"').replaceAll('&#39;', "'");
+                // Split by newlines and wrap each line in <p> tags
+                final lines = unescaped.split('\n');
+                return lines.map((line) => line.trim().isNotEmpty ? '<p>${line.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>' : '').join('');
+              });
+              processedContent = processedContent.substring(0, section.start) + cleanedHtml + processedContent.substring(section.end);
+            }
           } catch (e) {
             // If conversion fails, keep original markdown text
           }
@@ -1862,7 +1880,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
               fontFamily: 'monospace',
               leadingDistribution: TextLeadingDistribution.even,
             ),
-            codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
+            codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
             blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
             blockquoteDecoration: BoxDecoration(
               border: Border(left: BorderSide(color: context.outline, width: 3)),
@@ -2308,7 +2326,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
-                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0) + 1,
+                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
                                 itemBuilder: (context, index) {
                                   final state = ref.watch(agentActionControllerProvider);
                                   final pendingCalls = state.pendingFunctionCalls ?? [];
@@ -2318,57 +2336,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   }).toList();
 
                                   final messagesLength = agentAction.messages.length;
-                                  final loadingItemCount = agentAction.isLoading ? 1 : 0;
-                                  final confirmButtonIndex = messagesLength + loadingItemCount;
-
-                                  if (index == confirmButtonIndex) {
-                                    if (writeActions.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-
-                                    return Container(
-                                      padding: const EdgeInsets.only(left: 12, right: 12, top: 0, bottom: 0),
-                                      margin: const EdgeInsets.only(top: 0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          IntrinsicWidth(
-                                            child: VisirButton(
-                                              type: VisirButtonAnimationType.scaleAndOpacity,
-                                              style: VisirButtonStyle(
-                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                backgroundColor: context.primary,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              options: VisirButtonOptions(
-                                                bypassTextField: true,
-                                                shortcuts: [
-                                                  VisirButtonKeyboardShortcut(
-                                                    keys: [
-                                                      if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                                      if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                                      LogicalKeyboardKey.enter,
-                                                    ],
-                                                    message: context.tr.confirm,
-                                                  ),
-                                                ],
-                                              ),
-                                              onTap: () async {
-                                                final controller = ref.read(agentActionControllerProvider.notifier);
-                                                for (final call in writeActions) {
-                                                  final actionId = call['action_id'] as String? ?? '';
-                                                  if (actionId.isNotEmpty) {
-                                                    await controller.confirmAction(actionId: actionId);
-                                                  }
-                                                }
-                                              },
-                                              child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
 
                                   // Regular message items
                                   if (index == messagesLength) {
@@ -2414,8 +2381,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                     final functionName = call['function_name'] as String? ?? '';
                                     final actionId = call['action_id'] as String? ?? '';
                                     final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                                    final messageIndex = call['message_index'] as int?;
 
-                                    if (_isWriteAction(functionName) && actionId.isNotEmpty) {
+                                    // 이 메시지에 속한 write action만 표시
+                                    if (_isWriteAction(functionName) && actionId.isNotEmpty && messageIndex == index) {
                                       String signature = functionName;
                                       if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
                                         final title = functionArgs['title'] as String? ?? '';
@@ -2455,7 +2424,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             Expanded(child: _buildMessageContent(context, message.content, isUser)),
                                           ],
                                         ),
-                                        if (isLastMessage && writeActionsForMessage.isNotEmpty) ...[
+                                        if (writeActionsForMessage.isNotEmpty) ...[
                                           const SizedBox(height: 12),
                                           ...writeActionsForMessage.asMap().entries.map((entry) {
                                             final index = entry.key;
@@ -2482,6 +2451,50 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                               );
                                             }
                                           }),
+                                          // Confirm 버튼을 첫 번째 메시지(또는 task block이 있는 메시지)에만 표시
+                                          // 로딩 중이 아니고 writeActions가 있을 때만 표시
+                                          if (writeActions.isNotEmpty && !agentAction.isLoading) ...[
+                                            Container(
+                                              margin: const EdgeInsets.only(top: 12, bottom: 12),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  IntrinsicWidth(
+                                                    child: VisirButton(
+                                                      type: VisirButtonAnimationType.scaleAndOpacity,
+                                                      style: VisirButtonStyle(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                        backgroundColor: context.primary,
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                      options: VisirButtonOptions(
+                                                        bypassTextField: true,
+                                                        shortcuts: [
+                                                          VisirButtonKeyboardShortcut(
+                                                            keys: [
+                                                              if (PlatformX.isApple) LogicalKeyboardKey.meta,
+                                                              if (!PlatformX.isApple) LogicalKeyboardKey.control,
+                                                              LogicalKeyboardKey.enter,
+                                                            ],
+                                                            message: context.tr.confirm,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      onTap: () async {
+                                                        final controller = ref.read(agentActionControllerProvider.notifier);
+                                                        // 모든 write action을 한번에 처리
+                                                        final actionIds = writeActions.map((call) => call['action_id'] as String? ?? '').where((id) => id.isNotEmpty).toList();
+                                                        if (actionIds.isNotEmpty) {
+                                                          await controller.confirmActions(actionIds: actionIds);
+                                                        }
+                                                      },
+                                                      child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ],
                                       ],
                                     ),
