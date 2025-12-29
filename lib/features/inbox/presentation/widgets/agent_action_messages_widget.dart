@@ -35,6 +35,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 
 class AgentActionMessagesWidget extends ConsumerStatefulWidget {
   final double maxHeight;
@@ -880,11 +881,58 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         .replaceAll(taggedChannelRegex, '')
         .replaceAll(taggedProjectRegex, '');
 
-    // Check if content is HTML (contains HTML tags)
-    final isHtml = cleanedContent.contains('<') && cleanedContent.contains('>');
+    // Check if content is HTML (contains HTML tags, but exclude custom inapp tags)
+    final htmlTagRegex = RegExp(r'<(?!/?(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
+    final isHtml = htmlTagRegex.hasMatch(cleanedContent);
 
     // Check if content is Markdown (contains Markdown patterns)
-    final isMarkdown = !isHtml && _isMarkdownContent(cleanedContent);
+    final isMarkdown = _isMarkdownContent(cleanedContent);
+
+    // If both HTML and Markdown are present, convert Markdown parts to HTML
+    String finalContent = cleanedContent;
+    if (isHtml && isMarkdown) {
+      // Extract HTML tags and their positions
+      final htmlTags = <({int start, int end, String tag})>[];
+      final htmlTagMatches = htmlTagRegex.allMatches(cleanedContent);
+      for (final match in htmlTagMatches) {
+        htmlTags.add((start: match.start, end: match.end, tag: match.group(0)!));
+      }
+
+      // Split content by HTML tags and convert markdown parts to HTML
+      String processedContent = cleanedContent;
+
+      // Find markdown sections (between HTML tags or at start/end)
+      final markdownSections = <({int start, int end})>[];
+      int lastEnd = 0;
+
+      for (final htmlTag in htmlTags) {
+        if (htmlTag.start > lastEnd) {
+          // There's text between last HTML tag and this one
+          markdownSections.add((start: lastEnd, end: htmlTag.start));
+        }
+        lastEnd = htmlTag.end;
+      }
+
+      // Add remaining text after last HTML tag
+      if (lastEnd < cleanedContent.length) {
+        markdownSections.add((start: lastEnd, end: cleanedContent.length));
+      }
+
+      // Convert markdown sections to HTML (in reverse order to maintain positions)
+      for (final section in markdownSections.reversed) {
+        final markdownText = cleanedContent.substring(section.start, section.end);
+        if (markdownText.trim().isNotEmpty) {
+          try {
+            final htmlFromMarkdown = md.markdownToHtml(markdownText);
+            processedContent = processedContent.substring(0, section.start) + htmlFromMarkdown + processedContent.substring(section.end);
+          } catch (e) {
+            // If conversion fails, keep original markdown text
+          }
+        }
+      }
+
+      finalContent = processedContent;
+    }
 
     // For HTML content, we need to process @mentions in the text and replace them with inline badges
     // We'll do this by wrapping HtmlWidget and processing the text content
@@ -895,11 +943,11 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       // But we also need to handle @mentions in the plain text parts
     }
 
-    if (isHtml) {
-      // For HTML content, we need to handle @mentions in text nodes
+    if (isHtml || (isHtml && isMarkdown)) {
+      // For HTML content (or mixed HTML/Markdown), we need to handle @mentions in text nodes
       // HtmlWidget doesn't easily support inline widgets in text, so we'll process the HTML string
       // and replace @mentions with special markers that we can handle in customWidgetBuilder
-      String processedHtml = cleanedContent;
+      String processedHtml = finalContent;
       if (taggedItems.isNotEmpty) {
         // Replace @mentions in HTML text with special placeholders
         for (final entry in taggedItems.entries) {

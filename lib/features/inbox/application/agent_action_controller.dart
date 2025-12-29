@@ -861,13 +861,14 @@ class AgentActionController extends _$AgentActionController {
                   print('[AI_AGENT] REQUESTING RECURSIVE CALL - newNumbers: $newNumbers');
                   // 요청된 inbox의 전체 내용을 포함하여 재요청
                   final updatedLoadedNumbers = {...state.loadedInboxNumbers, ...newNumbers};
-                  state = state.copyWith(messages: updatedMessagesWithResponse, loadedInboxNumbers: updatedLoadedNumbers, isLoading: true);
+                  // 첫 번째 응답 메시지는 아직 state에 저장하지 않음 (재귀 호출에서 최종 메시지로 대체될 예정)
+                  state = state.copyWith(loadedInboxNumbers: updatedLoadedNumbers, isLoading: true);
 
                   // 재요청 (같은 사용자 메시지로, _generateGeneralChat 직접 호출)
                   await _generateGeneralChat(
                     userMessage,
                     selectedProject: selectedProject,
-                    updatedMessages: updatedMessagesWithResponse,
+                    updatedMessages: updatedMessagesWithResponse, // 첫 번째 응답 포함하여 재귀 호출에 전달
                     taggedTasks: taggedTasks,
                     taggedEvents: taggedEvents,
                     taggedConnections: taggedConnections,
@@ -878,6 +879,7 @@ class AgentActionController extends _$AgentActionController {
                   );
                   print('[AI_AGENT] RECURSIVE CALL COMPLETED - returning from first call');
                   // 재귀 호출 완료 후 첫 번째 호출 종료
+                  // 재귀 호출에서 이미 최종 메시지가 state에 저장되었으므로 추가 작업 불필요
                   return;
                 } else {
                   print('[AI_AGENT] No new numbers to load - skipping recursive call');
@@ -895,6 +897,8 @@ class AgentActionController extends _$AgentActionController {
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
           if (isRecursiveCall) {
             print('[AI_AGENT] _generateGeneralChat END (recursive) - isRecursiveCall: $isRecursiveCall, messagesCount: ${updatedMessagesWithResponse.length}');
+            // 재귀 호출 완료 시 로딩 상태 해제
+            state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
             return;
           }
 
