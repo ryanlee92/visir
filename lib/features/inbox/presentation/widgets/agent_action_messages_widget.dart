@@ -794,7 +794,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
       return _buildTaskWidget(context, task, isUser);
     } catch (e) {
-      return Padding(padding: const EdgeInsets.only(top: 0), child: _buildActionConfirmWidget(context, 'createTask', functionArgs, actionId, isUser));
+      return Padding(padding: const EdgeInsets.only(top: 6), child: _buildActionConfirmWidget(context, 'createTask', functionArgs, actionId, isUser));
     }
   }
 
@@ -845,7 +845,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
       return _buildEventWidget(context, eventData, isUser);
     } catch (e) {
-      return Padding(padding: const EdgeInsets.only(top: 0), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
+      return Padding(padding: const EdgeInsets.only(top: 6), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
     }
   }
 
@@ -2327,7 +2327,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                     }
 
                                     return Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
@@ -2372,7 +2372,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   // Regular message items
                                   if (index == messagesLength) {
                                     return Container(
-                                      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                                      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
                                       padding: const EdgeInsets.all(12),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2432,7 +2432,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   }
 
                                   return Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
                                     child: Column(
@@ -2463,17 +2463,17 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
                                             if (functionName == 'createTask' || functionName == 'updateTask') {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 0),
+                                                padding: const EdgeInsets.only(bottom: 6),
                                                 child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 0),
+                                                padding: const EdgeInsets.only(bottom: 6),
                                                 child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 0),
+                                                padding: const EdgeInsets.only(bottom: 6),
                                                 child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
                                               );
                                             }
@@ -2868,7 +2868,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             ] else if (widget.functionName == 'createEvent' || widget.functionName == 'updateEvent') ...[
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ],
-            const SizedBox(height: 0),
+            const SizedBox(height: 6),
             if (!_isProcessing)
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -2877,7 +2877,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
                     child: VisirButton(
                       type: VisirButtonAnimationType.scaleAndOpacity,
                       style: VisirButtonStyle(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         backgroundColor: context.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),
