@@ -677,7 +677,8 @@ class CalendarEventListControllerInternal extends _$CalendarEventListControllerI
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    if (targetTab != tabType || targetMonth != targetDate.month) {
+    final eventMonth = event.startDate?.month ?? targetDate.month;
+    if (targetTab != tabType || eventMonth != targetDate.month) {
       completer.complete(resultType ?? RecurringEventEditType.single);
       return list;
     }
@@ -753,7 +754,8 @@ class CalendarEventListControllerInternal extends _$CalendarEventListControllerI
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    if (targetTab != tabType || targetMonth != targetDate.month) return list;
+    final eventMonth = event.startDate?.month ?? targetDate.month;
+    if (targetTab != tabType || eventMonth != targetDate.month) return list;
     if (ref.read(shouldUseMockDataProvider)) return list;
 
     lastLocalUpdatedTimestamp = DateTime.now().add(kLocalUpdateGracePeriod);

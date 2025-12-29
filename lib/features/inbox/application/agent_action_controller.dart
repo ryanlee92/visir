@@ -2044,13 +2044,10 @@ class AgentActionController extends _$AgentActionController {
       final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
 
       try {
-        debugPrint('[AgentAction] confirmActions: 함수 실행 시작, functionName=$functionName, functionArgs=$functionArgs');
         // 함수 이름에 따라 적절한 tabType 결정
         final tabType = _getTabTypeForFunction(functionName);
-        debugPrint('[AgentAction] confirmActions: tabType=$tabType');
 
         // 함수 실행
-        debugPrint('[AgentAction] confirmActions: executor.executeFunction 호출 전');
         final result = await executor.executeFunction(
           functionName,
           functionArgs,
@@ -2061,20 +2058,15 @@ class AgentActionController extends _$AgentActionController {
           availableInboxes: updatedAvailableInboxes,
           remainingCredits: remainingCredits,
         );
-        debugPrint('[AgentAction] confirmActions: executor.executeFunction 호출 완료, result=$result');
 
         if (result['success'] == true) {
           final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-          debugPrint('[AgentAction] confirmActions: 성공, functionName=$functionName, message=$message');
           functionResults.add({'function_name': functionName, 'success': true, 'message': message});
         } else {
           final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
-          debugPrint('[AgentAction] confirmActions: 실패, functionName=$functionName, error=$error');
           functionResults.add({'function_name': functionName, 'success': false, 'error': error});
         }
-      } catch (e, stackTrace) {
-        debugPrint('[AgentAction] confirmActions: 예외 발생, functionName=$functionName, error=$e');
-        debugPrint('[AgentAction] confirmActions: StackTrace: $stackTrace');
+      } catch (e) {
         functionResults.add({'function_name': functionName, 'success': false, 'error': e.toString()});
       }
     }
