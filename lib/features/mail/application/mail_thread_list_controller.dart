@@ -5,6 +5,7 @@ import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
@@ -192,8 +193,6 @@ class MailThreadListControllerInternal extends _$MailThreadListControllerInterna
     }
 
     if (!ref.watch(shouldUseMockDataProvider)) {
-      final userId = ref.watch(authControllerProvider.select((value) => value.requireValue.id));
-
       await persist(
         ref.watch(storageProvider.future),
         key: '${MailThreadListController.stringKey(TabType.mail)}:${isSignedIn}:${label}:${email}:${threadId}:${oAuthUniqueId}',
@@ -205,7 +204,7 @@ class MailThreadListControllerInternal extends _$MailThreadListControllerInterna
           }
           return (jsonDecode(trimmed) as List<dynamic>).map((e) => MailEntity.fromJson(e as Map<String, dynamic>)).toList();
         },
-        options: StorageOptions(destroyKey: userId),
+        options: Utils.storageOptions,
       ).future;
     }
 

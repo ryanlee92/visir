@@ -6,6 +6,7 @@ import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_fetch_result_entity.dart';
@@ -101,14 +102,14 @@ class MailListController extends _$MailListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .refresh()
@@ -132,14 +133,14 @@ class MailListController extends _$MailListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .loadMore()
@@ -163,14 +164,14 @@ class MailListController extends _$MailListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .search(loadMore: loadMore)
@@ -194,14 +195,14 @@ class MailListController extends _$MailListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .loadRecent()
@@ -225,14 +226,14 @@ class MailListController extends _$MailListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .load(refresh: refresh)
@@ -652,8 +653,6 @@ class MailListControllerInternal extends _$MailListControllerInternal {
       return MailListResultEntity(mails: {}, email: email, label: label);
     }
 
-    final userId = ref.watch(authControllerProvider.select((value) => value.requireValue.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: '${MailListController.stringKey}:${isSignedIn}:${label}:${email}:${query}:${oAuthUniqueId}',
@@ -665,7 +664,7 @@ class MailListControllerInternal extends _$MailListControllerInternal {
         }
         return MailListResultEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     if (!ref.mounted) return MailListResultEntity(mails: {}, email: email, label: label);

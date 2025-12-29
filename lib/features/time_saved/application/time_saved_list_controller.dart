@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/time_saved/application/user_action_switch_list_controller.dart';
@@ -61,10 +62,6 @@ class TimeSavedListControllerInternal extends _$TimeSavedListControllerInternal 
       return {};
     }
 
-    // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
-    // 따라서 userId는 안전하게 가져올 수 있습니다
-    final userId = ref.watch(authControllerProvider.select((value) => value.requireValue.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: 'time_saved_list_${isSignedIn}_${viewType.name}',
@@ -82,7 +79,7 @@ class TimeSavedListControllerInternal extends _$TimeSavedListControllerInternal 
               .toList(),
         );
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     refresh();

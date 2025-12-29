@@ -392,7 +392,6 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
 
     // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
     // 따라서 userId는 안전하게 가져올 수 있습니다
-    final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
 
     await persist(
       ref.watch(storageProvider.future),
@@ -405,7 +404,7 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
         }
         return (jsonDecode(trimmed) as List<dynamic>).map((e) => TaskEntity.fromJson(e, local: true)).toList();
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     return state.value ?? [];

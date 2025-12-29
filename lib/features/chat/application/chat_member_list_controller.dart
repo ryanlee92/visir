@@ -12,6 +12,7 @@ import 'package:Visir/features/chat/domain/entities/state/chat_fetch_members_res
 import 'package:Visir/features/chat/infrastructure/repositories/message_repository.dart';
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
@@ -173,7 +174,6 @@ class ChatMemberListControllerInternal extends _$ChatMemberListControllerInterna
 
     // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
     // 따라서 userId는 안전하게 가져올 수 있습니다
-    final destroyKeyUserId = ref.watch(authControllerProvider.select((value) => value.requireValue.id));
 
     persist(
       ref.watch(storageProvider.future),
@@ -186,7 +186,7 @@ class ChatMemberListControllerInternal extends _$ChatMemberListControllerInterna
         }
         return MessageMemberEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(destroyKey: destroyKeyUserId),
+      options: Utils.storageOptions,
     );
 
     return null;

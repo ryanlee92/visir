@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
@@ -72,14 +73,14 @@ class MailLabelListController extends _$MailLabelListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .load()
@@ -222,8 +223,6 @@ class MailLabelListControllerInternal extends _$MailLabelListControllerInternal 
     _repository = ref.watch(mailRepositoryProvider);
     if (ref.watch(shouldUseMockDataProvider)) return getMockLabels();
 
-    final userId = ref.watch(authControllerProvider.select((value) => value.requireValue.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: '${MailLabelListController.stringKey}:${isSignedIn}:${oAuthUniqueId}',
@@ -240,7 +239,7 @@ class MailLabelListControllerInternal extends _$MailLabelListControllerInternal 
               .toList(),
         );
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     return state.value ?? {};

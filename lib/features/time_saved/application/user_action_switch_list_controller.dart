@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/time_saved/domain/entities/user_action_entity.dart';
@@ -103,10 +104,6 @@ class UserActionSwitchListControllerInternal extends _$UserActionSwitchListContr
       return [];
     }
 
-    // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
-    // 따라서 userId는 안전하게 가져올 수 있습니다
-    final userId = ref.watch(authControllerProvider.select((value) => value.requireValue.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: 'user_action_switch_list_${isSignedIn}_${viewType.name}',
@@ -118,7 +115,7 @@ class UserActionSwitchListControllerInternal extends _$UserActionSwitchListContr
         }
         return (jsonDecode(trimmed) as List<dynamic>).map((e) => UserActionSwitchCountEntity.fromJson(e)).toList();
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     load();

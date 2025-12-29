@@ -769,8 +769,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       return TaskListResultEntity(tasks: [], taskDates: taskDates);
     }
 
-    final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: '${TaskListController.stringKey}:${isSignedIn}:${labelId}',
@@ -783,7 +781,7 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
         }
         return TaskListResultEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     return state.value ?? TaskListResultEntity(tasks: [], taskDates: taskDates);
@@ -921,14 +919,11 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
           offset = _remoteFetchedTasks.length;
         }
         final completedResult = await _taskRepository.fetchTasksByStatus(status: TaskStatus.done, pref: _pref, userId: _user.id, limit: limit, offset: offset);
-        completedResult.fold(
-          (l) {},
-          (r) {
-            // linkedEvent == null이고 isCancelled가 아닌 것만 필터링 (데이터베이스에서 이미 필터링했지만 추가 확인)
-            final filtered = r.where((t) => t.linkedEvent == null && !t.isCancelled).toList();
-            overdueAndCompletedTasks.addAll(filtered);
-          },
-        );
+        completedResult.fold((l) {}, (r) {
+          // linkedEvent == null이고 isCancelled가 아닌 것만 필터링 (데이터베이스에서 이미 필터링했지만 추가 확인)
+          final filtered = r.where((t) => t.linkedEvent == null && !t.isCancelled).toList();
+          overdueAndCompletedTasks.addAll(filtered);
+        });
         break;
       case TaskLabelType.today:
         // today: overdue만 필요 (오늘 날짜는 calendarTaskListControllerInternal에서 가져옴)
@@ -1562,7 +1557,7 @@ class TaskListResultEntity {
 
   void updateTasksOnView() {
     cachedRecurrenceInstances = {};
-    
+
     // Optimization: Single pass to filter and map non-recurring tasks
     // Avoids creating intermediate lists (where().toList().map().toList())
     final nonRecurringTasks = <TaskEntity>[];
@@ -1655,7 +1650,7 @@ class TaskListResultEntity {
           // Remove from map and list
           nonRecurringTasksByDateAndRecurringId.remove(lookupKey);
           nonRecurringTasks.remove(recurringTaskOnDate);
-          
+
           final updatedTask = recurringTaskOnDate.isCancelled || recurringTaskOnDate.isDone
               ? recurringTaskOnDate.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration))
               : recurringTaskOnDate.copyWith(
@@ -1668,12 +1663,12 @@ class TaskListResultEntity {
         }
       });
     });
-    
+
     // Optimization: Use List.from with capacity hint and addAll instead of spread operator
     // This reduces memory allocations compared to [...nonRecurringTasks, ..._tasks]
     tasksOnView = List.from(nonRecurringTasks, growable: true);
     tasksOnView.addAll(_tasks);
-    
+
     taskLabelList = [
       TaskLabelEntity(type: TaskLabelType.all),
       TaskLabelEntity(type: TaskLabelType.today),

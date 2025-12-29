@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'local_pref_controller.g.dart';
 
@@ -35,24 +37,15 @@ class LocalPrefControllerInternal extends _$LocalPrefControllerInternal {
   Future<LocalPrefEntity> build({required bool isSignedIn}) async {
     if (!isSignedIn) return fakeLocalPref;
 
-    // 순환 의존성 방지를 위해 authControllerProvider를 직접 watch하지 않고
-    // isSignedIn 파라미터를 사용하여 userId를 얻기
-    final userId = ref.read(authControllerProvider.select((v) => v.value!.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: 'local_pref_${isSignedIn}',
       encode: (LocalPrefEntity state) => jsonEncode(state.toJson()),
       decode: (String encoded) => LocalPrefEntity.fromJson(jsonDecode(encoded) as Map<String, dynamic>),
-      options: StorageOptions(cacheTime: StorageCacheTime.unsafe_forever, destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
-    if (state.value == null || state.value == LocalPrefEntity()) {
-      isFirstLoad = true;
-      return LocalPrefEntity();
-    }
-
-    return state.value!;
+    return state.value ?? LocalPrefEntity();
   }
 
   void _updateState({required LocalPrefEntity pref}) {

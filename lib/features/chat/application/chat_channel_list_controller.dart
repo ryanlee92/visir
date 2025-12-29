@@ -16,6 +16,7 @@ import 'package:Visir/features/chat/infrastructure/repositories/message_reposito
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
@@ -205,7 +206,7 @@ class ChatChannelListControllerInternal extends _$ChatChannelListControllerInter
           (jsonDecode(trimmed) as Map<String, dynamic>).entries.map((e) => MapEntry(e.key, MessageChannelFetchResultEntity.fromJson(e.value as Map<String, dynamic>))).toList(),
         );
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     return state.value ?? <String, MessageChannelFetchResultEntity>{};

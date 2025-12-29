@@ -10,6 +10,7 @@ import 'package:Visir/features/calendar/providers.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/color_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
@@ -74,14 +75,14 @@ class CalendarListController extends _$CalendarListController {
     List<String> result = [];
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (_controllers.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
       completer.complete(result);
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value
           .load()
@@ -148,7 +149,7 @@ class CalendarListControllerInternal extends _$CalendarListControllerInternal {
           ),
         );
       },
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     return state.value ?? {};

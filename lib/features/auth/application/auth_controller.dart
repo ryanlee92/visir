@@ -59,16 +59,12 @@ class AuthController extends _$AuthController {
       return fakeUser;
     }
 
-    // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
-    // 따라서 repository.currentUserId는 null이 아닙니다
-    final userId = repository.currentUserId ?? '';
-
     await persist(
       ref.watch(storageProvider.future),
       key: 'auth',
       encode: (UserEntity state) => jsonEncode(state.toJson()),
       decode: (String encoded) => UserEntity.fromJson(jsonDecode(encoded) as Map<String, dynamic>),
-      options: StorageOptions(cacheTime: StorageCacheTime.unsafe_forever, destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     // persist 데이터가 있으면 즉시 반환 (로딩 완료)

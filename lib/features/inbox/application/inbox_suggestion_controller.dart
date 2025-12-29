@@ -5,6 +5,7 @@ import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/domain/entities/ai_provider_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/application/inbox_list_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/agent_model_entity.dart';
@@ -102,10 +103,6 @@ class InboxSuggestionControllerInternal extends _$InboxSuggestionControllerInter
       return InboxSuggestionFetchListEntity(suggestions: [], sequence: 0);
     }
 
-    // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
-    // 따라서 userId는 안전하게 가져올 수 있습니다
-    final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
-
     await persist(
       ref.watch(storageProvider.future),
       key: '${InboxSuggestionController.stringKey}:${isSignedIn}:${isSearch ? 'search' : '${year}_${month}_${day}'}',
@@ -118,7 +115,7 @@ class InboxSuggestionControllerInternal extends _$InboxSuggestionControllerInter
         }
         return InboxSuggestionFetchListEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>, local: true); // 로컬 저장소는 평문
       },
-      options: StorageOptions(destroyKey: userId + '3'),
+      options: Utils.storageOptions,
     ).future;
 
     ref.listen(provider.select((e) => e.value?.sequence ?? 0), (previous, next) {

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/chat/domain/entities/chat_draft_entity.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
@@ -67,7 +68,7 @@ class ChatDraftControllerInternal extends _$ChatDraftControllerInternal {
           }
           return ChatDraftEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
         },
-        options: StorageOptions(destroyKey: ref.watch(authControllerProvider.select((v) => v.requireValue.id))),
+        options: Utils.storageOptions,
       ).future;
     }
     return state.value;

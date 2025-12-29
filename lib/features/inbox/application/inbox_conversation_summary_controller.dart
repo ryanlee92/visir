@@ -5,6 +5,7 @@ import 'package:Visir/features/calendar/application/calendar_event_list_controll
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/calendar/providers.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
@@ -29,6 +30,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'inbox_conversation_summary_controller.g.dart';
 
@@ -46,8 +48,6 @@ class InboxConversationSummary extends _$InboxConversationSummary {
       return null;
     }
 
-    final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
-
     // Watch task/event to detect changes in linkedMail/linkedMessage
     final task = ref.watch(
       calendarTaskListControllerProvider(tabType: TabType.home).select((v) => v.tasksOnView.firstWhereOrNull((t) => (t.isEvent ? t.eventId : t.id) == taskId)),
@@ -64,7 +64,7 @@ class InboxConversationSummary extends _$InboxConversationSummary {
       key: 'inbox_conversation_summary:$taskId:$eventId',
       encode: (String? state) => state ?? '',
       decode: (String encoded) => encoded.isEmpty ? null : encoded,
-      options: StorageOptions(destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     // Step 1: Check local cache first
@@ -73,10 +73,11 @@ class InboxConversationSummary extends _$InboxConversationSummary {
     }
 
     // Step 2: Try Supabase cache if local cache miss
+    final userId = Supabase.instance.client.auth.currentUser?.id;
     final supabaseDatasource = ref.watch(supabaseInboxDatasourceProvider);
     if (taskId != null || eventId != null) {
       try {
-        final supabaseSummary = await supabaseDatasource.fetchConversationSummaryFromCache(userId: userId, taskId: taskId, eventId: eventId);
+        final supabaseSummary = await supabaseDatasource.fetchConversationSummaryFromCache(userId: userId!, taskId: taskId, eventId: eventId);
         if (supabaseSummary != null && supabaseSummary.isNotEmpty) {
           // Save to local cache for next time
           state = AsyncData(supabaseSummary);

@@ -60,7 +60,9 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tuple/tuple.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_compress/video_compress.dart';
@@ -93,6 +95,8 @@ class Utils {
   static late ThemeData lightTheme;
   static late ThemeData darkTheme;
   static late AudioPlayer player;
+
+  static StorageOptions get storageOptions => StorageOptions(cacheTime: StorageCacheTime.unsafe_forever, destroyKey: Supabase.instance.client.auth.currentUser?.id);
 
   static WidgetRef get ref => _ref;
   static set ref(WidgetRef value) {

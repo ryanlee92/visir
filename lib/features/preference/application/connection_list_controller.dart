@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/domain/entities/connection_entity.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
@@ -16,8 +17,6 @@ class ConnectionListController extends _$ConnectionListController {
   Future<Map<String, List<ConnectionEntity>>> build() async {
     if (ref.watch(shouldUseMockDataProvider)) return {};
 
-    final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
-
     if (!ref.watch(shouldUseMockDataProvider)) {
       await persist(
         ref.watch(storageProvider.future),
@@ -29,7 +28,7 @@ class ConnectionListController extends _$ConnectionListController {
             (e) => MapEntry(e.key, (e.value as List).map((item) => ConnectionEntity.fromJson(item as Map<String, dynamic>)).toList()),
           ),
         ),
-        options: StorageOptions(cacheTime: StorageCacheTime.unsafe_forever, destroyKey: userId),
+        options: Utils.storageOptions,
       ).future;
     }
 

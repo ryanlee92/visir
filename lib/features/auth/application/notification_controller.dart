@@ -165,7 +165,7 @@ class NotificationControllerInternal extends _$NotificationControllerInternal {
         }
         return NotificationEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(cacheTime: StorageCacheTime.unsafe_forever, destroyKey: userId),
+      options: Utils.storageOptions,
     ).future;
 
     // deviceId를 build에서 캡처하여 initialize에 전달

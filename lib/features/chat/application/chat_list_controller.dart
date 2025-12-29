@@ -18,6 +18,7 @@ import 'package:Visir/features/chat/infrastructure/repositories/message_reposito
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
@@ -239,7 +240,7 @@ class ChatListControllerInternal extends _$ChatListControllerInternal {
         }
         return ChatFetchResultEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(destroyKey: ref.watch(authControllerProvider.select((value) => value.requireValue.id))),
+      options: Utils.storageOptions,
     ).future;
 
     return state.value;

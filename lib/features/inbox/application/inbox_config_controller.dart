@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/application/inbox_list_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
@@ -64,10 +65,6 @@ class InboxConfigControllerInternal extends _$InboxConfigControllerInternal {
     if (ref.watch(shouldUseMockDataProvider)) return null;
     if (isSearch) return null;
 
-    // shouldUseMockDataProvider가 false이므로 isSignedIn은 true입니다
-    // 따라서 userId는 안전하게 가져올 수 있습니다
-    final userId = ref.watch(authControllerProvider.select((v) => v.requireValue.id));
-
     final provider = inboxListControllerInternalProvider(isSearch: isSearch, year: year, month: month, day: day, isSignedIn: isSignedIn);
 
     await persist(
@@ -82,7 +79,7 @@ class InboxConfigControllerInternal extends _$InboxConfigControllerInternal {
         }
         return InboxConfigFetchListEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(destroyKey: userId + '1'),
+      options: Utils.storageOptions,
     ).future;
 
     ref.listen(provider.select((e) => e.value?.sequence ?? 0), (previous, next) {

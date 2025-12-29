@@ -12,6 +12,7 @@ import 'package:Visir/features/chat/domain/entities/state/chat_fetch_emojis_resu
 import 'package:Visir/features/chat/infrastructure/repositories/message_repository.dart';
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
@@ -84,7 +85,7 @@ class ChatEmojiListControllerInternal extends _$ChatEmojiListControllerInternal 
         }
         return ChatFetchEmojisResultEntity.fromJson(jsonDecode(trimmed) as Map<String, dynamic>);
       },
-      options: StorageOptions(destroyKey: ref.watch(authControllerProvider.select((value) => value.requireValue.id))),
+      options: Utils.storageOptions,
     ).future;
 
     final channelEmojis = ref.watch(

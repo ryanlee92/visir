@@ -202,14 +202,14 @@ class CalendarEventListController extends _$CalendarEventListController {
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.loading);
     final controllerLength = _controllers.entries.expand((e) => e.value.entries.where((e) => requireLoadMonth?.contains(e.key) ?? true)).length;
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (controllerLength == 0) {
       ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value.entries.where((e) => requireLoadMonth?.contains(e.key) ?? true).forEach((e) {
         e.value
@@ -239,14 +239,14 @@ class CalendarEventListController extends _$CalendarEventListController {
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.loading);
     final controllerLength = _controllers.entries.expand((e) => e.value.entries).length;
-    
+
     // OAuth가 없으면 즉시 success로 완료
     if (controllerLength == 0) {
       ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
       completer.complete();
       return completer.future;
     }
-    
+
     _controllers.forEach((key, value) {
       value.entries.forEach((e) {
         e.value
@@ -543,7 +543,7 @@ class CalendarEventListControllerInternal extends _$CalendarEventListControllerI
           }
           return (jsonDecode(trimmed) as List<dynamic>).map((e) => EventEntity.fromJson(e)).toList();
         },
-        options: StorageOptions(destroyKey: userId),
+        options: Utils.storageOptions,
       ).future;
     }
 
