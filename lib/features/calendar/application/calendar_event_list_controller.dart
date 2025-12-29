@@ -130,27 +130,36 @@ class CalendarEventListController extends _$CalendarEventListController {
       updateState(events: uniqueEvents, startDateTime: startDateTime, endDateTime: endDateTime);
     }
 
-    final calendarOAuthIds = ref.watch(localPrefControllerProvider.select((v) => v.value?.calendarOAuths?.map((e) => e.uniqueId).toList()));
-    calendarOAuthIds?.forEach((e) {
-      _controllers[e] = {
+    ref.watch(localPrefControllerProvider.select((v) => v.value?.calendarOAuths?.map((e) => e.uniqueId).toList().join()));
+    calendarOAuths.forEach((e) {
+      _controllers[e.uniqueId] = {
         DateFormat.yM().format(targetMonth): ref.watch(
-          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: targetMonth.year, targetMonth: targetMonth.month).notifier,
+          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: targetMonth.year, targetMonth: targetMonth.month).notifier,
         ),
         DateFormat.yM().format(prevMonth): ref.watch(
-          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: prevMonth.year, targetMonth: prevMonth.month).notifier,
+          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: prevMonth.year, targetMonth: prevMonth.month).notifier,
         ),
         DateFormat.yM().format(nextMonth): ref.watch(
-          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: nextMonth.year, targetMonth: nextMonth.month).notifier,
+          calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: nextMonth.year, targetMonth: nextMonth.month).notifier,
         ),
       };
 
-      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: targetMonth.year, targetMonth: targetMonth.month), (prev, next) {
+      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: targetMonth.year, targetMonth: targetMonth.month), (
+        prev,
+        next,
+      ) {
         _updateFromInternalControllers();
       });
-      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: prevMonth.year, targetMonth: prevMonth.month), (prev, next) {
+      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: prevMonth.year, targetMonth: prevMonth.month), (
+        prev,
+        next,
+      ) {
         _updateFromInternalControllers();
       });
-      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e, targetYear: nextMonth.year, targetMonth: nextMonth.month), (prev, next) {
+      ref.listen(calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: e.uniqueId, targetYear: nextMonth.year, targetMonth: nextMonth.month), (
+        prev,
+        next,
+      ) {
         _updateFromInternalControllers();
       });
     });
