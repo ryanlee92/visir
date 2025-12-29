@@ -1588,6 +1588,139 @@
   "agent_action_forwarding_as_is": "Forwarding the email as is:",
   "agent_action_send_forward_confirmation": "Would you like to send this forward?",
   "agent_action_suggested_forward": "Here's a suggested forward:",
+  "agent_action_reply_fallback_message": "Please write a reply to this email.",
+  "agent_action_reply_fallback_message_no_inbox": "Please write a reply to the email.",
+  "agent_action_forward_fallback_message": "Please forward this email.",
+  "agent_action_forward_fallback_message_no_inbox": "Please forward the email.",
+  "agent_action_create_task_fallback_from_mail": "Please create a task based on this email.",
+  "agent_action_create_task_fallback_from_inbox": "Please create a task based on this inbox item.",
+  "agent_action_create_task_fallback_no_inbox": "Please create a task.",
+  "agent_action_create_event_fallback_from_mail": "Please create an event based on this email.",
+  "agent_action_create_event_fallback_from_inbox": "Please create an event based on this inbox item.",
+  "agent_action_create_event_fallback_no_inbox": "Please create an event.",
+  "agent_action_confirm_send_mail": "Would you like to send the following email?\n\nTo: {to}\nSubject: {subject}",
+  "@agent_action_confirm_send_mail": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      },
+      "subject": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_reply_mail": "Would you like to send a reply to this email?\n\nSubject: {subject}",
+  "@agent_action_confirm_reply_mail": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_forward_mail": "Would you like to forward this email to the following address?\n\nTo: {to}",
+  "@agent_action_confirm_forward_mail": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_delete_task": "Would you like to delete this task?",
+  "agent_action_confirm_delete_event": "Would you like to delete this event?",
+  "agent_action_confirm_delete_mail": "Would you like to delete this email?",
+  "agent_action_confirm_update_task": "Would you like to update this task?\n\nTitle: {title}",
+  "@agent_action_confirm_update_task": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_update_event": "Would you like to update this event?\n\nTitle: {title}",
+  "@agent_action_confirm_update_event": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_mark_mail_read": "Would you like to mark this email as read?",
+  "agent_action_confirm_mark_mail_unread": "Would you like to mark this email as unread?",
+  "agent_action_confirm_archive_mail": "Would you like to archive this email?",
+  "agent_action_confirm_response_calendar_invitation": "Would you like to respond to the calendar invitation with \"{response}\"?",
+  "@agent_action_confirm_response_calendar_invitation": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_create_task": "Would you like to create the following task?\n\nTitle: {title}",
+  "@agent_action_confirm_create_task": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_create_event": "Would you like to create the following event?\n\nTitle: {title}",
+  "@agent_action_confirm_create_event": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_confirm_execute_action": "Would you like to execute this action?",
+  "agent_action_task_completed": "Task completed successfully.",
+  "agent_action_error_occurred_during_execution": "An error occurred during task execution.",
+  "agent_action_error_occurred_during_execution_with_function": "{functionName}: An error occurred during task execution: {error}",
+  "@agent_action_error_occurred_during_execution_with_function": {
+    "placeholders": {
+      "functionName": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_tasks_completed_count": "{count} tasks completed:\n{details}",
+  "@agent_action_tasks_completed_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_error_occurred_with_details": "An error occurred during task execution:\n{details}",
+  "@agent_action_error_occurred_with_details": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_partial_completion": "Some tasks completed:\n",
+  "agent_action_success_section": "Success:\n{details}",
+  "@agent_action_success_section": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "agent_action_failure_section": "Failure:\n{details}",
+  "@agent_action_failure_section": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
   "agent_tag_section_task": "Task",
   "agent_tag_section_event": "Event",
   "agent_tag_section_connections": "Connections",

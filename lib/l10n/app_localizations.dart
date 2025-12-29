@@ -7227,6 +7227,207 @@ abstract class AppLocalizations {
   /// **'Here\'s a suggested forward:'**
   String get agent_action_suggested_forward;
 
+  /// No description provided for @agent_action_reply_fallback_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please write a reply to this email.'**
+  String get agent_action_reply_fallback_message;
+
+  /// No description provided for @agent_action_reply_fallback_message_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Please write a reply to the email.'**
+  String get agent_action_reply_fallback_message_no_inbox;
+
+  /// No description provided for @agent_action_forward_fallback_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please forward this email.'**
+  String get agent_action_forward_fallback_message;
+
+  /// No description provided for @agent_action_forward_fallback_message_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Please forward the email.'**
+  String get agent_action_forward_fallback_message_no_inbox;
+
+  /// No description provided for @agent_action_create_task_fallback_from_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a task based on this email.'**
+  String get agent_action_create_task_fallback_from_mail;
+
+  /// No description provided for @agent_action_create_task_fallback_from_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a task based on this inbox item.'**
+  String get agent_action_create_task_fallback_from_inbox;
+
+  /// No description provided for @agent_action_create_task_fallback_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a task.'**
+  String get agent_action_create_task_fallback_no_inbox;
+
+  /// No description provided for @agent_action_create_event_fallback_from_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create an event based on this email.'**
+  String get agent_action_create_event_fallback_from_mail;
+
+  /// No description provided for @agent_action_create_event_fallback_from_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create an event based on this inbox item.'**
+  String get agent_action_create_event_fallback_from_inbox;
+
+  /// No description provided for @agent_action_create_event_fallback_no_inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create an event.'**
+  String get agent_action_create_event_fallback_no_inbox;
+
+  /// No description provided for @agent_action_confirm_send_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to send the following email?\n\nTo: {to}\nSubject: {subject}'**
+  String agent_action_confirm_send_mail(String to, String subject);
+
+  /// No description provided for @agent_action_confirm_reply_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to send a reply to this email?\n\nSubject: {subject}'**
+  String agent_action_confirm_reply_mail(String subject);
+
+  /// No description provided for @agent_action_confirm_forward_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to forward this email to the following address?\n\nTo: {to}'**
+  String agent_action_confirm_forward_mail(String to);
+
+  /// No description provided for @agent_action_confirm_delete_task.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to delete this task?'**
+  String get agent_action_confirm_delete_task;
+
+  /// No description provided for @agent_action_confirm_delete_event.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to delete this event?'**
+  String get agent_action_confirm_delete_event;
+
+  /// No description provided for @agent_action_confirm_delete_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to delete this email?'**
+  String get agent_action_confirm_delete_mail;
+
+  /// No description provided for @agent_action_confirm_update_task.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to update this task?\n\nTitle: {title}'**
+  String agent_action_confirm_update_task(String title);
+
+  /// No description provided for @agent_action_confirm_update_event.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to update this event?\n\nTitle: {title}'**
+  String agent_action_confirm_update_event(String title);
+
+  /// No description provided for @agent_action_confirm_mark_mail_read.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to mark this email as read?'**
+  String get agent_action_confirm_mark_mail_read;
+
+  /// No description provided for @agent_action_confirm_mark_mail_unread.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to mark this email as unread?'**
+  String get agent_action_confirm_mark_mail_unread;
+
+  /// No description provided for @agent_action_confirm_archive_mail.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to archive this email?'**
+  String get agent_action_confirm_archive_mail;
+
+  /// No description provided for @agent_action_confirm_response_calendar_invitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to respond to the calendar invitation with \"{response}\"?'**
+  String agent_action_confirm_response_calendar_invitation(String response);
+
+  /// No description provided for @agent_action_confirm_create_task.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to create the following task?\n\nTitle: {title}'**
+  String agent_action_confirm_create_task(String title);
+
+  /// No description provided for @agent_action_confirm_create_event.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to create the following event?\n\nTitle: {title}'**
+  String agent_action_confirm_create_event(String title);
+
+  /// No description provided for @agent_action_confirm_execute_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like to execute this action?'**
+  String get agent_action_confirm_execute_action;
+
+  /// No description provided for @agent_action_task_completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Task completed successfully.'**
+  String get agent_action_task_completed;
+
+  /// No description provided for @agent_action_error_occurred_during_execution.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred during task execution.'**
+  String get agent_action_error_occurred_during_execution;
+
+  /// No description provided for @agent_action_error_occurred_during_execution_with_function.
+  ///
+  /// In en, this message translates to:
+  /// **'{functionName}: An error occurred during task execution: {error}'**
+  String agent_action_error_occurred_during_execution_with_function(
+    String functionName,
+    String error,
+  );
+
+  /// No description provided for @agent_action_tasks_completed_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tasks completed:\n{details}'**
+  String agent_action_tasks_completed_count(int count, String details);
+
+  /// No description provided for @agent_action_error_occurred_with_details.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred during task execution:\n{details}'**
+  String agent_action_error_occurred_with_details(String details);
+
+  /// No description provided for @agent_action_partial_completion.
+  ///
+  /// In en, this message translates to:
+  /// **'Some tasks completed:\n'**
+  String get agent_action_partial_completion;
+
+  /// No description provided for @agent_action_success_section.
+  ///
+  /// In en, this message translates to:
+  /// **'Success:\n{details}'**
+  String agent_action_success_section(String details);
+
+  /// No description provided for @agent_action_failure_section.
+  ///
+  /// In en, this message translates to:
+  /// **'Failure:\n{details}'**
+  String agent_action_failure_section(String details);
+
   /// No description provided for @agent_tag_section_task.
   ///
   /// In en, this message translates to:

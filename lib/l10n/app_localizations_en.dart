@@ -4010,6 +4010,152 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agent_action_suggested_forward => 'Here\'s a suggested forward:';
 
   @override
+  String get agent_action_reply_fallback_message =>
+      'Please write a reply to this email.';
+
+  @override
+  String get agent_action_reply_fallback_message_no_inbox =>
+      'Please write a reply to the email.';
+
+  @override
+  String get agent_action_forward_fallback_message =>
+      'Please forward this email.';
+
+  @override
+  String get agent_action_forward_fallback_message_no_inbox =>
+      'Please forward the email.';
+
+  @override
+  String get agent_action_create_task_fallback_from_mail =>
+      'Please create a task based on this email.';
+
+  @override
+  String get agent_action_create_task_fallback_from_inbox =>
+      'Please create a task based on this inbox item.';
+
+  @override
+  String get agent_action_create_task_fallback_no_inbox =>
+      'Please create a task.';
+
+  @override
+  String get agent_action_create_event_fallback_from_mail =>
+      'Please create an event based on this email.';
+
+  @override
+  String get agent_action_create_event_fallback_from_inbox =>
+      'Please create an event based on this inbox item.';
+
+  @override
+  String get agent_action_create_event_fallback_no_inbox =>
+      'Please create an event.';
+
+  @override
+  String agent_action_confirm_send_mail(String to, String subject) {
+    return 'Would you like to send the following email?\n\nTo: $to\nSubject: $subject';
+  }
+
+  @override
+  String agent_action_confirm_reply_mail(String subject) {
+    return 'Would you like to send a reply to this email?\n\nSubject: $subject';
+  }
+
+  @override
+  String agent_action_confirm_forward_mail(String to) {
+    return 'Would you like to forward this email to the following address?\n\nTo: $to';
+  }
+
+  @override
+  String get agent_action_confirm_delete_task =>
+      'Would you like to delete this task?';
+
+  @override
+  String get agent_action_confirm_delete_event =>
+      'Would you like to delete this event?';
+
+  @override
+  String get agent_action_confirm_delete_mail =>
+      'Would you like to delete this email?';
+
+  @override
+  String agent_action_confirm_update_task(String title) {
+    return 'Would you like to update this task?\n\nTitle: $title';
+  }
+
+  @override
+  String agent_action_confirm_update_event(String title) {
+    return 'Would you like to update this event?\n\nTitle: $title';
+  }
+
+  @override
+  String get agent_action_confirm_mark_mail_read =>
+      'Would you like to mark this email as read?';
+
+  @override
+  String get agent_action_confirm_mark_mail_unread =>
+      'Would you like to mark this email as unread?';
+
+  @override
+  String get agent_action_confirm_archive_mail =>
+      'Would you like to archive this email?';
+
+  @override
+  String agent_action_confirm_response_calendar_invitation(String response) {
+    return 'Would you like to respond to the calendar invitation with \"$response\"?';
+  }
+
+  @override
+  String agent_action_confirm_create_task(String title) {
+    return 'Would you like to create the following task?\n\nTitle: $title';
+  }
+
+  @override
+  String agent_action_confirm_create_event(String title) {
+    return 'Would you like to create the following event?\n\nTitle: $title';
+  }
+
+  @override
+  String get agent_action_confirm_execute_action =>
+      'Would you like to execute this action?';
+
+  @override
+  String get agent_action_task_completed => 'Task completed successfully.';
+
+  @override
+  String get agent_action_error_occurred_during_execution =>
+      'An error occurred during task execution.';
+
+  @override
+  String agent_action_error_occurred_during_execution_with_function(
+    String functionName,
+    String error,
+  ) {
+    return '$functionName: An error occurred during task execution: $error';
+  }
+
+  @override
+  String agent_action_tasks_completed_count(int count, String details) {
+    return '$count tasks completed:\n$details';
+  }
+
+  @override
+  String agent_action_error_occurred_with_details(String details) {
+    return 'An error occurred during task execution:\n$details';
+  }
+
+  @override
+  String get agent_action_partial_completion => 'Some tasks completed:\n';
+
+  @override
+  String agent_action_success_section(String details) {
+    return 'Success:\n$details';
+  }
+
+  @override
+  String agent_action_failure_section(String details) {
+    return 'Failure:\n$details';
+  }
+
+  @override
   String get agent_tag_section_task => 'Task';
 
   @override

@@ -27,9 +27,6 @@ import 'package:Visir/features/inbox/domain/entities/agent_chat_history_entity.d
 import 'package:Visir/features/inbox/presentation/widgets/inbox_action_suggestions_widget.dart';
 import 'package:Visir/features/inbox/providers.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
-import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
-import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
-import 'package:Visir/features/mail/providers.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
@@ -175,484 +172,76 @@ class AgentActionController extends _$AgentActionController {
   }
 
   /// 액션 타입을 시작하고 초기 컨텍스트를 설정합니다.
+  /// 모든 agentAction은 동일한 방식으로 동작: 첫 메시지를 자동으로 generalChat으로 보냄
   Future<void> startAction({required AgentActionType actionType, InboxEntity? inbox, TaskEntity? task, EventEntity? event}) async {
     // 새로운 세션 ID 생성
     final sessionId = const Uuid().v4();
 
-    final contextInfo = _buildContextInfo(actionType, inbox: inbox, task: task, event: event);
+    // Set state with actionType first
+    state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
 
-    // Reply와 Forward 타입의 경우 AI로부터 suggested response를 받아옵니다
-    String initialMessage;
+    // 각 actionType에 맞는 첫 메시지 생성
+    String autoMessage = '';
+    List<InboxEntity>? inboxesForContext;
 
-    // Send의 경우 to, cc, bcc, body, title을 모두 물어봐야 함
-    if (actionType == AgentActionType.send) {
-      state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
-
-      // Send의 경우 모든 정보를 물어봄
-      initialMessage = Utils.mainContext.tr.agent_action_send_initial_message;
-
-      final newState = state.copyWith(
-        messages: [AgentActionMessage(role: 'assistant', content: initialMessage)],
-        isLoading: false,
-      );
-      state = newState;
-
-      // 히스토리 저장
-      _saveChatHistory();
-      return;
+    switch (actionType) {
+      case AgentActionType.send:
+        autoMessage = Utils.mainContext.tr.agent_action_send_initial_message;
+        break;
+      case AgentActionType.reply:
+        if (inbox != null) {
+          final autoMsg = Utils.mainContext.tr.agent_action_reply_initial_message('').replaceAll('{contextInfo}', '').trim();
+          autoMessage = autoMsg.isNotEmpty ? autoMsg : Utils.mainContext.tr.agent_action_reply_fallback_message;
+          inboxesForContext = [inbox];
+        } else {
+          autoMessage = Utils.mainContext.tr.agent_action_reply_fallback_message_no_inbox;
+        }
+        break;
+      case AgentActionType.forward:
+        if (inbox != null) {
+          autoMessage = Utils.mainContext.tr.agent_action_forward_fallback_message;
+          inboxesForContext = [inbox];
+        } else {
+          autoMessage = Utils.mainContext.tr.agent_action_forward_fallback_message_no_inbox;
+        }
+        break;
+      case AgentActionType.createTask:
+        if (inbox != null) {
+          final autoMsg = Utils.mainContext.tr.agent_action_create_task_initial_message('').replaceAll('{contextInfo}', '').replaceAll('\n\n\n', '\n\n').trim();
+          autoMessage = autoMsg.isNotEmpty 
+            ? autoMsg 
+            : (inbox.linkedMail != null 
+              ? Utils.mainContext.tr.agent_action_create_task_fallback_from_mail
+              : Utils.mainContext.tr.agent_action_create_task_fallback_from_inbox);
+          inboxesForContext = [inbox];
+        } else {
+          autoMessage = Utils.mainContext.tr.agent_action_create_task_fallback_no_inbox;
+        }
+        break;
+      case AgentActionType.createEvent:
+        if (inbox != null) {
+          final autoMsg = Utils.mainContext.tr.agent_action_create_task_initial_message('').replaceAll('{contextInfo}', '').replaceAll('\n\n\n', '\n\n').replaceAll('task', 'event').replaceAll('Task', 'Event').trim();
+          autoMessage = autoMsg.isNotEmpty 
+            ? autoMsg 
+            : (inbox.linkedMail != null 
+              ? Utils.mainContext.tr.agent_action_create_event_fallback_from_mail
+              : Utils.mainContext.tr.agent_action_create_event_fallback_from_inbox);
+          inboxesForContext = [inbox];
+        } else {
+          autoMessage = Utils.mainContext.tr.agent_action_create_event_fallback_no_inbox;
+        }
+        break;
+      default:
+        // 기타 actionType의 경우 기본 메시지 사용
+        autoMessage = Utils.mainContext.tr.agent_action_starting_action;
+        if (inbox != null) {
+          inboxesForContext = [inbox];
+        }
     }
 
-    // Forward의 경우 먼저 to/cc/bcc를 물어봐야 함
-    // TODO: Forward 기능은 나중에 구현 예정
-    // if (actionType == AgentActionType.forward && inbox?.linkedMail != null) {
-    //   state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false);
-
-    //   // Forward의 경우 먼저 누구에게 보낼지 물어봄
-    //   initialMessage =
-    //       'Who would you like to forward this email to? Please provide:\n- To recipients\n- CC recipients (optional)\n- BCC recipients (optional)\n\nYou can provide email addresses or names.';
-
-    //   state = state.copyWith(
-    //     messages: [AgentActionMessage(role: 'assistant', content: initialMessage)],
-    //     isLoading: false,
-    //   );
-    //   return;
-    // }
-
-    if (actionType == AgentActionType.reply && inbox?.linkedMail != null) {
-      state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: true, sessionId: sessionId);
-
-      final linkedMail = inbox!.linkedMail!;
-      final snippet = inbox.description ?? '';
-
-      // Fetch thread messages and original mail
-      List<Map<String, dynamic>>? threadMessages;
-      MailEntity? originalMail;
-      final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
-      final oauth = oauths.firstWhereOrNull((o) => o.email == linkedMail.hostMail);
-
-      if (oauth != null) {
-        final mailRepository = ref.read(mailRepositoryProvider);
-        final threadResult = await mailRepository.fetchThreads(
-          oauth: oauth,
-          type: linkedMail.type,
-          threadId: linkedMail.threadId,
-          labelId: CommonMailLabels.inbox.id,
-          email: linkedMail.hostMail,
-        );
-
-        await threadResult.fold(
-          (failure) async {
-            // Failed to fetch thread, continue with snippet only
-          },
-          (threadMails) async {
-            // Get the original mail (first in thread or the one matching messageId)
-            originalMail = threadMails.firstWhereOrNull((m) => m.id == linkedMail.messageId) ?? threadMails.firstOrNull;
-
-            // Convert thread mails to map format for AI
-            threadMessages = threadMails.map((mail) {
-              final fromUser = mail.from;
-              return {'from': fromUser?.name ?? fromUser?.email ?? 'Unknown', 'subject': mail.subject ?? '', 'body': mail.html ?? '', 'date': mail.date?.toIso8601String() ?? ''};
-            }).toList();
-          },
-        );
-      }
-
-      // Extract to, cc, bcc from original mail for AI
-      List<Map<String, String>> originalToList = [];
-      List<Map<String, String>> originalCcList = [];
-      List<Map<String, String>> originalBccList = [];
-      final mail = originalMail;
-      if (mail != null) {
-        originalToList = mail.to.map((user) => {'email': user.email, 'name': user.name ?? ''}).toList();
-        originalCcList = mail.cc.map((user) => {'email': user.email, 'name': user.name ?? ''}).toList();
-        originalBccList = mail.bcc.map((user) => {'email': user.email, 'name': user.name ?? ''}).toList();
-      }
-
-      // Get sender email and name from original mail's from field
-      String? senderEmail;
-      String? senderName;
-      if (originalMail?.from != null) {
-        senderEmail = originalMail!.from!.email;
-        senderName = originalMail!.from!.name;
-      } else {
-        // Fallback: try to parse from linkedMail.fromName if available
-        // Note: linkedMail only has fromName, not email, so we use it as fallback
-        senderName = linkedMail.fromName.isNotEmpty ? linkedMail.fromName : null;
-      }
-
-      // Get current user email to exclude from recipients
-      final me = ref.read(authControllerProvider).value;
-      final currentUserEmail = me?.email ?? '';
-
-      // Get original mail body for language detection
-      String? originalMailBody;
-      if (mail != null) {
-        // Use snippet or HTML body for language detection
-        originalMailBody = mail.snippet ?? mail.html;
-      }
-
-      // API 키 선택: useUserApiKey가 true이면 사용자 API 키, false이면 환경 변수 API 키
-      String? apiKey;
-      if (useUserApiKey) {
-        final apiKeys = ref.read(aiApiKeysProvider);
-        apiKey = apiKeys[selectedModel.provider.name];
-      }
-
-      // 사용자 ID 가져오기 (크레딧 체크용)
-      final userId = me?.id;
-
-      final suggestedResult = await _repository.generateSuggestedReply(
-        linkedMail: linkedMail,
-        snippet: snippet,
-        model: selectedModel.modelName,
-        threadMessages: threadMessages,
-        originalTo: originalToList,
-        originalCc: originalCcList,
-        originalBcc: originalBccList,
-        senderEmail: senderEmail,
-        senderName: senderName,
-        currentUserEmail: currentUserEmail,
-        originalMailBody: originalMailBody,
-        apiKey: apiKey,
-        userId: userId,
-      );
-
-      final suggestedResponse = suggestedResult.fold(
-        (failure) {
-          // 크레딧 부족 예외 처리
-          failure.whenOrNull(
-            insufficientCredits: (_, required, available) {
-              // 크레딧을 토큰 수로 변환
-              final requiredTokens = AiPricingCalculator.calculateTokensFromCredits(required);
-              final availableTokens = AiPricingCalculator.calculateTokensFromCredits(available);
-              // 크레딧 구매 화면으로 이동
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Utils.showPopupDialog(
-                  child: AiCreditsScreen(
-                    isSmall: true,
-                    isInPrefScreen: false,
-                    warning: Utils.mainContext.tr.ai_credits_insufficient_message(
-                      Utils.numberFormatter(requiredTokens.toDouble(), fractionDigits: 0),
-                      Utils.numberFormatter(availableTokens.toDouble(), fractionDigits: 0),
-                    ),
-                  ),
-                  size: Size(500, 600),
-                );
-              });
-            },
-          );
-          return null;
-        },
-        (response) {
-          return response;
-        },
-      );
-
-      if (suggestedResponse == null) {
-        // AI response failed, use fallback
-        initialMessage = Utils.mainContext.tr.agent_action_reply_initial_message('').replaceAll('{contextInfo}', '');
-      } else {
-        // Check if we have a valid suggested_reply
-        final suggestedReplyRaw = suggestedResponse['suggested_reply'] as String?;
-        if (suggestedReplyRaw != null && suggestedReplyRaw.isNotEmpty) {
-          final threadSummary = suggestedResponse['thread_summary'] as String? ?? '';
-          String suggestedReply = suggestedReplyRaw;
-
-          // Get AI-determined recipients (only for initial generation)
-          final aiToList =
-              (suggestedResponse['to'] as List?)?.cast<Map<String, dynamic>>().map((r) => {'email': r['email'] as String? ?? '', 'name': r['name'] as String? ?? ''}).toList() ??
-              [];
-          final aiCcList =
-              (suggestedResponse['cc'] as List?)?.cast<Map<String, dynamic>>().map((r) => {'email': r['email'] as String? ?? '', 'name': r['name'] as String? ?? ''}).toList() ??
-              [];
-          final aiBccList =
-              (suggestedResponse['bcc'] as List?)?.cast<Map<String, dynamic>>().map((r) => {'email': r['email'] as String? ?? '', 'name': r['name'] as String? ?? ''}).toList() ??
-              [];
-          final suggestReplyAll = suggestedResponse['suggest_reply_all'] as bool? ?? false;
-
-          // Get user name for reply (always use the current user's name, not the sender's name)
-          final me = ref.read(authControllerProvider).value;
-          String? userName;
-
-          if (me != null && me.name != null && me.name!.isNotEmpty) {
-            // Always use the current user's first name
-            userName = me.name!.split(' ').first;
-          }
-
-          // Replace [Your Name] placeholder if userName is available
-          if (userName != null) {
-            suggestedReply = suggestedReply.replaceAll('[Your Name]', userName);
-            suggestedReply = suggestedReply.replaceAll('[your name]', userName);
-          }
-
-          // Get from information (current user)
-          final fromList = me != null && me.email != null
-              ? [
-                  {'email': linkedMail.hostMail, 'name': me.name ?? ''},
-                ]
-              : [];
-
-          // Create message with separate blocks for summary and reply
-          String messageText = '';
-          if (threadSummary.isNotEmpty) {
-            messageText += '${Utils.mainContext.tr.agent_action_email_thread_summary}\n\n<inapp_mail_summary>${jsonEncode({'summary': threadSummary})}</inapp_mail_summary>';
-          }
-          if (suggestedReply.isNotEmpty) {
-            if (messageText.isNotEmpty) {
-              messageText +=
-                  '\n\n${Utils.mainContext.tr.agent_action_suggested_reply}\n\n<inapp_mail>${jsonEncode({'reply': suggestedReply, 'from': fromList, 'to': aiToList, 'cc': aiCcList, 'bcc': aiBccList, 'suggest_reply_all': suggestReplyAll})}</inapp_mail>';
-            } else {
-              messageText =
-                  '${Utils.mainContext.tr.agent_action_suggested_reply}\n\n<inapp_mail>${jsonEncode({'reply': suggestedReply, 'from': fromList, 'to': aiToList, 'cc': aiCcList, 'bcc': aiBccList, 'suggest_reply_all': suggestReplyAll})}</inapp_mail>';
-            }
-            messageText += '\n\n${Utils.mainContext.tr.agent_action_send_confirmation}';
-            if (suggestReplyAll) {
-              messageText += '\n\n${Utils.mainContext.tr.agent_action_reply_all_suggestion}';
-            }
-          }
-
-          initialMessage = messageText;
-        } else {
-          // AI response exists but suggested_reply is empty, use fallback
-          initialMessage = Utils.mainContext.tr.agent_action_reply_initial_message('').replaceAll('{contextInfo}', '');
-        }
-      }
-
-      // Update state with initial message and set loading to false
-      state = state.copyWith(
-        messages: [AgentActionMessage(role: 'assistant', content: initialMessage)],
-        isLoading: false,
-      );
-    } else if (actionType == AgentActionType.createTask && inbox != null) {
-      state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
-
-      // Use suggestion entity from inbox if available
-      final suggestion = inbox.suggestion;
-      if (suggestion != null && suggestion.summary != null && suggestion.summary!.isNotEmpty) {
-        // Create TaskEntity from InboxSuggestionEntity
-        // No loading needed - suggestion is already available
-        final me = ref.read(authControllerProvider).value;
-        if (me == null) {
-          initialMessage = _buildInitialMessage(actionType, contextInfo, inbox: inbox, task: task, event: event);
-        } else {
-          DateTime? startAt = suggestion.target_date ?? DateTime.now().dateOnly;
-          DateTime? endAt;
-
-          bool? isAllDay = suggestion.target_date == null ? true : suggestion.is_date_only;
-          if (suggestion.duration != null && suggestion.duration! > 0) {
-            endAt = startAt.add(Duration(minutes: suggestion.duration!));
-          } else {
-            endAt = startAt.add(isAllDay == true ? const Duration(days: 1) : const Duration(hours: 1));
-          }
-
-          final taskEntity = TaskEntity(
-            id: const Uuid().v4(),
-            ownerId: me.id,
-            title: suggestion.summary!,
-            description: inbox.description,
-            projectId: suggestion.project_id,
-            startAt: startAt,
-            endAt: endAt,
-            isAllDay: isAllDay,
-            linkedMails: inbox.linkedMail != null ? [inbox.linkedMail!] : [],
-            linkedMessages: inbox.linkedMessage != null ? [inbox.linkedMessage!] : [],
-            createdAt: DateTime.now(),
-            status: TaskStatus.none,
-          );
-
-          final taskJson = jsonEncode(taskEntity.toJson(local: true));
-          final suggestedHtml = '<inapp_task>$taskJson</inapp_task>';
-          initialMessage = Utils.mainContext.tr.agent_action_create_task_suggested_response(suggestedHtml);
-
-          // Set state with initial message and no loading
-          final newState = state.copyWith(
-            actionType: actionType,
-            inbox: inbox,
-            task: task,
-            event: event,
-            messages: [AgentActionMessage(role: 'assistant', content: initialMessage)],
-            isLoading: false,
-          );
-          state = newState;
-
-          // 히스토리 저장
-          _saveChatHistory();
-          return;
-        }
-      } else {
-        initialMessage = _buildInitialMessage(actionType, contextInfo, inbox: inbox, task: task, event: event);
-      }
-    } else if (actionType == AgentActionType.createEvent && inbox != null) {
-      // Set loading state first with empty messages to show loading indicator
-      state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, messages: [], isLoading: true, sessionId: sessionId);
-
-      // Use suggestion entity from inbox if available
-      final suggestion = inbox.suggestion;
-      if (suggestion != null && suggestion.summary != null && suggestion.summary!.isNotEmpty) {
-        // Use AI to generate suggested event with calendar selection
-        final me = ref.read(authControllerProvider).value;
-        if (me == null) {
-          initialMessage = _buildInitialMessage(actionType, contextInfo, inbox: inbox, task: task, event: event);
-        } else {
-          final calendarMap = ref.read(calendarListControllerProvider);
-          final calendarList = calendarMap.values.expand((e) => e).toList();
-          final calendarsList = calendarList.map((c) => {'id': c.uniqueId, 'name': c.name, 'email': c.email, 'modifiable': c.modifiable}).toList();
-
-          // API 키 선택: useUserApiKey가 true이면 사용자 API 키, false이면 환경 변수 API 키
-          String? apiKey;
-          if (useUserApiKey) {
-            final apiKeys = ref.read(aiApiKeysProvider);
-            apiKey = apiKeys[selectedModel.provider.name];
-          }
-
-          // Call AI to generate suggested event with calendar selection
-          final suggestedResult = await _repository.generateSuggestedEvent(inbox: inbox, calendars: calendarsList, model: selectedModel.modelName, apiKey: apiKey, userId: me.id);
-
-          final suggestedEventInfo = suggestedResult.fold((failure) {
-            // 크레딧 부족 예외 처리
-            failure.whenOrNull(
-              insufficientCredits: (_, required, available) {
-                // 크레딧 구매 화면으로 이동
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Utils.showPopupDialog(
-                    child: AiCreditsScreen(
-                      isSmall: true,
-                      isInPrefScreen: false,
-                      warning: Utils.mainContext.tr.ai_credits_insufficient_message(
-                        Utils.numberFormatter(required, fractionDigits: 4),
-                        Utils.numberFormatter(available, fractionDigits: 4),
-                      ),
-                    ),
-                    size: Size(500, 600),
-                  );
-                });
-              },
-            );
-            return null;
-          }, (info) => info);
-
-          // Always create suggested event, even if AI didn't return calendar_id
-          String? calendarId;
-          CalendarEntity? calendar;
-
-          if (suggestedEventInfo != null && suggestedEventInfo['calendar_id'] != null) {
-            calendarId = suggestedEventInfo['calendar_id'] as String;
-            calendar = calendarList.firstWhereOrNull((c) => c.uniqueId == calendarId);
-          }
-
-          // Fallback: use default calendar if AI didn't select one
-          if (calendar == null) {
-            final lastUsedCalendarId = ref.read(lastUsedCalendarIdProvider).firstOrNull;
-            final modifiableCalendars = calendarList.where((c) => c.modifiable == true).toList();
-            calendar =
-                modifiableCalendars.where((e) => e.uniqueId == (me.defaultCalendarId ?? lastUsedCalendarId)).toList().firstOrNull ??
-                modifiableCalendars.firstOrNull ??
-                calendarList.firstOrNull;
-          }
-
-          if (calendar == null) {
-            initialMessage = _buildInitialMessage(actionType, contextInfo, inbox: inbox, task: task, event: event);
-          } else {
-            DateTime? startAt = suggestion.target_date ?? DateTime.now().dateOnly;
-            DateTime? endAt;
-
-            bool isAllDay = suggestion.target_date == null ? true : (suggestion.is_date_only ?? false);
-            if (suggestion.duration != null && suggestion.duration! > 0) {
-              endAt = startAt.add(Duration(minutes: suggestion.duration!));
-            } else {
-              endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
-            }
-
-            final timezone = ref.read(timezoneProvider).value;
-
-            // Parse location from AI response
-            final location = suggestedEventInfo?['location'] as String?;
-
-            // Parse attendees from AI response
-            List<EventAttendeeEntity> attendees = [];
-            final attendeesList = suggestedEventInfo?['attendees'] as List<dynamic>?;
-            if (attendeesList != null && attendeesList.isNotEmpty) {
-              attendees = attendeesList
-                  .whereType<String>()
-                  .map((email) => EventAttendeeEntity(email: email.trim(), responseStatus: EventAttendeeResponseStatus.needsAction))
-                  .toList();
-            }
-
-            // Parse conference_link from AI response
-            String? conferenceLink;
-            final conferenceLinkStr = suggestedEventInfo?['conference_link'] as String?;
-            if (conferenceLinkStr != null && conferenceLinkStr.isNotEmpty && conferenceLinkStr != 'null') {
-              // If AI returns "added", it means a conference link should be generated
-              conferenceLink = conferenceLinkStr == 'added' ? 'added' : conferenceLinkStr;
-            }
-
-            final eventEntity = EventEntity(
-              calendarType: calendar.type ?? CalendarEntityType.google,
-              eventId: Utils.generateBase32HexStringFromTimestamp(),
-              title: suggestedEventInfo?['title'] as String? ?? suggestion.summary!,
-              description: suggestedEventInfo?['description'] as String? ?? inbox.description, // AI가 summarize한 description
-              rrule: null,
-              location: location, // AI가 추출한 location
-              isAllDay: isAllDay,
-              startDate: startAt,
-              endDate: isAllDay ? startAt.dateOnly : endAt,
-              timezone: timezone,
-              attendees: attendees, // AI가 추출한 attendees
-              reminders: isAllDay ? [] : (calendar.defaultReminders ?? []),
-              attachments: [],
-              conferenceLink: conferenceLink, // AI가 초기에 판단한 컨퍼런스 콜
-              modifiedEvent: null,
-              calendar: calendar,
-              sequence: 1,
-            );
-
-            final eventJson = jsonEncode({
-              'id': eventEntity.eventId,
-              'title': eventEntity.title,
-              'description': eventEntity.description,
-              'calendar_id': eventEntity.calendar.uniqueId,
-              'start_at': eventEntity.startDate.toIso8601String(),
-              'end_at': eventEntity.endDate.toIso8601String(),
-              'location': eventEntity.location,
-              'rrule': eventEntity.rrule?.toString(),
-              'attendees': eventEntity.attendees.map((a) => a.email).whereType<String>().toList(),
-              'conference_link': eventEntity.conferenceLink,
-              'isAllDay': eventEntity.isAllDay,
-            });
-            final suggestedHtml = '<inapp_event>$eventJson</inapp_event>';
-            initialMessage = Utils.mainContext.tr.agent_action_create_task_suggested_response(suggestedHtml).replaceAll('task', 'event').replaceAll('Task', 'Event');
-          }
-        }
-      } else {
-        initialMessage = _buildInitialMessage(actionType, contextInfo, inbox: inbox, task: task, event: event);
-      }
-
-      // Update state with initial message and set loading to false
-      final newState = state.copyWith(
-        messages: [AgentActionMessage(role: 'assistant', content: initialMessage)],
-        isLoading: false,
-      );
-      state = newState;
-
-      // 히스토리 저장
-      _saveChatHistory();
-    } else {
-      state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
-
-      initialMessage = _buildInitialMessage(actionType, contextInfo, inbox: inbox, task: task, event: event);
-
-      final newState = state.copyWith(
-        actionType: actionType,
-        inbox: inbox,
-        task: task,
-        event: event,
-        messages: [AgentActionMessage(role: 'assistant', content: initialMessage)],
-        isLoading: false,
-      );
-      state = newState;
-
-      // 히스토리 저장
-      _saveChatHistory();
+    // 첫 메시지를 자동으로 generalChat으로 보냄
+    if (autoMessage.isNotEmpty) {
+      await _sendAutoMessage(autoMessage, inboxes: inboxesForContext);
     }
   }
 
@@ -695,6 +284,29 @@ class AgentActionController extends _$AgentActionController {
         taggedConnections: taggedConnections,
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
+        inboxes: inboxes,
+      );
+    } catch (e) {
+      state = state.copyWith(messages: updatedMessages, isLoading: false);
+    }
+  }
+
+  /// agentAction 시작 시 첫 메시지를 자동으로 보냅니다.
+  Future<void> _sendAutoMessage(
+    String autoMessage, {
+    List<InboxEntity>? inboxes,
+  }) async {
+    if (autoMessage.trim().isEmpty) return;
+
+    // 사용자 메시지로 추가 (자동 메시지)
+    final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: autoMessage)];
+    state = state.copyWith(messages: updatedMessages, isLoading: true);
+
+    try {
+      // generalChat으로 처리
+      await _generateGeneralChat(
+        autoMessage,
+        updatedMessages: updatedMessages,
         inboxes: inboxes,
       );
     } catch (e) {
@@ -1108,13 +720,13 @@ class AgentActionController extends _$AgentActionController {
                   }
                 }
 
-                final successMessage = result['message'] as String? ?? '작업이 완료되었습니다.';
+                final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
                 successMessages.add(successMessage);
               } else if (result['success'] == true) {
-                final successMessage = result['message'] as String? ?? '작업이 완료되었습니다.';
+                final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
                 successMessages.add(successMessage);
               } else {
-                final errorMessage = result['error'] as String? ?? '작업 실행 중 오류가 발생했습니다.';
+                final errorMessage = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
                 errorMessages.add('$functionName: $errorMessage');
               }
             }
@@ -1143,25 +755,30 @@ class AgentActionController extends _$AgentActionController {
               resultMessage = successMessages.last;
             } else {
               // 여러 함수지만 chain이 아닌 경우: 모든 메시지 포함
-              resultMessage = '${successMessages.length}개의 작업이 완료되었습니다:\n${successMessages.map((m) => '• $m').join('\n')}';
+              final details = successMessages.map((m) => '• $m').join('\n');
+              resultMessage = Utils.mainContext.tr.agent_action_tasks_completed_count(successMessages.length, details);
             }
           } else if (successMessages.isEmpty) {
             // 모든 함수가 실패한 경우
-            resultMessage = '작업 실행 중 오류가 발생했습니다:\n${errorMessages.map((m) => '• $m').join('\n')}';
+            final details = errorMessages.map((m) => '• $m').join('\n');
+            resultMessage = Utils.mainContext.tr.agent_action_error_occurred_with_details(details);
           } else {
             // 일부 성공, 일부 실패
             if (isChain) {
               // chain인 경우: 마지막 함수의 결과만 사용
               // 성공한 함수가 있으면 마지막 성공 메시지 사용, 없으면 에러 메시지
-              resultMessage = successMessages.isNotEmpty ? successMessages.last : '작업 실행 중 오류가 발생했습니다:\n${errorMessages.map((m) => '• $m').join('\n')}';
+              final details = errorMessages.map((m) => '• $m').join('\n');
+              resultMessage = successMessages.isNotEmpty ? successMessages.last : Utils.mainContext.tr.agent_action_error_occurred_with_details(details);
             } else {
               // chain이 아닌 경우: 모든 메시지 포함
-              resultMessage = '일부 작업이 완료되었습니다:\n';
+              resultMessage = Utils.mainContext.tr.agent_action_partial_completion;
               if (successMessages.isNotEmpty) {
-                resultMessage += '성공:\n${successMessages.map((m) => '• $m').join('\n')}\n';
+                final details = successMessages.map((m) => '• $m').join('\n');
+                resultMessage += Utils.mainContext.tr.agent_action_success_section(details);
               }
               if (errorMessages.isNotEmpty) {
-                resultMessage += '실패:\n${errorMessages.map((m) => '• $m').join('\n')}';
+                final details = errorMessages.map((m) => '• $m').join('\n');
+                resultMessage += Utils.mainContext.tr.agent_action_failure_section(details);
               }
             }
           }
@@ -1466,42 +1083,42 @@ class AgentActionController extends _$AgentActionController {
       case 'sendMail':
         final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
         final subject = args['subject'] as String? ?? '';
-        return '다음 이메일을 전송하시겠습니까?\n\n받는 사람: $to\n제목: $subject';
+        return Utils.mainContext.tr.agent_action_confirm_send_mail(to, subject);
       case 'replyMail':
         final subject = args['subject'] as String? ?? '';
-        return '이메일에 답장을 보내시겠습니까?\n\n제목: $subject';
+        return Utils.mainContext.tr.agent_action_confirm_reply_mail(subject);
       case 'forwardMail':
         final to = (args['to'] as List<dynamic>?)?.map((e) => e.toString()).join(', ') ?? '';
-        return '이메일을 다음 주소로 전달하시겠습니까?\n\n받는 사람: $to';
+        return Utils.mainContext.tr.agent_action_confirm_forward_mail(to);
       case 'deleteTask':
-        return '작업을 삭제하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_delete_task;
       case 'deleteEvent':
-        return '일정을 삭제하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_delete_event;
       case 'deleteMail':
-        return '이메일을 삭제하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_delete_mail;
       case 'updateTask':
         final title = args['title'] as String? ?? '';
-        return '작업을 수정하시겠습니까?\n\n제목: $title';
+        return Utils.mainContext.tr.agent_action_confirm_update_task(title);
       case 'updateEvent':
         final title = args['title'] as String? ?? '';
-        return '일정을 수정하시겠습니까?\n\n제목: $title';
+        return Utils.mainContext.tr.agent_action_confirm_update_event(title);
       case 'markMailAsRead':
-        return '이메일을 읽음으로 표시하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_mark_mail_read;
       case 'markMailAsUnread':
-        return '이메일을 읽지 않음으로 표시하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_mark_mail_unread;
       case 'archiveMail':
-        return '이메일을 보관하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_archive_mail;
       case 'responseCalendarInvitation':
         final response = args['response'] as String? ?? '';
-        return '캘린더 초대에 "$response"로 응답하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_response_calendar_invitation(response);
       case 'createTask':
         final title = args['title'] as String? ?? '';
-        return '다음 작업을 생성하시겠습니까?\n\n제목: $title';
+        return Utils.mainContext.tr.agent_action_confirm_create_task(title);
       case 'createEvent':
         final title = args['title'] as String? ?? '';
-        return '다음 일정을 생성하시겠습니까?\n\n제목: $title';
+        return Utils.mainContext.tr.agent_action_confirm_create_event(title);
       default:
-        return '이 작업을 실행하시겠습니까?';
+        return Utils.mainContext.tr.agent_action_confirm_execute_action;
     }
   }
 
@@ -2435,14 +2052,14 @@ class AgentActionController extends _$AgentActionController {
         );
 
         if (result['success'] == true) {
-          final message = result['message'] as String? ?? '작업이 완료되었습니다.';
+          final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
           successMessages.add(message);
         } else {
-          final error = result['error'] as String? ?? '작업 실행 중 오류가 발생했습니다.';
+          final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
           errorMessages.add('$functionName: $error');
         }
       } catch (e) {
-        errorMessages.add('$functionName: 작업 실행 중 오류가 발생했습니다: ${e.toString()}');
+        errorMessages.add(Utils.mainContext.tr.agent_action_error_occurred_during_execution_with_function(functionName, e.toString()));
       }
     }
 
@@ -2452,17 +2069,21 @@ class AgentActionController extends _$AgentActionController {
       if (successMessages.length == 1) {
         resultMessage = successMessages.first;
       } else {
-        resultMessage = '${successMessages.length}개의 작업이 완료되었습니다:\n${successMessages.map((m) => '• $m').join('\n')}';
+        final details = successMessages.map((m) => '• $m').join('\n');
+        resultMessage = Utils.mainContext.tr.agent_action_tasks_completed_count(successMessages.length, details);
       }
     } else if (successMessages.isEmpty) {
-      resultMessage = '작업 실행 중 오류가 발생했습니다:\n${errorMessages.map((m) => '• $m').join('\n')}';
+      final details = errorMessages.map((m) => '• $m').join('\n');
+      resultMessage = Utils.mainContext.tr.agent_action_error_occurred_with_details(details);
     } else {
-      resultMessage = '일부 작업이 완료되었습니다:\n';
+      resultMessage = Utils.mainContext.tr.agent_action_partial_completion;
       if (successMessages.isNotEmpty) {
-        resultMessage += '성공:\n${successMessages.map((m) => '• $m').join('\n')}\n';
+        final details = successMessages.map((m) => '• $m').join('\n');
+        resultMessage += Utils.mainContext.tr.agent_action_success_section(details);
       }
       if (errorMessages.isNotEmpty) {
-        resultMessage += '실패:\n${errorMessages.map((m) => '• $m').join('\n')}';
+        final details = errorMessages.map((m) => '• $m').join('\n');
+        resultMessage += Utils.mainContext.tr.agent_action_failure_section(details);
       }
     }
 
@@ -2849,97 +2470,12 @@ AI: $cleanAssistantMessage
     }
   }
 
-  String _buildContextInfo(AgentActionType actionType, {InboxEntity? inbox, TaskEntity? task, EventEntity? event}) {
-    switch (actionType) {
-      case AgentActionType.reply:
-        // case AgentActionType.forward: // TODO: Forward 기능은 나중에 구현 예정
-        if (inbox?.linkedMail != null) {
-          final linkedMail = inbox!.linkedMail!;
-          // LinkedMailEntity에서 사용 가능한 정보 사용
-          final snippet = inbox.description ?? '';
-          return '''
-Original Email:
-Subject: ${linkedMail.title}
-From: ${linkedMail.fromName}
-Body:
-$snippet
-''';
-        }
-        return '';
-      case AgentActionType.createTask:
-        if (inbox != null) {
-          final title = inbox.title;
-          final description = inbox.description;
-          return '''
-Inbox Item:
-Title: $title
-Description:
-${description ?? ''}
-''';
-        }
-        return '';
-      case AgentActionType.createEvent:
-        if (inbox != null) {
-          final title = inbox.title;
-          final description = inbox.description;
-          return '''
-Inbox Item:
-Title: $title
-Description:
-${description ?? ''}
-''';
-        }
-        return '';
-      default:
-        return '';
-    }
-  }
-
-  String _escapeHtml(String text) {
-    return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
-  }
-
-  String _buildInitialMessage(AgentActionType actionType, String contextInfo, {InboxEntity? inbox, TaskEntity? task, EventEntity? event}) {
-    String contextHtml = '';
-
-    if ((actionType == AgentActionType.reply /* || actionType == AgentActionType.forward */ ) && inbox != null) {
-      // TODO: Forward 기능은 나중에 구현 예정
-      final inboxJson = jsonEncode(inbox.toJson(local: true));
-      contextHtml = '<inapp_inbox>$inboxJson</inapp_inbox>';
-    } else if (actionType == AgentActionType.createTask) {
-      // createTask에서는 inbox item을 표시하지 않음 (suggested task만 표시)
-      contextHtml = '';
-    } else if (actionType == AgentActionType.createEvent) {
-      // createEvent에서는 inbox item을 표시하지 않음 (suggested event만 표시)
-      contextHtml = '';
-    } else {
-      final escapedContextInfo = _escapeHtml(contextInfo).replaceAll('\n', '<br>');
-      contextHtml = '<div class="inbox-section"><div class="section-title">Inbox Item</div><div class="field"><span class="value">$escapedContextInfo</span></div></div>';
-    }
-
-    switch (actionType) {
-      case AgentActionType.reply:
-        final baseMessage = Utils.mainContext.tr.agent_action_reply_initial_message('');
-        final parts = baseMessage.split('{contextInfo}');
-        return '${parts[0]}$contextHtml${parts.length > 1 ? parts[1] : ''}';
-      // case AgentActionType.forward: // TODO: Forward 기능은 나중에 구현 예정
-      //   // Forward는 reply와 유사하지만 forward 형식으로 초기 메시지 생성
-      //   final baseMessage = Utils.mainContext.tr.agent_action_reply_initial_message('').replaceAll('reply', 'forward').replaceAll('Reply', 'Forward');
-      //   final parts = baseMessage.split('{contextInfo}');
-      //   return '${parts[0]}$contextHtml${parts.length > 1 ? parts[1] : ''}';
-      case AgentActionType.createTask:
-        // createTask에서는 contextInfo를 표시하지 않음 (suggested task만 표시)
-        return Utils.mainContext.tr.agent_action_create_task_initial_message('').replaceAll('{contextInfo}', '').replaceAll('\n\n\n', '\n\n');
-      case AgentActionType.createEvent:
-        // createEvent에서는 contextInfo를 표시하지 않음 (suggested event만 표시)
-        return Utils.mainContext.tr.agent_action_create_task_initial_message('').replaceAll('{contextInfo}', '').replaceAll('\n\n\n', '\n\n').replaceAll('task', 'event');
-      default:
-        return '<p>${_escapeHtml(Utils.mainContext.tr.agent_action_starting_action)}</p>';
-    }
-  }
 
   /// AI를 사용하여 사용자의 확인 상태를 판단합니다.
   /// conversation history와 user request를 기반으로 사용자가 action을 진행할 의사가 있는지 확인합니다.
+  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
+  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
+  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
   Future<bool> checkConfirmationFromAI({
     required LinkedMailEntity linkedMail,
     required String content,
@@ -2948,37 +2484,15 @@ ${description ?? ''}
     String? previousContent,
     required String model,
   }) async {
-    String? apiKey;
-    if (useUserApiKey) {
-      final apiKeys = ref.read(aiApiKeysProvider);
-      // model에서 provider 추출 (model name에서 provider 추론 필요)
-      // 일단 현재 선택된 모델의 provider 사용
-      apiKey = apiKeys[selectedModel.provider.name];
-    }
-
-    final suggestedResult = await _repository.generateSuggestedReply(
-      linkedMail: linkedMail,
-      snippet: content,
-      model: model,
-      threadMessages: null,
-      previousReply: previousContent,
-      userModificationRequest: previousContent != null ? userRequest : userRequest,
-      originalTo: [],
-      originalCc: [],
-      originalBcc: [],
-      senderEmail: null,
-      senderName: null,
-      currentUserEmail: linkedMail.hostMail,
-      originalMailBody: null,
-      actionType: 'send', // Indicate this is for send action
-      apiKey: apiKey,
-    );
-
-    final suggestedResponse = suggestedResult.fold((failure) => null, (response) => response);
-    return suggestedResponse?['isConfirmed'] as bool? ?? false;
+    // 더 이상 특화된 AI 호출을 사용하지 않음
+    // 확인은 MCP 함수 호출 시 자동으로 처리됨
+    return false;
   }
 
   /// Mail action을 위한 confirmation 체크 (reply, send 등)
+  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
+  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
+  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
   Future<bool> checkMailConfirmation({
     required LinkedMailEntity linkedMail,
     required String content,
@@ -2987,35 +2501,32 @@ ${description ?? ''}
     String? previousContent,
     required String model,
   }) async {
-    // AI에 전달할 때는 평문이어야 하므로 local: true 사용
-    return await checkConfirmationFromAI(
-      linkedMail: linkedMail,
-      content: content,
-      userRequest: userRequest,
-      conversationHistory: conversationHistory.map((m) => m.toJson(local: true)).toList(),
-      previousContent: previousContent,
-      model: model,
-    );
+    // 더 이상 특화된 AI 호출을 사용하지 않음
+    return false;
   }
 
   /// Task action을 위한 confirmation 체크
-  /// Task는 generateTaskFromInbox에서 이미 isConfirmed를 반환하므로,
-  /// 이 함수는 일관성을 위한 wrapper입니다.
+  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
+  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
+  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
   Future<bool> checkTaskConfirmation({required Map<String, dynamic> taskInfo}) async {
-    // Task의 경우 AI가 이미 taskInfo에 isConfirmed를 포함하여 반환
-    return taskInfo['isConfirmed'] as bool? ?? false;
+    // 더 이상 특화된 AI 호출을 사용하지 않음
+    return false;
   }
 
   /// Event action을 위한 confirmation 체크
-  /// Event는 generateEventFromInbox에서 이미 isConfirmed를 반환하므로,
-  /// 이 함수는 일관성을 위한 wrapper입니다.
+  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
+  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
+  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
   Future<bool> checkEventConfirmation({required Map<String, dynamic> eventInfo}) async {
-    // Event의 경우 AI가 이미 eventInfo에 isConfirmed를 포함하여 반환
-    return eventInfo['isConfirmed'] as bool? ?? false;
+    // 더 이상 특화된 AI 호출을 사용하지 않음
+    return false;
   }
 
   /// 모든 action에 공통적으로 적용되는 confirmation 체크
-  /// 새로운 action을 추가할 때도 이 함수를 사용하여 일관성을 유지합니다.
+  /// 이제 generalChat을 통해 처리되므로 더 이상 특화된 AI 호출이 필요 없습니다.
+  /// 확인은 MCP 함수 호출 시 자동으로 처리됩니다.
+  @Deprecated('더 이상 사용되지 않습니다. MCP 함수 호출 시 자동으로 확인이 처리됩니다.')
   Future<bool> checkActionConfirmation({
     required AgentActionType actionType,
     Map<String, dynamic>? actionInfo,
@@ -3026,37 +2537,8 @@ ${description ?? ''}
     String? previousContent,
     required String model,
   }) async {
-    switch (actionType) {
-      case AgentActionType.reply:
-      case AgentActionType.send:
-        if (linkedMail != null && content != null && userRequest != null && conversationHistory != null) {
-          return await checkMailConfirmation(
-            linkedMail: linkedMail,
-            content: content,
-            userRequest: userRequest,
-            conversationHistory: conversationHistory,
-            previousContent: previousContent,
-            model: model,
-          );
-        }
-        return false;
-      case AgentActionType.createTask:
-        if (actionInfo != null) {
-          return await checkTaskConfirmation(taskInfo: actionInfo);
-        }
-        return false;
-      case AgentActionType.createEvent:
-        if (actionInfo != null) {
-          return await checkEventConfirmation(eventInfo: actionInfo);
-        }
-        return false;
-      default:
-        // 새로운 action이 추가되면 여기에 추가
-        // 기본적으로 actionInfo에서 isConfirmed를 확인
-        if (actionInfo != null) {
-          return actionInfo['isConfirmed'] as bool? ?? false;
-        }
-        return false;
-    }
+    // 더 이상 특화된 AI 호출을 사용하지 않음
+    // 확인은 MCP 함수 호출 시 자동으로 처리됨
+    return false;
   }
 }
