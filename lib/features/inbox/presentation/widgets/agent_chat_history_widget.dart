@@ -10,7 +10,6 @@ import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_empty_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/selection_widget.dart';
-import 'package:Visir/features/common/presentation/widgets/wave_refresh_header.dart';
 import 'package:Visir/features/common/presentation/widgets/wave_refresh_footer.dart';
 import 'package:Visir/features/inbox/application/agent_action_controller.dart';
 import 'package:Visir/features/inbox/application/agent_chat_history_controller.dart';
