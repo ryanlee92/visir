@@ -636,11 +636,14 @@ class AgentActionController extends _$AgentActionController {
                   return null;
                 }
 
+                // 함수 이름에 따라 적절한 tabType 결정
+                final tabType = _getTabTypeForFunction(functionName);
+
                 // 함수 실행
                 final result = await executor.executeFunction(
                   functionName,
                   functionArgs,
-                  tabType: TabType.home,
+                  tabType: tabType,
                   availableTasks: updatedTaggedTasks,
                   availableEvents: updatedTaggedEvents,
                   availableConnections: taggedConnections,
@@ -1846,6 +1849,123 @@ class AgentActionController extends _$AgentActionController {
     state = AgentActionState(selectedModel: currentModel, useUserApiKey: currentUseUserApiKey, sessionId: null);
   }
 
+  /// 함수 이름에 따라 적절한 TabType을 결정합니다.
+  /// main_screen.dart의 콜백 함수들(onGmailChanged, onSlackChanged 등)을 참고하여 작성했습니다.
+  TabType _getTabTypeForFunction(String functionName) {
+    // Task 관련 함수들 - home 사용 (calendarTask는 home으로)
+    if (functionName.contains('Task') ||
+        functionName.startsWith('createTask') ||
+        functionName.startsWith('updateTask') ||
+        functionName.startsWith('deleteTask') ||
+        functionName.startsWith('toggleTask') ||
+        functionName.startsWith('assignProject') ||
+        functionName.startsWith('setPriority') ||
+        functionName.startsWith('addTags') ||
+        functionName.startsWith('removeTags') ||
+        functionName.startsWith('setDueDate') ||
+        functionName.startsWith('setReminder') ||
+        functionName.startsWith('setRecurrence') ||
+        functionName.startsWith('duplicateTask') ||
+        functionName.startsWith('getTodayTasks') ||
+        functionName.startsWith('getUpcomingTasks') ||
+        functionName.startsWith('getOverdueTasks') ||
+        functionName.startsWith('getUnscheduledTasks') ||
+        functionName.startsWith('getCompletedTasks') ||
+        functionName.startsWith('removeReminder') ||
+        functionName.startsWith('removeRecurrence') ||
+        functionName.startsWith('listTasks') ||
+        functionName.startsWith('getTask') ||
+        functionName.startsWith('moveTask') ||
+        functionName.startsWith('getTaskAttachments')) {
+      return TabType.home;
+    }
+
+    // Calendar/Event 관련 함수들 - home 사용 (calendarEvent는 home으로)
+    if (functionName.contains('Event') ||
+        functionName.contains('Calendar') ||
+        functionName.startsWith('createEvent') ||
+        functionName.startsWith('updateEvent') ||
+        functionName.startsWith('deleteEvent') ||
+        functionName.startsWith('responseCalendarInvitation') ||
+        functionName.startsWith('optimizeSchedule') ||
+        functionName.startsWith('reschedule') ||
+        functionName.startsWith('duplicateEvent') ||
+        functionName.startsWith('getTodayEvents') ||
+        functionName.startsWith('getUpcomingEvents') ||
+        functionName.startsWith('listEvents') ||
+        functionName.startsWith('getEvent') ||
+        functionName.startsWith('moveEvent') ||
+        functionName.startsWith('getEventAttachments') ||
+        functionName.startsWith('getCalendarList')) {
+      return TabType.home;
+    }
+
+    // Mail 관련 함수들 - mail 사용 (onGmailChanged는 모든 tabType을 사용하지만, 실제로는 mail tab이 적절)
+    if (functionName.contains('Mail') ||
+        functionName.startsWith('sendMail') ||
+        functionName.startsWith('replyMail') ||
+        functionName.startsWith('replyAllMail') ||
+        functionName.startsWith('forwardMail') ||
+        functionName.startsWith('markMail') ||
+        functionName.startsWith('archiveMail') ||
+        functionName.startsWith('unarchiveMail') ||
+        functionName.startsWith('pinMail') ||
+        functionName.startsWith('unpinMail') ||
+        functionName.startsWith('spamMail') ||
+        functionName.startsWith('unspamMail') ||
+        functionName.startsWith('deleteMail') ||
+        functionName.startsWith('getMail') ||
+        functionName.startsWith('listMails') ||
+        functionName.startsWith('moveMail') ||
+        functionName.startsWith('getMailLabels') ||
+        functionName.startsWith('getMailAttachments')) {
+      return TabType.mail;
+    }
+
+    // Message/Chat 관련 함수들 - chat 사용 (onSlackChanged는 모든 tabType을 사용하지만, 실제로는 chat tab이 적절)
+    if (functionName.contains('Message') ||
+        functionName.startsWith('sendMessage') ||
+        functionName.startsWith('replyMessage') ||
+        functionName.startsWith('editMessage') ||
+        functionName.startsWith('deleteMessage') ||
+        functionName.startsWith('addReaction') ||
+        functionName.startsWith('removeReaction') ||
+        functionName.startsWith('getMessage') ||
+        functionName.startsWith('listMessages') ||
+        functionName.startsWith('searchMessages') ||
+        functionName.startsWith('getMessageAttachments')) {
+      return TabType.chat;
+    }
+
+    // Inbox 관련 함수들 - home 사용
+    if (functionName.contains('Inbox') ||
+        functionName.startsWith('getInbox') ||
+        functionName.startsWith('listInboxes') ||
+        functionName.startsWith('pinInbox') ||
+        functionName.startsWith('unpinInbox') ||
+        functionName.startsWith('createTaskFromInbox')) {
+      return TabType.home;
+    }
+
+    // Project 관련 함수들 - home 사용
+    if (functionName.contains('Project') ||
+        functionName.startsWith('createProject') ||
+        functionName.startsWith('updateProject') ||
+        functionName.startsWith('deleteProject') ||
+        functionName.startsWith('searchProject') ||
+        functionName.startsWith('linkToProject') ||
+        functionName.startsWith('moveProject') ||
+        functionName.startsWith('inviteUserToProject') ||
+        functionName.startsWith('removeUserFromProject') ||
+        functionName.startsWith('getProject') ||
+        functionName.startsWith('listProjects')) {
+      return TabType.home;
+    }
+
+    // 기본값은 home
+    return TabType.home;
+  }
+
   /// 확인이 필요한 함수 호출을 실행합니다.
   Future<void> confirmAction({required String actionId}) async {
     // 유저가 confirm 메시지를 보낸 것처럼 처리 (AI에게는 보내지 않음)
@@ -1924,11 +2044,14 @@ class AgentActionController extends _$AgentActionController {
       final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
 
       try {
+        // 함수 이름에 따라 적절한 tabType 결정
+        final tabType = _getTabTypeForFunction(functionName);
+
         // 함수 실행
         final result = await executor.executeFunction(
           functionName,
           functionArgs,
-          tabType: TabType.home,
+          tabType: tabType,
           availableTasks: updatedTaggedTasks,
           availableEvents: updatedTaggedEvents,
           availableConnections: taggedConnections,
