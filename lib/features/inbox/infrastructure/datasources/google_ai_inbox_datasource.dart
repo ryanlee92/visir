@@ -833,8 +833,9 @@ When you need to display entity information (tasks, events, mails, messages, cal
 ### Task Entity
 Use `<inapp_task>` tag to display task information:
 ```html
-<inapp_task>{"id": "task-id", "title": "Task title", "description": "Task description", "project_id": "project-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "rrule": "FREQ=WEEKLY;BYDAY=MO", "status": "none"}</inapp_task>
+<inapp_task>{"title": "Task title", "description": "Task description", "project_id": "project-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "rrule": "FREQ=WEEKLY;BYDAY=MO", "status": "none"}</inapp_task>
 ```
+**IMPORTANT**: Do NOT include `id` field if the task doesn't exist yet (id will be null). Only include fields that have actual values - omit null fields entirely.
 
 ### Event Entity
 Use `<inapp_event>` tag to display event information:

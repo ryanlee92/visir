@@ -23,6 +23,8 @@ import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
+import 'package:Visir/features/task/application/task_list_controller.dart';
+import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_entity.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
@@ -148,6 +150,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     final project = task.projectId != null ? projects.where((p) => p.uniqueId == task.projectId).firstOrNull : defaultProject;
 
     return Container(
+      margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surfaceVariant.withValues(alpha: 0.5),
@@ -1074,9 +1077,13 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     // Keep tagged_connection, tagged_channel, tagged_project for inline badge rendering
     // They will be handled by HtmlWidget's customWidgetBuilder
 
+    // Check if content contains inapp_ tags (these should be treated as HTML)
+    final inappTagRegex = RegExp(r'<inapp_[a-z_]+>', caseSensitive: false);
+    final hasInappTags = inappTagRegex.hasMatch(cleanedContent);
+
     // Check if content is HTML (contains HTML tags, but exclude custom inapp tags)
     final htmlTagRegex = RegExp(r'<(?!/?(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
-    final isHtml = htmlTagRegex.hasMatch(cleanedContent);
+    final isHtml = htmlTagRegex.hasMatch(cleanedContent) || hasInappTags;
 
     // Check if content is Markdown (contains Markdown patterns)
     final isMarkdown = _isMarkdownContent(cleanedContent);
@@ -1293,19 +1300,86 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                 }
               }
 
+              // Filter out null values and string "null" values
+              final cleanedData = <String, dynamic>{};
+              jsonData.forEach((key, value) {
+                if (value != null && value != 'null' && !(value is String && value.toLowerCase() == 'null')) {
+                  cleanedData[key] = value;
+                }
+              });
+
+              // Convert camelCase to snake_case for TaskEntity.fromJson
+              final normalizedData = <String, dynamic>{};
+              cleanedData.forEach((key, value) {
+                String snakeKey = key;
+                if (key == 'startAt') {
+                  snakeKey = 'start_at';
+                } else if (key == 'endAt') {
+                  snakeKey = 'end_at';
+                } else if (key == 'projectId') {
+                  snakeKey = 'project_id';
+                } else if (key == 'createdAt') {
+                  snakeKey = 'created_at';
+                } else if (key == 'updatedAt') {
+                  snakeKey = 'updated_at';
+                } else if (key == 'isAllDay') {
+                  snakeKey = 'is_all_day';
+                } else if (key == 'recurrenceEndAt') {
+                  snakeKey = 'recurrence_end_at';
+                } else if (key == 'recurringTaskId') {
+                  snakeKey = 'recurring_task_id';
+                } else if (key == 'excludedRecurrenceDate') {
+                  snakeKey = 'excluded_recurrence_date';
+                } else if (key == 'editedRecurrenceTaskIds') {
+                  snakeKey = 'edited_recurrence_task_ids';
+                } else if (key == 'doNotApplyDateOffset') {
+                  snakeKey = 'do_not_apply_date_offset';
+                }
+                normalizedData[snakeKey] = value;
+              });
+
               // Normalize rrule if present
-              if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
-                final rruleStr = jsonData['rrule'] as String;
+              if (normalizedData['rrule'] != null && normalizedData['rrule'] is String) {
+                final rruleStr = normalizedData['rrule'] as String;
                 if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
-                  jsonData['rrule'] = 'RRULE:$rruleStr';
+                  normalizedData['rrule'] = 'RRULE:$rruleStr';
                 }
               }
 
-              final task = TaskEntity.fromJson(jsonData, local: true);
+              var task = TaskEntity.fromJson(normalizedData, local: true);
+
+              // If id is null, try to find task from controllers
+              if (task.id == null || task.id!.isEmpty) {
+                final title = normalizedData['title'] as String?;
+                TaskEntity? foundTask;
+
+                // Try to find task by title from controllers
+                if (title != null && title.isNotEmpty) {
+                  try {
+                    final taskListState = ref.read(taskListControllerProvider);
+                    final allTasks = taskListState.tasks;
+                    foundTask = allTasks.firstWhereOrNull((t) => t.title == title);
+                  } catch (_) {}
+
+                  if (foundTask == null) {
+                    try {
+                      final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+                      final calendarTasks = calendarState.tasks;
+                      foundTask = calendarTasks.firstWhereOrNull((t) => t.title == title);
+                    } catch (_) {}
+                  }
+
+                  if (foundTask != null) {
+                    // Update task with found id and other fields
+                    task = foundTask;
+                  }
+                }
+              }
+
               return _buildTaskWidget(context, task, isUser);
             } catch (e) {
               // 디버깅을 위해 에러 메시지 표시
-              return Text(context.tr.agent_action_task_generation_failed, style: baseStyle?.copyWith(color: context.error));
+              return Text('${context.tr.agent_action_task_generation_failed}: $e', style: baseStyle?.copyWith(color: context.error));
             }
           }
           if (element.localName == 'inapp_event') {
@@ -1730,16 +1804,206 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             switch (tagName) {
               case 'inapp_task':
                 try {
-                  if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
-                    final rruleStr = jsonData['rrule'] as String;
+                  // Convert camelCase to snake_case for TaskEntity.fromJson
+                  // Also filter out null values and string "null" values
+                  final normalizedData = <String, dynamic>{};
+                  jsonData.forEach((key, value) {
+                    // Skip null values and string "null"
+                    if (value == null || value == 'null' || (value is String && value.toLowerCase() == 'null')) {
+                      return;
+                    }
+
+                    String snakeKey = key;
+                    if (key == 'startAt') {
+                      snakeKey = 'start_at';
+                    } else if (key == 'endAt') {
+                      snakeKey = 'end_at';
+                    } else if (key == 'projectId') {
+                      snakeKey = 'project_id';
+                    } else if (key == 'createdAt') {
+                      snakeKey = 'created_at';
+                    } else if (key == 'updatedAt') {
+                      snakeKey = 'updated_at';
+                    } else if (key == 'isAllDay') {
+                      snakeKey = 'is_all_day';
+                    } else if (key == 'recurrenceEndAt') {
+                      snakeKey = 'recurrence_end_at';
+                    } else if (key == 'recurringTaskId') {
+                      snakeKey = 'recurring_task_id';
+                    } else if (key == 'excludedRecurrenceDate') {
+                      snakeKey = 'excluded_recurrence_date';
+                    } else if (key == 'editedRecurrenceTaskIds') {
+                      snakeKey = 'edited_recurrence_task_ids';
+                    } else if (key == 'doNotApplyDateOffset') {
+                      snakeKey = 'do_not_apply_date_offset';
+                    }
+                    normalizedData[snakeKey] = value;
+                  });
+
+                  if (normalizedData['rrule'] != null && normalizedData['rrule'] is String) {
+                    final rruleStr = normalizedData['rrule'] as String;
                     if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
-                      jsonData['rrule'] = 'RRULE:$rruleStr';
+                      normalizedData['rrule'] = 'RRULE:$rruleStr';
                     }
                   }
-                  final task = TaskEntity.fromJson(jsonData, local: true);
+                  var task = TaskEntity.fromJson(normalizedData, local: true);
+
+                  // If id is null, try to find task from controllers
+                  if (task.id == null || task.id!.isEmpty) {
+                    final title = normalizedData['title'] as String?;
+                    TaskEntity? foundTask;
+
+                    // Try to find task by title from controllers
+                    if (title != null && title.isNotEmpty) {
+                      try {
+                        final taskListState = ref.read(taskListControllerProvider);
+                        final allTasks = taskListState.tasks;
+                        foundTask = allTasks.firstWhereOrNull((t) => t.title == title);
+                      } catch (_) {}
+
+                      if (foundTask == null) {
+                        try {
+                          final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+                          final calendarTasks = calendarState.tasks;
+                          foundTask = calendarTasks.firstWhereOrNull((t) => t.title == title);
+                        } catch (_) {}
+                      }
+
+                      if (foundTask != null) {
+                        // Update task with found id and other fields
+                        task = foundTask;
+                      }
+                    }
+                  }
+
                   widget = _buildTaskWidget(context, task, isUser);
                 } catch (e) {
-                  // Skip invalid task
+                  // If parsing fails, try to find task from controllers
+                  print('[AI_AGENT] Error parsing task entity in markdown: $e');
+                  print('[AI_AGENT] JSON data: $jsonData');
+
+                  TaskEntity? foundTask;
+                  final taskId = jsonData['id'] as String?;
+                  final title = jsonData['title'] as String?;
+
+                  // Try to find task by ID or title from controllers
+                  if (taskId != null && taskId.isNotEmpty) {
+                    // Search in task list controller
+                    try {
+                      final taskListState = ref.read(taskListControllerProvider);
+                      final allTasks = taskListState.tasks;
+                      foundTask = allTasks.firstWhereOrNull((t) => t.id == taskId);
+                    } catch (_) {}
+
+                    // If not found, search in calendar task list controller
+                    if (foundTask == null) {
+                      try {
+                        final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+                        final calendarTasks = calendarState.tasks;
+                        foundTask = calendarTasks.firstWhereOrNull((t) => t.id == taskId);
+                      } catch (_) {}
+                    }
+                  }
+
+                  // If still not found and title exists, try searching by title
+                  if (foundTask == null && title != null && title.isNotEmpty) {
+                    try {
+                      final taskListState = ref.read(taskListControllerProvider);
+                      final allTasks = taskListState.tasks;
+                      foundTask = allTasks.firstWhereOrNull((t) => t.title == title);
+                    } catch (_) {}
+
+                    if (foundTask == null) {
+                      try {
+                        final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+                        final calendarTasks = calendarState.tasks;
+                        foundTask = calendarTasks.firstWhereOrNull((t) => t.title == title);
+                      } catch (_) {}
+                    }
+                  }
+
+                  if (foundTask != null) {
+                    widget = _buildTaskWidget(context, foundTask, isUser);
+                  } else {
+                    // If task not found, try one more time with cleaned JSON (without null values)
+                    try {
+                      final cleanedJsonData = <String, dynamic>{};
+                      jsonData.forEach((key, value) {
+                        if (value != null && value != 'null' && !(value is String && value.toLowerCase() == 'null')) {
+                          cleanedJsonData[key] = value;
+                        }
+                      });
+
+                      if (cleanedJsonData.isNotEmpty) {
+                        // Convert camelCase to snake_case
+                        final normalizedData = <String, dynamic>{};
+                        cleanedJsonData.forEach((key, value) {
+                          String snakeKey = key;
+                          if (key == 'startAt')
+                            snakeKey = 'start_at';
+                          else if (key == 'endAt')
+                            snakeKey = 'end_at';
+                          else if (key == 'projectId')
+                            snakeKey = 'project_id';
+                          else if (key == 'createdAt')
+                            snakeKey = 'created_at';
+                          else if (key == 'updatedAt')
+                            snakeKey = 'updated_at';
+                          else if (key == 'isAllDay')
+                            snakeKey = 'is_all_day';
+                          else if (key == 'recurrenceEndAt')
+                            snakeKey = 'recurrence_end_at';
+                          else if (key == 'recurringTaskId')
+                            snakeKey = 'recurring_task_id';
+                          else if (key == 'excludedRecurrenceDate')
+                            snakeKey = 'excluded_recurrence_date';
+                          else if (key == 'editedRecurrenceTaskIds')
+                            snakeKey = 'edited_recurrence_task_ids';
+                          else if (key == 'doNotApplyDateOffset')
+                            snakeKey = 'do_not_apply_date_offset';
+                          normalizedData[snakeKey] = value;
+                        });
+
+                        var task = TaskEntity.fromJson(normalizedData, local: true);
+                        if (task.id == null || task.id!.isEmpty) {
+                          final taskTitle = normalizedData['title'] as String?;
+                          if (taskTitle != null && taskTitle.isNotEmpty) {
+                            try {
+                              final taskListState = ref.read(taskListControllerProvider);
+                              final allTasks = taskListState.tasks;
+                              final found = allTasks.firstWhereOrNull((t) => t.title == taskTitle);
+                              if (found != null) task = found;
+                            } catch (_) {}
+
+                            if (task.id == null || task.id!.isEmpty) {
+                              try {
+                                final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+                                final calendarTasks = calendarState.tasks;
+                                final found = calendarTasks.firstWhereOrNull((t) => t.title == taskTitle);
+                                if (found != null) task = found;
+                              } catch (_) {}
+                            }
+                          }
+                        }
+                        widget = _buildTaskWidget(context, task, isUser);
+                      }
+                    } catch (_) {
+                      // If still fails, create a fallback widget with basic info
+                      widget = Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: context.surfaceVariant.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(8)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(title ?? 'Unknown Task', style: context.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            Text('Error parsing task: $e', style: context.bodySmall?.copyWith(color: context.error)),
+                          ],
+                        ),
+                      );
+                    }
+                  }
                 }
                 break;
               case 'inapp_event':
@@ -1833,13 +2097,22 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                 break;
             }
 
-            if (widget != null) {
-              final placeholder = '___ENTITY_PLACEHOLDER_${placeholderIndex++}___';
-              entityWidgets.add((placeholder: placeholder, widget: widget, position: position));
-              markdownContent = markdownContent.replaceFirst(match.group(0)!, placeholder);
-            }
+            // Always create a widget, even if parsing fails (to avoid placeholder being left)
+            final finalWidget =
+                widget ??
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: context.surfaceVariant.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(4)),
+                  child: Text('Failed to render entity', style: context.bodySmall?.copyWith(color: context.error)),
+                );
+
+            final placeholder = '___ENTITY_PLACEHOLDER_${placeholderIndex++}___';
+            entityWidgets.add((placeholder: placeholder, widget: finalWidget, position: position));
+            markdownContent = markdownContent.replaceFirst(match.group(0)!, placeholder);
           } catch (e) {
-            // Skip invalid entity tags
+            // If even error widget creation fails, remove the tag entirely
+            markdownContent = markdownContent.replaceFirst(match.group(0)!, '');
           }
         }
       }
