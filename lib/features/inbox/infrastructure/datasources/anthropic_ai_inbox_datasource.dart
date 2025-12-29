@@ -708,7 +708,67 @@ When calling multiple functions, analyze dependencies and mark functions that ca
     {"function": "createTask", "arguments": {...}, "can_parallelize": false, "depends_on": ["searchTask"]}
   ]
   ```
-The system will automatically execute parallelizable functions simultaneously for better performance.''';
+The system will automatically execute parallelizable functions simultaneously for better performance.
+
+## Displaying Entity Information with Custom Tags
+
+When you need to display entity information (tasks, events, mails, messages, calendars, inbox items) in your response, use the following custom HTML tags to ensure proper rendering:
+
+### Task Entity
+Use `<inapp_task>` tag to display task information:
+```html
+<inapp_task>{"id": "task-id", "title": "Task title", "description": "Task description", "project_id": "project-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "rrule": "FREQ=WEEKLY;BYDAY=MO", "status": "none"}</inapp_task>
+```
+
+### Event Entity
+Use `<inapp_event>` tag to display event information:
+```html
+<inapp_event>{"id": "event-id", "title": "Event title", "description": "Event description", "calendar_id": "calendar-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "location": "Location", "rrule": "FREQ=WEEKLY;BYDAY=MO", "attendees": ["email@example.com"], "isAllDay": false}</inapp_event>
+```
+
+### Mail Entity
+Use `<inapp_mail_entity>` tag to display mail information:
+```html
+<inapp_mail_entity>{"id": "mail-id", "threadId": "thread-id", "subject": "Mail subject", "snippet": "Mail snippet", "from": {"name": "Sender Name", "email": "sender@example.com"}, "date": "2024-01-01T10:00:00Z"}</inapp_mail_entity>
+```
+
+### Message Entity
+Use `<inapp_message>` tag to display chat message information:
+```html
+<inapp_message>{"id": "message-id", "channelId": "channel-id", "userId": "user-id", "text": "Message text", "createdAt": "2024-01-01T10:00:00Z"}</inapp_message>
+```
+
+### Calendar Entity
+Use `<inapp_calendar>` tag to display calendar information:
+```html
+<inapp_calendar>{"id": "calendar-id", "name": "Calendar Name", "email": "calendar@example.com", "backgroundColor": "#4285f4"}</inapp_calendar>
+```
+
+### Event Entity (Full Details)
+Use `<inapp_event_entity>` tag to display full event entity information:
+```html
+<inapp_event_entity>{"id": "event-id", "title": "Event title", "description": "Event description", "calendar_id": "calendar-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "location": "Location", "rrule": "FREQ=WEEKLY;BYDAY=MO", "attendees": [{"email": "email@example.com", "displayName": "Name"}], "isAllDay": false}</inapp_event_entity>
+```
+
+### Inbox Entity
+Use `<inapp_inbox>` tag to display inbox item information:
+```html
+<inapp_inbox>{"id": "inbox-id", "title": "Inbox title", "description": "Inbox description", "inboxDatetime": "2024-01-01T10:00:00Z"}</inapp_inbox>
+```
+
+### When to Use These Tags
+
+Use these tags when:
+1. **Displaying search results**: After calling `searchInbox`, `searchTask`, or `searchCalendarEvent`, display the results using the appropriate tags
+2. **Showing entity details**: When the user asks about a specific task, event, mail, or message, display it using the appropriate tag
+3. **Listing multiple entities**: When showing multiple entities, use multiple tags in your response
+4. **Providing context**: When referencing entities in your response, use these tags to make them visually distinct
+
+**IMPORTANT**: 
+- Always include the JSON data inside the tags as a single-line string (no line breaks in JSON)
+- Use the appropriate tag for each entity type
+- You can combine these tags with regular HTML/text in your response
+- These tags work in both HTML and Markdown responses''';
 
       if (projectContext != null && projectContext.isNotEmpty) {
         systemMessage += '\n\n## Project Context\n$projectContext';

@@ -24,6 +24,21 @@ import 'package:Visir/features/preference/application/local_pref_controller.dart
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
+import 'package:Visir/features/chat/domain/entities/message_entity.dart';
+import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
+import 'package:Visir/features/chat/domain/entities/message_member_entity.dart';
+import 'package:Visir/features/chat/domain/entities/message_group_entity.dart';
+import 'package:Visir/features/chat/domain/entities/message_emoji_entity.dart';
+import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
+import 'package:Visir/features/chat/application/chat_member_list_controller.dart';
+import 'package:Visir/features/chat/application/chat_group_list_controller.dart';
+import 'package:Visir/features/chat/application/chat_emoji_list_controller.dart';
+import 'package:Visir/features/chat/providers.dart';
+import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
+import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
+import 'package:Visir/features/calendar/domain/entities/event_attendee_entity.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/color_extension.dart';
+import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1193,6 +1208,98 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
               return Text('Error parsing mail: $e', style: baseStyle?.copyWith(color: context.error));
             }
           }
+          if (element.localName == 'inapp_mail_entity') {
+            try {
+              final jsonText = element.text.trim();
+              if (jsonText.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              Map<String, dynamic> jsonData;
+              try {
+                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+              } catch (e) {
+                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                if (jsonMatch != null) {
+                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                } else {
+                  rethrow;
+                }
+              }
+              final mail = MailEntity.fromJson(jsonData);
+              return _buildMailEntityWidget(context, mail, isUser);
+            } catch (e) {
+              return Text('Error parsing mail entity: $e', style: baseStyle?.copyWith(color: context.error));
+            }
+          }
+          if (element.localName == 'inapp_message') {
+            try {
+              final jsonText = element.text.trim();
+              if (jsonText.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              Map<String, dynamic> jsonData;
+              try {
+                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+              } catch (e) {
+                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                if (jsonMatch != null) {
+                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                } else {
+                  rethrow;
+                }
+              }
+              final message = MessageEntity.fromJson(jsonData);
+              return _buildMessageWidget(context, message, isUser);
+            } catch (e) {
+              return Text('Error parsing message: $e', style: baseStyle?.copyWith(color: context.error));
+            }
+          }
+          if (element.localName == 'inapp_calendar') {
+            try {
+              final jsonText = element.text.trim();
+              if (jsonText.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              Map<String, dynamic> jsonData;
+              try {
+                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+              } catch (e) {
+                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                if (jsonMatch != null) {
+                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                } else {
+                  rethrow;
+                }
+              }
+              final calendar = CalendarEntity.fromJson(jsonData);
+              return _buildCalendarWidget(context, calendar, isUser);
+            } catch (e) {
+              return Text('Error parsing calendar: $e', style: baseStyle?.copyWith(color: context.error));
+            }
+          }
+          if (element.localName == 'inapp_event_entity') {
+            try {
+              final jsonText = element.text.trim();
+              if (jsonText.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              Map<String, dynamic> jsonData;
+              try {
+                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+              } catch (e) {
+                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                if (jsonMatch != null) {
+                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                } else {
+                  rethrow;
+                }
+              }
+              final event = EventEntity.fromJson(jsonData);
+              return _buildEventEntityWidget(context, event, isUser);
+            } catch (e) {
+              return Text('Error parsing event entity: $e', style: baseStyle?.copyWith(color: context.error));
+            }
+          }
           if (element.localName == 'inapp_action_confirm') {
             try {
               final jsonText = element.text.trim();
@@ -1419,8 +1526,145 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         },
       );
     } else if (isMarkdown) {
-      // Render Markdown content
+      // Render Markdown content with entity tag support
       final unescapedContent = _htmlUnescape.convert(cleanedContent);
+
+      // Extract entity tags from markdown content
+      final List<({String placeholder, Widget widget, int position})> entityWidgets = [];
+      final RegExp entityTagRegex = RegExp(
+        r'<(inapp_task|inapp_event|inapp_mail|inapp_mail_entity|inapp_message|inapp_calendar|inapp_event_entity|inapp_inbox|inapp_mail_summary|inapp_action_confirm)>([\s\S]*?)</\1>',
+        multiLine: true,
+      );
+
+      String markdownContent = unescapedContent;
+      int placeholderIndex = 0;
+
+      // Replace entity tags with placeholders and store widgets
+      for (final match in entityTagRegex.allMatches(unescapedContent)) {
+        final tagName = match.group(1)!;
+        final jsonText = match.group(2)?.trim() ?? '';
+        final position = match.start;
+
+        if (jsonText.isNotEmpty) {
+          try {
+            Map<String, dynamic> jsonData;
+            try {
+              jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            } catch (e) {
+              final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+              if (jsonMatch != null) {
+                jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+              } else {
+                continue;
+              }
+            }
+
+            Widget? widget;
+            switch (tagName) {
+              case 'inapp_task':
+                try {
+                  if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
+                    final rruleStr = jsonData['rrule'] as String;
+                    if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
+                      jsonData['rrule'] = 'RRULE:$rruleStr';
+                    }
+                  }
+                  final task = TaskEntity.fromJson(jsonData, local: true);
+                  widget = _buildTaskWidget(context, task, isUser);
+                } catch (e) {
+                  // Skip invalid task
+                }
+                break;
+              case 'inapp_event':
+                try {
+                  if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
+                    final rruleStr = jsonData['rrule'] as String;
+                    if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
+                      jsonData['rrule'] = 'RRULE:$rruleStr';
+                    }
+                  }
+                  final eventData = _parseEventFromJson(jsonData);
+                  widget = _buildEventWidget(context, eventData, isUser);
+                } catch (e) {
+                  // Skip invalid event
+                }
+                break;
+              case 'inapp_mail_entity':
+                try {
+                  final mail = MailEntity.fromJson(jsonData);
+                  widget = _buildMailEntityWidget(context, mail, isUser);
+                } catch (e) {
+                  // Skip invalid mail
+                }
+                break;
+              case 'inapp_message':
+                try {
+                  final message = MessageEntity.fromJson(jsonData);
+                  widget = _buildMessageWidget(context, message, isUser);
+                } catch (e) {
+                  // Skip invalid message
+                }
+                break;
+              case 'inapp_calendar':
+                try {
+                  final calendar = CalendarEntity.fromJson(jsonData);
+                  widget = _buildCalendarWidget(context, calendar, isUser);
+                } catch (e) {
+                  // Skip invalid calendar
+                }
+                break;
+              case 'inapp_event_entity':
+                try {
+                  final event = EventEntity.fromJson(jsonData);
+                  widget = _buildEventEntityWidget(context, event, isUser);
+                } catch (e) {
+                  // Skip invalid event entity
+                }
+                break;
+              case 'inapp_inbox':
+                try {
+                  final inbox = InboxEntity.fromJson(jsonData, local: true);
+                  widget = _buildInboxWidget(context, inbox, isUser);
+                } catch (e) {
+                  // Skip invalid inbox
+                }
+                break;
+              case 'inapp_mail_summary':
+                try {
+                  final summary = jsonData['summary'] as String? ?? '';
+                  if (summary.isNotEmpty) {
+                    widget = _buildMailSummaryWidget(context, summary, isUser);
+                  }
+                } catch (e) {
+                  // Skip invalid summary
+                }
+                break;
+              case 'inapp_mail':
+                try {
+                  final mailData = jsonData;
+                  if (mailData['reply'] == null && mailData['message'] != null) {
+                    mailData['reply'] = mailData['message'];
+                  }
+                  widget = _buildMailReplyWidget(context, mailData, isUser);
+                } catch (e) {
+                  // Skip invalid mail reply
+                }
+                break;
+            }
+
+            if (widget != null) {
+              final placeholder = '___ENTITY_PLACEHOLDER_${placeholderIndex++}___';
+              entityWidgets.add((placeholder: placeholder, widget: widget, position: position));
+              markdownContent = markdownContent.replaceFirst(match.group(0)!, placeholder);
+            }
+          } catch (e) {
+            // Skip invalid entity tags
+          }
+        }
+      }
+
+      // Sort entity widgets by position (reverse order for replacement)
+      entityWidgets.sort((a, b) => b.position.compareTo(a.position));
 
       // baseStyle에서 fontFamily를 제거하여 기본 폰트 사용
       final defaultStyle = baseStyle?.copyWith(fontFamily: null);
@@ -1436,32 +1680,126 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         inherit: false, // 상속 비활성화
       );
 
-      return MarkdownBody(
-        data: unescapedContent,
-        styleSheet: MarkdownStyleSheet(
-          p: defaultStyle,
-          h1: createHeaderStyle(baseFontSize * 1.5),
-          h2: createHeaderStyle(baseFontSize * 1.3),
-          h3: createHeaderStyle(baseFontSize * 1.1),
-          h4: createHeaderStyle(baseFontSize * 1.05),
-          h5: createHeaderStyle(baseFontSize),
-          h6: createHeaderStyle(baseFontSize * 0.95),
-          code: defaultStyle?.copyWith(
-            backgroundColor: Colors.transparent,
-            color: context.primaryContainer,
-            fontFamily: 'monospace',
-            leadingDistribution: TextLeadingDistribution.even,
+      // If there are entity widgets, we need to split markdown and insert widgets
+      if (entityWidgets.isEmpty) {
+        // No entity widgets, just render markdown normally
+        return MarkdownBody(
+          data: markdownContent,
+          styleSheet: MarkdownStyleSheet(
+            p: defaultStyle,
+            h1: createHeaderStyle(baseFontSize * 1.5),
+            h2: createHeaderStyle(baseFontSize * 1.3),
+            h3: createHeaderStyle(baseFontSize * 1.1),
+            h4: createHeaderStyle(baseFontSize * 1.05),
+            h5: createHeaderStyle(baseFontSize),
+            h6: createHeaderStyle(baseFontSize * 0.95),
+            code: defaultStyle?.copyWith(
+              backgroundColor: Colors.transparent,
+              color: context.primaryContainer,
+              fontFamily: 'monospace',
+              leadingDistribution: TextLeadingDistribution.even,
+            ),
+            codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
+            blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
+            blockquoteDecoration: BoxDecoration(
+              border: Border(left: BorderSide(color: context.outline, width: 3)),
+            ),
+            listBullet: defaultStyle,
+            tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
+            tableBody: defaultStyle,
           ),
-          codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
-          blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
-          blockquoteDecoration: BoxDecoration(
-            border: Border(left: BorderSide(color: context.outline, width: 3)),
-          ),
-          listBullet: defaultStyle,
-          tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
-          tableBody: defaultStyle,
-        ),
-      );
+        );
+      } else {
+        // Split markdown by placeholders and insert widgets
+        final List<Widget> children = [];
+        String remainingContent = markdownContent;
+
+        // Sort by position in reverse order to replace from end to start
+        final sortedWidgets = List.from(entityWidgets)
+          ..sort((a, b) {
+            final indexA = markdownContent.indexOf(a.placeholder);
+            final indexB = markdownContent.indexOf(b.placeholder);
+            return indexB.compareTo(indexA);
+          });
+
+        for (final entityWidget in sortedWidgets) {
+          final placeholderIndex = remainingContent.indexOf(entityWidget.placeholder);
+          if (placeholderIndex != -1) {
+            // Add markdown before placeholder
+            final beforeText = remainingContent.substring(0, placeholderIndex);
+            if (beforeText.trim().isNotEmpty) {
+              children.add(
+                MarkdownBody(
+                  data: beforeText,
+                  styleSheet: MarkdownStyleSheet(
+                    p: defaultStyle,
+                    h1: createHeaderStyle(baseFontSize * 1.5),
+                    h2: createHeaderStyle(baseFontSize * 1.3),
+                    h3: createHeaderStyle(baseFontSize * 1.1),
+                    h4: createHeaderStyle(baseFontSize * 1.05),
+                    h5: createHeaderStyle(baseFontSize),
+                    h6: createHeaderStyle(baseFontSize * 0.95),
+                    code: defaultStyle?.copyWith(
+                      backgroundColor: Colors.transparent,
+                      color: context.primaryContainer,
+                      fontFamily: 'monospace',
+                      leadingDistribution: TextLeadingDistribution.even,
+                    ),
+                    codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
+                    blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
+                    blockquoteDecoration: BoxDecoration(
+                      border: Border(left: BorderSide(color: context.outline, width: 3)),
+                    ),
+                    listBullet: defaultStyle,
+                    tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
+                    tableBody: defaultStyle,
+                  ),
+                ),
+              );
+            }
+
+            // Add entity widget
+            children.add(entityWidget.widget);
+
+            // Update remaining content
+            remainingContent = remainingContent.substring((placeholderIndex + entityWidget.placeholder.length).toInt());
+          }
+        }
+
+        // Add remaining markdown
+        if (remainingContent.trim().isNotEmpty) {
+          children.add(
+            MarkdownBody(
+              data: remainingContent,
+              styleSheet: MarkdownStyleSheet(
+                p: defaultStyle,
+                h1: createHeaderStyle(baseFontSize * 1.5),
+                h2: createHeaderStyle(baseFontSize * 1.3),
+                h3: createHeaderStyle(baseFontSize * 1.1),
+                h4: createHeaderStyle(baseFontSize * 1.05),
+                h5: createHeaderStyle(baseFontSize),
+                h6: createHeaderStyle(baseFontSize * 0.95),
+                code: defaultStyle?.copyWith(
+                  backgroundColor: Colors.transparent,
+                  color: context.primaryContainer,
+                  fontFamily: 'monospace',
+                  leadingDistribution: TextLeadingDistribution.even,
+                ),
+                codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
+                blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
+                blockquoteDecoration: BoxDecoration(
+                  border: Border(left: BorderSide(color: context.outline, width: 3)),
+                ),
+                listBullet: defaultStyle,
+                tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
+                tableBody: defaultStyle,
+              ),
+            ),
+          );
+        }
+
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: children);
+      }
     } else {
       final unescapedContent = _htmlUnescape.convert(cleanedContent);
 
@@ -1809,20 +2147,18 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 final state = ref.watch(agentActionControllerProvider);
                                 final pendingCalls = state.pendingFunctionCalls ?? [];
                                 final selectedIds = state.selectedActionIds;
-                                
+
                                 if (pendingCalls.length < 2) {
                                   return const SizedBox.shrink();
                                 }
-                                
+
                                 final hasSelected = selectedIds.isNotEmpty;
-                                
+
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
                                     color: context.surfaceVariant.withValues(alpha: 0.5),
-                                    border: Border(
-                                      bottom: BorderSide(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                    ),
+                                    border: Border(bottom: BorderSide(color: context.outline.withValues(alpha: 0.2), width: 1)),
                                   ),
                                   child: Row(
                                     children: [
@@ -1834,10 +2170,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                         },
                                       ),
                                       Expanded(
-                                        child: Text(
-                                          '${selectedIds.length}/${pendingCalls.length}개 선택됨',
-                                          style: context.bodySmall?.copyWith(color: context.onSurfaceVariant),
-                                        ),
+                                        child: Text('${selectedIds.length}/${pendingCalls.length}개 선택됨', style: context.bodySmall?.copyWith(color: context.onSurfaceVariant)),
                                       ),
                                       if (hasSelected)
                                         VisirButton(
@@ -1850,10 +2183,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                           onTap: () async {
                                             await controller.confirmActions(actionIds: selectedIds.toList());
                                           },
-                                          child: Text(
-                                            '선택한 항목 확인 (${selectedIds.length})',
-                                            style: context.bodySmall?.copyWith(color: context.onPrimary),
-                                          ),
+                                          child: Text('선택한 항목 확인 (${selectedIds.length})', style: context.bodySmall?.copyWith(color: context.onPrimary)),
                                         ),
                                     ],
                                   ),
@@ -1940,6 +2270,275 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                 ),
               ),
             ),
+    );
+  }
+
+  // Mail Entity Widget
+  Widget _buildMailEntityWidget(BuildContext context, MailEntity mail, bool isUser) {
+    final fromName = mail.from?.name ?? mail.from?.email ?? '';
+    final subject = mail.subject ?? '';
+    final snippet = mail.snippet ?? '';
+    final dateStr = mail.getDateString(context) ?? '';
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surface,
+        border: Border.all(color: isUser ? context.primaryContainer : context.outline.withValues(alpha: 0.3), width: 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              VisirIcon(type: VisirIconType.mail, size: 16, color: isUser ? context.onPrimaryContainer : context.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '메일',
+                  style: context.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : context.primary),
+                ),
+              ),
+              if (dateStr.isNotEmpty) Text(dateStr, style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (fromName.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                '보낸 사람: $fromName',
+                style: context.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: isUser ? context.onPrimaryContainer : context.onSurface),
+              ),
+            ),
+          if (subject.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                subject,
+                style: context.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : context.onSurface),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          if (snippet.isNotEmpty)
+            Text(
+              snippet,
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
+    );
+  }
+
+  // Message Widget
+  Widget _buildMessageWidget(BuildContext context, MessageEntity message, bool isUser) {
+    final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+    final members = ref.read(chatMemberListControllerProvider(tabType: TabType.home)).members;
+
+    final channelId = message.channelId;
+    final channel = channelId != null ? channels.firstWhereOrNull((c) => c.id == channelId) : null;
+    final channelName = channel?.displayName ?? channel?.name ?? '알 수 없는 채널';
+
+    // Get user name from message
+    String userName = '알 수 없는 사용자';
+    final userId = message.userId;
+    if (userId != null) {
+      final member = members.firstWhereOrNull((m) => m.id == userId);
+      userName = member?.displayName ?? userId;
+    }
+
+    // Get text from message
+    String text = '';
+    switch (message.type) {
+      case MessageEntityType.slack:
+        text = message.slackMessage?.text ?? '';
+        break;
+    }
+
+    final createdAt = message.createdAt;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surface,
+        border: Border.all(color: isUser ? context.primaryContainer : context.outline.withValues(alpha: 0.3), width: 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              VisirIcon(type: channel?.icon ?? VisirIconType.chatChannel, size: 16, color: isUser ? context.onPrimaryContainer : context.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  channelName,
+                  style: context.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : context.primary),
+                ),
+              ),
+              if (createdAt != null) Text(createdAt.forceDateTimeString, style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '$userName: $text',
+            style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurface, height: 1.4),
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Calendar Widget
+  Widget _buildCalendarWidget(BuildContext context, CalendarEntity calendar, bool isUser) {
+    final bgColor = ColorX.fromHex(calendar.backgroundColor);
+    final fgColor = ColorX.fromHex(calendar.foregroundColor);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgColor.withValues(alpha: isUser ? 0.3 : 0.15),
+        border: Border.all(color: bgColor.withValues(alpha: isUser ? 0.5 : 0.3), width: 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          VisirIcon(type: VisirIconType.calendar, size: 16, color: isUser ? context.onPrimaryContainer : fgColor, isSelected: true),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              calendar.name,
+              style: context.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : fgColor),
+            ),
+          ),
+          if (calendar.email != null && calendar.email!.isNotEmpty)
+            Text(calendar.email!, style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : fgColor.withValues(alpha: 0.7))),
+        ],
+      ),
+    );
+  }
+
+  // Event Entity Widget
+  Widget _buildEventEntityWidget(BuildContext context, EventEntity event, bool isUser) {
+    final calendar = event.calendar;
+    final title = event.title ?? '';
+    final description = event.description ?? '';
+    final location = event.location ?? '';
+    final startDate = event.startDate;
+    final endDate = event.endDate;
+    final isAllDay = event.isAllDay;
+    final attendees = event.attendees;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surface,
+        border: Border.all(color: isUser ? context.primaryContainer : context.outline.withValues(alpha: 0.3), width: 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 20,
+                decoration: BoxDecoration(color: ColorX.fromHex(calendar.backgroundColor), borderRadius: BorderRadius.circular(2)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  calendar.name,
+                  style: context.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : context.primary),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (title.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                title,
+                style: context.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: isUser ? context.onPrimaryContainer : context.onSurface),
+              ),
+            ),
+          if (startDate != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  VisirIcon(type: VisirIconType.clock, size: 14, color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                  const SizedBox(width: 4),
+                  Text(
+                    isAllDay
+                        ? '${startDate.forceDateString}${endDate != null && endDate != startDate ? ' - ${endDate.forceDateString}' : ''} • ${context.tr.all_day}'
+                        : '${startDate.forceDateTimeString}${endDate != null ? ' - ${endDate.forceDateTimeString}' : ''}',
+                    style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+          if (location.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  VisirIcon(type: VisirIconType.location, size: 14, color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      location,
+                      style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (attendees.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  VisirIcon(type: VisirIconType.attendee, size: 14, color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      attendees.map((a) => a.email ?? a.displayName ?? '').where((e) => e.isNotEmpty).join(', '),
+                      style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (description.isNotEmpty)
+            Text(
+              description,
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.4),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
     );
   }
 }
