@@ -32,11 +32,11 @@ class LocalPrefControllerInternal extends _$LocalPrefControllerInternal {
 
   @override
   Future<LocalPrefEntity> build({required bool isSignedIn}) async {
-    if (ref.watch(shouldUseMockDataProvider)) return fakeLocalPref;
+    if (ref.read(shouldUseMockDataProvider)) return fakeLocalPref;
 
     // 순환 의존성 방지를 위해 authControllerProvider를 직접 watch하지 않고
     // isSignedIn 파라미터를 사용하여 userId를 얻기
-    final userId = isSignedIn ? ref.watch(authControllerProvider.select((v) => v.value?.id ?? fakeUser.id)) : fakeUser.id;
+    final userId = ref.read(authControllerProvider.select((v) => v.value!.id));
 
     await persist(
       ref.watch(storageProvider.future),
