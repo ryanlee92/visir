@@ -1609,7 +1609,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
               final mail = MailEntity.fromJson(jsonData);
               return _buildMailEntityWidget(context, mail, isUser);
             } catch (e) {
-              print('[AI_AGENT] Error parsing mail entity: $e');
               return Text('Error parsing mail entity: $e', style: baseStyle?.copyWith(color: context.error));
             }
           }
@@ -1991,8 +1990,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   widget = _buildTaskWidget(context, task, isUser);
                 } catch (e) {
                   // If parsing fails, try to find task from controllers
-                  print('[AI_AGENT] Error parsing task entity in markdown: $e');
-                  print('[AI_AGENT] JSON data: $jsonData');
 
                   TaskEntity? foundTask;
                   final taskId = jsonData['id'] as String?;
@@ -2150,7 +2147,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   final mail = MailEntity.fromJson(jsonData);
                   widget = _buildMailEntityWidget(context, mail, isUser);
                 } catch (e) {
-                  print('[AI_AGENT] Error parsing mail entity in markdown: $e, jsonData: $jsonData');
                   // Skip invalid mail
                 }
                 break;

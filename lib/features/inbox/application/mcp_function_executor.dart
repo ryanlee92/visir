@@ -3053,7 +3053,6 @@ class McpFunctionExecutor {
       results.add({'taskId': updatedTask.id, 'startAt': bestStartTime?.toIso8601String() ?? '', 'endAt': bestEndTime?.toIso8601String() ?? ''});
     }
 
-    print('[Reschedule] Completed: ${results.length} tasks rescheduled successfully');
     return {'success': true, 'results': results, 'message': '${results.length}개의 작업이 오늘 적절한 시간에 재스케줄되었습니다.'};
   }
 

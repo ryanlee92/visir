@@ -186,7 +186,6 @@ class Utils {
         ),
       );
     } else {
-      print('######## mainContext: $mainContext');
       return CupertinoScaffold.showCupertinoModalBottomSheet<T>(
         context: mainContext,
         duration: kThemeAnimationDuration,
