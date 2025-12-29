@@ -202,6 +202,14 @@ class CalendarEventListController extends _$CalendarEventListController {
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.loading);
     final controllerLength = _controllers.entries.expand((e) => e.value.entries.where((e) => requireLoadMonth?.contains(e.key) ?? true)).length;
+    
+    // OAuth가 없으면 즉시 success로 완료
+    if (controllerLength == 0) {
+      ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
+      completer.complete();
+      return completer.future;
+    }
+    
     _controllers.forEach((key, value) {
       value.entries.where((e) => requireLoadMonth?.contains(e.key) ?? true).forEach((e) {
         e.value
@@ -230,19 +238,28 @@ class CalendarEventListController extends _$CalendarEventListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.loading);
+    final controllerLength = _controllers.entries.expand((e) => e.value.entries).length;
+    
+    // OAuth가 없으면 즉시 success로 완료
+    if (controllerLength == 0) {
+      ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
+      completer.complete();
+      return completer.future;
+    }
+    
     _controllers.forEach((key, value) {
       value.entries.forEach((e) {
         e.value
             .load(showLoading: showLoading, isChunkUpdate: isChunkUpdate)
             .then((_) {
               resultCount++;
-              if (resultCount != _controllers.entries.expand((e) => e.value.entries).length) return;
+              if (resultCount != controllerLength) return;
               ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
               completer.complete();
             })
             .catchError((error) {
               resultCount++;
-              if (resultCount != _controllers.entries.expand((e) => e.value.entries).length) return;
+              if (resultCount != controllerLength) return;
               ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.error);
               completer.complete();
             });

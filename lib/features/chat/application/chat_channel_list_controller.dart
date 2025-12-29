@@ -95,6 +95,14 @@ class ChatChannelListController extends _$ChatChannelListController {
     Map<String, MessageChannelFetchResultEntity> result = {};
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
+
+    // OAuth가 없으면 즉시 success로 완료
+    if (_controller.isEmpty) {
+      ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
+      completer.complete(result);
+      return completer.future;
+    }
+
     _controller.forEach((key, value) {
       value
           .load()

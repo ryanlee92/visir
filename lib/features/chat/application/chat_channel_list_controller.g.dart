@@ -51,7 +51,7 @@ final class ChatChannelListControllerProvider
 }
 
 String _$chatChannelListControllerHash() =>
-    r'2a500fc58b46ba737fdfae50794f4c3cc1ba138b';
+    r'0f9b9c0adf0bc806bff96f058bb2b9d3daa9223b';
 
 abstract class _$ChatChannelListController
     extends $Notifier<Map<String, MessageChannelFetchResultEntity>> {

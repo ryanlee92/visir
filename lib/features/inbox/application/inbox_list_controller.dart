@@ -657,18 +657,26 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     Completer<void> completer = Completer<void>();
     this.query = query;
     int resultCount = 0;
+    final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
+    
+    // OAuth가 없으면 즉시 완료
+    if (totalControllers == 0) {
+      completer.complete();
+      return completer.future;
+    }
+    
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
           .load(refresh: true, query: query)
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -678,12 +686,12 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
           .load(refresh: true, query: query)
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -695,18 +703,26 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     Completer<void> completer = Completer<void>();
     this.query = null;
     int resultCount = 0;
+    final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
+    
+    // OAuth가 없으면 즉시 완료
+    if (totalControllers == 0) {
+      completer.complete();
+      return completer.future;
+    }
+    
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
           .load(refresh: true)
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -716,12 +732,12 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
           .load(refresh: true)
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -731,18 +747,26 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
   Future<void> loadMore() async {
     Completer<void> completer = Completer<void>();
     int resultCount = 0;
+    final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
+    
+    // OAuth가 없으면 즉시 완료
+    if (totalControllers == 0) {
+      completer.complete();
+      return completer.future;
+    }
+    
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
           .load(query: query)
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -752,12 +776,12 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
           .load(query: query)
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -842,18 +866,26 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
     Completer<void> completer = Completer<void>();
     this.query = query;
     int resultCount = 0;
+    final totalControllers = _sourceMailControllers.length + _sourceChatControllers.length;
+    
+    // OAuth가 없으면 즉시 완료
+    if (totalControllers == 0) {
+      completer.complete();
+      return completer.future;
+    }
+    
     _sourceMailControllers.forEach((key, value) {
       ref
           .read(value.notifier)
           .loadRecent()
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });
@@ -863,12 +895,12 @@ class InboxListControllerInternal extends _$InboxListControllerInternal {
           .loadRecent()
           .then((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           })
           .catchError((e) {
             resultCount++;
-            if (resultCount != _sourceMailControllers.length + _sourceChatControllers.length) return;
+            if (resultCount != totalControllers) return;
             completer.complete();
           });
     });

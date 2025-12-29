@@ -155,6 +155,14 @@ class CalendarTaskListController extends _$CalendarTaskListController {
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.loading);
     final controllerLength = _controllers.entries.expand((e) => e.value.entries.where((e) => requireLoadMonth?.contains(e.key) ?? true)).length;
+
+    // OAuth가 없으면 즉시 success로 완료
+    if (controllerLength == 0) {
+      ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
+      completer.complete();
+      return completer.future;
+    }
+
     _controllers.forEach((key, value) {
       value.entries.where((e) => requireLoadMonth?.contains(e.key) ?? true).forEach((e) {
         e.value
@@ -181,19 +189,28 @@ class CalendarTaskListController extends _$CalendarTaskListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.loading);
+    final controllerLength = _controllers.entries.expand((e) => e.value.entries).length;
+
+    // OAuth가 없으면 즉시 success로 완료
+    if (controllerLength == 0) {
+      ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
+      completer.complete();
+      return completer.future;
+    }
+
     _controllers.forEach((key, value) {
       value.entries.forEach((e) {
         e.value
             .load(showLoading: showLoading, isRefresh: isRefresh, isChunkUpdate: isChunkUpdate)
             .then((_) {
               resultCount++;
-              if (resultCount != _controllers.entries.expand((e) => e.value.entries).length) return;
+              if (resultCount != controllerLength) return;
               ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.success);
               completer.complete();
             })
             .catchError((error) {
               resultCount++;
-              if (resultCount != _controllers.entries.expand((e) => e.value.entries).length) return;
+              if (resultCount != controllerLength) return;
               ref.read(loadingStatusProvider.notifier).update(stringKey(tabType), LoadingState.error);
               completer.complete();
             });
@@ -1140,7 +1157,7 @@ class CalendarTaskResultEntity {
 
   void updateTasksOnView() {
     cachedRecurrenceInstances = {};
-    
+
     // Optimization: Single pass to filter and map non-recurring tasks
     // Avoids creating intermediate lists (where().toList().map().toList())
     final nonRecurringTasks = <TaskEntity>[];
@@ -1226,7 +1243,7 @@ class CalendarTaskResultEntity {
           // Remove from map and list
           nonRecurringTasksByDateAndRecurringId.remove(lookupKey);
           nonRecurringTasks.remove(recurringTaskOnDate);
-          
+
           if (recurringTaskOnDate.isDone) {
             _tasks.add(recurringTaskOnDate.copyWith(editedStartTime: date, editedEndTime: date.add(taskDuration)));
           } else if (recurringTaskOnDate.isCancelled) {
@@ -1244,7 +1261,7 @@ class CalendarTaskResultEntity {
         }
       });
     });
-    
+
     // Optimization: Use List.from and addAll instead of spread operator
     // Filter out cancelled tasks in a single pass
     tasksOnView = <TaskEntity>[];

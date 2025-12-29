@@ -72,6 +72,14 @@ class MailLabelListController extends _$MailLabelListController {
     Completer<void> completer = Completer();
     int resultCount = 0;
     ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.loading);
+    
+    // OAuth가 없으면 즉시 success로 완료
+    if (_controllers.isEmpty) {
+      ref.read(loadingStatusProvider.notifier).update(stringKey, LoadingState.success);
+      completer.complete();
+      return completer.future;
+    }
+    
     _controllers.forEach((key, value) {
       value
           .load()

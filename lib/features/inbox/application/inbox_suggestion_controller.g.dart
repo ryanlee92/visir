@@ -129,7 +129,7 @@ final class InboxSuggestionControllerInternalProvider
 }
 
 String _$inboxSuggestionControllerInternalHash() =>
-    r'cc83a9c11cc1d8b13ec631e03f14f3bce1396b65';
+    r'06d681fcb9a199cf0969f5aa8a29b7f13da47716';
 
 final class InboxSuggestionControllerInternalFamily extends $Family
     with

@@ -48,7 +48,7 @@ final class MailLabelListControllerProvider
 }
 
 String _$mailLabelListControllerHash() =>
-    r'a76b058f1fc78f9634c91b94ac0fb1039d650fa4';
+    r'c36723e06de36bc0837f1aebbdaf2aee7026c6c8';
 
 abstract class _$MailLabelListController
     extends $Notifier<Map<String, List<MailLabelEntity>>> {

@@ -39,7 +39,7 @@ final class AgentChatHistoryControllerProvider
 }
 
 String _$agentChatHistoryControllerHash() =>
-    r'8e3c65c335b58a7749256b5300c063799583d064';
+    r'887b4006719bdce81f62db22acbeb6c176d701cf';
 
 abstract class _$AgentChatHistoryController
     extends $AsyncNotifier<List<AgentChatHistoryEntity>> {

@@ -42,7 +42,7 @@ final class MailListControllerProvider
 }
 
 String _$mailListControllerHash() =>
-    r'81f81dcabb5e438bc53ced533bbed78d73c70355';
+    r'0e6f820f9aef08e70a01edeb04db5fe24f04121a';
 
 abstract class _$MailListController extends $Notifier<MailListResultEntity> {
   MailListResultEntity build();
