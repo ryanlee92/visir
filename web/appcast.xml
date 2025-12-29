@@ -2,27 +2,27 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
 	<channel>
 		<title>Visir</title>
-		<description>Fewer tools. One workflow.</description>
+		<description>Your AI Executive Assistant.</description>
 		<language>en</language>
 		<item>
-			<title>Version 1.0.45</title>
+			<title>Version 2.0.0</title>
 			<!-- For the macOS item, it is recommended to add 'sparkle:version' and 'sparkle:shortVersionString' to the item node, rather than as part of the enclosure. -->
-			<sparkle:version>988</sparkle:version>
-			<sparkle:shortVersionString>1.0.45</sparkle:shortVersionString>
+			<sparkle:version>1001</sparkle:version>
+			<sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Fri, 19 Dec 2025 03:00:00 +0900</pubDate>
-			<enclosure url="https://visir.pro/release/taskey-setup.zip"
-                sparkle:edSignature="6V4Zz5+IZungQmDhgTFdYCQ6PDcGINDWC6/gCttxD5e2JbVnDR7oM1B3qUwyAphZEWohM2Ez2j2m6/mPwUOQDw==" length="100843258"
+			<pubDate>Mon, 29 Dec 2025 20:00:00 +0900</pubDate>
+			<enclosure url="https://visir.pro/release/visir-setup.zip"
+                sparkle:edSignature="o1uJPUZr53wZTZsLrw/QX+z7CcpvOvP1Jgs1aqaMKE96Qx2zqNCozLbu8GpzVJtvVQ8pAVIVNr8qgF0RzWzcDg==" length="101715378"
 				sparkle:os="macos"
 				type="application/octet-stream" />
 		</item>
 		<item>
-			<title>Version 1.0.45</title>
+			<title>Version 2.0.0</title>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Fri, 19 Dec 2025 03:00:00 +0900</pubDate>
-			<enclosure url="https://visir.pro/release/taskey-setup.exe"
-                sparkle:dsaSignature="MDwCHAup33nTNYcxIJ4t5Jfy1MIXveCHNyMC9Di+KCkCHEpe7DLLgEM1BZgZNuU2ZO9qnZdKmTEaTQbKn0Y=" length="0"
-				sparkle:version="1.0.45+988"
+			<pubDate>Mon, 29 Dec 2025 20:00:00 +0900</pubDate>
+			<enclosure url="https://visir.pro/release/visir-setup.exe"
+                sparkle:dsaSignature="MDwCHDmBfY2YGXNYz2B30V9daoweV4PkFUf04B8fGEQCHBg1q96cW+6AN65FIjU0UbBVL6VQN1cJ/K8tYN4=" length="0"
+				sparkle:version="2.0.0+1001"
 				sparkle:os="windows"
 				type="application/octet-stream" />
 		</item>
