@@ -642,15 +642,29 @@ Return only the HTML-formatted email body. Do not include any additional explana
 
 ## CRITICAL DATE EXTRACTION RULES
 When creating tasks or events from inbox items:
-1. **ALWAYS check the inbox item's content/description FIRST** for dates/times before using default dates
-2. Extract dates from the inbox item content in various formats:
+1. **ALWAYS check the inbox item's content/description FIRST** for **actionable dates/times** (deadlines, meeting times, schedules) before using default dates
+2. **MULTIPLE DEADLINES**: If the inbox item contains MULTIPLE deadlines (e.g., "2026년 1월 6일까지 제출", "2026년 1월 15일까지 제출", "2026년 1월 29일까지 제출"), you MUST create SEPARATE tasks/events for EACH deadline:
+   - Each deadline should have its own task/event with a distinct title describing what needs to be submitted by that deadline
+   - Extract the specific materials/documents mentioned for each deadline
+   - Use the exact deadline date for each task/event's `startAt` and `endAt`
+   - Example: If the inbox says "주주명부는 1월 6일까지, 재무제표는 1월 29일까지", create TWO separate tasks:
+     1. Task 1: Title about 주주명부, deadline: 2026-01-06
+     2. Task 2: Title about 재무제표, deadline: 2026-01-29
+3. Extract **actionable dates** from the inbox item content:
+   - **Deadlines**: "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20", "제출 기한: 내일", "2026년 1월 6일(화)까지", "2026년 1월 15일(목)까지", "2026년 1월 29일(목)까지"
+   - **Meeting/Event times**: "Meeting on January 15th at 3pm", "Event starts at 2:00 PM on Friday", "회의 시간: 1월 15일 오후 3시"
+   - **Schedule dates**: "Schedule for next Monday", "일정: 내일"
+   - **Task completion dates**: "Complete by Friday", "완료 기한: 금요일"
    - Absolute dates: "January 15th", "2024-01-15", "15/01/2024"
    - Relative dates: "tomorrow", "next Monday", "in 3 days"
-   - Date + time: "3pm on Friday", "Meeting at 2:00 PM", "Event starts at 2:00 PM on Friday"
-   - Deadline mentions: "Due date: 2024-01-20", "Deadline: tomorrow", "Deadline: January 15th"
-3. If the inbox item mentions a date/time, you MUST use that date/time instead of defaulting to today or tomorrow
-4. Only use default dates (today/tomorrow) if NO dates are found in the inbox item's content
-5. When parsing dates from inbox content, consider the context and convert them to ISO 8601 format (YYYY-MM-DDTHH:mm:ss)
+   - Date + time: "3pm on Friday", "Meeting at 2:00 PM"
+4. **DO NOT** use reference dates that are just mentioned for context:
+   - "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are reference points, not deadlines
+   - "2025-12-31 기준 주주명부" - this is a reference date for the document, not a task deadline
+   - Look for keywords like "기준", "as of", "based on" to identify reference dates vs actionable dates
+5. If the inbox item mentions an **actionable date/time** (deadline, meeting time, schedule), you MUST use that date/time instead of defaulting to today or tomorrow
+6. Only use default dates (today/tomorrow) if NO actionable dates are found in the inbox item's content
+7. When parsing dates from inbox content, consider the context and convert them to ISO 8601 format (YYYY-MM-DDTHH:mm:ss)
 
 When calculating dates for repetitive tasks, use TODAY's date ($todayStr) as the starting point.
 

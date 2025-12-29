@@ -792,10 +792,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         status: TaskStatus.none,
       );
 
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [_buildTaskWidget(context, task, isUser), const SizedBox(height: 8), _buildActionConfirmButton(context, actionId, isUser)],
-      );
+      return _buildTaskWidget(context, task, isUser);
     } catch (e) {
       return Padding(padding: const EdgeInsets.only(top: 8), child: _buildActionConfirmWidget(context, 'createTask', functionArgs, actionId, isUser));
     }
@@ -846,10 +843,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         'isAllDay': isAllDay,
       };
 
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [_buildEventWidget(context, eventData, isUser), const SizedBox(height: 8), _buildActionConfirmButton(context, actionId, isUser)],
-      );
+      return _buildEventWidget(context, eventData, isUser);
     } catch (e) {
       return Padding(padding: const EdgeInsets.only(top: 8), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
     }
@@ -2352,55 +2346,96 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 ],
                               ),
                             ),
-                            // Batch confirmation button if multiple pending actions exist
+                            // Single confirm button for all pending actions in the last message
                             Builder(
                               builder: (context) {
                                 final state = ref.watch(agentActionControllerProvider);
                                 final pendingCalls = state.pendingFunctionCalls ?? [];
-                                final selectedIds = state.selectedActionIds;
+                                final writeActions = pendingCalls.where((call) {
+                                  final functionName = call['function_name'] as String? ?? '';
+                                  return _isWriteAction(functionName);
+                                }).toList();
 
-                                if (pendingCalls.length < 2) {
+                                if (writeActions.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
 
-                                final hasSelected = selectedIds.isNotEmpty;
-
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: context.surfaceVariant.withValues(alpha: 0.5),
-                                    border: Border(bottom: BorderSide(color: context.outline.withValues(alpha: 0.2), width: 1)),
-                                  ),
                                   child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Checkbox(
-                                        value: selectedIds.length == pendingCalls.length,
-                                        tristate: true,
-                                        onChanged: (value) {
-                                          controller.toggleAllActionsSelection(value ?? false);
-                                        },
-                                      ),
-                                      Expanded(
-                                        child: Text('${selectedIds.length}/${pendingCalls.length}개 선택됨', style: context.bodySmall?.copyWith(color: context.onSurfaceVariant)),
-                                      ),
-                                      if (hasSelected)
-                                        VisirButton(
+                                      IntrinsicWidth(
+                                        child: VisirButton(
                                           type: VisirButtonAnimationType.scaleAndOpacity,
                                           style: VisirButtonStyle(
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                             backgroundColor: context.primary,
-                                            borderRadius: BorderRadius.circular(6),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          options: VisirButtonOptions(
+                                            bypassTextField: true,
+                                            shortcuts: [
+                                              VisirButtonKeyboardShortcut(
+                                                keys: [
+                                                  if (PlatformX.isApple) LogicalKeyboardKey.meta,
+                                                  if (!PlatformX.isApple) LogicalKeyboardKey.control,
+                                                  LogicalKeyboardKey.enter,
+                                                ],
+                                                message: context.tr.confirm,
+                                              ),
+                                            ],
                                           ),
                                           onTap: () async {
-                                            await controller.confirmActions(actionIds: selectedIds.toList());
+                                            final controller = ref.read(agentActionControllerProvider.notifier);
+                                            // Confirm all write actions
+                                            for (final call in writeActions) {
+                                              final actionId = call['action_id'] as String? ?? '';
+                                              if (actionId.isNotEmpty) {
+                                                await controller.confirmAction(actionId: actionId);
+                                              }
+                                            }
                                           },
-                                          child: Text('선택한 항목 확인 (${selectedIds.length})', style: context.bodySmall?.copyWith(color: context.onPrimary)),
+                                          child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
                                         ),
+                                      ),
                                     ],
                                   ),
                                 );
                               },
                             ),
+                            // Removed batch confirmation UI - keeping this comment for reference
+                            Builder(
+                              builder: (context) {
+                                // This builder is intentionally empty - batch confirmation removed
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            Builder(
+                              builder: (context) {
+                                // Removed batch confirmation logic
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            Builder(
+                              builder: (context) {
+                                // Removed checkbox logic
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            Builder(
+                              builder: (context) {
+                                // Removed select all/deselect all logic
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            Builder(
+                              builder: (context) {
+                                // Removed confirm selected button
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                            // Removed old batch confirmation UI
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
@@ -2447,15 +2482,30 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   final pendingCalls = state.pendingFunctionCalls ?? [];
                                   final isLastMessage = index == agentAction.messages.length - 1;
 
-                                  // Find write actions that need confirmation (remove duplicates by action_id)
+                                  // Find write actions that need confirmation (remove duplicates by action_id and function args)
                                   final writeActionsForMessage = <Map<String, dynamic>>[];
                                   final seenActionIds = <String>{};
+                                  final seenFunctionSignatures = <String>{}; // Track function name + args to prevent true duplicates
                                   for (final call in pendingCalls) {
                                     final functionName = call['function_name'] as String? ?? '';
                                     final actionId = call['action_id'] as String? ?? '';
-                                    if (_isWriteAction(functionName) && actionId.isNotEmpty && !seenActionIds.contains(actionId)) {
-                                      seenActionIds.add(actionId);
-                                      writeActionsForMessage.add(call);
+                                    final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+
+                                    if (_isWriteAction(functionName) && actionId.isNotEmpty) {
+                                      // Create a signature based on function name and key args (title, startAt for tasks/events)
+                                      String signature = functionName;
+                                      if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
+                                        final title = functionArgs['title'] as String? ?? '';
+                                        final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
+                                        signature = '$functionName|$title|$startAt';
+                                      }
+
+                                      // Only add if we haven't seen this action_id OR this exact function signature
+                                      if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
+                                        seenActionIds.add(actionId);
+                                        seenFunctionSignatures.add(signature);
+                                        writeActionsForMessage.add(call);
+                                      }
                                     }
                                   }
 
@@ -2482,7 +2532,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             Expanded(child: _buildMessageContent(context, message.content, isUser)),
                                           ],
                                         ),
-                                        // Display write action confirmations for last message
+                                        // Display write action confirmations for last message (without individual confirm buttons)
                                         if (isLastMessage && writeActionsForMessage.isNotEmpty) ...[
                                           const SizedBox(height: 12),
                                           ...writeActionsForMessage.map((call) {
@@ -2490,15 +2540,21 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
                                             final actionId = call['action_id'] as String? ?? '';
 
-                                            // Render entity widget + confirm button for createTask/createEvent
+                                            // Render entity widget without confirm button (confirm button is at message level)
                                             if (functionName == 'createTask' || functionName == 'updateTask') {
-                                              return _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser);
-                                            } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
-                                              return _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser);
-                                            } else {
-                                              // For other write actions, show confirmation widget
                                               return Padding(
-                                                padding: const EdgeInsets.only(top: 8),
+                                                padding: const EdgeInsets.only(bottom: 8),
+                                                child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
+                                              );
+                                            } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(bottom: 8),
+                                                child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
+                                              );
+                                            } else {
+                                              // For other write actions, show confirmation widget without button
+                                              return Padding(
+                                                padding: const EdgeInsets.only(bottom: 8),
                                                 child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
                                               );
                                             }

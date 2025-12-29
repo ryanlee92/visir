@@ -1589,11 +1589,16 @@ ${previousTaskEntity != null ? '''- IMPORTANT: A previous task entity is provide
 - If the user doesn't mention a field (title, description, date/time, project, etc.), keep it exactly as it is in the previous task entity.
 - Only extract and apply the specific changes requested by the user.
 - CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
-  1. FIRST: Check the Inbox Item Information (Description section above) for any dates/times mentioned in the inbox item's content
+  1. FIRST: Check the Inbox Item Information (Description section above) for **actionable dates/times** that should be used for the task/event:
+     - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20")
+     - **Meeting/Event times** (e.g., "Meeting on January 15th at 3pm", "회의 시간: 1월 15일 오후 3시")
+     - **Schedule dates** (e.g., "Schedule for next Monday", "일정: 내일")
+     - **Task completion dates** (e.g., "Complete by Friday", "완료 기한: 금요일")
+     - **DO NOT** use reference dates that are just mentioned for context (e.g., "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are just reference points, not deadlines)
   2. SECOND: Check the user's explicit request for dates/times
   3. THIRD: Use suggested task information if available
-  4. LAST: Use default dates (today/tomorrow) only if no dates are found in the inbox item or user request
-- CRITICAL: If the inbox item's description contains a date/time (e.g., "Meeting on January 15th at 3pm", "Due date: 2024-01-20", "Deadline: tomorrow"), you MUST extract and use that date/time from the inbox item's content. Do NOT ignore dates mentioned in the inbox item.
+  4. LAST: Use default dates (today/tomorrow) only if no actionable dates are found in the inbox item or user request
+- CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "기준", "based on"). If the inbox item contains an actionable date/time (e.g., "Due date: 2024-01-20", "Meeting on January 15th at 3pm", "Deadline: tomorrow"), you MUST extract and use that date/time from the inbox item's content. Do NOT ignore actionable dates mentioned in the inbox item.
 - CRITICAL: If the user requests a date/time change (e.g., "tomorrow", "내일", "change date to X", "make it tomorrow", "I want to create task at tomorrow"), you MUST extract the new date and include it in start_at (LOCAL timezone format: YYYY-MM-DDTHH:mm:ss without Z suffix). Do NOT leave start_at as null or empty. Do NOT use the previous task's date.
 - CRITICAL PROJECT SELECTION: If the user mentions a project name or requests a project change (e.g., "change project to X", "I want to change project to networking project", "set project to Y", "networking project"), you MUST:
   1. Look at the Available Projects section above
@@ -1623,11 +1628,16 @@ ${previousTaskEntity != null ? '''- IMPORTANT: A previous task entity is provide
   - If user says "as is" or "create as is", use the previous task entity exactly as is (all fields unchanged) - in this case, you can omit start_at from the response or set it to the previous task's start_at.''' : '''- Generate a task title and description based on the inbox item and user request.
 - CRITICAL PROJECT SELECTION: Look at the Available Projects section above. If the user mentions a project name, find the matching project from the list and return its EXACT project_id. Match project names case-insensitively with partial matching. If no project is mentioned or no match is found, use null for project_id.
 - CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
-  1. FIRST: Check the Inbox Item Information (Description section above) for any dates/times mentioned in the inbox item's content. The inbox item's description may contain dates like "Meeting on January 15th at 3pm", "Due date: 2024-01-20", "Deadline: tomorrow", "Event starts at 2:00 PM on Friday", etc. You MUST extract and use these dates from the inbox item's content.
+  1. FIRST: Check the Inbox Item Information (Description section above) for **actionable dates/times** that should be used for the task/event:
+     - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20")
+     - **Meeting/Event times** (e.g., "Meeting on January 15th at 3pm", "Event starts at 2:00 PM on Friday", "회의 시간: 1월 15일 오후 3시")
+     - **Schedule dates** (e.g., "Schedule for next Monday", "일정: 내일")
+     - **Task completion dates** (e.g., "Complete by Friday", "완료 기한: 금요일")
+     - **DO NOT** use reference dates that are just mentioned for context (e.g., "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are just reference points, not deadlines)
   2. SECOND: Check the user's explicit request for dates/times (e.g., "create task for tomorrow", "make it next Monday")
   3. THIRD: Use suggested task information if available
-  4. LAST: Use default dates (today/tomorrow) only if no dates are found in the inbox item or user request
-- CRITICAL: If the inbox item's description contains a date/time, you MUST extract and use that date/time from the inbox item's content. Do NOT ignore dates mentioned in the inbox item. Parse dates in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", etc.) and convert them to ISO 8601 format.
+  4. LAST: Use default dates (today/tomorrow) only if no actionable dates are found in the inbox item or user request
+- CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "기준", "based on"). Parse dates in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", etc.) and convert them to ISO 8601 format.
 - If the user mentions a specific date or time, extract it and include it in start_at (ISO 8601 format).
 - CRITICAL: If the user mentions a specific time (e.g., "9시", "9 o'clock", "9am", "오후 3시", "3pm"), you MUST include the time in start_at (format: YYYY-MM-DDTHH:mm:ss) and set isAllDay to false. If only a date is mentioned without time, you can set isAllDay to true or include 00:00:00 in start_at.
 - ${suggestion != null ? 'If the user requests to create the task "as is", "as suggested", "create as suggested", or similar phrases, use the suggested task\'s start_at, end_at, and isAllDay values from the Suggested Task Information section above.' : ''}
@@ -2816,17 +2826,32 @@ When calling `createTask` or `updateTask`, you MUST use the following field name
 - ✅ `actionNeeded` (NOT `action_needed`)
 
 **CRITICAL DATE EXTRACTION**: When creating tasks from inbox items:
-- **ALWAYS check the inbox item's description/content FIRST** for dates/times before using default dates
-- Extract dates from the inbox item content in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", "Meeting at 2:00 PM", "Deadline: 2024-01-20")
-- If the inbox item mentions a date/time, use that date/time instead of defaulting to today or tomorrow
-- Only use default dates (today/tomorrow) if NO dates are found in the inbox item's content
+- **ALWAYS check the inbox item's description/content FIRST** for **actionable dates/times** (deadlines, meeting times, schedules) before using default dates
+- **MULTIPLE DEADLINES**: If the inbox item contains MULTIPLE deadlines (e.g., "2026년 1월 6일까지 제출", "2026년 1월 15일까지 제출", "2026년 1월 29일까지 제출"), you MUST create SEPARATE tasks for EACH deadline:
+  - Each deadline should have its own task with a distinct title describing what needs to be submitted by that deadline
+  - Extract the specific materials/documents mentioned for each deadline
+  - Use the exact deadline date for each task's `startAt` and `endAt`
+  - Example: If the inbox says "주주명부는 1월 6일까지, 재무제표는 1월 29일까지", create TWO separate tasks:
+    1. Task 1: Title about 주주명부, deadline: 2026-01-06
+    2. Task 2: Title about 재무제표, deadline: 2026-01-29
+- Extract **actionable dates** from the inbox item content:
+  - **Deadlines**: "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20", "제출 기한: 내일", "2026년 1월 6일(화)까지", "2026년 1월 15일(목)까지", "2026년 1월 29일(목)까지"
+  - **Meeting/Event times**: "Meeting on January 15th at 3pm", "회의 시간: 1월 15일 오후 3시"
+  - **Schedule dates**: "Schedule for next Monday", "일정: 내일"
+  - **Task completion dates**: "Complete by Friday", "완료 기한: 금요일"
+- **DO NOT** use reference dates that are just mentioned for context:
+  - "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are reference points, not deadlines
+  - "2025-12-31 기준 주주명부" - this is a reference date for the document, not a task deadline
+  - Look for keywords like "기준", "as of", "based on" to identify reference dates vs actionable dates
+- If the inbox item mentions an **actionable date/time**, use that date/time instead of defaulting to today or tomorrow
+- Only use default dates (today/tomorrow) if NO actionable dates are found in the inbox item's content
 
 **Task Entity Fields**:
 - `title` (string, required): Task title
 - `description` (string, optional): Task description
 - `projectId` (string, optional): Project ID
-- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise use user request or default dates.
-- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise calculate based on startAt.
+- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from **actionable dates** (deadlines, meeting times, schedules) in the inbox item's content if available, otherwise use user request or default dates. Do NOT use reference dates.
+- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from **actionable dates** in the inbox item's content if available, otherwise calculate based on startAt.
 - `isAllDay` (boolean, optional, default: false): Whether the task is all-day
 - `status` (string, optional, default: "none"): Task status - one of: "none", "done", "cancelled"
 - `from` (string, optional): Source of the task (e.g., "GitHub", "Email")
@@ -2862,17 +2887,29 @@ When calling `createEvent` or `updateEvent`, you MUST use the following field na
 - ✅ `actionNeeded` (NOT `action_needed`)
 
 **CRITICAL DATE EXTRACTION**: When creating events from inbox items:
-- **ALWAYS check the inbox item's description/content FIRST** for dates/times before using default dates
-- Extract dates from the inbox item content in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", "Meeting at 2:00 PM", "Event starts at 2:00 PM on Friday")
-- If the inbox item mentions a date/time, use that date/time instead of defaulting to today or tomorrow
-- Only use default dates (today/tomorrow) if NO dates are found in the inbox item's content
+- **ALWAYS check the inbox item's description/content FIRST** for **actionable dates/times** (deadlines, meeting times, schedules) before using default dates
+- **MULTIPLE DEADLINES**: If the inbox item contains MULTIPLE deadlines or event times, you MUST create SEPARATE events for EACH deadline/time:
+  - Each deadline should have its own event with a distinct title describing what needs to be done by that deadline
+  - Extract the specific materials/documents mentioned for each deadline
+  - Use the exact deadline date for each event's `startAt` and `endAt`
+- Extract **actionable dates** from the inbox item content:
+  - **Deadlines**: "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20", "제출 기한: 내일", "2026년 1월 6일(화)까지", "2026년 1월 15일(목)까지", "2026년 1월 29일(목)까지"
+  - **Meeting/Event times**: "Meeting on January 15th at 3pm", "Event starts at 2:00 PM on Friday", "회의 시간: 1월 15일 오후 3시"
+  - **Schedule dates**: "Schedule for next Monday", "일정: 내일"
+  - **Task completion dates**: "Complete by Friday", "완료 기한: 금요일"
+- **DO NOT** use reference dates that are just mentioned for context:
+  - "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are reference points, not deadlines
+  - "2025-12-31 기준 주주명부" - this is a reference date for the document, not an event time
+  - Look for keywords like "기준", "as of", "based on" to identify reference dates vs actionable dates
+- If the inbox item mentions an **actionable date/time**, use that date/time instead of defaulting to today or tomorrow
+- Only use default dates (today/tomorrow) if NO actionable dates are found in the inbox item's content
 
 **Event Entity Fields**:
 - `title` (string, required): Event title
 - `description` (string, optional): Event description
 - `calendarId` (string, optional): Calendar ID
-- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise use user request or default dates.
-- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise calculate based on startAt.
+- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from **actionable dates** (deadlines, meeting times, schedules) in the inbox item's content if available, otherwise use user request or default dates. Do NOT use reference dates.
+- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from **actionable dates** in the inbox item's content if available, otherwise calculate based on startAt.
 - `isAllDay` (boolean, optional, default: false): Whether the event is all-day
 - `location` (string, optional): Event location
 - `attendees` (array of strings, optional): List of attendee email addresses (e.g., ["email1@example.com", "email2@example.com"])
