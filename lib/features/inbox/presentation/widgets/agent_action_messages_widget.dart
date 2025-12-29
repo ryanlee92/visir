@@ -2327,7 +2327,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                     }
 
                                     return Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      padding: const EdgeInsets.only(left: 12, right: 12, top: 0, bottom: 0),
+                                      margin: const EdgeInsets.only(top: 0),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
@@ -2432,7 +2433,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   }
 
                                   return Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+                                    margin: EdgeInsets.only(top: 6, bottom: isLastMessage && writeActionsForMessage.isNotEmpty ? 0 : 6, left: 0, right: 0),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
                                     child: Column(
@@ -2455,25 +2456,28 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                           ],
                                         ),
                                         if (isLastMessage && writeActionsForMessage.isNotEmpty) ...[
-                                          const SizedBox(height: 6),
-                                          ...writeActionsForMessage.map((call) {
+                                          const SizedBox(height: 12),
+                                          ...writeActionsForMessage.asMap().entries.map((entry) {
+                                            final index = entry.key;
+                                            final call = entry.value;
+                                            final isLast = index == writeActionsForMessage.length - 1;
                                             final functionName = call['function_name'] as String? ?? '';
                                             final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
                                             final actionId = call['action_id'] as String? ?? '';
 
                                             if (functionName == 'createTask' || functionName == 'updateTask') {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 6),
+                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
                                                 child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 6),
+                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
                                                 child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
                                               );
                                             } else {
                                               return Padding(
-                                                padding: const EdgeInsets.only(bottom: 6),
+                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
                                                 child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
                                               );
                                             }
