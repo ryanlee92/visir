@@ -4013,6 +4013,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agent_action_suggested_forward => 'Here\'s a suggested forward:';
 
   @override
+  String get agent_action_task_prepared_for_confirmation =>
+      'A new task has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your tasks.';
+
+  @override
+  String get agent_action_event_prepared_for_confirmation =>
+      'A new event has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your calendar.';
+
+  @override
+  String get agent_action_mail_prepared_for_confirmation =>
+      'A new email has been prepared and is waiting for your confirmation. Once you confirm, it will be sent.';
+
+  @override
+  String get agent_action_prepared_for_confirmation =>
+      'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
+
+  @override
   String get agent_action_reply_fallback_message =>
       'Please write a reply to this email.';
 

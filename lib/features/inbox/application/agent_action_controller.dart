@@ -506,6 +506,35 @@ class AgentActionController extends _$AgentActionController {
         final functionCalls = executor.parseFunctionCalls(aiMessage);
         print('[AI_AGENT] Function calls detected: ${functionCalls.length}, isRecursiveCall: $isRecursiveCall');
 
+        // 함수 호출 태그를 제거한 메시지 추출 (AI가 생성한 메시지 부분)
+        String aiMessageWithoutFunctionCalls = aiMessage;
+        // function_call 태그 제거
+        aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(RegExp(r'<function_call.*?</function_call>', dotAll: true), '').trim();
+        // JSON 배열 형식의 함수 호출 제거
+        final arrayStart = aiMessageWithoutFunctionCalls.indexOf('[');
+        final arrayEnd = aiMessageWithoutFunctionCalls.lastIndexOf(']');
+        if (arrayStart != -1 && arrayEnd != -1 && arrayEnd > arrayStart) {
+          try {
+            final arrayStr = aiMessageWithoutFunctionCalls.substring(arrayStart, arrayEnd + 1);
+            final parsed = jsonDecode(arrayStr) as List<dynamic>?;
+            if (parsed != null && parsed.isNotEmpty) {
+              bool isFunctionCallArray = false;
+              for (final item in parsed) {
+                if (item is Map<String, dynamic> && item.containsKey('function') && item.containsKey('arguments')) {
+                  isFunctionCallArray = true;
+                  break;
+                }
+              }
+              if (isFunctionCallArray) {
+                // 함수 호출 배열 제거
+                aiMessageWithoutFunctionCalls = (aiMessageWithoutFunctionCalls.substring(0, arrayStart) + aiMessageWithoutFunctionCalls.substring(arrayEnd + 1)).trim();
+              }
+            }
+          } catch (e) {
+            // JSON 파싱 실패 시 무시
+          }
+        }
+
         if (functionCalls.isNotEmpty) {
           // 여러 개의 함수 호출이 감지되면 순차적으로 실행
           // availableInboxes는 state.inbox가 있으면 그것을 사용하고, 없으면 전달받은 inboxes 사용
@@ -548,6 +577,9 @@ class AgentActionController extends _$AgentActionController {
 
           // 함수 호출을 의존성에 따라 그룹화
           final executionGroups = _groupFunctionCalls(functionCalls);
+
+          // 모든 그룹의 결과를 수집할 리스트
+          final allGroupResults = <Map<String, dynamic>?>[];
 
           // 각 그룹을 순차적으로 실행 (그룹 내부는 병렬 실행)
           for (final group in executionGroups) {
@@ -613,6 +645,9 @@ class AgentActionController extends _$AgentActionController {
                 return {'functionCall': functionCall, 'result': result, 'functionName': functionName};
               }),
             );
+
+            // 그룹 결과를 전체 리스트에 추가
+            allGroupResults.addAll(groupResults);
 
             // 그룹 결과 처리
             for (final groupResult in groupResults) {
@@ -733,66 +768,40 @@ class AgentActionController extends _$AgentActionController {
             state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers);
           }
 
-          // 확인이 필요한 함수 호출이 있는지 확인
-          final pendingCalls = state.pendingFunctionCalls ?? [];
-          final hasPendingCalls = pendingCalls.isNotEmpty;
+          // AI가 처음 생성한 메시지 사용 (함수 호출 태그 제거된 버전)
+          String resultMessage = aiMessageWithoutFunctionCalls;
 
-          // 결과 메시지 생성
-          // chain인 경우 (함수가 2개 이상): 중간 메시지는 간단하게, 마지막 메시지만 전체 포함
-          final isChain = functionCalls.length > 1;
-          String resultMessage;
+          // 확인이 필요한 함수가 있는지 확인
+          final pendingCallsForMessage = state.pendingFunctionCalls ?? [];
+          final hasPendingCalls = pendingCallsForMessage.isNotEmpty;
 
-          if (errorMessages.isEmpty) {
-            // 모든 함수가 성공한 경우
-            if (successMessages.length == 1) {
-              resultMessage = successMessages.first;
-            } else if (isChain) {
-              // chain인 경우: 마지막 함수의 메시지만 사용 (사용자 입력 요청이 포함될 수 있음)
-              resultMessage = successMessages.last;
-            } else {
-              // 여러 함수지만 chain이 아닌 경우: 모든 메시지 포함
-              final details = successMessages.map((m) => '• $m').join('\n');
-              resultMessage = Utils.mainContext.tr.agent_action_tasks_completed_count(successMessages.length, details);
-            }
-          } else if (successMessages.isEmpty) {
-            // 모든 함수가 실패한 경우
-            final details = errorMessages.map((m) => '• $m').join('\n');
-            resultMessage = Utils.mainContext.tr.agent_action_error_occurred_with_details(details);
-          } else {
-            // 일부 성공, 일부 실패
-            if (isChain) {
-              // chain인 경우: 마지막 함수의 결과만 사용
-              // 성공한 함수가 있으면 마지막 성공 메시지 사용, 없으면 에러 메시지
-              final details = errorMessages.map((m) => '• $m').join('\n');
-              resultMessage = successMessages.isNotEmpty ? successMessages.last : Utils.mainContext.tr.agent_action_error_occurred_with_details(details);
-            } else {
-              // chain이 아닌 경우: 모든 메시지 포함
-              resultMessage = Utils.mainContext.tr.agent_action_partial_completion;
-              if (successMessages.isNotEmpty) {
-                final details = successMessages.map((m) => '• $m').join('\n');
-                resultMessage += Utils.mainContext.tr.agent_action_success_section(details);
+          // 메시지가 비어있으면 기본 메시지 생성
+          if (resultMessage.trim().isEmpty) {
+            if (hasPendingCalls) {
+              // 확인이 필요한 함수가 있는 경우, 기본 확인 메시지 생성
+              final pendingFunctionNames = pendingCallsForMessage.map((call) => call['function_name'] as String? ?? '').where((name) => name.isNotEmpty).toList();
+              if (pendingFunctionNames.isNotEmpty) {
+                // 함수 이름에 따라 적절한 메시지 생성
+                if (pendingFunctionNames.contains('createTask')) {
+                  resultMessage = 'A new task has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your tasks.';
+                } else if (pendingFunctionNames.contains('createEvent')) {
+                  resultMessage = 'A new event has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your calendar.';
+                } else if (pendingFunctionNames.contains('sendMail') || pendingFunctionNames.contains('replyMail') || pendingFunctionNames.contains('forwardMail')) {
+                  resultMessage = 'A new email has been prepared and is waiting for your confirmation. Once you confirm, it will be sent.';
+                } else {
+                  resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
+                }
+              } else {
+                resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
               }
-              if (errorMessages.isNotEmpty) {
-                final details = errorMessages.map((m) => '• $m').join('\n');
-                resultMessage += Utils.mainContext.tr.agent_action_failure_section(details);
-              }
+            } else if (errorMessages.isEmpty) {
+              resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+            } else {
+              resultMessage = errorMessages.join('\n\n');
             }
           }
 
-          // 확인이 필요한 함수 호출이 있으면 inapp_action_confirm 태그 추가
-          if (hasPendingCalls) {
-            // 각 pending call에 대해 inapp_action_confirm 태그 추가
-            for (final pendingCall in pendingCalls) {
-              final actionId = pendingCall['action_id'] as String;
-              final functionName = pendingCall['function_name'] as String;
-              final functionArgs = pendingCall['function_args'] as Map<String, dynamic>;
-
-              final confirmTag =
-                  '<inapp_action_confirm>${jsonEncode({'action_id': actionId, 'function_name': functionName, 'function_args': functionArgs})}</inapp_action_confirm>';
-
-              resultMessage += '\n\n$confirmTag';
-            }
-          }
+          // 확인이 필요한 함수 호출은 pendingFunctionCalls에 저장되어 있으므로 태그 추가 불필요
 
           final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage);
           final updatedMessagesWithResponse = [...messages, assistantMessage];
@@ -2070,27 +2079,100 @@ class AgentActionController extends _$AgentActionController {
       }
     }
 
-    // 결과 메시지 생성
+    // 함수 실행 결과를 AI에게 전달하여 적절한 메시지 생성
     String resultMessage;
-    if (errorMessages.isEmpty) {
-      if (successMessages.length == 1) {
-        resultMessage = successMessages.first;
+
+    // 함수 실행 결과 요약 생성
+    final functionResultsSummary = <String>[];
+    for (var i = 0; i < callsToExecute.length; i++) {
+      final call = callsToExecute[i];
+      final functionName = call['function_name'] as String? ?? '';
+
+      // 해당 함수의 실행 결과 찾기
+      if (i < successMessages.length) {
+        final message = successMessages[i];
+        if (message.isNotEmpty) {
+          functionResultsSummary.add('$functionName: $message');
+        } else {
+          functionResultsSummary.add('$functionName: completed successfully');
+        }
       } else {
-        final details = successMessages.map((m) => '• $m').join('\n');
-        resultMessage = Utils.mainContext.tr.agent_action_tasks_completed_count(successMessages.length, details);
+        final errorIndex = i - successMessages.length;
+        if (errorIndex < errorMessages.length) {
+          final error = errorMessages[errorIndex];
+          functionResultsSummary.add('$functionName: failed - $error');
+        }
       }
-    } else if (successMessages.isEmpty) {
-      final details = errorMessages.map((m) => '• $m').join('\n');
-      resultMessage = Utils.mainContext.tr.agent_action_error_occurred_with_details(details);
+    }
+
+    // 함수 실행 결과를 AI에게 전달하여 메시지 생성
+    if (functionResultsSummary.isNotEmpty) {
+      final functionResultsText = functionResultsSummary.join('\n');
+      final functionResultsPrompt =
+          'The following functions were executed:\n$functionResultsText\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear.';
+
+      // 함수 실행 결과를 포함한 메시지로 AI 호출
+      final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt)];
+
+      final me = ref.read(authControllerProvider).value;
+      final userId = me?.id;
+      final selectedModel = this.selectedModel;
+      String? apiKey;
+      if (useUserApiKey) {
+        final apiKeys = ref.read(aiApiKeysProvider);
+        apiKey = apiKeys[selectedModel.provider.name];
+      } else {
+        // 환경 변수에서 가져오기 (datasource와 동일한 방식)
+        try {
+          final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
+          final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
+          apiKey = env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null;
+        } catch (e) {
+          // 환경 변수 읽기 실패
+        }
+      }
+
+      try {
+        final functionResponse = await _repository.generateGeneralChat(
+          userMessage: functionResultsPrompt,
+          conversationHistory: functionResultsMessages.map((m) => m.toJson(local: true)).toList(),
+          projectContext: null,
+          taggedContext: null,
+          channelContext: null,
+          inboxContext: null,
+          model: selectedModel.modelName,
+          apiKey: apiKey,
+          userId: userId,
+          systemPrompt: 'You are a helpful assistant. Provide a brief, natural summary of the function execution results.',
+        );
+
+        final functionAiResponse = functionResponse.fold((failure) => null, (response) => response);
+        if (functionAiResponse != null && functionAiResponse['message'] != null) {
+          resultMessage = functionAiResponse['message'] as String;
+          // 함수 호출 태그 제거
+          resultMessage = resultMessage.replaceAll(RegExp(r'<function_call>.*?</function_call>', dotAll: true), '').trim();
+        } else {
+          // AI 호출 실패 시 기본 메시지 사용
+          if (errorMessages.isEmpty) {
+            resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+          } else {
+            resultMessage = errorMessages.join('\n\n');
+          }
+        }
+      } catch (e) {
+        // AI 호출 실패 시 기본 메시지 사용
+        if (errorMessages.isEmpty) {
+          resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+        } else {
+          resultMessage = errorMessages.join('\n\n');
+        }
+      }
     } else {
-      resultMessage = Utils.mainContext.tr.agent_action_partial_completion;
-      if (successMessages.isNotEmpty) {
-        final details = successMessages.map((m) => '• $m').join('\n');
-        resultMessage += Utils.mainContext.tr.agent_action_success_section(details);
-      }
-      if (errorMessages.isNotEmpty) {
-        final details = errorMessages.map((m) => '• $m').join('\n');
-        resultMessage += Utils.mainContext.tr.agent_action_failure_section(details);
+      // 함수 실행 결과가 없으면 기본 메시지 사용
+      if (errorMessages.isEmpty) {
+        resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+      } else {
+        resultMessage = errorMessages.join('\n\n');
       }
     }
 

@@ -7233,6 +7233,30 @@ abstract class AppLocalizations {
   /// **'Here\'s a suggested forward:'**
   String get agent_action_suggested_forward;
 
+  /// No description provided for @agent_action_task_prepared_for_confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'A new task has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your tasks.'**
+  String get agent_action_task_prepared_for_confirmation;
+
+  /// No description provided for @agent_action_event_prepared_for_confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'A new event has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your calendar.'**
+  String get agent_action_event_prepared_for_confirmation;
+
+  /// No description provided for @agent_action_mail_prepared_for_confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'A new email has been prepared and is waiting for your confirmation. Once you confirm, it will be sent.'**
+  String get agent_action_mail_prepared_for_confirmation;
+
+  /// No description provided for @agent_action_prepared_for_confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.'**
+  String get agent_action_prepared_for_confirmation;
+
   /// No description provided for @agent_action_reply_fallback_message.
   ///
   /// In en, this message translates to:

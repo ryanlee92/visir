@@ -27,6 +27,7 @@ import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_entity.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
 import 'package:Visir/features/chat/application/chat_member_list_controller.dart';
+import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,6 +36,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:uuid/uuid.dart';
 
 class AgentActionMessagesWidget extends ConsumerStatefulWidget {
   final double maxHeight;
@@ -677,6 +679,218 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     return _ActionConfirmWidget(functionName: functionName, functionArgs: functionArgs, actionId: actionId, confirmationMessage: confirmationMessage, isUser: isUser);
   }
 
+  /// Check if a function is a write action (requires confirmation)
+  bool _isWriteAction(String functionName) {
+    const writeActions = {
+      // Task actions
+      'createTask',
+      'updateTask',
+      'deleteTask',
+      'toggleTaskStatus',
+      'assignProject',
+      'setPriority',
+      'addTags',
+      'removeTags',
+      'setDueDate',
+      'setReminder',
+      'setRecurrence',
+      'duplicateTask',
+      'removeReminder',
+      'removeRecurrence',
+      'moveTask',
+      // Event actions
+      'createEvent',
+      'updateEvent',
+      'deleteEvent',
+      'responseCalendarInvitation',
+      'duplicateEvent',
+      'moveEvent',
+      'optimizeSchedule',
+      'reschedule',
+      // Mail actions
+      'sendMail',
+      'replyMail',
+      'forwardMail',
+      'deleteMail',
+      'archiveMail',
+      'unarchiveMail',
+      'pinMail',
+      'unpinMail',
+      'markMailAsRead',
+      'markMailAsUnread',
+      'markMailAsImportant',
+      'markMailAsNotImportant',
+      'spamMail',
+      'unspamMail',
+      'moveMailToLabel',
+      'replyAllMail',
+      // Message actions
+      'sendMessage',
+      'replyMessage',
+      'editMessage',
+      'deleteMessage',
+      'addReaction',
+      'removeReaction',
+      // Project actions
+      'createProject',
+      'updateProject',
+      'deleteProject',
+      'moveProject',
+      'inviteUserToProject',
+      'removeUserFromProject',
+      'linkToProject',
+      // Inbox actions
+      'pinInbox',
+      'unpinInbox',
+      'createTaskFromInbox',
+    };
+    return writeActions.contains(functionName);
+  }
+
+  Widget _buildTaskEntityWithConfirm(BuildContext context, Map<String, dynamic> functionArgs, String actionId, bool isUser) {
+    try {
+      final user = ref.read(authControllerProvider).requireValue;
+      final title = functionArgs['title'] as String? ?? '';
+      final description = functionArgs['description'] as String? ?? '';
+      final projectId = functionArgs['projectId'] as String?;
+      final startAtStr = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String?;
+      final endAtStr = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String?;
+      final isAllDay = functionArgs['isAllDay'] as bool? ?? false;
+
+      DateTime? startAt;
+      DateTime? endAt;
+      if (startAtStr != null) {
+        try {
+          startAt = DateTime.parse(startAtStr).toLocal();
+        } catch (e) {
+          startAt = DateTime.now();
+        }
+      } else {
+        startAt = DateTime.now();
+      }
+
+      if (endAtStr != null) {
+        try {
+          endAt = DateTime.parse(endAtStr).toLocal();
+        } catch (e) {
+          endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+        }
+      } else {
+        endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+      }
+
+      final task = TaskEntity(
+        id: const Uuid().v4(),
+        ownerId: user.id,
+        title: title,
+        description: description,
+        projectId: projectId,
+        startAt: startAt,
+        endAt: endAt,
+        isAllDay: isAllDay,
+        createdAt: DateTime.now(),
+        status: TaskStatus.none,
+      );
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildTaskWidget(context, task, isUser), const SizedBox(height: 8), _buildActionConfirmButton(context, actionId, isUser)],
+      );
+    } catch (e) {
+      return Padding(padding: const EdgeInsets.only(top: 8), child: _buildActionConfirmWidget(context, 'createTask', functionArgs, actionId, isUser));
+    }
+  }
+
+  Widget _buildEventEntityWithConfirm(BuildContext context, Map<String, dynamic> functionArgs, String actionId, bool isUser) {
+    try {
+      final title = functionArgs['title'] as String? ?? '';
+      final description = functionArgs['description'] as String? ?? '';
+      final calendarId = functionArgs['calendarId'] as String?;
+      final startAtStr = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String?;
+      final endAtStr = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String?;
+      final isAllDay = functionArgs['isAllDay'] as bool? ?? false;
+      final location = functionArgs['location'] as String?;
+      final attendeesList = functionArgs['attendees'] as List<dynamic>?;
+
+      DateTime? startAt;
+      DateTime? endAt;
+      if (startAtStr != null) {
+        try {
+          startAt = DateTime.parse(startAtStr).toLocal();
+        } catch (e) {
+          startAt = DateTime.now();
+        }
+      } else {
+        startAt = DateTime.now();
+      }
+
+      if (endAtStr != null) {
+        try {
+          endAt = DateTime.parse(endAtStr).toLocal();
+        } catch (e) {
+          endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+        }
+      } else {
+        endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+      }
+
+      final eventData = {
+        'id': const Uuid().v4(),
+        'title': title,
+        'description': description,
+        'calendar_id': calendarId,
+        'start_at': startAt.toIso8601String(),
+        'end_at': endAt.toIso8601String(),
+        'location': location,
+        'attendees': attendeesList ?? [],
+        'isAllDay': isAllDay,
+      };
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildEventWidget(context, eventData, isUser), const SizedBox(height: 8), _buildActionConfirmButton(context, actionId, isUser)],
+      );
+    } catch (e) {
+      return Padding(padding: const EdgeInsets.only(top: 8), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
+    }
+  }
+
+  Widget _buildActionConfirmButton(BuildContext context, String actionId, bool isUser) {
+    final state = ref.watch(agentActionControllerProvider);
+    final pendingCalls = state.pendingFunctionCalls ?? [];
+    final isPending = pendingCalls.any((call) => call['action_id'] == actionId);
+
+    if (!isPending) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IntrinsicWidth(
+          child: VisirButton(
+            type: VisirButtonAnimationType.scaleAndOpacity,
+            style: VisirButtonStyle(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), backgroundColor: context.primary, borderRadius: BorderRadius.circular(12)),
+            options: VisirButtonOptions(
+              bypassTextField: true,
+              shortcuts: [
+                VisirButtonKeyboardShortcut(
+                  keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
+                  message: context.tr.confirm,
+                ),
+              ],
+            ),
+            onTap: () async {
+              final controller = ref.read(agentActionControllerProvider.notifier);
+              await controller.confirmAction(actionId: actionId);
+            },
+            child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+          ),
+        ),
+      ],
+    );
+  }
+
   /// Check if content appears to be Markdown format
   bool _isMarkdownContent(String content) {
     if (content.trim().isEmpty) return false;
@@ -902,16 +1116,12 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     // Keep tagged_connection, tagged_channel, tagged_project for inline badge rendering
     // They will be handled by HtmlWidget's customWidgetBuilder
 
-    // Check if content contains inapp_action_confirm tags (should be rendered as HTML)
-    final hasInappActionConfirm = RegExp(r'<inapp_action_confirm>', caseSensitive: false).hasMatch(cleanedContent);
-
     // Check if content is HTML (contains HTML tags, but exclude custom inapp tags)
     final htmlTagRegex = RegExp(r'<(?!/?(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
-    final isHtml = htmlTagRegex.hasMatch(cleanedContent) || hasInappActionConfirm;
+    final isHtml = htmlTagRegex.hasMatch(cleanedContent);
 
     // Check if content is Markdown (contains Markdown patterns)
-    // If hasInappActionConfirm, don't treat as markdown (force HTML rendering)
-    final isMarkdown = hasInappActionConfirm ? false : _isMarkdownContent(cleanedContent);
+    final isMarkdown = _isMarkdownContent(cleanedContent);
 
     // If both HTML and Markdown are present, convert Markdown parts to HTML
     String finalContent = cleanedContent;
@@ -1315,35 +1525,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
               return Text('Error parsing event entity: $e', style: baseStyle?.copyWith(color: context.error));
             }
           }
-          if (element.localName == 'inapp_action_confirm') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              // Extract first valid JSON object if multiple JSON objects are concatenated
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                // Try to extract first JSON object using regex
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final functionName = jsonData['function_name'] as String? ?? '';
-              final functionArgs = jsonData['function_args'] as Map<String, dynamic>? ?? {};
-              final actionId = jsonData['action_id'] as String? ?? '';
-
-              return _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser);
-            } catch (e) {
-              return Text('Error parsing action confirm: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
           // Tagged items rendering - inline badges
           if (element.localName == 'tagged_task') {
             try {
@@ -1677,16 +1858,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   widget = _buildMailReplyWidget(context, mailData, isUser);
                 } catch (e) {
                   // Skip invalid mail reply
-                }
-                break;
-              case 'inapp_action_confirm':
-                try {
-                  final functionName = jsonData['function_name'] as String? ?? '';
-                  final functionArgs = jsonData['function_args'] as Map<String, dynamic>? ?? {};
-                  final actionId = jsonData['action_id'] as String? ?? '';
-                  widget = _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser);
-                } catch (e) {
-                  // Skip invalid action confirm
                 }
                 break;
             }
@@ -2271,6 +2442,20 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   // Extract tagged projects for this message
                                   final taggedProjects = _extractTaggedProjects(message.content);
 
+                                  // Check for pending write actions related to this message
+                                  final state = ref.watch(agentActionControllerProvider);
+                                  final pendingCalls = state.pendingFunctionCalls ?? [];
+                                  final isLastMessage = index == agentAction.messages.length - 1;
+
+                                  // Find write actions that need confirmation
+                                  final writeActionsForMessage = <Map<String, dynamic>>[];
+                                  for (final call in pendingCalls) {
+                                    final functionName = call['function_name'] as String? ?? '';
+                                    if (_isWriteAction(functionName)) {
+                                      writeActionsForMessage.add(call);
+                                    }
+                                  }
+
                                   return Container(
                                     margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
                                     padding: const EdgeInsets.all(12),
@@ -2294,6 +2479,28 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             Expanded(child: _buildMessageContent(context, message.content, isUser)),
                                           ],
                                         ),
+                                        // Display write action confirmations for last message
+                                        if (isLastMessage && writeActionsForMessage.isNotEmpty) ...[
+                                          const SizedBox(height: 12),
+                                          ...writeActionsForMessage.map((call) {
+                                            final functionName = call['function_name'] as String? ?? '';
+                                            final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                                            final actionId = call['action_id'] as String? ?? '';
+
+                                            // Render entity widget + confirm button for createTask/createEvent
+                                            if (functionName == 'createTask' || functionName == 'updateTask') {
+                                              return _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser);
+                                            } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
+                                              return _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser);
+                                            } else {
+                                              // For other write actions, show confirmation widget
+                                              return Padding(
+                                                padding: const EdgeInsets.only(top: 8),
+                                                child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
+                                              );
+                                            }
+                                          }),
+                                        ],
                                       ],
                                     ),
                                   );
@@ -2650,31 +2857,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
       return const SizedBox.shrink();
     }
 
-    // 마지막 메시지에서 현재 actionId를 가진 inapp_action_confirm 태그가 있는지 확인
-    final lastMessage = messages.last;
-    bool isLastMessage = false;
-
-    if (lastMessage.content.contains('inapp_action_confirm')) {
-      try {
-        final regex = RegExp(r'<inapp_action_confirm>([\s\S]*?)</inapp_action_confirm>');
-        final matches = regex.allMatches(lastMessage.content);
-        for (final match in matches) {
-          final jsonText = match.group(1)?.trim() ?? '';
-          if (jsonText.isNotEmpty) {
-            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-            final actionId = jsonData['action_id'] as String? ?? '';
-            if (actionId == widget.actionId) {
-              isLastMessage = true;
-              break;
-            }
-          }
-        }
-      } catch (e) {
-        // 파싱 에러 무시
-      }
-    }
-
-    // 마지막 메시지가 아니면 버튼만 숨김 (위젯은 표시)
+    // pendingFunctionCalls는 항상 마지막 메시지와 관련되므로 항상 표시
 
     return Focus(
       focusNode: _focusNode,
@@ -2717,28 +2900,33 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ],
             const SizedBox(height: 12),
-            // Confirm button - 마지막 메시지인 경우에만 표시
-            if (isLastMessage && !_isProcessing)
-              IntrinsicWidth(
-                child: VisirButton(
-                  type: VisirButtonAnimationType.scaleAndOpacity,
-                  style: VisirButtonStyle(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    backgroundColor: context.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  options: VisirButtonOptions(
-                    bypassTextField: true,
-                    shortcuts: [
-                      VisirButtonKeyboardShortcut(
-                        keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
-                        message: context.tr.confirm,
+            // Confirm button - pendingFunctionCalls는 항상 마지막 메시지와 관련되므로 항상 표시
+            if (!_isProcessing)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IntrinsicWidth(
+                    child: VisirButton(
+                      type: VisirButtonAnimationType.scaleAndOpacity,
+                      style: VisirButtonStyle(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        backgroundColor: context.primary,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
+                      options: VisirButtonOptions(
+                        bypassTextField: true,
+                        shortcuts: [
+                          VisirButtonKeyboardShortcut(
+                            keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
+                            message: context.tr.confirm,
+                          ),
+                        ],
+                      ),
+                      onTap: _handleConfirm,
+                      child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+                    ),
                   ),
-                  onTap: _handleConfirm,
-                  child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                ),
+                ],
               ),
           ],
         ),
