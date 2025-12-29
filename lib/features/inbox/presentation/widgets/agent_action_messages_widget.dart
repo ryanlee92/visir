@@ -150,8 +150,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: context.surface,
-        border: Border.all(color: context.outline.withValues(alpha: 0.3), width: 1),
+        color: isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surfaceVariant.withValues(alpha: 0.5),
+        border: Border.all(color: isUser ? context.primaryContainer : context.outline.withValues(alpha: 0.3), width: 1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
@@ -2447,11 +2447,14 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   final pendingCalls = state.pendingFunctionCalls ?? [];
                                   final isLastMessage = index == agentAction.messages.length - 1;
 
-                                  // Find write actions that need confirmation
+                                  // Find write actions that need confirmation (remove duplicates by action_id)
                                   final writeActionsForMessage = <Map<String, dynamic>>[];
+                                  final seenActionIds = <String>{};
                                   for (final call in pendingCalls) {
                                     final functionName = call['function_name'] as String? ?? '';
-                                    if (_isWriteAction(functionName)) {
+                                    final actionId = call['action_id'] as String? ?? '';
+                                    if (_isWriteAction(functionName) && actionId.isNotEmpty && !seenActionIds.contains(actionId)) {
+                                      seenActionIds.add(actionId);
                                       writeActionsForMessage.add(call);
                                     }
                                   }
@@ -2459,7 +2462,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   return Container(
                                     margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
                                     padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                                    decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [

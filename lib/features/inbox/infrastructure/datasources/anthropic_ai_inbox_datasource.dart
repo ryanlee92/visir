@@ -640,6 +640,18 @@ Return only the HTML-formatted email body. Do not include any additional explana
 - TOMORROW's date: $tomorrowStr
 - Current time: ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}
 
+## CRITICAL DATE EXTRACTION RULES
+When creating tasks or events from inbox items:
+1. **ALWAYS check the inbox item's content/description FIRST** for dates/times before using default dates
+2. Extract dates from the inbox item content in various formats:
+   - Absolute dates: "January 15th", "2024-01-15", "15/01/2024"
+   - Relative dates: "tomorrow", "next Monday", "in 3 days"
+   - Date + time: "3pm on Friday", "Meeting at 2:00 PM", "Event starts at 2:00 PM on Friday"
+   - Deadline mentions: "Due date: 2024-01-20", "Deadline: tomorrow", "Deadline: January 15th"
+3. If the inbox item mentions a date/time, you MUST use that date/time instead of defaulting to today or tomorrow
+4. Only use default dates (today/tomorrow) if NO dates are found in the inbox item's content
+5. When parsing dates from inbox content, consider the context and convert them to ISO 8601 format (YYYY-MM-DDTHH:mm:ss)
+
 When calculating dates for repetitive tasks, use TODAY's date ($todayStr) as the starting point.
 
 You can help users manage tasks, events, and emails by calling functions. When the user mentions actions like "toggle task status", "create task", "delete event", etc., you should call the appropriate function.

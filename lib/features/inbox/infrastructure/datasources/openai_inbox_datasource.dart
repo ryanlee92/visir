@@ -1588,6 +1588,12 @@ $userRequest
 ${previousTaskEntity != null ? '''- IMPORTANT: A previous task entity is provided above. Use it as the base and ONLY modify the fields that the user explicitly requests to change.
 - If the user doesn't mention a field (title, description, date/time, project, etc.), keep it exactly as it is in the previous task entity.
 - Only extract and apply the specific changes requested by the user.
+- CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
+  1. FIRST: Check the Inbox Item Information (Description section above) for any dates/times mentioned in the inbox item's content
+  2. SECOND: Check the user's explicit request for dates/times
+  3. THIRD: Use suggested task information if available
+  4. LAST: Use default dates (today/tomorrow) only if no dates are found in the inbox item or user request
+- CRITICAL: If the inbox item's description contains a date/time (e.g., "Meeting on January 15th at 3pm", "Due date: 2024-01-20", "Deadline: tomorrow"), you MUST extract and use that date/time from the inbox item's content. Do NOT ignore dates mentioned in the inbox item.
 - CRITICAL: If the user requests a date/time change (e.g., "tomorrow", "내일", "change date to X", "make it tomorrow", "I want to create task at tomorrow"), you MUST extract the new date and include it in start_at (LOCAL timezone format: YYYY-MM-DDTHH:mm:ss without Z suffix). Do NOT leave start_at as null or empty. Do NOT use the previous task's date.
 - CRITICAL PROJECT SELECTION: If the user mentions a project name or requests a project change (e.g., "change project to X", "I want to change project to networking project", "set project to Y", "networking project"), you MUST:
   1. Look at the Available Projects section above
@@ -1616,6 +1622,12 @@ ${previousTaskEntity != null ? '''- IMPORTANT: A previous task entity is provide
     * Calculate end_at based on the previous task's duration
   - If user says "as is" or "create as is", use the previous task entity exactly as is (all fields unchanged) - in this case, you can omit start_at from the response or set it to the previous task's start_at.''' : '''- Generate a task title and description based on the inbox item and user request.
 - CRITICAL PROJECT SELECTION: Look at the Available Projects section above. If the user mentions a project name, find the matching project from the list and return its EXACT project_id. Match project names case-insensitively with partial matching. If no project is mentioned or no match is found, use null for project_id.
+- CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
+  1. FIRST: Check the Inbox Item Information (Description section above) for any dates/times mentioned in the inbox item's content. The inbox item's description may contain dates like "Meeting on January 15th at 3pm", "Due date: 2024-01-20", "Deadline: tomorrow", "Event starts at 2:00 PM on Friday", etc. You MUST extract and use these dates from the inbox item's content.
+  2. SECOND: Check the user's explicit request for dates/times (e.g., "create task for tomorrow", "make it next Monday")
+  3. THIRD: Use suggested task information if available
+  4. LAST: Use default dates (today/tomorrow) only if no dates are found in the inbox item or user request
+- CRITICAL: If the inbox item's description contains a date/time, you MUST extract and use that date/time from the inbox item's content. Do NOT ignore dates mentioned in the inbox item. Parse dates in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", etc.) and convert them to ISO 8601 format.
 - If the user mentions a specific date or time, extract it and include it in start_at (ISO 8601 format).
 - CRITICAL: If the user mentions a specific time (e.g., "9시", "9 o'clock", "9am", "오후 3시", "3pm"), you MUST include the time in start_at (format: YYYY-MM-DDTHH:mm:ss) and set isAllDay to false. If only a date is mentioned without time, you can set isAllDay to true or include 00:00:00 in start_at.
 - ${suggestion != null ? 'If the user requests to create the task "as is", "as suggested", "create as suggested", or similar phrases, use the suggested task\'s start_at, end_at, and isAllDay values from the Suggested Task Information section above.' : ''}
@@ -2803,12 +2815,18 @@ When calling `createTask` or `updateTask`, you MUST use the following field name
 - ✅ `isAllDay` (NOT `is_all_day`)
 - ✅ `actionNeeded` (NOT `action_needed`)
 
+**CRITICAL DATE EXTRACTION**: When creating tasks from inbox items:
+- **ALWAYS check the inbox item's description/content FIRST** for dates/times before using default dates
+- Extract dates from the inbox item content in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", "Meeting at 2:00 PM", "Deadline: 2024-01-20")
+- If the inbox item mentions a date/time, use that date/time instead of defaulting to today or tomorrow
+- Only use default dates (today/tomorrow) if NO dates are found in the inbox item's content
+
 **Task Entity Fields**:
 - `title` (string, required): Task title
 - `description` (string, optional): Task description
 - `projectId` (string, optional): Project ID
-- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00")
-- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00")
+- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise use user request or default dates.
+- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise calculate based on startAt.
 - `isAllDay` (boolean, optional, default: false): Whether the task is all-day
 - `status` (string, optional, default: "none"): Task status - one of: "none", "done", "cancelled"
 - `from` (string, optional): Source of the task (e.g., "GitHub", "Email")
@@ -2843,12 +2861,18 @@ When calling `createEvent` or `updateEvent`, you MUST use the following field na
 - ✅ `conferenceLink` (NOT `conference_link`)
 - ✅ `actionNeeded` (NOT `action_needed`)
 
+**CRITICAL DATE EXTRACTION**: When creating events from inbox items:
+- **ALWAYS check the inbox item's description/content FIRST** for dates/times before using default dates
+- Extract dates from the inbox item content in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", "Meeting at 2:00 PM", "Event starts at 2:00 PM on Friday")
+- If the inbox item mentions a date/time, use that date/time instead of defaulting to today or tomorrow
+- Only use default dates (today/tomorrow) if NO dates are found in the inbox item's content
+
 **Event Entity Fields**:
 - `title` (string, required): Event title
 - `description` (string, optional): Event description
 - `calendarId` (string, optional): Calendar ID
-- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00")
-- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00")
+- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise use user request or default dates.
+- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from the inbox item's content if available, otherwise calculate based on startAt.
 - `isAllDay` (boolean, optional, default: false): Whether the event is all-day
 - `location` (string, optional): Event location
 - `attendees` (array of strings, optional): List of attendee email addresses (e.g., ["email1@example.com", "email2@example.com"])
