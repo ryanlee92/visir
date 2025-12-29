@@ -89,6 +89,7 @@ class AgentActionState {
   final String? sessionId; // Session ID for chat history
   final Set<int> loadedInboxNumbers; // Inbox item numbers that have been fully loaded (with full content)
   final List<Map<String, dynamic>>? pendingFunctionCalls; // Function calls waiting for user confirmation
+  final Set<String> selectedActionIds; // Action IDs selected for batch confirmation
 
   AgentActionState({
     this.actionType,
@@ -104,8 +105,10 @@ class AgentActionState {
     this.sessionId,
     Set<int>? loadedInboxNumbers,
     this.pendingFunctionCalls,
+    Set<String>? selectedActionIds,
   }) : messages = messages ?? [],
-       loadedInboxNumbers = loadedInboxNumbers ?? {};
+       loadedInboxNumbers = loadedInboxNumbers ?? {},
+       selectedActionIds = selectedActionIds ?? {};
 
   AgentActionState copyWith({
     AgentActionType? actionType,
@@ -119,6 +122,7 @@ class AgentActionState {
     String? sessionId,
     Set<int>? loadedInboxNumbers,
     List<Map<String, dynamic>>? pendingFunctionCalls,
+    Set<String>? selectedActionIds,
   }) {
     return AgentActionState(
       actionType: actionType ?? this.actionType,
@@ -132,6 +136,7 @@ class AgentActionState {
       sessionId: sessionId ?? this.sessionId,
       loadedInboxNumbers: loadedInboxNumbers ?? this.loadedInboxNumbers,
       pendingFunctionCalls: pendingFunctionCalls ?? this.pendingFunctionCalls,
+      selectedActionIds: selectedActionIds ?? this.selectedActionIds,
     );
   }
 
@@ -933,165 +938,185 @@ class AgentActionController extends _$AgentActionController {
             'createEvent',
           };
 
-          // 각 함수 호출을 순차적으로 실행
-          for (int i = 0; i < functionCalls.length; i++) {
-            final functionCall = functionCalls[i];
-            final functionName = functionCall['function'] as String;
-            var functionArgs = functionCall['arguments'] as Map<String, dynamic>;
+          // 함수 호출을 의존성에 따라 그룹화
+          final executionGroups = _groupFunctionCalls(functionCalls);
 
-            // 태그된 항목들을 자동으로 파라미터에 추가
-            functionArgs = _enrichFunctionArgsWithTaggedItems(
-              functionName: functionName,
-              args: functionArgs,
-              taggedTasks: updatedTaggedTasks,
-              taggedEvents: updatedTaggedEvents,
-              taggedConnections: taggedConnections,
-              availableInboxes: updatedAvailableInboxes,
+          // 각 그룹을 순차적으로 실행 (그룹 내부는 병렬 실행)
+          for (final group in executionGroups) {
+            // 그룹 내부 함수들을 병렬로 실행
+            final groupResults = await Future.wait(
+              group.map((functionCall) async {
+                final functionName = functionCall['function'] as String;
+                var functionArgs = functionCall['arguments'] as Map<String, dynamic>;
+
+                // 태그된 항목들을 자동으로 파라미터에 추가
+                functionArgs = _enrichFunctionArgsWithTaggedItems(
+                  functionName: functionName,
+                  args: functionArgs,
+                  taggedTasks: updatedTaggedTasks,
+                  taggedEvents: updatedTaggedEvents,
+                  taggedConnections: taggedConnections,
+                  availableInboxes: updatedAvailableInboxes,
+                );
+
+                // 크레딧 정보를 함수 인자에 추가하여 크레딧을 넘기는 작업 방지
+                functionArgs['_remaining_credits'] = remainingCredits;
+
+                // 확인이 필요한 함수인지 체크
+                final requiresConfirmation = functionsRequiringConfirmation.contains(functionName);
+
+                if (requiresConfirmation) {
+                  // 확인이 필요한 함수는 실행하지 않고 pendingFunctionCalls에 저장
+                  // actionId 생성
+                  final actionId = const Uuid().v4();
+
+                  // pendingFunctionCalls에 추가
+                  final pendingCalls = state.pendingFunctionCalls ?? [];
+                  pendingCalls.add({
+                    'action_id': actionId,
+                    'function_name': functionName,
+                    'function_args': functionArgs,
+                    'index': functionCalls.indexOf(functionCall),
+                    'updated_tagged_tasks': updatedTaggedTasks,
+                    'updated_tagged_events': updatedTaggedEvents,
+                    'tagged_connections': taggedConnections,
+                    'updated_available_inboxes': updatedAvailableInboxes,
+                    'remaining_credits': remainingCredits,
+                  });
+
+                  state = state.copyWith(pendingFunctionCalls: pendingCalls);
+
+                  // 확인이 필요한 함수는 null 반환 (나중에 처리)
+                  return null;
+                }
+
+                // 함수 실행
+                final result = await executor.executeFunction(
+                  functionName,
+                  functionArgs,
+                  tabType: TabType.home,
+                  availableTasks: updatedTaggedTasks,
+                  availableEvents: updatedTaggedEvents,
+                  availableConnections: taggedConnections,
+                  availableInboxes: updatedAvailableInboxes,
+                  remainingCredits: remainingCredits,
+                );
+
+                return {'functionCall': functionCall, 'result': result, 'functionName': functionName};
+              }),
             );
 
-            // 크레딧 정보를 함수 인자에 추가하여 크레딧을 넘기는 작업 방지
-            functionArgs['_remaining_credits'] = remainingCredits;
+            // 그룹 결과 처리
+            for (final groupResult in groupResults) {
+              if (groupResult == null) {
+                // 확인이 필요한 함수는 이미 pendingFunctionCalls에 추가됨
+                continue;
+              }
 
-            // 확인이 필요한 함수인지 체크
-            final requiresConfirmation = functionsRequiringConfirmation.contains(functionName);
+              final result = groupResult['result'] as Map<String, dynamic>;
+              final functionName = groupResult['functionName'] as String;
 
-            if (requiresConfirmation) {
-              // 확인이 필요한 함수는 실행하지 않고 pendingFunctionCalls에 저장
-              // actionId 생성
-              final actionId = const Uuid().v4();
+              results.add(result);
 
-              // pendingFunctionCalls에 추가
-              final pendingCalls = state.pendingFunctionCalls ?? [];
-              pendingCalls.add({
-                'action_id': actionId,
-                'function_name': functionName,
-                'function_args': functionArgs,
-                'index': i,
-                'updated_tagged_tasks': updatedTaggedTasks,
-                'updated_tagged_events': updatedTaggedEvents,
-                'tagged_connections': taggedConnections,
-                'updated_available_inboxes': updatedAvailableInboxes,
-                'remaining_credits': remainingCredits,
-              });
+              // 검색 함수 결과 처리
+              if (result['success'] == true && result['results'] != null) {
+                final searchResults = result['results'] as List<dynamic>?;
 
-              state = state.copyWith(pendingFunctionCalls: pendingCalls);
+                if (functionName == 'searchInbox' && searchResults != null) {
+                  // 검색된 inbox 처리
+                  final searchResultInboxes = <InboxEntity>[];
+                  final searchResultNumbers = <int>{};
 
-              // AI 응답에 inapp_action_confirm 태그를 포함시켜서 반환
-              // 이 함수 호출은 나중에 사용자가 확인할 때 실행됨
-              continue;
-            }
+                  for (final resultItem in searchResults) {
+                    if (resultItem is Map<String, dynamic>) {
+                      final inboxId = resultItem['id'] as String?;
+                      final inboxNumber = resultItem['number'] as int?;
 
-            final result = await executor.executeFunction(
-              functionName,
-              functionArgs,
-              tabType: TabType.home,
-              availableTasks: updatedTaggedTasks,
-              availableEvents: updatedTaggedEvents,
-              availableConnections: taggedConnections,
-              availableInboxes: updatedAvailableInboxes,
-              remainingCredits: remainingCredits,
-            );
+                      if (inboxId != null) {
+                        // 기존 inboxes에서 찾기
+                        final foundInbox = updatedAvailableInboxes?.firstWhereOrNull((inbox) => inbox.id == inboxId);
 
-            results.add(result);
-
-            // 검색 함수 결과 처리
-            if (result['success'] == true && result['results'] != null) {
-              final searchResults = result['results'] as List<dynamic>?;
-
-              if (functionName == 'searchInbox' && searchResults != null) {
-                // 검색된 inbox 처리
-                final searchResultInboxes = <InboxEntity>[];
-                final searchResultNumbers = <int>{};
-
-                for (final resultItem in searchResults) {
-                  if (resultItem is Map<String, dynamic>) {
-                    final inboxId = resultItem['id'] as String?;
-                    final inboxNumber = resultItem['number'] as int?;
-
-                    if (inboxId != null) {
-                      // 기존 inboxes에서 찾기
-                      final foundInbox = updatedAvailableInboxes?.firstWhereOrNull((inbox) => inbox.id == inboxId);
-
-                      if (foundInbox != null) {
-                        searchResultInboxes.add(foundInbox);
-                        if (inboxNumber != null) {
-                          searchResultNumbers.add(inboxNumber);
+                        if (foundInbox != null) {
+                          searchResultInboxes.add(foundInbox);
+                          if (inboxNumber != null) {
+                            searchResultNumbers.add(inboxNumber);
+                          }
                         }
                       }
                     }
                   }
-                }
 
-                // 검색된 inbox를 availableInboxes에 추가 (중복 제거)
-                if (searchResultInboxes.isNotEmpty) {
-                  final existingIds = updatedAvailableInboxes?.map((e) => e.id).toSet() ?? {};
-                  final newInboxes = searchResultInboxes.where((e) => !existingIds.contains(e.id)).toList();
-                  updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
-                  updatedLoadedInboxNumbers = {...updatedLoadedInboxNumbers, ...searchResultNumbers};
-                }
-              } else if (functionName == 'searchTask' && searchResults != null) {
-                // 검색된 task 처리
-                final searchResultTasks = <TaskEntity>[];
+                  // 검색된 inbox를 availableInboxes에 추가 (중복 제거)
+                  if (searchResultInboxes.isNotEmpty) {
+                    final existingIds = updatedAvailableInboxes?.map((e) => e.id).toSet() ?? {};
+                    final newInboxes = searchResultInboxes.where((e) => !existingIds.contains(e.id)).toList();
+                    updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
+                    updatedLoadedInboxNumbers = {...updatedLoadedInboxNumbers, ...searchResultNumbers};
+                  }
+                } else if (functionName == 'searchTask' && searchResults != null) {
+                  // 검색된 task 처리
+                  final searchResultTasks = <TaskEntity>[];
 
-                for (final resultItem in searchResults) {
-                  if (resultItem is Map<String, dynamic>) {
-                    final taskId = resultItem['id'] as String?;
+                  for (final resultItem in searchResults) {
+                    if (resultItem is Map<String, dynamic>) {
+                      final taskId = resultItem['id'] as String?;
 
-                    if (taskId != null) {
-                      // task_list_controller에서 찾기
-                      final allTasks = ref.read(taskListControllerProvider).tasks;
-                      final foundTask = allTasks.firstWhereOrNull((task) => task.id == taskId);
+                      if (taskId != null) {
+                        // task_list_controller에서 찾기
+                        final allTasks = ref.read(taskListControllerProvider).tasks;
+                        final foundTask = allTasks.firstWhereOrNull((task) => task.id == taskId);
 
-                      if (foundTask != null && !foundTask.isEventDummyTask) {
-                        searchResultTasks.add(foundTask);
+                        if (foundTask != null && !foundTask.isEventDummyTask) {
+                          searchResultTasks.add(foundTask);
+                        }
                       }
                     }
                   }
-                }
 
-                // 검색된 task를 taggedTasks에 추가 (중복 제거)
-                if (searchResultTasks.isNotEmpty) {
-                  final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
-                  final newTasks = searchResultTasks.where((e) => !existingIds.contains(e.id)).toList();
-                  updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
-                }
-              } else if (functionName == 'searchCalendarEvent' && searchResults != null) {
-                // 검색된 event 처리
-                final searchResultEvents = <EventEntity>[];
+                  // 검색된 task를 taggedTasks에 추가 (중복 제거)
+                  if (searchResultTasks.isNotEmpty) {
+                    final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
+                    final newTasks = searchResultTasks.where((e) => !existingIds.contains(e.id)).toList();
+                    updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
+                  }
+                } else if (functionName == 'searchCalendarEvent' && searchResults != null) {
+                  // 검색된 event 처리
+                  final searchResultEvents = <EventEntity>[];
 
-                for (final resultItem in searchResults) {
-                  if (resultItem is Map<String, dynamic>) {
-                    final eventId = resultItem['id'] as String?;
-                    final uniqueId = resultItem['uniqueId'] as String?;
+                  for (final resultItem in searchResults) {
+                    if (resultItem is Map<String, dynamic>) {
+                      final eventId = resultItem['id'] as String?;
+                      final uniqueId = resultItem['uniqueId'] as String?;
 
-                    if (eventId != null || uniqueId != null) {
-                      // calendar_event_list_controller에서 찾기
-                      final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
-                      final foundEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == uniqueId);
+                      if (eventId != null || uniqueId != null) {
+                        // calendar_event_list_controller에서 찾기
+                        final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+                        final foundEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == uniqueId);
 
-                      if (foundEvent != null) {
-                        searchResultEvents.add(foundEvent);
+                        if (foundEvent != null) {
+                          searchResultEvents.add(foundEvent);
+                        }
                       }
                     }
                   }
+
+                  // 검색된 event를 taggedEvents에 추가 (중복 제거)
+                  if (searchResultEvents.isNotEmpty) {
+                    final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+                    final newEvents = searchResultEvents.where((e) => !existingIds.contains(e.uniqueId)).toList();
+                    updatedTaggedEvents = [...(updatedTaggedEvents ?? []), ...newEvents];
+                  }
                 }
 
-                // 검색된 event를 taggedEvents에 추가 (중복 제거)
-                if (searchResultEvents.isNotEmpty) {
-                  final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
-                  final newEvents = searchResultEvents.where((e) => !existingIds.contains(e.uniqueId)).toList();
-                  updatedTaggedEvents = [...(updatedTaggedEvents ?? []), ...newEvents];
-                }
+                final successMessage = result['message'] as String? ?? '작업이 완료되었습니다.';
+                successMessages.add(successMessage);
+              } else if (result['success'] == true) {
+                final successMessage = result['message'] as String? ?? '작업이 완료되었습니다.';
+                successMessages.add(successMessage);
+              } else {
+                final errorMessage = result['error'] as String? ?? '작업 실행 중 오류가 발생했습니다.';
+                errorMessages.add('$functionName: $errorMessage');
               }
-
-              final successMessage = result['message'] as String? ?? '작업이 완료되었습니다.';
-              successMessages.add(successMessage);
-            } else if (result['success'] == true) {
-              final successMessage = result['message'] as String? ?? '작업이 완료되었습니다.';
-              successMessages.add(successMessage);
-            } else {
-              final errorMessage = result['error'] as String? ?? '작업 실행 중 오류가 발생했습니다.';
-              errorMessages.add('$functionName: $errorMessage');
             }
           }
 
@@ -2348,66 +2373,172 @@ class AgentActionController extends _$AgentActionController {
 
   /// 확인이 필요한 함수 호출을 실행합니다.
   Future<void> confirmAction({required String actionId}) async {
+    await confirmActions(actionIds: [actionId]);
+  }
+
+  /// 여러 액션을 일괄 확인하고 실행합니다.
+  Future<void> confirmActions({required List<String> actionIds}) async {
+    if (actionIds.isEmpty) return;
+
     final pendingCalls = state.pendingFunctionCalls ?? [];
-    final pendingCall = pendingCalls.firstWhereOrNull((call) => call['action_id'] == actionId);
+    final callsToExecute = pendingCalls.where((call) {
+      final callActionId = call['action_id'] as String?;
+      return callActionId != null && actionIds.contains(callActionId);
+    }).toList();
 
-    if (pendingCall == null) {
-      return;
-    }
-
-    // 타입 안전하게 데이터 추출
-    final functionName = pendingCall['function_name'] as String?;
-    final functionArgs = pendingCall['function_args'] as Map<String, dynamic>?;
-
-    if (functionName == null || functionArgs == null) {
+    if (callsToExecute.isEmpty) {
       return;
     }
 
     // pendingFunctionCalls에서 먼저 제거 (UI 업데이트를 위해)
-    final updatedPendingCalls = pendingCalls.where((call) => call['action_id'] != actionId).toList();
-    state = state.copyWith(pendingFunctionCalls: updatedPendingCalls.isEmpty ? null : updatedPendingCalls);
+    final updatedPendingCalls = pendingCalls.where((call) {
+      final callActionId = call['action_id'] as String?;
+      return callActionId == null || !actionIds.contains(callActionId);
+    }).toList();
+    state = state.copyWith(
+      pendingFunctionCalls: updatedPendingCalls.isEmpty ? null : updatedPendingCalls,
+      selectedActionIds: {},
+    );
 
-    // 타입 안전하게 컨텍스트 데이터 추출
-    final updatedTaggedTasks = pendingCall['updated_tagged_tasks'] as List<TaskEntity>?;
-    final updatedTaggedEvents = pendingCall['updated_tagged_events'] as List<EventEntity>?;
-    final taggedConnections = pendingCall['tagged_connections'] as List<ConnectionEntity>?;
-    final updatedAvailableInboxes = pendingCall['updated_available_inboxes'] as List<InboxEntity>?;
-    final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
+    final executor = McpFunctionExecutor(ref);
+    final successMessages = <String>[];
+    final errorMessages = <String>[];
 
-    try {
-      // 함수 실행
-      final executor = McpFunctionExecutor(ref);
-      final result = await executor.executeFunction(
-        functionName,
-        functionArgs,
-        tabType: TabType.home,
-        availableTasks: updatedTaggedTasks,
-        availableEvents: updatedTaggedEvents,
-        availableConnections: taggedConnections,
-        availableInboxes: updatedAvailableInboxes,
-        remainingCredits: remainingCredits,
-      );
+    // 각 액션을 순차적으로 실행 (의존성 고려)
+    for (final pendingCall in callsToExecute) {
+      // 타입 안전하게 데이터 추출
+      final functionName = pendingCall['function_name'] as String?;
+      final functionArgs = pendingCall['function_args'] as Map<String, dynamic>?;
 
-      // 결과 메시지 추가
-      final successMessage = result['success'] == true ? (result['message'] as String? ?? '작업이 완료되었습니다.') : (result['error'] as String? ?? '작업 실행 중 오류가 발생했습니다.');
+      if (functionName == null || functionArgs == null) {
+        continue;
+      }
 
-      final assistantMessage = AgentActionMessage(role: 'assistant', content: successMessage);
+      // 타입 안전하게 컨텍스트 데이터 추출
+      final updatedTaggedTasks = pendingCall['updated_tagged_tasks'] as List<TaskEntity>?;
+      final updatedTaggedEvents = pendingCall['updated_tagged_events'] as List<EventEntity>?;
+      final taggedConnections = pendingCall['tagged_connections'] as List<ConnectionEntity>?;
+      final updatedAvailableInboxes = pendingCall['updated_available_inboxes'] as List<InboxEntity>?;
+      final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
 
-      final updatedMessages = [...state.messages, assistantMessage];
-      state = state.copyWith(messages: updatedMessages);
+      try {
+        // 함수 실행
+        final result = await executor.executeFunction(
+          functionName,
+          functionArgs,
+          tabType: TabType.home,
+          availableTasks: updatedTaggedTasks,
+          availableEvents: updatedTaggedEvents,
+          availableConnections: taggedConnections,
+          availableInboxes: updatedAvailableInboxes,
+          remainingCredits: remainingCredits,
+        );
 
-      // 히스토리 저장
-      _saveChatHistory();
-    } catch (e) {
-      // 에러 발생 시 에러 메시지 추가
-      final errorMessage = AgentActionMessage(role: 'assistant', content: '작업 실행 중 오류가 발생했습니다: ${e.toString()}');
-
-      final updatedMessages = [...state.messages, errorMessage];
-      state = state.copyWith(messages: updatedMessages);
-
-      // 히스토리 저장
-      _saveChatHistory();
+        if (result['success'] == true) {
+          final message = result['message'] as String? ?? '작업이 완료되었습니다.';
+          successMessages.add(message);
+        } else {
+          final error = result['error'] as String? ?? '작업 실행 중 오류가 발생했습니다.';
+          errorMessages.add('$functionName: $error');
+        }
+      } catch (e) {
+        errorMessages.add('$functionName: 작업 실행 중 오류가 발생했습니다: ${e.toString()}');
+      }
     }
+
+    // 결과 메시지 생성
+    String resultMessage;
+    if (errorMessages.isEmpty) {
+      if (successMessages.length == 1) {
+        resultMessage = successMessages.first;
+      } else {
+        resultMessage = '${successMessages.length}개의 작업이 완료되었습니다:\n${successMessages.map((m) => '• $m').join('\n')}';
+      }
+    } else if (successMessages.isEmpty) {
+      resultMessage = '작업 실행 중 오류가 발생했습니다:\n${errorMessages.map((m) => '• $m').join('\n')}';
+    } else {
+      resultMessage = '일부 작업이 완료되었습니다:\n';
+      if (successMessages.isNotEmpty) {
+        resultMessage += '성공:\n${successMessages.map((m) => '• $m').join('\n')}\n';
+      }
+      if (errorMessages.isNotEmpty) {
+        resultMessage += '실패:\n${errorMessages.map((m) => '• $m').join('\n')}';
+      }
+    }
+
+    final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage);
+    final updatedMessages = [...state.messages, assistantMessage];
+    state = state.copyWith(messages: updatedMessages);
+
+    // 히스토리 저장
+    _saveChatHistory();
+  }
+
+  /// 액션 선택 상태를 토글합니다.
+  void toggleActionSelection(String actionId) {
+    final selectedIds = Set<String>.from(state.selectedActionIds);
+    if (selectedIds.contains(actionId)) {
+      selectedIds.remove(actionId);
+    } else {
+      selectedIds.add(actionId);
+    }
+    state = state.copyWith(selectedActionIds: selectedIds);
+  }
+
+  /// 모든 액션을 선택하거나 선택 해제합니다.
+  void toggleAllActionsSelection(bool selectAll) {
+    final pendingCalls = state.pendingFunctionCalls ?? [];
+    if (selectAll) {
+      final allActionIds = pendingCalls.map((call) => call['action_id'] as String?).whereType<String>().toSet();
+      state = state.copyWith(selectedActionIds: allActionIds);
+    } else {
+      state = state.copyWith(selectedActionIds: {});
+    }
+  }
+
+  /// 함수 호출을 의존성에 따라 그룹화합니다.
+  /// 각 그룹은 동시에 실행 가능하며, 그룹 간에는 순차적으로 실행됩니다.
+  List<List<Map<String, dynamic>>> _groupFunctionCalls(List<Map<String, dynamic>> functionCalls) {
+    final groups = <List<Map<String, dynamic>>>[];
+    final processed = <int>{};
+
+    for (int i = 0; i < functionCalls.length; i++) {
+      if (processed.contains(i)) continue;
+
+      final functionCall = functionCalls[i];
+      final canParallelize = functionCall['can_parallelize'] as bool? ?? false;
+      final dependsOn = functionCall['depends_on'] as List<dynamic>?;
+
+      // depends_on이 있거나 can_parallelize가 false면 별도 그룹으로 분리
+      if (dependsOn != null && dependsOn.isNotEmpty || !canParallelize) {
+        groups.add([functionCall]);
+        processed.add(i);
+        continue;
+      }
+
+      // can_parallelize가 true이고 depends_on이 없으면 같은 그룹에 추가
+      final currentGroup = <Map<String, dynamic>>[functionCall];
+      processed.add(i);
+
+      // 같은 그룹에 추가할 수 있는 다른 함수들 찾기
+      for (int j = i + 1; j < functionCalls.length; j++) {
+        if (processed.contains(j)) continue;
+
+        final otherCall = functionCalls[j];
+        final otherCanParallelize = otherCall['can_parallelize'] as bool? ?? false;
+        final otherDependsOn = otherCall['depends_on'] as List<dynamic>?;
+
+        // 같은 조건을 만족하면 같은 그룹에 추가
+        if (otherCanParallelize && (otherDependsOn == null || otherDependsOn.isEmpty)) {
+          currentGroup.add(otherCall);
+          processed.add(j);
+        }
+      }
+
+      groups.add(currentGroup);
+    }
+
+    return groups;
   }
 
   /// 프로젝트 ID를 추출합니다.

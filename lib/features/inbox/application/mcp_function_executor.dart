@@ -78,7 +78,15 @@ class McpFunctionExecutor {
             // 먼저 함수 호출 형식인지 확인
             for (final item in parsed) {
               if (item is Map<String, dynamic> && item.containsKey('function') && item.containsKey('arguments')) {
-                results.add(item);
+                // can_parallelize 필드가 있으면 포함, 없으면 기본값 true (독립적인 함수는 기본적으로 병렬 처리 가능)
+                final functionCall = Map<String, dynamic>.from(item);
+                if (!functionCall.containsKey('can_parallelize')) {
+                  // 기본값: 검색 함수들은 병렬 처리 가능, 나머지는 false
+                  final functionName = functionCall['function'] as String? ?? '';
+                  final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
+                  functionCall['can_parallelize'] = searchFunctions.contains(functionName);
+                }
+                results.add(functionCall);
               }
             }
             if (results.isNotEmpty) return results;
@@ -132,7 +140,14 @@ class McpFunctionExecutor {
         if (functionName != null && argumentsJson != null) {
           try {
             final arguments = jsonDecode(argumentsJson) as Map<String, dynamic>;
-            results.add({'function': functionName, 'arguments': arguments});
+            final functionCall = <String, dynamic>{
+              'function': functionName,
+              'arguments': arguments,
+            };
+            // can_parallelize 필드는 커스텀 태그 형식에서는 기본값 사용
+            final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
+            functionCall['can_parallelize'] = searchFunctions.contains(functionName);
+            results.add(functionCall);
           } catch (e) {
             // 개별 파싱 실패는 무시하고 계속 진행
           }
@@ -149,7 +164,14 @@ class McpFunctionExecutor {
           try {
             final parsed = jsonDecode(jsonStr) as Map<String, dynamic>;
             if (parsed.containsKey('function') && parsed.containsKey('arguments')) {
-              results.add(parsed);
+              final functionCall = Map<String, dynamic>.from(parsed);
+              // can_parallelize 필드가 없으면 기본값 설정
+              if (!functionCall.containsKey('can_parallelize')) {
+                final functionName = functionCall['function'] as String? ?? '';
+                final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
+                functionCall['can_parallelize'] = searchFunctions.contains(functionName);
+              }
+              results.add(functionCall);
             }
           } catch (e) {
             // 개별 파싱 실패는 무시하고 계속 진행
@@ -168,7 +190,28 @@ class McpFunctionExecutor {
         if (functionName != null && argumentsJson != null) {
           try {
             final arguments = jsonDecode(argumentsJson) as Map<String, dynamic>;
-            results.add({'function': functionName, 'arguments': arguments});
+            final functionCall = <String, dynamic>{
+              'function': functionName,
+              'arguments': arguments,
+            };
+            // can_parallelize 필드가 없으면 기본값 설정
+            // 정규식으로 파싱한 경우 전체 JSON을 다시 파싱해서 can_parallelize 확인 시도
+            try {
+              // 전체 JSON 블록을 다시 파싱해서 can_parallelize 확인
+              final fullJsonStr = aiResponse.substring(match.start, match.end);
+              final fullJson = jsonDecode(fullJsonStr) as Map<String, dynamic>?;
+              if (fullJson != null && fullJson.containsKey('can_parallelize')) {
+                functionCall['can_parallelize'] = fullJson['can_parallelize'] as bool? ?? false;
+              } else {
+                final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
+                functionCall['can_parallelize'] = searchFunctions.contains(functionName);
+              }
+            } catch (e) {
+              // 전체 JSON 파싱 실패 시 기본값 사용
+              final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
+              functionCall['can_parallelize'] = searchFunctions.contains(functionName);
+            }
+            results.add(functionCall);
           } catch (e) {
             // 개별 파싱 실패는 무시하고 계속 진행
           }

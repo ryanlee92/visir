@@ -693,7 +693,22 @@ When users request repetitive tasks (e.g., "오늘부터 매일 1주 간 task �
 
 **Date Format**: Always use ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00")
 - For all-day tasks, set isAllDay to true and use dates like "2024-01-01T00:00:00" to "2024-01-02T00:00:00"
-- For timed tasks, include both startAt and endAt times''';
+- For timed tasks, include both startAt and endAt times
+
+### Parallel Execution and Dependency Analysis
+When calling multiple functions, analyze dependencies and mark functions that can run in parallel:
+- **Independent search functions** (`searchInbox`, `searchTask`, `searchCalendarEvent`) can run in parallel - set `can_parallelize: true`
+- **Functions that depend on previous results** (e.g., creating a task after searching) must run sequentially - set `can_parallelize: false` and optionally include `depends_on: ["functionName"]`
+- **Functions modifying the same resource** must run sequentially - set `can_parallelize: false`
+- **Example format**:
+  ```json
+  [
+    {"function": "searchInbox", "arguments": {...}, "can_parallelize": true},
+    {"function": "searchTask", "arguments": {...}, "can_parallelize": true},
+    {"function": "createTask", "arguments": {...}, "can_parallelize": false, "depends_on": ["searchTask"]}
+  ]
+  ```
+The system will automatically execute parallelizable functions simultaneously for better performance.''';
 
       if (projectContext != null && projectContext.isNotEmpty) {
         systemMessage += '\n\n## Project Context\n$projectContext';

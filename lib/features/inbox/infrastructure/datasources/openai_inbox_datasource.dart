@@ -2777,7 +2777,20 @@ The user can then click the confirm button or press Command+Enter (Mac) / Ctrl+E
 7. For repetitive tasks, calculate dates correctly and create separate function calls for each occurrence.
 8. **Function Chaining**: When chaining functions (e.g., search → action), call all functions in a single response. The system will execute them sequentially and automatically pass results between functions.
 9. **User Confirmation**: Functions that require confirmation will automatically show a confirmation UI. You don't need to ask the user separately - just call the function and the system will handle the confirmation flow.
-10. If you're just having a conversation without needing to call a function, respond normally without function_call blocks.''';
+10. **Parallel Execution and Dependency Analysis**: When calling multiple functions, analyze dependencies and mark functions that can run in parallel:
+    - **Independent search functions** (`searchInbox`, `searchTask`, `searchCalendarEvent`) can run in parallel - set `can_parallelize: true`
+    - **Functions that depend on previous results** (e.g., creating a task after searching) must run sequentially - set `can_parallelize: false` and optionally include `depends_on: ["functionName"]`
+    - **Functions modifying the same resource** must run sequentially - set `can_parallelize: false`
+    - **Example format**:
+      ```json
+      [
+        {"function": "searchInbox", "arguments": {...}, "can_parallelize": true},
+        {"function": "searchTask", "arguments": {...}, "can_parallelize": true},
+        {"function": "createTask", "arguments": {...}, "can_parallelize": false, "depends_on": ["searchTask"]}
+      ]
+      ```
+    The system will automatically execute parallelizable functions simultaneously for better performance.
+11. If you're just having a conversation without needing to call a function, respond normally without function_call blocks.''';
 
       if (projectContext != null && projectContext.isNotEmpty) {
         systemMessage +=

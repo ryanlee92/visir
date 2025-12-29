@@ -1803,6 +1803,63 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 ],
                               ),
                             ),
+                            // Batch confirmation button if multiple pending actions exist
+                            Builder(
+                              builder: (context) {
+                                final state = ref.watch(agentActionControllerProvider);
+                                final pendingCalls = state.pendingFunctionCalls ?? [];
+                                final selectedIds = state.selectedActionIds;
+                                
+                                if (pendingCalls.length < 2) {
+                                  return const SizedBox.shrink();
+                                }
+                                
+                                final hasSelected = selectedIds.isNotEmpty;
+                                
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: context.surfaceVariant.withValues(alpha: 0.5),
+                                    border: Border(
+                                      bottom: BorderSide(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Checkbox(
+                                        value: selectedIds.length == pendingCalls.length,
+                                        tristate: true,
+                                        onChanged: (value) {
+                                          controller.toggleAllActionsSelection(value ?? false);
+                                        },
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          '${selectedIds.length}/${pendingCalls.length}개 선택됨',
+                                          style: context.bodySmall?.copyWith(color: context.onSurfaceVariant),
+                                        ),
+                                      ),
+                                      if (hasSelected)
+                                        VisirButton(
+                                          type: VisirButtonAnimationType.scaleAndOpacity,
+                                          style: VisirButtonStyle(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            backgroundColor: context.primary,
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          onTap: () async {
+                                            await controller.confirmActions(actionIds: selectedIds.toList());
+                                          },
+                                          child: Text(
+                                            '선택한 항목 확인 (${selectedIds.length})',
+                                            style: context.bodySmall?.copyWith(color: context.onPrimary),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
@@ -1980,13 +2037,24 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Confirmation message
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                widget.confirmationMessage,
-                style: context.bodyMedium?.copyWith(color: widget.isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5),
-              ),
+            // Checkbox for batch selection
+            Row(
+              children: [
+                Checkbox(
+                  value: state.selectedActionIds.contains(widget.actionId),
+                  onChanged: !_isProcessing
+                      ? (value) {
+                          ref.read(agentActionControllerProvider.notifier).toggleActionSelection(widget.actionId);
+                        }
+                      : null,
+                ),
+                Expanded(
+                  child: Text(
+                    widget.confirmationMessage,
+                    style: context.bodyMedium?.copyWith(color: widget.isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5),
+                  ),
+                ),
+              ],
             ),
             // Action details based on function type
             if (widget.functionName == 'sendMail' || widget.functionName == 'replyMail' || widget.functionName == 'forwardMail') ...[
