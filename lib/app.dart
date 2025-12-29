@@ -188,7 +188,8 @@ class _ExampleAppState extends ConsumerState<ExampleApp> {
     }
 
     final isSignedIn = ref.watch(isSignedInProvider);
-    if (!isSignedIn)
+    print('######## 1234 $isSignedIn');
+    if (!isSignedIn) {
       return Screenshot(
         controller: _screenshotController,
         child: KeyboardShortcut(
@@ -205,14 +206,16 @@ class _ExampleAppState extends ConsumerState<ExampleApp> {
             debugShowCheckedModeBanner: false,
             scrollBehavior: const ScrollBehavior().copyWith(physics: const VisirBouncingScrollPhysics()),
             builder: (context, child) {
+              final query = MediaQuery.of(context);
               return MediaQuery(
-                data: PlatformX.isDesktop ? context.mediaQuery.copyWith(textScaler: TextScaler.linear(textScaler)) : context.mediaQuery,
+                data: PlatformX.isDesktop ? query.copyWith(textScaler: TextScaler.linear(textScaler)) : query,
                 child: const AuthWrapper(key: ValueKey('auth')),
               );
             },
           ),
         ),
       );
+    }
 
     router ??= GoRouter(
       routes: [
@@ -261,8 +264,9 @@ class _ExampleAppState extends ConsumerState<ExampleApp> {
                       debugShowCheckedModeBanner: false,
                       scrollBehavior: const ScrollBehavior().copyWith(physics: const VisirBouncingScrollPhysics()),
                       builder: (context, child) {
+                        final query = MediaQuery.of(context);
                         return MediaQuery(
-                          data: PlatformX.isDesktop ? context.mediaQuery.copyWith(textScaler: TextScaler.linear(textScaler)) : context.mediaQuery,
+                          data: PlatformX.isDesktop ? query.copyWith(textScaler: TextScaler.linear(textScaler)) : query,
                           child: child ?? SizedBox.shrink(),
                         );
                       },
