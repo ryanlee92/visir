@@ -7,12 +7,7 @@ class McpFunctionSchema {
   final List<McpFunctionParameter> parameters;
   final String? returnType;
 
-  const McpFunctionSchema({
-    required this.name,
-    required this.description,
-    required this.parameters,
-    this.returnType,
-  });
+  const McpFunctionSchema({required this.name, required this.description, required this.parameters, this.returnType});
 
   Map<String, dynamic> toJson() {
     return {
@@ -43,13 +38,7 @@ class McpFunctionParameter {
   final List<String>? enumValues;
   final bool? required;
 
-  const McpFunctionParameter({
-    required this.name,
-    required this.type,
-    required this.description,
-    this.enumValues,
-    this.required,
-  });
+  const McpFunctionParameter({required this.name, required this.type, required this.description, this.enumValues, this.required});
 }
 
 /// 사용 가능한 모든 함수 스키마를 정의합니다.
@@ -64,13 +53,32 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'title', type: 'string', description: '작업 제목', required: true),
           McpFunctionParameter(name: 'description', type: 'string', description: '작업 설명 (선택사항)'),
           McpFunctionParameter(name: 'projectId', type: 'string', description: '프로젝트 ID (선택사항)'),
-          McpFunctionParameter(name: 'startAt', type: 'string', description: '시작 날짜/시간 (ISO 8601 형식, 선택사항)'),
-          McpFunctionParameter(name: 'endAt', type: 'string', description: '종료 날짜/시간 (ISO 8601 형식, 선택사항)'),
-          McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 작업 여부 (기본값: false)'),
-          McpFunctionParameter(name: 'status', type: 'string', description: '작업 상태', enumValues: ['none', 'done', 'cancelled']),
-          McpFunctionParameter(name: 'from', type: 'string', description: '작업이 생성된 소스 (예: GitHub, Email 등, 선택사항)'),
-          McpFunctionParameter(name: 'subject', type: 'string', description: '원본 제목 또는 주제 (선택사항)'),
-          McpFunctionParameter(name: 'actionNeeded', type: 'string', description: '필요한 액션 설명 (선택사항)'),
+          McpFunctionParameter(
+            name: 'startAt',
+            type: 'string',
+            description: '시작 날짜/시간 (ISO 8601 형식: YYYY-MM-DDTHH:mm:ss, 예: "2024-01-01T09:00:00", 선택사항). 필드명은 startAt을 사용하세요 (start_at 아님).',
+            required: false,
+          ),
+          McpFunctionParameter(
+            name: 'endAt',
+            type: 'string',
+            description: '종료 날짜/시간 (ISO 8601 형식: YYYY-MM-DDTHH:mm:ss, 예: "2024-01-01T10:00:00", 선택사항). 필드명은 endAt을 사용하세요 (end_at 아님).',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 작업 여부 (기본값: false)', required: false),
+          McpFunctionParameter(name: 'status', type: 'string', description: '작업 상태 (기본값: "none")', enumValues: ['none', 'done', 'cancelled'], required: false),
+          McpFunctionParameter(
+            name: 'rrule',
+            type: 'string',
+            description: '반복 규칙 (RFC 5545 RRULE 형식, 예: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO", "FREQ=MONTHLY", 선택사항)',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'reminders', type: 'array', description: '알림 목록 (선택사항). 각 항목은 {"method": "push"|"email", "minutes": number} 형식', required: false),
+          McpFunctionParameter(name: 'recurrenceEndAt', type: 'string', description: '반복 종료 날짜/시간 (ISO 8601 형식: YYYY-MM-DDTHH:mm:ss, 선택사항)', required: false),
+          McpFunctionParameter(name: 'excludedRecurrenceDate', type: 'array', description: '제외된 반복 날짜 목록 (ISO 8601 형식 문자열 배열, 선택사항)', required: false),
+          McpFunctionParameter(name: 'from', type: 'string', description: '작업이 생성된 소스 (예: GitHub, Email 등, 선택사항)', required: false),
+          McpFunctionParameter(name: 'subject', type: 'string', description: '원본 제목 또는 주제 (선택사항)', required: false),
+          McpFunctionParameter(name: 'actionNeeded', type: 'string', description: '필요한 액션 설명 (선택사항)', required: false),
         ],
       ),
       McpFunctionSchema(
@@ -85,21 +93,21 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'endAt', type: 'string', description: '종료 날짜/시간 (ISO 8601 형식)'),
           McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 작업 여부'),
           McpFunctionParameter(name: 'status', type: 'string', description: '작업 상태', enumValues: ['none', 'done', 'cancelled']),
+          McpFunctionParameter(name: 'rrule', type: 'string', description: '반복 규칙 (RFC 5545 RRULE 형식, 예: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO", 선택사항)'),
+          McpFunctionParameter(name: 'reminders', type: 'array', description: '알림 목록 (선택사항). 각 항목은 {"method": "push"|"email", "minutes": number} 형식'),
+          McpFunctionParameter(name: 'recurrenceEndAt', type: 'string', description: '반복 종료 날짜/시간 (ISO 8601 형식, 선택사항)'),
+          McpFunctionParameter(name: 'excludedRecurrenceDate', type: 'array', description: '제외된 반복 날짜 목록 (ISO 8601 형식 문자열 배열, 선택사항)'),
         ],
       ),
       McpFunctionSchema(
         name: 'deleteTask',
         description: '작업을 삭제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'taskId', type: 'string', description: '작업 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'taskId', type: 'string', description: '작업 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'toggleTaskStatus',
         description: '작업의 완료 상태를 토글합니다 (완료 ↔ 미완료).',
-        parameters: [
-          McpFunctionParameter(name: 'taskId', type: 'string', description: '작업 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'taskId', type: 'string', description: '작업 ID', required: true)],
       ),
 
       // Calendar Actions
@@ -108,17 +116,35 @@ class McpFunctionRegistry {
         description: '새로운 일정을 생성합니다. 제목, 설명, 날짜/시간, 위치, 참석자 등을 설정할 수 있습니다.',
         parameters: [
           McpFunctionParameter(name: 'title', type: 'string', description: '일정 제목', required: true),
-          McpFunctionParameter(name: 'description', type: 'string', description: '일정 설명 (선택사항)'),
-          McpFunctionParameter(name: 'calendarId', type: 'string', description: '캘린더 ID (선택사항)'),
-          McpFunctionParameter(name: 'startAt', type: 'string', description: '시작 날짜/시간 (ISO 8601 형식, 선택사항)'),
-          McpFunctionParameter(name: 'endAt', type: 'string', description: '종료 날짜/시간 (ISO 8601 형식, 선택사항)'),
-          McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 일정 여부 (기본값: false)'),
-          McpFunctionParameter(name: 'location', type: 'string', description: '장소 (선택사항)'),
-          McpFunctionParameter(name: 'attendees', type: 'array', description: '참석자 이메일 목록 (선택사항)'),
-          McpFunctionParameter(name: 'conferenceLink', type: 'string', description: '화상회의 링크 (선택사항, "added"로 설정하면 자동 생성)'),
-          McpFunctionParameter(name: 'from', type: 'string', description: '일정이 생성된 소스 (예: GitHub, Email 등, 선택사항)'),
-          McpFunctionParameter(name: 'subject', type: 'string', description: '원본 제목 또는 주제 (선택사항)'),
-          McpFunctionParameter(name: 'actionNeeded', type: 'string', description: '필요한 액션 설명 (선택사항)'),
+          McpFunctionParameter(name: 'description', type: 'string', description: '일정 설명 (선택사항)', required: false),
+          McpFunctionParameter(name: 'calendarId', type: 'string', description: '캘린더 ID (선택사항)', required: false),
+          McpFunctionParameter(
+            name: 'startAt',
+            type: 'string',
+            description: '시작 날짜/시간 (ISO 8601 형식: YYYY-MM-DDTHH:mm:ss, 예: "2024-01-01T09:00:00", 선택사항). 필드명은 startAt을 사용하세요 (start_at 아님).',
+            required: false,
+          ),
+          McpFunctionParameter(
+            name: 'endAt',
+            type: 'string',
+            description: '종료 날짜/시간 (ISO 8601 형식: YYYY-MM-DDTHH:mm:ss, 예: "2024-01-01T10:00:00", 선택사항). 필드명은 endAt을 사용하세요 (end_at 아님).',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 일정 여부 (기본값: false)', required: false),
+          McpFunctionParameter(name: 'location', type: 'string', description: '장소 (선택사항)', required: false),
+          McpFunctionParameter(name: 'attendees', type: 'array', description: '참석자 이메일 목록 (선택사항, 예: ["email1@example.com", "email2@example.com"])', required: false),
+          McpFunctionParameter(name: 'conferenceLink', type: 'string', description: '화상회의 링크 (선택사항, "added"로 설정하면 자동 생성)', required: false),
+          McpFunctionParameter(
+            name: 'rrule',
+            type: 'string',
+            description: '반복 규칙 (RFC 5545 RRULE 형식, 예: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO", "FREQ=MONTHLY", 선택사항)',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'reminders', type: 'array', description: '알림 목록 (선택사항). 각 항목은 {"method": "push"|"email", "minutes": number} 형식', required: false),
+          McpFunctionParameter(name: 'timezone', type: 'string', description: '타임존 (선택사항, 예: "America/New_York", "Asia/Seoul". 기본값: 사용자 설정 타임존)', required: false),
+          McpFunctionParameter(name: 'from', type: 'string', description: '일정이 생성된 소스 (예: GitHub, Email 등, 선택사항)', required: false),
+          McpFunctionParameter(name: 'subject', type: 'string', description: '원본 제목 또는 주제 (선택사항)', required: false),
+          McpFunctionParameter(name: 'actionNeeded', type: 'string', description: '필요한 액션 설명 (선택사항)', required: false),
         ],
       ),
       McpFunctionSchema(
@@ -133,27 +159,23 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'isAllDay', type: 'boolean', description: '하루 종일 일정 여부'),
           McpFunctionParameter(name: 'location', type: 'string', description: '장소'),
           McpFunctionParameter(name: 'attendees', type: 'array', description: '참석자 이메일 목록'),
+          McpFunctionParameter(name: 'rrule', type: 'string', description: '반복 규칙 (RFC 5545 RRULE 형식, 예: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO", 선택사항)'),
+          McpFunctionParameter(name: 'reminders', type: 'array', description: '알림 목록 (선택사항). 각 항목은 {"method": "push"|"email", "minutes": number} 형식'),
+          McpFunctionParameter(name: 'timezone', type: 'string', description: '타임존 (선택사항, 예: "America/New_York", "Asia/Seoul")'),
+          McpFunctionParameter(name: 'conferenceLink', type: 'string', description: '화상회의 링크 (선택사항, "added"로 설정하면 자동 생성)'),
         ],
       ),
       McpFunctionSchema(
         name: 'deleteEvent',
         description: '일정을 삭제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'eventId', type: 'string', description: '일정 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'eventId', type: 'string', description: '일정 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'responseCalendarInvitation',
         description: '캘린더 초대에 응답합니다.',
         parameters: [
           McpFunctionParameter(name: 'eventId', type: 'string', description: '일정 ID', required: true),
-          McpFunctionParameter(
-            name: 'response',
-            type: 'string',
-            description: '응답 상태',
-            enumValues: ['accepted', 'declined', 'tentative'],
-            required: true,
-          ),
+          McpFunctionParameter(name: 'response', type: 'string', description: '응답 상태', enumValues: ['accepted', 'declined', 'tentative'], required: true),
         ],
       ),
 
@@ -194,30 +216,22 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'markMailAsRead',
         description: '이메일을 읽음으로 표시합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'markMailAsUnread',
         description: '이메일을 읽지 않음으로 표시합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'archiveMail',
         description: '이메일을 보관합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'deleteMail',
         description: '이메일을 삭제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '스레드 ID', required: true)],
       ),
 
       // Project Actions (continued)
@@ -233,16 +247,12 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'deleteProject',
         description: '프로젝트를 삭제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'projectId', type: 'string', description: '프로젝트 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'projectId', type: 'string', description: '프로젝트 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'searchProject',
         description: '프로젝트를 검색합니다. 검색어로 이름이나 설명을 검색할 수 있습니다.',
-        parameters: [
-          McpFunctionParameter(name: 'query', type: 'string', description: '검색어 (이름, 설명 등)', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'query', type: 'string', description: '검색어 (이름, 설명 등)', required: true)],
       ),
       McpFunctionSchema(
         name: 'moveProject',
@@ -291,17 +301,11 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'limit', type: 'number', description: '결과 개수 제한 (선택사항)'),
         ],
       ),
-      McpFunctionSchema(
-        name: 'listProjects',
-        description: '프로젝트 목록을 가져옵니다.',
-        parameters: [],
-      ),
+      McpFunctionSchema(name: 'listProjects', description: '프로젝트 목록을 가져옵니다.', parameters: []),
       McpFunctionSchema(
         name: 'getTaskDetails',
         description: '특정 작업의 상세 정보를 가져옵니다.',
-        parameters: [
-          McpFunctionParameter(name: 'taskId', type: 'string', description: '작업 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'taskId', type: 'string', description: '작업 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'getEventDetails',
@@ -311,22 +315,12 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'uniqueId', type: 'string', description: '고유 ID (eventId 또는 uniqueId 중 하나 필요)'),
         ],
       ),
-      McpFunctionSchema(
-        name: 'getCalendarList',
-        description: '사용 가능한 캘린더 목록을 가져옵니다.',
-        parameters: [],
-      ),
-      McpFunctionSchema(
-        name: 'getUnscheduledTasks',
-        description: '스케줄되지 않은 작업 목록을 가져옵니다.',
-        parameters: [],
-      ),
+      McpFunctionSchema(name: 'getCalendarList', description: '사용 가능한 캘린더 목록을 가져옵니다.', parameters: []),
+      McpFunctionSchema(name: 'getUnscheduledTasks', description: '스케줄되지 않은 작업 목록을 가져옵니다.', parameters: []),
       McpFunctionSchema(
         name: 'getCompletedTasks',
         description: '완료된 작업 목록을 가져옵니다.',
-        parameters: [
-          McpFunctionParameter(name: 'limit', type: 'number', description: '결과 개수 제한 (선택사항)'),
-        ],
+        parameters: [McpFunctionParameter(name: 'limit', type: 'number', description: '결과 개수 제한 (선택사항)')],
       ),
       McpFunctionSchema(
         name: 'removeReminder',
@@ -347,9 +341,7 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'getInboxDetails',
         description: '인박스의 상세 정보를 가져옵니다.',
-        parameters: [
-          McpFunctionParameter(name: 'inboxId', type: 'string', description: '인박스 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'inboxId', type: 'string', description: '인박스 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'listInboxes',
@@ -363,16 +355,12 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'pinInbox',
         description: '인박스 항목을 고정합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'inboxId', type: 'string', description: '인박스 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'inboxId', type: 'string', description: '인박스 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'unpinInbox',
         description: '고정된 인박스 항목의 고정을 해제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'inboxId', type: 'string', description: '인박스 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'inboxId', type: 'string', description: '인박스 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'createTaskFromInbox',
@@ -406,9 +394,7 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'searchInbox',
         description: '인박스에서 이메일이나 메시지를 검색합니다. 검색어로 제목, 발신자, 내용 등을 검색할 수 있습니다.',
-        parameters: [
-          McpFunctionParameter(name: 'query', type: 'string', description: '검색어 (제목, 발신자, 내용 등)', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'query', type: 'string', description: '검색어 (제목, 발신자, 내용 등)', required: true)],
       ),
       McpFunctionSchema(
         name: 'searchTask',
@@ -421,72 +407,52 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'searchCalendarEvent',
         description: '캘린더 일정을 검색합니다. 검색어로 제목이나 설명을 검색할 수 있습니다.',
-        parameters: [
-          McpFunctionParameter(name: 'query', type: 'string', description: '검색어 (제목, 설명 등)', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'query', type: 'string', description: '검색어 (제목, 설명 등)', required: true)],
       ),
       McpFunctionSchema(
         name: 'replyAllMail',
         description: '메일에 전체 답장을 보냅니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'unarchiveMail',
         description: '보관된 메일을 보관 해제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'pinMail',
         description: '메일을 고정합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'unpinMail',
         description: '고정된 메일을 고정 해제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'markMailAsImportant',
         description: '메일을 중요 표시합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'markMailAsNotImportant',
         description: '메일의 중요 표시를 제거합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'spamMail',
         description: '메일을 스팸으로 표시합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'unspamMail',
         description: '스팸 표시를 제거합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'getMailDetails',
         description: '메일의 상세 정보를 가져옵니다.',
-        parameters: [
-          McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'threadId', type: 'string', description: '메일 스레드 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'listMails',
@@ -510,9 +476,7 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'getMailLabels',
         description: '사용 가능한 메일 라벨 목록을 가져옵니다.',
-        parameters: [
-          McpFunctionParameter(name: 'email', type: 'string', description: '이메일 주소 (선택사항, 없으면 모든 계정의 라벨)'),
-        ],
+        parameters: [McpFunctionParameter(name: 'email', type: 'string', description: '이메일 주소 (선택사항, 없으면 모든 계정의 라벨)')],
       ),
       McpFunctionSchema(
         name: 'sendMessage',
@@ -541,9 +505,7 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'deleteMessage',
         description: '메시지를 삭제합니다.',
-        parameters: [
-          McpFunctionParameter(name: 'messageId', type: 'string', description: '메시지 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'messageId', type: 'string', description: '메시지 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'addReaction',
@@ -564,9 +526,7 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'getMessageDetails',
         description: '메시지의 상세 정보를 가져옵니다.',
-        parameters: [
-          McpFunctionParameter(name: 'messageId', type: 'string', description: '메시지 ID', required: true),
-        ],
+        parameters: [McpFunctionParameter(name: 'messageId', type: 'string', description: '메시지 ID', required: true)],
       ),
       McpFunctionSchema(
         name: 'listMessages',
@@ -599,4 +559,3 @@ class McpFunctionRegistry {
     return getAllFunctions().map((f) => f.toJson()).toList();
   }
 }
-

@@ -710,6 +710,89 @@ When calling multiple functions, analyze dependencies and mark functions that ca
   ```
 The system will automatically execute parallelizable functions simultaneously for better performance.
 
+## Task Entity Schema
+
+When calling `createTask` or `updateTask`, you MUST use the following field names and formats:
+
+**CRITICAL FIELD NAMING**: Use camelCase field names (NOT snake_case):
+- ✅ `startAt` (NOT `start_at`)
+- ✅ `endAt` (NOT `end_at`)
+- ✅ `projectId` (NOT `project_id`)
+- ✅ `isAllDay` (NOT `is_all_day`)
+- ✅ `actionNeeded` (NOT `action_needed`)
+
+**Task Entity Fields**:
+- `title` (string, required): Task title
+- `description` (string, optional): Task description
+- `projectId` (string, optional): Project ID
+- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00")
+- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00")
+- `isAllDay` (boolean, optional, default: false): Whether the task is all-day
+- `status` (string, optional, default: "none"): Task status - one of: "none", "done", "cancelled"
+- `from` (string, optional): Source of the task (e.g., "GitHub", "Email")
+- `subject` (string, optional): Original subject or title
+- `actionNeeded` (string, optional): Action needed description
+
+**Example createTask call**:
+```json
+{
+  "function": "createTask",
+  "arguments": {
+    "title": "Review pull request",
+    "description": "Review PR #123",
+    "projectId": "project-123",
+    "startAt": "2024-01-01T09:00:00",
+    "endAt": "2024-01-01T10:00:00",
+    "isAllDay": false,
+    "status": "none"
+  }
+}
+```
+
+## Event Entity Schema
+
+When calling `createEvent` or `updateEvent`, you MUST use the following field names and formats:
+
+**CRITICAL FIELD NAMING**: Use camelCase field names (NOT snake_case):
+- ✅ `startAt` (NOT `start_at`)
+- ✅ `endAt` (NOT `end_at`)
+- ✅ `calendarId` (NOT `calendar_id`)
+- ✅ `isAllDay` (NOT `is_all_day`)
+- ✅ `conferenceLink` (NOT `conference_link`)
+- ✅ `actionNeeded` (NOT `action_needed`)
+
+**Event Entity Fields**:
+- `title` (string, required): Event title
+- `description` (string, optional): Event description
+- `calendarId` (string, optional): Calendar ID
+- `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00")
+- `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00")
+- `isAllDay` (boolean, optional, default: false): Whether the event is all-day
+- `location` (string, optional): Event location
+- `attendees` (array of strings, optional): List of attendee email addresses (e.g., ["email1@example.com", "email2@example.com"])
+- `conferenceLink` (string, optional): Conference link (set to "added" to auto-generate)
+- `from` (string, optional): Source of the event (e.g., "GitHub", "Email")
+- `subject` (string, optional): Original subject or title
+- `actionNeeded` (string, optional): Action needed description
+
+**Example createEvent call**:
+```json
+{
+  "function": "createEvent",
+  "arguments": {
+    "title": "Team meeting",
+    "description": "Weekly team sync",
+    "calendarId": "cal-123",
+    "startAt": "2024-01-01T09:00:00",
+    "endAt": "2024-01-01T10:00:00",
+    "isAllDay": false,
+    "location": "Conference Room A",
+    "attendees": ["alice@example.com", "bob@example.com"],
+    "conferenceLink": "added"
+  }
+}
+```
+
 ## Displaying Entity Information with Custom Tags
 
 When you need to display entity information (tasks, events, mails, messages, calendars, inbox items) in your response, use the following custom HTML tags to ensure proper rendering:
@@ -725,6 +808,8 @@ Use `<inapp_event>` tag to display event information:
 ```html
 <inapp_event>{"id": "event-id", "title": "Event title", "description": "Event description", "calendar_id": "calendar-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "location": "Location", "rrule": "FREQ=WEEKLY;BYDAY=MO", "attendees": ["email@example.com"], "isAllDay": false}</inapp_event>
 ```
+
+**Note**: When displaying entities in tags, use snake_case field names (e.g., `start_at`, `end_at`, `project_id`) as shown in the examples above. However, when calling functions, ALWAYS use camelCase field names (e.g., `startAt`, `endAt`, `projectId`).
 
 ### Mail Entity
 Use `<inapp_mail_entity>` tag to display mail information:
