@@ -2330,6 +2330,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 itemBuilder: (context, index) {
                                   final state = ref.watch(agentActionControllerProvider);
                                   final pendingCalls = state.pendingFunctionCalls ?? [];
+                                  final isLoading = state.isLoading;
                                   final writeActions = pendingCalls.where((call) {
                                     final functionName = call['function_name'] as String? ?? '';
                                     return _isWriteAction(functionName);
@@ -2452,8 +2453,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                             }
                                           }),
                                           // Confirm 버튼을 첫 번째 메시지(또는 task block이 있는 메시지)에만 표시
-                                          // 로딩 중이 아니고 writeActions가 있을 때만 표시
-                                          if (writeActions.isNotEmpty && !agentAction.isLoading) ...[
+                                          // 로딩 중이 아니고 writeActions가 있고, 이 메시지가 마지막 메시지일 때만 표시
+                                          if (writeActions.isNotEmpty && !isLoading && isLastMessage) ...[
                                             Container(
                                               margin: const EdgeInsets.only(top: 12, bottom: 12),
                                               child: Row(
