@@ -159,14 +159,16 @@ void main() {
       expect(parallelGroup.length, 2);
 
       // 의존성 그룹들
-      final taskDependent = functionCalls.firstWhere((call) => 
-        call['depends_on'] != null && call['depends_on'].contains('searchTask')
-      );
+      final taskDependent = functionCalls.firstWhere((call) {
+        final dependsOn = call['depends_on'] as List?;
+        return dependsOn != null && dependsOn.contains('searchTask');
+      });
       expect(taskDependent['function'], 'createTask');
 
-      final mailDependent = functionCalls.firstWhere((call) => 
-        call['depends_on'] != null && call['depends_on'].contains('searchInbox')
-      );
+      final mailDependent = functionCalls.firstWhere((call) {
+        final dependsOn = call['depends_on'] as List?;
+        return dependsOn != null && dependsOn.contains('searchInbox');
+      });
       expect(mailDependent['function'], 'replyMail');
     });
   });
