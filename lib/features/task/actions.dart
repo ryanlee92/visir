@@ -119,17 +119,24 @@ class TaskAction {
     required DateTime? selectedEndDate,
     bool showToast = true,
   }) async {
+    print('[TaskAction] deleteTask 시작: task.id=${task.id}, task.title=${task.title}, tabType=$tabType');
     if (tabType == TabType.task) {
+      print('[TaskAction] deleteTask: taskListController.saveTask 호출 (newTask=null)');
       await Utils.ref
           .read(taskListControllerProvider.notifier)
           .saveTask(originalTask: task, newTask: null, selectedEndDate: selectedEndDate, selectedStartDate: selectedStartDate, targetTab: tabType);
+      print('[TaskAction] deleteTask: taskListController.saveTask 완료');
     } else {
+      print('[TaskAction] deleteTask: calendarTaskListController.saveTask 호출 (newTask=null)');
       await Utils.ref
           .read(calendarTaskListControllerProvider(tabType: tabType).notifier)
           .saveTask(originalTask: task, newTask: null, selectedEndDate: selectedEndDate, selectedStartDate: selectedStartDate, targetTab: tabType);
+      print('[TaskAction] deleteTask: calendarTaskListController.saveTask 완료');
     }
 
+    print('[TaskAction] deleteTask: deleteLinkedTaskForInboxIfLinked 호출');
     deleteLinkedTaskForInboxIfLinked(task);
+    print('[TaskAction] deleteTask: deleteLinkedTaskForInboxIfLinked 완료');
 
     if (!showToast) return;
 

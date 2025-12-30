@@ -317,20 +317,6 @@ List<String> _getRecommendedMcpFunctions(InboxSuggestionEntity suggestion, Inbox
       functions.add('createEvent');
       break;
 
-    case InboxSuggestionReason.question:
-      if (inbox.linkedMail != null || inbox.linkedMessage != null) {
-        // noreply 이메일은 reply 액션을 제안하지 않음
-        final fromName = inbox.linkedMail?.fromName ?? '';
-        final isNoReply =
-            fromName.toLowerCase().contains('noreply') ||
-            fromName.toLowerCase().contains('no-reply') ||
-            (fromName.contains('@') && fromName.toLowerCase().split('@').first.contains('noreply'));
-        if (!isNoReply) {
-          functions.add('replyMail');
-        }
-      }
-      break;
-
     case InboxSuggestionReason.approval_request:
       // 승인 요청은 urgent/important인 경우 createTask로 추천
       if (suggestion.urgency == InboxSuggestionUrgency.urgent || suggestion.urgency == InboxSuggestionUrgency.important) {
@@ -378,6 +364,7 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
 
     // Inbox 기반 액션 추천
     for (final inbox in inboxes.take(5)) {
+      print('########## inbox: ${inbox.title}');
       final suggestion = inbox.suggestion;
       if (suggestion == null) continue;
 
@@ -397,19 +384,19 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
           // 모든 linked tasks 합치기
           final allLinkedTasks = [...linkedTasks, ...linkedTasksFromController];
 
-          if (functionName == 'createTask') {
-            // createTask인 경우: 일반 task가 있으면 제외 (event task는 제외)
-            final hasRegularTask = allLinkedTasks.any((task) => !task.isEvent);
-            if (hasRegularTask) {
-              continue;
-            }
-          } else if (functionName == 'createEvent') {
-            // createEvent인 경우: event task가 있으면 제외
-            final hasEventTask = allLinkedTasks.any((task) => task.isEvent);
-            if (hasEventTask) {
-              continue;
-            }
-          }
+          // if (functionName == 'createTask') {
+          //   // createTask인 경우: 일반 task가 있으면 제외 (event task는 제외)
+          //   final hasRegularTask = allLinkedTasks.any((task) => !task.isEvent);
+          //   if (hasRegularTask) {
+          //     continue;
+          //   }
+          // } else if (functionName == 'createEvent') {
+          //   // createEvent인 경우: event task가 있으면 제외
+          //   final hasEventTask = allLinkedTasks.any((task) => task.isEvent);
+          //   if (hasEventTask) {
+          //     continue;
+          //   }
+          // }
         }
         final summary = suggestion.summary ?? '';
         String? itemName;
@@ -463,20 +450,17 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final isMobileView = PlatformX.isMobileView;
-
     // 태그 높이 계산 (padding + icon + text + spacing)
     const tagHeight = 6.0 + 6.0 + 12.0 + 6.0; // vertical padding + icon height + text height + spacing
-    const tagSpacing = 6.0; // 태그 간 간격
-    const maxLines = 5;
+
     // 모바일에서는 가로 스크롤이므로 한 줄만 필요, 데스크톱에서는 여러 줄 가능
-    final maxHeight = isMobileView ? tagHeight : (tagHeight * maxLines) + (tagSpacing * (maxLines - 1));
+    final maxHeight = tagHeight;
     final suggestionWidgets = suggestions.map((suggestion) {
       return IntrinsicWidth(
         child: VisirButton(
           type: VisirButtonAnimationType.scaleAndOpacity,
           style: VisirButtonStyle(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             backgroundColor: context.surface.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
@@ -512,27 +496,13 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 8),
       width: double.maxFinite,
       constraints: PlatformX.isMobileView ? null : BoxConstraints(maxHeight: maxHeight),
-      child: isMobileView
-          ? SingleChildScrollView(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(right: 6), child: widget))],
-              ),
-            )
-          : Padding(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Wrap(spacing: 6, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.start, alignment: WrapAlignment.start, children: suggestionWidgets),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(left: 12, right: 12),
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(right: 6), child: widget))],
+        ),
+      ),
     );
   }
 }

@@ -949,6 +949,55 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
   Widget _buildMessageContent(BuildContext context, String content, bool isUser) {
     final baseStyle = context.bodyLarge?.textColor(context.onSurfaceVariant);
 
+    // Remove function call JSON arrays from content (agent responses may contain raw function calls)
+    String cleanedContent = content;
+
+    // Remove JSON arrays that contain function calls (format: [{"function": "...", "arguments": {...}}, ...])
+    final functionCallArrayRegex = RegExp(
+      r'\[\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\}(?:\s*,\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\})*\s*\]',
+      dotAll: true,
+    );
+    cleanedContent = cleanedContent.replaceAll(functionCallArrayRegex, '');
+
+    // Also try to detect and remove function call arrays by parsing JSON
+    try {
+      // Find all JSON array patterns
+      final jsonArrayRegex = RegExp(r'\[(?:\s*\{[^}]*\}(?:\s*,\s*\{[^}]*\})*)?\s*\]', dotAll: true);
+      final matches = jsonArrayRegex.allMatches(cleanedContent).toList();
+
+      // Process matches in reverse order to maintain positions
+      for (final match in matches.reversed) {
+        try {
+          final arrayStr = cleanedContent.substring(match.start, match.end);
+          final parsed = jsonDecode(arrayStr) as List<dynamic>?;
+          if (parsed != null && parsed.isNotEmpty) {
+            bool isFunctionCallArray = false;
+            for (final item in parsed) {
+              if (item is Map<String, dynamic> && item.containsKey('function') && item.containsKey('arguments')) {
+                isFunctionCallArray = true;
+                break;
+              }
+            }
+            if (isFunctionCallArray) {
+              // Remove the function call array
+              cleanedContent = cleanedContent.substring(0, match.start) + cleanedContent.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+    } catch (e) {
+      // If parsing fails, continue with cleaned content
+    }
+
+    // Remove any remaining standalone function call objects
+    final functionCallObjectRegex = RegExp(r'\{\s*"function"\s*:\s*"[^"]+"\s*,\s*"arguments"\s*:\s*\{[^}]*\}\s*\}', dotAll: true);
+    cleanedContent = cleanedContent.replaceAll(functionCallObjectRegex, '');
+
+    // Clean up any extra whitespace or newlines left behind
+    cleanedContent = cleanedContent.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n').trim();
+
     // Extract tagged items from HTML tags first
     final Map<String, Map<String, dynamic>> taggedItems = {};
     final RegExp taggedTaskRegex = RegExp(r'<tagged_task>(.*?)</tagged_task>', dotAll: true);
@@ -958,7 +1007,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     final RegExp taggedProjectRegex = RegExp(r'<tagged_project>(.*?)</tagged_project>', dotAll: true);
 
     // Extract tagged tasks
-    for (final match in taggedTaskRegex.allMatches(content)) {
+    for (final match in taggedTaskRegex.allMatches(cleanedContent)) {
       try {
         final jsonText = match.group(1)?.trim() ?? '';
         if (jsonText.isNotEmpty) {
@@ -974,7 +1023,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
 
     // Extract tagged events
-    for (final match in taggedEventRegex.allMatches(content)) {
+    for (final match in taggedEventRegex.allMatches(cleanedContent)) {
       try {
         final jsonText = match.group(1)?.trim() ?? '';
         if (jsonText.isNotEmpty) {
@@ -990,7 +1039,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
 
     // Extract tagged connections
-    for (final match in taggedConnectionRegex.allMatches(content)) {
+    for (final match in taggedConnectionRegex.allMatches(cleanedContent)) {
       try {
         final jsonText = match.group(1)?.trim() ?? '';
         if (jsonText.isNotEmpty) {
@@ -1008,7 +1057,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
 
     // Extract tagged channels
-    for (final match in taggedChannelRegex.allMatches(content)) {
+    for (final match in taggedChannelRegex.allMatches(cleanedContent)) {
       try {
         final jsonText = match.group(1)?.trim() ?? '';
         if (jsonText.isNotEmpty) {
@@ -1024,7 +1073,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
 
     // Extract tagged projects
-    for (final match in taggedProjectRegex.allMatches(content)) {
+    for (final match in taggedProjectRegex.allMatches(cleanedContent)) {
       try {
         final jsonText = match.group(1)?.trim() ?? '';
         if (jsonText.isNotEmpty) {
@@ -1040,10 +1089,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
 
     // Convert tagged_item tags to inapp_entity tags for UI rendering
-    String cleanedContent = content;
+    // (cleanedContent already initialized above with function call JSON removed)
 
     // Convert all tagged_task to inapp_task (process in reverse order to maintain positions)
-    final taggedTaskMatches = taggedTaskRegex.allMatches(content).toList();
+    final taggedTaskMatches = taggedTaskRegex.allMatches(cleanedContent).toList();
     for (final match in taggedTaskMatches.reversed) {
       try {
         final jsonText = match.group(1)?.trim() ?? '';

@@ -454,6 +454,18 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     final result = await _taskRepository.fetchTasksBetweenDates(startDateTime: startDateTime, endDateTime: endDateTime, pref: pref, userId: user.id);
 
     result.fold((l) {}, (r) {
+      // 특정 task ID 로그
+      final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
+      final foundTask = r.firstWhereOrNull((t) => t.id == targetTaskId);
+      if (foundTask != null) {
+        print(
+          '[CalendarTaskListControllerInternal] load: targetTaskId=$targetTaskId 발견! targetYear=$targetYear, targetMonth=$targetMonth, startDateTime=$startDateTime, endDateTime=$endDateTime, startAt=${foundTask.startAt}, endAt=${foundTask.endAt}',
+        );
+      } else {
+        print(
+          '[CalendarTaskListControllerInternal] load: targetTaskId=$targetTaskId 없음, targetYear=$targetYear, targetMonth=$targetMonth, startDateTime=$startDateTime, endDateTime=$endDateTime, 총 ${r.length}개 task',
+        );
+      }
       _updateState(list: [...r]..unique((e) => e.id), targetMonth: targetDate, updatedTimestamp: updateTimestamp, isLocalUpdate: false, isChunkUpdate: isChunkUpdate);
     });
   }
@@ -933,6 +945,19 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
 
     list = list.where((e) => e.id?.isNotEmpty == true).toList().unique((e) => e.id)..sort((a, b) => a.id!.compareTo(b.id!));
     _beforeLoginTasks = _beforeLoginTasks.map((e) => list.firstWhereOrNull((e) => e.id == e.id) ?? e).toList();
+
+    // 특정 task ID 로그
+    final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
+    final foundTask = list.firstWhereOrNull((t) => t.id == targetTaskId);
+    if (foundTask != null) {
+      print(
+        '[CalendarTaskListControllerInternal] _updateState: targetTaskId=$targetTaskId 발견! targetYear=$targetYear, targetMonth=$targetMonth, isLocalUpdate=$isLocalUpdate, 총 ${list.length}개 task, startAt=${foundTask.startAt}, endAt=${foundTask.endAt}',
+      );
+    } else {
+      print(
+        '[CalendarTaskListControllerInternal] _updateState: targetTaskId=$targetTaskId 없음, targetYear=$targetYear, targetMonth=$targetMonth, isLocalUpdate=$isLocalUpdate, 총 ${list.length}개 task',
+      );
+    }
 
     if (list.isEmpty) {
       _uploadRemindersAndSyncToServer();

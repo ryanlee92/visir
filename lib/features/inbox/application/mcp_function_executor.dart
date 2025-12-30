@@ -35,6 +35,7 @@ import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
+import 'package:Visir/features/task/domain/entities/task_reminder_option_type.dart';
 import 'package:Visir/features/common/domain/entities/connection_entity.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
@@ -447,18 +448,20 @@ class McpFunctionExecutor {
     final endAtStr = args['endAt'] as String? ?? args['end_at'] as String?;
     var isAllDay = args['isAllDay'] as bool? ?? false;
     final statusStr = args['status'] as String? ?? 'none';
+    final inboxId = args['inboxId'] as String?;
 
-    // Find matching inbox by title or description to get linkedMail/linkedMessage and suggestion
+    // Find matching inbox by id first, then by linkedMail/linkedMessage
     InboxEntity? matchingInbox;
     if (availableInboxes != null && availableInboxes.isNotEmpty) {
-      // Try to find inbox that matches the task title or description
-      matchingInbox = availableInboxes.firstWhereOrNull((inbox) {
-        final inboxTitle = (inbox.title ?? '').toLowerCase();
-        final inboxDescription = (inbox.description ?? '').toLowerCase();
-        final taskTitle = title.toLowerCase();
-        final taskDescription = (description ?? '').toLowerCase();
-        return inboxTitle.contains(taskTitle) || taskTitle.contains(inboxTitle) || inboxDescription.contains(taskDescription) || taskDescription.contains(inboxDescription);
-      });
+      // First, try to find inbox by id if provided
+      if (inboxId != null && inboxId.isNotEmpty) {
+        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
+      }
+
+      // If not found by id, try to find inbox that has linkedMail or linkedMessage
+      if (matchingInbox == null) {
+        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMail != null || inbox.linkedMessage != null);
+      }
     }
 
     // If projectId is not provided, try to get it from inbox suggestion, then lastUsedProject, then defaultProject
@@ -568,6 +571,18 @@ class McpFunctionExecutor {
       }
     }
 
+    // Set reminders based on user preferences (same logic as task_simple_create_widget.dart)
+    final defaultTaskReminderType = user.userDefaultTaskReminderType;
+    final defaultAllDayTaskReminderType = user.userDefaultAllDayTaskReminderType;
+    final List<EventReminderEntity> reminders = isAllDay
+        ? defaultAllDayTaskReminderType == TaskReminderOptionType.none
+              ? []
+              : [EventReminderEntity(method: 'push', minutes: defaultAllDayTaskReminderType.minutes())]
+        : defaultTaskReminderType == TaskReminderOptionType.none
+        ? []
+        : [EventReminderEntity(method: 'push', minutes: defaultTaskReminderType.minutes())];
+
+    final now = DateTime.now();
     final task = TaskEntity(
       id: const Uuid().v4(),
       ownerId: user.id,
@@ -579,8 +594,11 @@ class McpFunctionExecutor {
       isAllDay: isAllDay,
       linkedMails: linkedMails,
       linkedMessages: linkedMessages,
-      createdAt: DateTime.now(),
+      reminders: reminders,
+      createdAt: now,
+      updatedAt: now,
       status: status,
+      recurrenceEndAt: endAt, // recurrence_end_at을 end_at과 같게 설정하여 null이 되지 않도록
     );
 
     await TaskAction.upsertTask(task: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
@@ -658,14 +676,20 @@ class McpFunctionExecutor {
   }
 
   Future<Map<String, dynamic>> _executeDeleteTask(Map<String, dynamic> args, {required TabType tabType, List<TaskEntity>? availableTasks}) async {
+    print('[McpFunctionExecutor] _executeDeleteTask 시작: args=$args, tabType=$tabType');
     final taskId = args['taskId'] as String?;
     if (taskId == null) {
+      print('[McpFunctionExecutor] _executeDeleteTask: taskId가 없음');
       return {'success': false, 'error': 'taskId is required'};
     }
+    print('[McpFunctionExecutor] _executeDeleteTask: taskId=$taskId');
 
     final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+    print('[McpFunctionExecutor] _executeDeleteTask: allTasks 개수=${allTasks.length}');
     final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
+    print('[McpFunctionExecutor] _executeDeleteTask: task 찾음, task.id=${task.id}, task.title=${task.title}');
 
+    print('[McpFunctionExecutor] _executeDeleteTask: TaskAction.deleteTask 호출 전');
     await TaskAction.deleteTask(
       task: task,
       calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag,
@@ -674,6 +698,7 @@ class McpFunctionExecutor {
       selectedEndDate: task.endAt,
       showToast: false,
     );
+    print('[McpFunctionExecutor] _executeDeleteTask: TaskAction.deleteTask 호출 완료');
 
     return {'success': true, 'message': 'Task deleted successfully'};
   }
@@ -707,6 +732,7 @@ class McpFunctionExecutor {
     final location = args['location'] as String?;
     final attendeesList = args['attendees'] as List<dynamic>?;
     final conferenceLink = args['conferenceLink'] as String?;
+    final inboxId = args['inboxId'] as String?;
 
     final calendarMap = ref.read(calendarListControllerProvider);
     final calendarList = calendarMap.values.expand((e) => e).toList();
@@ -772,18 +798,21 @@ class McpFunctionExecutor {
       sequence: 1,
     );
 
-    // Find matching inbox by title or description to get linkedMail/linkedMessage
+    // Find matching inbox by id first, then by linkedMail/linkedMessage
     List<LinkedMailEntity> linkedMails = [];
     List<LinkedMessageEntity> linkedMessages = [];
     if (availableInboxes != null && availableInboxes.isNotEmpty) {
-      // Try to find inbox that matches the event title or description
-      final matchingInbox = availableInboxes.firstWhereOrNull((inbox) {
-        final inboxTitle = (inbox.title ?? '').toLowerCase();
-        final inboxDescription = (inbox.description ?? '').toLowerCase();
-        final eventTitle = title.toLowerCase();
-        final eventDescription = (description ?? '').toLowerCase();
-        return inboxTitle.contains(eventTitle) || eventTitle.contains(inboxTitle) || inboxDescription.contains(eventDescription) || eventDescription.contains(inboxDescription);
-      });
+      InboxEntity? matchingInbox;
+
+      // First, try to find inbox by id if provided
+      if (inboxId != null && inboxId.isNotEmpty) {
+        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
+      }
+
+      // If not found by id, try to find inbox that has linkedMail or linkedMessage
+      if (matchingInbox == null) {
+        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMail != null || inbox.linkedMessage != null);
+      }
 
       if (matchingInbox != null) {
         if (matchingInbox.linkedMail != null) {
@@ -801,21 +830,25 @@ class McpFunctionExecutor {
       final lastUsedProjectId = ref.read(lastUsedProjectIdProvider).firstOrNull;
       final lastUsedProject = lastUsedProjectId == null ? null : ref.read(projectListControllerProvider).firstWhereOrNull((e) => e.isPointedProjectId(lastUsedProjectId));
       final defaultProject = ref.read(projectListControllerProvider).firstWhereOrNull((e) => e.isDefault);
+      final now = DateTime.now();
+      final taskEndAt = isAllDay ? startAt.dateOnly : endAt;
       final task = TaskEntity(
         id: const Uuid().v4(),
         ownerId: user.id,
         title: title,
         description: description,
         startAt: startAt,
-        endAt: isAllDay ? startAt.dateOnly : endAt,
+        endAt: taskEndAt,
         isAllDay: isAllDay,
         linkedMails: linkedMails,
         linkedMessages: linkedMessages,
         reminders: isAllDay ? [] : (calendar.defaultReminders ?? []),
-        createdAt: DateTime.now(),
+        createdAt: now,
+        updatedAt: now,
         status: TaskStatus.none,
         linkedEvent: event,
         projectId: lastUsedProject?.uniqueId ?? defaultProject?.uniqueId,
+        recurrenceEndAt: taskEndAt, // recurrence_end_at을 end_at과 같게 설정하여 null이 되지 않도록
       );
 
       await TaskAction.upsertTask(
