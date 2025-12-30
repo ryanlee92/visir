@@ -2,6 +2,16 @@
   import Icon from '../components/Icon.svelte';
   // FontAwesome icons are not used - using SVG icons instead
   import Button from '../components/Button.svelte';
+
+  function handleDownload(url: string) {
+    // Create a temporary anchor element and click it to trigger browser's native download
+    const link = document.createElement('a');
+    link.href = url;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 </script>
 
 <div class="pt-32 pb-24 min-h-screen relative">
@@ -40,14 +50,14 @@
             <p class="text-visir-text-muted font-light text-sm mb-6">Requires macOS 11.0 or later.</p>
             
             <div class="flex flex-col gap-3 mb-6">
-              <a href="/release/visir-setup.zip" download>
+              <button 
+                type="button"
+                on:click={() => handleDownload('https://visir.pro/release/visir-setup.zip')}
+              >
                 <Button variant="primary" className="w-full justify-center">
                   <span>Download for macOS</span>
                 </Button>
-              </a>
-              <a href="/release/visir-beta.zip" download class="text-sm text-visir-text-muted hover:text-visir-primary transition-colors">
-                <span>Beta version available</span>
-              </a>
+              </button>
             </div>
 
             <!-- Installation Steps -->
@@ -59,7 +69,11 @@
                     1
                   </div>
                   <p class="text-sm text-visir-text-muted font-light leading-relaxed">
-                    <a href="/release/visir-setup.zip" download class="text-visir-primary hover:underline font-medium">Download</a> the ZIP file
+                    <button 
+                      type="button"
+                      on:click={() => handleDownload('https://visir.pro/release/visir-setup.zip')}
+                      class="text-visir-primary hover:underline font-medium cursor-pointer bg-transparent border-none p-0"
+                    >Download</button> the ZIP file
                   </p>
                 </div>
                 <div class="flex items-start gap-3">
@@ -95,14 +109,14 @@
             <p class="text-visir-text-muted font-light text-sm mb-6">Windows 10 and 11 supported.</p>
             
             <div class="flex flex-col gap-3 mb-6">
-              <a href="/release/visir-setup.exe" download>
+              <button 
+                type="button"
+                on:click={() => handleDownload('https://visir.pro/release/visir-setup.exe')}
+              >
                 <Button variant="primary" className="w-full justify-center">
                   <span>Download for Windows</span>
                 </Button>
-              </a>
-              <a href="/release/visir-beta.exe" download class="text-sm text-visir-text-muted hover:text-visir-primary transition-colors">
-                <span>Beta version available</span>
-              </a>
+              </button>
             </div>
 
             <!-- Installation Steps -->
@@ -114,7 +128,11 @@
                     1
                   </div>
                   <p class="text-sm text-visir-text-muted font-light leading-relaxed">
-                    <a href="/release/visir-setup.exe" download class="text-visir-primary hover:underline font-medium">Download</a> the EXE file
+                    <button 
+                      type="button"
+                      on:click={() => handleDownload('https://visir.pro/release/visir-setup.exe')}
+                      class="text-visir-primary hover:underline font-medium cursor-pointer bg-transparent border-none p-0"
+                    >Download</button> the EXE file
                   </p>
                 </div>
                 <div class="flex items-start gap-3">

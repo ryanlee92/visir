@@ -10,12 +10,12 @@
   const features: Feature[] = [
     {
       title: "Unified Context, Zero Switching",
-      description: "Visir unifies Gmail, Slack, and Calendars into one intelligent timeline. Drag any message to your calendar to time-block it, or instantly convert it to a task. Reply to emails or chats directly within Visir—no need to switch apps.",
+      description: "Visir unifies Email, Team chat, and Calendars into one intelligent timeline. Drag any message to your calendar to time-block it, or instantly convert it to a task. Reply to emails or chats directly within Visir—no need to switch apps.",
       icon: "Sms",
       imagePosition: 'right',
       visualType: 'desktop',
       benefits: [
-        "Universal Inbox: Manage Gmail, Slack, and Outlook in a single list.",
+        "Universal Inbox: Manage Email, Team chat, and Calendars in a single list.",
         "Time Blocking: Drag tasks directly onto your calendar to secure focus time.",
         "Instant Capture: Use global shortcuts to capture thoughts without breaking flow."
       ]
