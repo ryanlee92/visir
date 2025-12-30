@@ -15,7 +15,7 @@
             android:id="@+id/date_header_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:includeFontPadding="false"
             android:fontFamily="@font/suite_medium"
             android:layout_margin="2dp"
@@ -42,7 +42,7 @@
                 android:focusable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
@@ -81,24 +81,26 @@
             <TextView
                 android:id="@+id/appointment_time"
                 android:layout_width="match_parent"
-                android:layout_height="14dp"
-                android:textSize="11sp"
-                android:layout_marginBottom="2dp"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:fontFamily="@font/suite_medium"
                 android:gravity="center_vertical"
-                android:includeFontPadding="false" />
+                android:includeFontPadding="false"
+                android:minHeight="16dp" />
 
             <TextView
                 android:id="@+id/appointment_title"
                 android:layout_width="match_parent"
-                android:layout_height="14dp"
-                android:textSize="12sp"
-                android:maxLines="1"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:maxLines="2"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
-                android:includeFontPadding="false" />
+                android:includeFontPadding="false"
+                android:minHeight="20dp" />
 
         </LinearLayout>
 

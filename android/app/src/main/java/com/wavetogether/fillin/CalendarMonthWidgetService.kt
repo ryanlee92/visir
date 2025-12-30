@@ -2,6 +2,7 @@ package com.wavetogether.fillin
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.view.View
@@ -209,25 +210,24 @@ class CalendarMonthWidgetServiceFactory(
                 
                 // Set event text color - use gray for previous/next month
                 if (day.isCurrentMonth) {
-                    eventView.setTextColor(R.id.event_text, appointment.colorInt)
+                    eventView.setTextColor(R.id.event_text, appointment.textColor(context))
                 } else {
                     // Previous/next month: use gray color instead of opacity
                     eventView.setTextColor(R.id.event_text, colors.surfaceTint)
                 }
                 
-                // Set background color with opacity (only for current month)
-                if (day.isCurrentMonth) {
-                    val bgColor = appointment.colorInt
-                    val r = Color.red(bgColor)
-                    val g = Color.green(bgColor)
-                    val b = Color.blue(bgColor)
-                    val bgAlpha = 0x26 // ~15% opacity
-                    val bgColorWithAlpha = Color.argb(bgAlpha, r, g, b)
-                    eventView.setInt(R.id.event_text, "setBackgroundColor", bgColorWithAlpha)
+                // Set background color with opacity
+                val bgColor = appointment.colorInt
+                val r = Color.red(bgColor)
+                val g = Color.green(bgColor)
+                val b = Color.blue(bgColor)
+                val bgAlpha = if (day.isCurrentMonth) {
+                    0x26 // ~15% opacity for current month
                 } else {
-                    // Previous/next month: no background or very light gray background
-                    eventView.setInt(R.id.event_text, "setBackgroundColor", Color.TRANSPARENT)
+                    0x13 // ~7.5% opacity for previous/next month (lighter)
                 }
+                val bgColorWithAlpha = Color.argb(bgAlpha, r, g, b)
+                eventView.setInt(R.id.event_text, "setBackgroundColor", bgColorWithAlpha)
                 
                 remoteViews.addView(R.id.events_container, eventView)
             }
@@ -275,5 +275,62 @@ data class AppointmentData(
     val title: String,
     val colorInt: Int,
     val isAllDay: Boolean
-)
+) {
+    private fun isDarkMode(context: Context): Boolean {
+        val widgetData = HomeWidgetPlugin.getData(context)
+        val themeMode = widgetData.getString("themeMode", "system")
+        
+        return when (themeMode) {
+            "light" -> false
+            "dark" -> true
+            else -> context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        }
+    }
+
+    private fun getHSV(color: Int): FloatArray {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        return hsv
+    }
+
+    private fun HSVToColor(hsv: FloatArray, alpha: Int = 255): Int {
+        return Color.HSVToColor(alpha, hsv)
+    }
+
+    private fun _baseBackgroundColor(context: Context): Int {
+        val hsv = getHSV(colorInt)
+        
+        if (!isDarkMode(context)) {
+            if (hsv[2] > 0.7f && hsv[1] >= 0.2f && hsv[1] < 0.5f) {
+                hsv[2] = 0.7f
+            } else if (hsv[2] > 0.5f && hsv[1] < 0.2f) {
+                hsv[2] = 0.5f
+            } else if (hsv[2] > 0.9f && hsv[1] >= 0.5f) {
+                hsv[2] = 0.9f
+            }
+        }
+        
+        return HSVToColor(hsv)
+    }
+
+    fun textColor(context: Context): Int {
+        val hsv = getHSV(_baseBackgroundColor(context))
+        
+        if (isDarkMode(context)) {
+            if (hsv[2] <= 0.6f) {
+                hsv[2] = 0.9f
+            }
+            hsv[1] = 0.1f
+            hsv[2] = 1.0f
+        } else {
+            if (hsv[0] > 0.4f && hsv[0] < 0.95f && hsv[2] > 0.7f && hsv[1] >= 0.5f) {
+                hsv[2] = 0.7f
+            }
+            hsv[1] = 0.95f
+            hsv[2] = 0.3f
+        }
+        
+        return HSVToColor(hsv)
+    }
+}
 
