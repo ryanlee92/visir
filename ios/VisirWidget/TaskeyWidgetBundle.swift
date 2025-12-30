@@ -8,6 +8,7 @@ struct VisirWidgetBundle: WidgetBundle {
         UpcomingWidget()
         TaskWidget()
         CalendarMonthWidget()
+        NextScheduleWidget()
         // VisirWidgetLiveActivity()
     }
 }

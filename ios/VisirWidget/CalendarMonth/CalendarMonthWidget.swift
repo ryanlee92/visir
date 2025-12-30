@@ -40,7 +40,7 @@ struct CalendarMonthWidget: Widget {
         .configurationDisplayName("Calendar Month")
         .description("View your calendar in month view")
         .disableContentMarginsIfNeeded()
-        .supportedFamilies([.systemMedium, .systemLarge])
+        .supportedFamilies([.systemLarge])
     }
 }
 

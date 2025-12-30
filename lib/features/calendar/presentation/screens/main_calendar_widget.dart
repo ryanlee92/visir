@@ -2262,6 +2262,9 @@ class MainCalendarWidgetState extends ConsumerState<MainCalendarWidget> with Aut
         await HomeWidget.saveWidgetData<String>('calendarHide', jsonEncode(calendarTabCalendarHide));
 
         Utils.updateWidgetData(userEmail: user.email ?? '', appointments: Utils.sortWidgetAppointmentsData(data), themeMode: ref.read(themeSwitchProvider));
+
+        // Next Schedule 위젯 데이터 업데이트
+        Utils.updateNextScheduleWidgetData(ref: ref, result: result, events: newEvents, projects: ref.read(projectListControllerProvider));
       });
     }
   }

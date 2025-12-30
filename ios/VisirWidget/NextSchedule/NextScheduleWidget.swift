@@ -1,45 +1,46 @@
 import WidgetKit
 import SwiftUI
 
-struct TodayWidgetEntryView : View {
+struct NextScheduleWidgetEntryView : View {
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var family
 
     var body: some View {
-        TodayMediumWidgetView(entry: entry)
+        NextScheduleMediumWidgetView(entry: entry)
     }
 }
 
 @available(iOS 17.0, *)
-private struct TodayWidgetBackgroundWrapper: View {
+private struct NextScheduleWidgetBackgroundWrapper: View {
     @Environment(\.colorScheme) var colorScheme
     let entry: Provider.Entry
 
     var body: some View {
         let colors = VisirColorScheme.getColor(for: colorScheme)
-        TodayWidgetEntryView(entry: entry)
+        NextScheduleWidgetEntryView(entry: entry)
             .containerBackground(for: .widget) {
                 colors.background
             }
     }
 }
 
-struct TodayWidget: Widget {
-    let kind: String = "TodayWidget"
+struct NextScheduleWidget: Widget {
+    let kind: String = "NextScheduleWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             if #available(iOS 17.0, *) {
-                TodayWidgetBackgroundWrapper(entry: entry)
+                NextScheduleWidgetBackgroundWrapper(entry: entry)
             } else {
-                TodayWidgetEntryView(entry: entry)
+                NextScheduleWidgetEntryView(entry: entry)
                     .padding()
                     .background(Color.clear)
             }
         }
-        .configurationDisplayName("Today")
-        .description("Quick view of today's events and tasks")
-        .disableContentMarginsIfNeeded()
+        .configurationDisplayName("Next Schedule")
+        .description("View your next upcoming schedule")
         .supportedFamilies([.systemMedium])
+        .disableContentMarginsIfNeeded()
     }
 }
+

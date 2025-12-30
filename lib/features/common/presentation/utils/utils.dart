@@ -11,6 +11,9 @@ import 'package:Visir/dependency/toasty_box/toast_item.dart';
 import 'package:Visir/dependency/toasty_box/toast_service.dart';
 import 'package:Visir/dependency/xen_popup_card/xen_popup_card.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
+import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
+import 'package:Visir/features/task/domain/entities/task_entity.dart';
+import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/chat/domain/entities/emoji_category_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_emoji_entity.dart';
@@ -33,6 +36,7 @@ import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/feedback/application/feedback_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
+import 'package:Visir/features/inbox/application/inbox_conversation_summary_controller.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_file_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_user_entity.dart';
@@ -1485,6 +1489,160 @@ class Utils {
     await updateWidgetCore();
   }
 
+  static Future<void> updateNextScheduleWidgetData({
+    required WidgetRef ref,
+    required List<TaskEntity> result,
+    required List<EventEntity> events,
+    required List<ProjectEntity> projects,
+  }) async {
+    if (!PlatformX.isMobile) return;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+
+    // 오늘의 이벤트와 태스크 분리
+    final todayEvents = events.where((e) => !e.isAllDay && e.startDate.isAfter(today) && e.startDate.isBefore(tomorrow)).toList();
+    final todayTasks = result.where((t) {
+      if (t.isEventDummyTask || t.isDone || t.isCancelled) return false;
+      if (t.isAllDay) return false;
+      final startTime = t.editedStartTime ?? t.startAt ?? t.startDate;
+      return startTime.isAfter(today) && startTime.isBefore(tomorrow);
+    }).toList();
+
+    // 오늘의 다음 일정 (현재 시간 이후)
+    final todayUpcomingItems = <Map<String, dynamic>>[
+      ...todayEvents
+          .where((e) {
+            final startTime = e.editedStartTime ?? e.startDate;
+            return startTime.isAfter(now);
+          })
+          .map((e) {
+            final linkedTask = result.firstWhereOrNull((t) => t.linkedEvent?.eventId == e.eventId);
+            return {
+              'time': e.editedStartTime ?? e.startDate,
+              'isEvent': true,
+              'event': e,
+              'task': linkedTask,
+              'title': e.title ?? 'Untitled',
+              'color': e.backgroundColor,
+              'calendar': e.calendar,
+              'description': e.description,
+            };
+          }),
+      ...todayTasks
+          .where((t) {
+            final startTime = t.editedStartTime ?? t.startAt ?? t.startDate;
+            return startTime.isAfter(now);
+          })
+          .map((t) {
+            final project = projects.firstWhereOrNull((p) => p.isPointedProject(t));
+            return {
+              'time': t.editedStartTime ?? t.startAt ?? t.startDate,
+              'isEvent': false,
+              'task': t,
+              'title': t.title ?? 'Untitled',
+              'color': project?.color ?? Colors.transparent,
+              'project': project,
+              'calendar': t.linkedEvent?.calendar,
+              'description': t.description,
+            };
+          }),
+    ]..sort((a, b) => (a['time'] as DateTime).compareTo(b['time'] as DateTime));
+
+    // 미래 일정
+    final futureEvents = events.where((e) => !e.isAllDay && e.startDate.isAfter(now)).toList();
+    final futureTasks = result.where((t) {
+      if (t.isEventDummyTask || t.isDone || t.isCancelled) return false;
+      if (t.isAllDay) return false;
+      final startTime = t.editedStartTime ?? t.startAt ?? t.startDate;
+      return startTime.isAfter(now);
+    }).toList();
+
+    final futureUpcomingItems = <Map<String, dynamic>>[
+      ...futureEvents.map((e) {
+        final linkedTask = result.firstWhereOrNull((t) => t.linkedEvent?.eventId == e.eventId);
+        return {
+          'time': e.editedStartTime ?? e.startDate,
+          'isEvent': true,
+          'event': e,
+          'task': linkedTask,
+          'title': e.title ?? 'Untitled',
+          'color': e.backgroundColor,
+          'calendar': e.calendar,
+          'description': e.description,
+        };
+      }),
+      ...futureTasks.map((t) {
+        final project = projects.firstWhereOrNull((p) => p.isPointedProject(t));
+        return {
+          'time': t.editedStartTime ?? t.startAt ?? t.startDate,
+          'isEvent': false,
+          'task': t,
+          'title': t.title ?? 'Untitled',
+          'color': project?.color ?? Colors.transparent,
+          'project': project,
+          'calendar': t.linkedEvent?.calendar,
+          'description': t.description,
+        };
+      }),
+    ]..sort((a, b) => (a['time'] as DateTime).compareTo(b['time'] as DateTime));
+
+    // 다음 일정 선택 (오늘 우선, 없으면 미래)
+    final nextItem = todayUpcomingItems.isNotEmpty ? todayUpcomingItems.first : (futureUpcomingItems.isNotEmpty ? futureUpcomingItems.first : null);
+
+    if (nextItem == null) {
+      await HomeWidget.saveWidgetData<String>('nextSchedule', '');
+      await updateWidgetCore();
+      return;
+    }
+
+    final nextEvent = nextItem['event'] as EventEntity?;
+    final nextTask = nextItem['task'] as TaskEntity?;
+    final nextProject = nextItem['project'] as ProjectEntity?;
+    final nextCalendar = nextItem['calendar'] as CalendarEntity?;
+
+    final startTime = nextItem['time'] as DateTime;
+    final endTime = nextEvent != null
+        ? (nextEvent.editedEndTime ?? nextEvent.endDate)
+        : (nextTask?.editedEndTime ?? nextTask?.endAt ?? nextTask?.endDate ?? startTime.add(const Duration(hours: 1)));
+    final duration = endTime.difference(startTime).inMinutes;
+
+    // Conversation summary 가져오기
+    String? conversationSummary;
+    try {
+      final summaryAsync = ref.read(inboxConversationSummaryProvider(nextTask?.id, nextEvent?.uniqueId));
+      conversationSummary = summaryAsync.value;
+    } catch (e) {
+      // 에러 발생 시 무시하고 계속 진행
+    }
+
+    // previousContext는 conversation summary 텍스트로 설정
+    Map<String, dynamic>? previousContext;
+    if (conversationSummary != null && conversationSummary.isNotEmpty) {
+      previousContext = {'summary': conversationSummary};
+    }
+
+    final nextScheduleData = {
+      'title': nextItem['title'] as String,
+      'startTimeMs': startTime.millisecondsSinceEpoch,
+      'endTimeMs': endTime.millisecondsSinceEpoch,
+      'duration': duration,
+      'isEvent': nextItem['isEvent'] as bool,
+      'eventId': nextEvent?.eventId,
+      'taskId': nextTask?.id,
+      'colorInt': (nextItem['color'] as Color).value,
+      'location': nextEvent?.location,
+      'conferenceLink': nextTask?.conferenceLink ?? nextEvent?.conferenceLink,
+      'projectName': nextProject?.name,
+      'calendarName': nextCalendar?.name,
+      'previousContext': previousContext,
+    };
+
+    await HomeWidget.saveWidgetData<String>('nextSchedule', jsonEncode(nextScheduleData));
+    await updateWidgetCore();
+  }
+
   static Future<void> insertInboxWidgetDataFromNotification({required RemoteMessage message}) async {
     if (!PlatformX.isMobile) return;
 
@@ -1785,6 +1943,12 @@ class Utils {
         iOSName: 'CalendarMonthWidget',
         androidName: 'CalendarMonthWidgetProvider',
         qualifiedAndroidName: 'com.wavetogether.fillin.CalendarMonthWidgetProvider',
+      ),
+      HomeWidget.updateWidget(
+        name: 'NextScheduleWidgetProvider',
+        iOSName: 'NextScheduleWidget',
+        androidName: 'NextScheduleWidgetProvider',
+        qualifiedAndroidName: 'com.wavetogether.fillin.NextScheduleWidgetProvider',
       ),
       if (PlatformX.isIOS) HomeWidget.updateWidget(iOSName: 'TodayWidget'),
     ];
