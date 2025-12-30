@@ -2365,3 +2365,17 @@ export const sendtaskoreventchangenotificationforwidgets = v2.https.onRequest(
 		response.send(JSON.stringify({ success: true }));
 	},
 );
+
+export const redirecttaskeytowork = v2.https.onRequest(
+	{
+		minInstances: 0,
+	},
+	async (request, response) => {
+		const url = parse(request.url, true);
+		const path = url.pathname || '/';
+		const query = url.search || '';
+		
+		const redirectUrl = `https://visir.pro${path}${query}`;
+		response.redirect(301, redirectUrl);
+	},
+);
