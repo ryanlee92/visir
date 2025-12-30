@@ -109,25 +109,30 @@ class CalendarEventListController extends _$CalendarEventListController {
     // Initialize state with empty result
     state = CalendarEventResultEntity(events: [], startDateTime: startDateTime, endDateTime: endDateTime);
 
+    Timer? _updateFromInternalControllersTimer;
     void _updateFromInternalControllers() {
-      final allEvents = <EventEntity>[];
-      _controllers.forEach((oauthUniqueId, oauthControllers) {
-        oauthControllers.forEach((monthKey, controller) {
-          try {
-            final parsedDate = DateFormat.yM().parse(monthKey);
-            final controllerState = ref.read(
-              calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: oauthUniqueId, targetYear: parsedDate.year, targetMonth: parsedDate.month),
-            );
-            final events = controllerState.value ?? <EventEntity>[];
-            allEvents.addAll(events);
-          } catch (e) {
-            // If parsing fails, skip this controller
-          }
+      // debounce를 추가하여 연속된 호출을 방지
+      _updateFromInternalControllersTimer?.cancel();
+      _updateFromInternalControllersTimer = Timer(const Duration(milliseconds: 10), () {
+        final allEvents = <EventEntity>[];
+        _controllers.forEach((oauthUniqueId, oauthControllers) {
+          oauthControllers.forEach((monthKey, controller) {
+            try {
+              final parsedDate = DateFormat.yM().parse(monthKey);
+              final controllerState = ref.read(
+                calendarEventListControllerInternalProvider(isSignedIn: isSignedIn, oAuthUniqueId: oauthUniqueId, targetYear: parsedDate.year, targetMonth: parsedDate.month),
+              );
+              final events = controllerState.value ?? <EventEntity>[];
+              allEvents.addAll(events);
+            } catch (e) {
+              // If parsing fails, skip this controller
+            }
+          });
         });
-      });
 
-      final uniqueEvents = allEvents.unique((e) => e.uniqueId);
-      updateState(events: uniqueEvents, startDateTime: startDateTime, endDateTime: endDateTime);
+        final uniqueEvents = allEvents.unique((e) => e.uniqueId);
+        updateState(events: uniqueEvents, startDateTime: startDateTime, endDateTime: endDateTime);
+      });
     }
 
     ref.watch(localPrefControllerProvider.select((v) => v.value?.calendarOAuths?.map((e) => e.uniqueId).toList().join()));
