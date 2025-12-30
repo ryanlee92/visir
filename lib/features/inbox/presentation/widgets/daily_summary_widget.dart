@@ -763,8 +763,7 @@ class DailySummaryWidget extends ConsumerWidget {
               ...items.map((item) {
                 final project = item.projectId != null ? ref.read(projectListControllerProvider).firstWhereOrNull((p) => p.uniqueId == item.projectId) : null;
                 final itemIconColor = project?.color ?? context.onSurfaceVariant;
-                final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
-                final isUnread = item.inbox?.getIsUnread(channels) ?? false;
+                final isUnread = item.inbox?.isRead != true;
 
                 return _buildDraggable(
                   ref: ref,
@@ -790,14 +789,7 @@ class DailySummaryWidget extends ConsumerWidget {
                             .updateInboxConfig(
                               configs: [
                                 (item.inbox?.config?.copyWith(isRead: true) ??
-                                    InboxConfigEntity(
-                                      id: item.inbox!.uniqueId,
-                                      userId: userId,
-                                      dateTime: DateTime.now(),
-                                      updatedAt: DateTime.now(),
-                                      isRead: true,
-                                      inboxUniqueId: item.inbox!.uniqueId,
-                                    )),
+                                    InboxConfigEntity(id: item.inbox!.uniqueId, userId: userId, dateTime: DateTime.now(), updatedAt: DateTime.now(), isRead: true)),
                               ],
                             );
                       }
@@ -1008,8 +1000,7 @@ class DailySummaryWidget extends ConsumerWidget {
                         children: items.map((item) {
                           final project = item.projectId != null ? ref.read(projectListControllerProvider).firstWhereOrNull((p) => p.uniqueId == item.projectId) : null;
                           final itemIconColor = project?.color ?? context.onSurfaceVariant;
-                          final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
-                          final isUnread = item.inbox?.getIsUnread(channels) ?? false;
+                          final isUnread = item.inbox?.isRead != true;
 
                           return _buildDraggable(
                             ref: ref,
@@ -1027,6 +1018,19 @@ class DailySummaryWidget extends ConsumerWidget {
                               hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
                               forceShiftOffset: Offset(0, -36),
                               beforePopup: () {
+                                if (item.inbox?.isRead != true) {
+                                  final userId = Utils.ref.read(authControllerProvider).value?.id;
+                                  if (userId == null) return;
+                                  ref
+                                      .read(inboxConfigListControllerProvider.notifier)
+                                      .updateInboxConfig(
+                                        configs: [
+                                          (item.inbox?.config?.copyWith(isRead: true) ??
+                                              InboxConfigEntity(id: item.inbox!.uniqueId, userId: userId, dateTime: DateTime.now(), updatedAt: DateTime.now(), isRead: true)),
+                                        ],
+                                      );
+                                }
+
                                 if (item.inbox!.linkedMessage != null) {
                                   final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
                                   final channel = channels.firstWhereOrNull((e) => e.id == item.inbox!.linkedMessage!.channelId);

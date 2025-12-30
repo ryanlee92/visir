@@ -4,6 +4,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/ui_extension
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
+import 'package:Visir/features/inbox/application/inbox_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
@@ -361,15 +362,13 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
 
   List<McpActionSuggestion> _generateSuggestions(BuildContext context, WidgetRef ref) {
     final suggestions = <McpActionSuggestion>[];
-    final linkedTasksData = ref.watch(inboxLinkedTaskControllerProvider);
-    final linkedConfigData = ref.watch(inboxConfigListControllerProvider);
 
     // Inbox 기반 액션 추천
     for (final inbox in inboxes) {
       final suggestion = inbox.suggestion;
       if (suggestion == null) continue;
-      if (linkedTasksData?.linkedTasks.any((t) => t.inboxId == inbox.id) == true) continue;
-      if (linkedConfigData?.configs.firstWhereOrNull((c) => c.inboxUniqueId == inbox.uniqueId)?.isRead == true) continue;
+      if (inbox.isRead == true) continue;
+      if (inbox.linkedTask != null) continue;
 
       // MCP 함수 추천
       final recommendedFunctions = _getRecommendedMcpFunctions(suggestion, inbox);

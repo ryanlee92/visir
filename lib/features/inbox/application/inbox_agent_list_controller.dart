@@ -315,7 +315,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     final processedInboxes = filteredInboxes.map((e) {
       final suggestion = suggestions?.suggestions.firstWhereOrNull((s) => s.id == e.id || (s.id.contains(',') && s.id.split(',').contains(e.id)));
       final linkedTask = linkedTasks?.linkedTasks.firstWhereOrNull((s) => s.inboxId == e.id);
-      final config = configs?.configs.firstWhereOrNull((s) => s.inboxUniqueId == e.uniqueId);
+      final config = configs?.configs.firstWhereOrNull((s) => s.id == e.uniqueId);
 
       // Extract merged inbox IDs from suggestion if it exists
       // AI suggestion controller stores merged IDs as comma-separated string in suggestion.id
