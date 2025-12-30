@@ -676,20 +676,14 @@ class McpFunctionExecutor {
   }
 
   Future<Map<String, dynamic>> _executeDeleteTask(Map<String, dynamic> args, {required TabType tabType, List<TaskEntity>? availableTasks}) async {
-    print('[McpFunctionExecutor] _executeDeleteTask 시작: args=$args, tabType=$tabType');
     final taskId = args['taskId'] as String?;
     if (taskId == null) {
-      print('[McpFunctionExecutor] _executeDeleteTask: taskId가 없음');
       return {'success': false, 'error': 'taskId is required'};
     }
-    print('[McpFunctionExecutor] _executeDeleteTask: taskId=$taskId');
 
     final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
-    print('[McpFunctionExecutor] _executeDeleteTask: allTasks 개수=${allTasks.length}');
     final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
-    print('[McpFunctionExecutor] _executeDeleteTask: task 찾음, task.id=${task.id}, task.title=${task.title}');
 
-    print('[McpFunctionExecutor] _executeDeleteTask: TaskAction.deleteTask 호출 전');
     await TaskAction.deleteTask(
       task: task,
       calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag,
@@ -698,7 +692,6 @@ class McpFunctionExecutor {
       selectedEndDate: task.endAt,
       showToast: false,
     );
-    print('[McpFunctionExecutor] _executeDeleteTask: TaskAction.deleteTask 호출 완료');
 
     return {'success': true, 'message': 'Task deleted successfully'};
   }

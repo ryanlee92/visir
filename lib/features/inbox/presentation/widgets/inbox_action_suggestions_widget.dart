@@ -364,7 +364,6 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
 
     // Inbox 기반 액션 추천
     for (final inbox in inboxes.take(5)) {
-      print('########## inbox: ${inbox.title}');
       final suggestion = inbox.suggestion;
       if (suggestion == null) continue;
 

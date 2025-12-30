@@ -895,43 +895,15 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
 
         final overdueResult = await _taskRepository.fetchTasksBetweenDates(startDateTime: overdueStartDate, endDateTime: overdueEndDate, pref: _pref, userId: _user.id);
         overdueResult.fold((l) {}, (r) {
-          // 특정 task ID 로그
-          final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-          final foundInResult = r.firstWhereOrNull((t) => t.id == targetTaskId);
-          if (foundInResult != null) {
-            print(
-              '[TaskListController] load (all/overdue): targetTaskId=$targetTaskId fetchTasksBetweenDates에서 발견! status=${foundInResult.status}, isOverdue=${foundInResult.isOverdue}, isUnscheduled=${foundInResult.isUnscheduled}, linkedEvent=${foundInResult.linkedEvent != null}, isCancelled=${foundInResult.isCancelled}',
-            );
-          }
           // overdue: status가 none이고 isOverdue이고 linkedEvent == null이고 isCancelled가 아닌 태스크
           final overdueTasks = r.where((t) => t.status == TaskStatus.none && t.isOverdue && !t.isUnscheduled && t.linkedEvent == null && !t.isCancelled).toList();
-          final foundInOverdue = overdueTasks.firstWhereOrNull((t) => t.id == targetTaskId);
-          if (foundInOverdue != null) {
-            print('[TaskListController] load (all/overdue): targetTaskId=$targetTaskId overdueTasks에 포함됨');
-          } else if (foundInResult != null) {
-            print('[TaskListController] load (all/overdue): targetTaskId=$targetTaskId overdueTasks에서 필터링됨 (제외됨)');
-          }
           overdueAndCompletedTasks.addAll(overdueTasks);
         });
 
         // unscheduled tasks 가져오기
         final unscheduledResult = await _taskRepository.fetchUnscheduledTasks(pref: _pref, userId: _user.id);
         unscheduledResult.fold((l) {}, (r) {
-          // 특정 task ID 로그
-          final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-          final foundInResult = r.firstWhereOrNull((t) => t.id == targetTaskId);
-          if (foundInResult != null) {
-            print(
-              '[TaskListController] load (all/unscheduled): targetTaskId=$targetTaskId fetchUnscheduledTasks에서 발견! status=${foundInResult.status}, linkedEvent=${foundInResult.linkedEvent != null}, isCancelled=${foundInResult.isCancelled}',
-            );
-          }
           final unscheduledTasks = r.where((t) => (t.status == TaskStatus.none || t.status == TaskStatus.braindump) && t.linkedEvent == null && !t.isCancelled).toList();
-          final foundInUnscheduled = unscheduledTasks.firstWhereOrNull((t) => t.id == targetTaskId);
-          if (foundInUnscheduled != null) {
-            print('[TaskListController] load (all/unscheduled): targetTaskId=$targetTaskId unscheduledTasks에 포함됨');
-          } else if (foundInResult != null) {
-            print('[TaskListController] load (all/unscheduled): targetTaskId=$targetTaskId unscheduledTasks에서 필터링됨 (제외됨)');
-          }
           overdueAndCompletedTasks.addAll(unscheduledTasks);
         });
         break;
@@ -948,22 +920,8 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
         }
         final completedResult = await _taskRepository.fetchTasksByStatus(status: TaskStatus.done, pref: _pref, userId: _user.id, limit: limit, offset: offset);
         completedResult.fold((l) {}, (r) {
-          // 특정 task ID 로그
-          final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-          final foundInResult = r.firstWhereOrNull((t) => t.id == targetTaskId);
-          if (foundInResult != null) {
-            print(
-              '[TaskListController] load (completed): targetTaskId=$targetTaskId fetchTasksByStatus에서 발견! status=${foundInResult.status}, linkedEvent=${foundInResult.linkedEvent != null}, isCancelled=${foundInResult.isCancelled}, offset=$offset, limit=$limit',
-            );
-          }
           // linkedEvent == null이고 isCancelled가 아닌 것만 필터링 (데이터베이스에서 이미 필터링했지만 추가 확인)
           final filtered = r.where((t) => t.linkedEvent == null && !t.isCancelled).toList();
-          final foundInFiltered = filtered.firstWhereOrNull((t) => t.id == targetTaskId);
-          if (foundInFiltered != null) {
-            print('[TaskListController] load (completed): targetTaskId=$targetTaskId filtered에 포함됨');
-          } else if (foundInResult != null) {
-            print('[TaskListController] load (completed): targetTaskId=$targetTaskId filtered에서 필터링됨 (제외됨)');
-          }
           overdueAndCompletedTasks.addAll(filtered);
         });
         break;
@@ -1016,17 +974,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       } else {
         _remoteFetchedTasks = [...overdueAndCompletedTasks, ..._remoteFetchedTasks]..unique((e) => e.id);
       }
-    }
-
-    // 특정 task ID 로그
-    final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-    final foundTask = _remoteFetchedTasks.firstWhereOrNull((t) => t.id == targetTaskId);
-    if (foundTask != null) {
-      print(
-        '[TaskListController] load: targetTaskId=$targetTaskId 발견! taskLabelType=$taskLabelType, startAt=${foundTask.startAt}, endAt=${foundTask.endAt}, status=${foundTask.status}, isOverdue=${foundTask.isOverdue}, isUnscheduled=${foundTask.isUnscheduled}, linkedEvent=${foundTask.linkedEvent != null}, isCancelled=${foundTask.isCancelled}',
-      );
-    } else {
-      print('[TaskListController] load: targetTaskId=$targetTaskId 없음, taskLabelType=$taskLabelType, 총 ${_remoteFetchedTasks.length}개 task 로드됨');
     }
 
     // completed, overdue, unscheduled 탭이 아닐 때만 taskDates 업데이트
@@ -1093,13 +1040,9 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       }
     } else {
       if (newTask != null) {
-        print('[TaskListController] saveTask: newTask가 있음, _upsertTask 호출');
         await _upsertTask(task: newTask, originalTask: originalTask, targetTab: targetTab);
       } else if (originalTask != null) {
-        print('[TaskListController] saveTask: newTask가 null이고 originalTask가 있음, _deleteTask 호출');
-        print('[TaskListController] saveTask: originalTask.id=${originalTask.id}, originalTask.title=${originalTask.title}');
         await _deleteTask(task: originalTask, targetTab: targetTab);
-        print('[TaskListController] saveTask: _deleteTask 완료');
       }
     }
   }
@@ -1404,20 +1347,14 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
   }
 
   Future<List<TaskEntity>> _deleteTask({required TaskEntity task, bool? forceDelete, bool? doNotUpdateState, List<TaskEntity>? prevState, required TabType targetTab}) async {
-    print(
-      '[TaskListController] _deleteTask 시작: task.id=${task.id}, task.title=${task.title}, forceDelete=$forceDelete, doNotUpdateState=$doNotUpdateState, targetTab=$targetTab, tabType=$tabType',
-    );
     final pref = ref.read(localPrefControllerProvider).value;
     if (pref == null) {
-      print('[TaskListController] _deleteTask: pref가 null이어서 종료');
       return [];
     }
 
     List<TaskEntity> previousState = prevState ?? tasks;
-    print('[TaskListController] _deleteTask: previousState 개수=${previousState.length}');
 
     if (doNotUpdateState != true) {
-      print('[TaskListController] _deleteTask: 로컬 상태 업데이트 시작');
       final list = tasks
         ..removeWhere((e) => e.id == task.id!)
         ..add(task.copyWith(status: TaskStatus.cancelled, startAt: task.startAt, endAt: task.startAt))
@@ -1426,21 +1363,17 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       DateTime updatedTimestamp = DateTime.now();
       this.updatedTimestamp = updatedTimestamp;
       _updateState(list: list, updatedTimestamp: updatedTimestamp, isLocalUpdate: true);
-      print('[TaskListController] _deleteTask: 로컬 상태 업데이트 완료');
     }
 
     if (targetTab != tabType) {
-      print('[TaskListController] _deleteTask: targetTab($targetTab) != tabType($tabType), 종료');
       return state.value?.tasks ?? [];
     }
 
-    print('[TaskListController] _deleteTask: task.rrule=${task.rrule}, forceDelete=$forceDelete');
     final eventResult = task.rrule == null || forceDelete == true
         ? await _taskRepository.deleteTask(task: task)
         : await _taskRepository.saveTask(
             task: task.copyWith(status: TaskStatus.cancelled, startAt: task.startAt, endAt: task.startAt),
           );
-    print('[TaskListController] _deleteTask: repository 호출 완료');
 
     return eventResult.fold(
       (l) {
@@ -1466,17 +1399,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
 
   void _updateState({required List<TaskEntity> list, required DateTime updatedTimestamp, required bool isLocalUpdate}) async {
     list = list.where((e) => e.id?.isNotEmpty == true).toList().unique((e) => e.id)..sort((a, b) => a.id!.compareTo(b.id!));
-
-    // 특정 task ID 로그
-    final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-    final foundTask = list.firstWhereOrNull((t) => t.id == targetTaskId);
-    if (foundTask != null) {
-      print(
-        '[TaskListController] _updateState: targetTaskId=$targetTaskId 발견! isLocalUpdate=$isLocalUpdate, 총 ${list.length}개 task, startAt=${foundTask.startAt}, endAt=${foundTask.endAt}, status=${foundTask.status}',
-      );
-    } else {
-      print('[TaskListController] _updateState: targetTaskId=$targetTaskId 없음, isLocalUpdate=$isLocalUpdate, 총 ${list.length}개 task');
-    }
 
     if (!isLocalUpdate) _remoteFetchedTasks = list;
 

@@ -6,7 +6,6 @@ import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/domain/datasources/task_datasource.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_search_result_entity.dart';
-import 'package:collection/collection.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -53,15 +52,6 @@ class TaskRepository {
       final allTasks = <TaskEntity>[];
       for (final taskList in result) {
         allTasks.addAll(taskList);
-      }
-      
-      // 특정 task ID 로그
-      final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-      final foundTask = allTasks.firstWhereOrNull((t) => t.id == targetTaskId);
-      if (foundTask != null) {
-        print('[TaskRepository] fetchTasks: targetTaskId=$targetTaskId 발견! startAtBefore=$startAtBefore, startAtAfter=$startAtAfter, 총 ${allTasks.length}개 task');
-      } else {
-        print('[TaskRepository] fetchTasks: targetTaskId=$targetTaskId 없음, startAtBefore=$startAtBefore, startAtAfter=$startAtAfter, 총 ${allTasks.length}개 task');
       }
 
       return right(allTasks);
@@ -125,15 +115,6 @@ class TaskRepository {
       for (final taskList in result) {
         allTasks.addAll(taskList);
       }
-      
-      // 특정 task ID 로그
-      final targetTaskId = '1b348c67-1832-46f1-b2b2-91ec9c0928ab';
-      final foundTask = allTasks.firstWhereOrNull((t) => t.id == targetTaskId);
-      if (foundTask != null) {
-        print('[TaskRepository] fetchTasksBetweenDates: targetTaskId=$targetTaskId 발견! startDateTime=$startDateTime, endDateTime=$endDateTime, 총 ${allTasks.length}개 task');
-      } else {
-        print('[TaskRepository] fetchTasksBetweenDates: targetTaskId=$targetTaskId 없음, startDateTime=$startDateTime, endDateTime=$endDateTime, 총 ${allTasks.length}개 task');
-      }
 
       return right(allTasks);
     } catch (e) {
@@ -182,17 +163,12 @@ class TaskRepository {
   }
 
   Future<Either<Failure, bool>> deleteTask({required TaskEntity task}) async {
-    print('[TaskRepository] deleteTask 시작: task.id=${task.id}, task.title=${task.title}');
     try {
       final list = remoteDatasourceTypes.map((d) => datasources[d]?.deleteTask(task: task)).whereType<Future<bool>>();
-      print('[TaskRepository] deleteTask: datasource 개수=${list.length}');
       await Future.wait(list);
-      print('[TaskRepository] deleteTask: datasource 호출 완료');
       sendTaskOrEventChangeFcm(task: task, action: 'delete');
-      print('[TaskRepository] deleteTask: FCM 전송 완료');
       return right(true);
     } catch (e) {
-      print('[TaskRepository] deleteTask: 에러 발생, 에러=$e');
       return Utils.debugLeft(e);
     }
   }
