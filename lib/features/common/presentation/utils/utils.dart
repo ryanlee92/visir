@@ -1933,12 +1933,6 @@ class Utils {
         qualifiedAndroidName: 'com.wavetogether.fillin.TaskWidgetProvider',
       ),
       HomeWidget.updateWidget(
-        name: 'InboxWidgetProvider',
-        iOSName: 'InboxWidget',
-        androidName: 'InboxWidgetProvider',
-        qualifiedAndroidName: 'com.wavetogether.fillin.InboxWidgetProvider',
-      ),
-      HomeWidget.updateWidget(
         name: 'CalendarMonthWidgetProvider',
         iOSName: 'CalendarMonthWidget',
         androidName: 'CalendarMonthWidgetProvider',
