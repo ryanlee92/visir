@@ -25,7 +25,8 @@ class CalendarMonthWidgetService : RemoteViewsService() {
             surfaceTint = intent.getIntExtra("surfaceTint", 0),
             secondary = intent.getIntExtra("secondary", 0),
             error = intent.getIntExtra("error", 0),
-            tertiary = intent.getIntExtra("tertiary", 0)
+            tertiary = intent.getIntExtra("tertiary", 0),
+            surface = intent.getIntExtra("surface", 0)
         )
         val cellHeightPx = intent.getIntExtra("cellHeightPx", 0)
         return CalendarMonthWidgetServiceFactory(applicationContext, colors, cellHeightPx)

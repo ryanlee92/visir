@@ -156,6 +156,7 @@ class CalendarMonthWidgetProvider : AppWidgetProvider() {
             putExtra("secondary", colors.secondary)
             putExtra("error", colors.error)
             putExtra("tertiary", colors.tertiary)
+            putExtra("surface", colors.surface)
             putExtra("cellHeightPx", cellHeightPx)
             data = Uri.parse(this.toUri(Intent.URI_INTENT_SCHEME))
         }

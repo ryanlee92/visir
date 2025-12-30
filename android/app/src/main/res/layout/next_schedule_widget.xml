@@ -97,10 +97,10 @@
                         android:gravity="center_vertical">
 
                         <ImageView
+                            android:id="@+id/previous_context_icon"
                             android:layout_width="16dp"
                             android:layout_height="16dp"
-                            android:src="@android:drawable/ic_menu_info_details"
-                            android:tint="?attr/colorOnBackground" />
+                            android:src="@android:drawable/ic_menu_info_details" />
 
                         <TextView
                             android:id="@+id/previous_context_title"

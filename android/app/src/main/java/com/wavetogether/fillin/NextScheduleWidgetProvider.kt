@@ -92,7 +92,7 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
         views.setViewVisibility(R.id.content_container, android.view.View.VISIBLE)
         
         // Load next schedule data
-        val nextScheduleJson = widgetData.getString("nextSchedule", "")
+        val nextScheduleJson = widgetData.getString("nextSchedule", "") ?: ""
         
         if (nextScheduleJson.isEmpty()) {
             views.setViewVisibility(R.id.content_container, android.view.View.GONE)
@@ -134,7 +134,7 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
             val typeString = if (projectName.isNotEmpty()) projectName else calendarName
             val detailsText = "$dateString • $duration min • $typeString"
             views.setTextViewText(R.id.event_details, detailsText)
-            views.setInt(R.id.event_details, "setTextColor", colors.inverseSurface)
+            views.setInt(R.id.event_details, "setTextColor", colors.onInverseSurface)
             
             // Previous Context
             val previousContext = nextSchedule.optJSONObject("previousContext")
@@ -145,6 +145,7 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.previous_context_text, summary)
                     views.setInt(R.id.previous_context_title, "setTextColor", colors.onBackground)
                     views.setInt(R.id.previous_context_text, "setTextColor", colors.onBackground)
+                    views.setInt(R.id.previous_context_icon, "setColorFilter", colors.onBackground)
                     // Set background color to surface with 0.5 alpha (same as Flutter app)
                     val surfaceColor = colors.surface
                     val surfaceColorWithAlpha = Color.argb(
@@ -160,9 +161,6 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
             } else {
                 views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
             }
-            
-            // Location - removed
-            views.setViewVisibility(R.id.location_container, android.view.View.GONE)
             
         } catch (e: Exception) {
             e.printStackTrace()

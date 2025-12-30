@@ -194,6 +194,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
             putExtra("secondary", colors.secondary)
             putExtra("error", colors.error)
             putExtra("tertiary", colors.tertiary)
+            putExtra("surface", colors.surface)
             putExtra("isTaskWidget", true)
             data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
         }
