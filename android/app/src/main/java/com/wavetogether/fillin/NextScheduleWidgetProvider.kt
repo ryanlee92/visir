@@ -145,7 +145,7 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(R.id.previous_context_text, summary)
                     views.setInt(R.id.previous_context_title, "setTextColor", colors.onBackground)
                     views.setInt(R.id.previous_context_text, "setTextColor", colors.onBackground)
-                    // Set background color to surface with 0.5 alpha
+                    // Set background color to surface with 0.5 alpha (same as Flutter app)
                     val surfaceColor = colors.surface
                     val surfaceColorWithAlpha = Color.argb(
                         (Color.alpha(surfaceColor) * 0.5).toInt(),

@@ -30,7 +30,7 @@ data class VisirColorScheme(
             secondary = Color.parseColor("#5d85ff"),
             error = Color.parseColor("#ff5d5d"),
             tertiary = Color.parseColor("#7b86c4"),
-            surface = Color.parseColor("#FBFBFD")
+            surface = Color.parseColor("#D9D9D8")
         )
         
         private val darkColors = VisirColorScheme(
@@ -44,7 +44,7 @@ data class VisirColorScheme(
             secondary = Color.parseColor("#5d85ff"),
             error = Color.parseColor("#ff5d5d"),
             tertiary = Color.parseColor("#7b86c4"),
-            surface = Color.parseColor("#2C2C2E")
+            surface = Color.parseColor("#2F2F2F")
         )
         
         fun getColor(context: Context): VisirColorScheme {

@@ -55,7 +55,6 @@ struct NextScheduleContentView: View {
                 // Previous Context (if available)
                 if let previousContext = data.previousContext {
                     PreviousContextView(context: previousContext, colors: colors)
-                        .padding(.top, 6)
                 }
             }
             .padding(.top, 14)

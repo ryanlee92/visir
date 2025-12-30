@@ -39,7 +39,7 @@ struct VisirColorScheme {
         secondary: Color(hexString: "0xff5d85ff"),
         error: Color(hexString: "0xffff5d5d"),
         tertiary: Color(hexString: "0xff7b86c4"),
-        surface: Color(hexString: "0xFFFBFBFD"),
+        surface: Color(hexString: "0xffD9D9D8"),
     )
     
     private static let darkColors = (
@@ -54,7 +54,7 @@ struct VisirColorScheme {
         secondary: Color(hexString: "0xff5d85ff"),
         error: Color(hexString: "0xffff5d5d"),
         tertiary: Color(hexString: "0xff7b86c4"),
-        surface: Color(hexString: "0xFF2C2C2E"),
+        surface: Color(hexString: "0xff2F2F2F"),
     )
     
     static func getColor(for colorScheme: ColorScheme) -> (isDarkMode: Bool, background: Color, onBackground: Color, outline: Color, shadow: Color, onInverseSurface: Color, surfaceTint: Color, primary: Color, secondary: Color, error: Color, tertiary: Color, surface: Color) {
