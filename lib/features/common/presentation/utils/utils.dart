@@ -1484,9 +1484,14 @@ class Utils {
       );
       List<Future> futures = [HomeWidget.saveWidgetData<String>('inboxes', jsonString), HomeWidget.saveWidgetData<String>('inboxUpdatedAt', DateTime.now().toIso8601String())];
       await Future.wait(futures);
+      // Update inbox widget when inbox data changes
+      await updateInboxWidget();
     }
 
-    await updateWidgetCore();
+    // Update appointment widgets when appointment data changes
+    if (appointments != null) {
+      await updateAppointmentWidgets();
+    }
   }
 
   static Future<({String? taskId, String? eventId})?> updateNextScheduleWidgetData({
@@ -1593,7 +1598,13 @@ class Utils {
 
     if (nextItem == null) {
       await HomeWidget.saveWidgetData<String>('nextSchedule', '');
-      await updateWidgetCore();
+      // Update only NextScheduleWidget when data changes
+      await HomeWidget.updateWidget(
+        name: 'NextScheduleWidgetProvider',
+        iOSName: 'NextScheduleWidget',
+        androidName: 'NextScheduleWidgetProvider',
+        qualifiedAndroidName: 'com.wavetogether.fillin.NextScheduleWidgetProvider',
+      );
       return null;
     }
 
@@ -1664,7 +1675,13 @@ class Utils {
     }
 
     await HomeWidget.saveWidgetData<String>('nextSchedule', jsonEncode(nextScheduleData));
-    await updateWidgetCore();
+    // Update only NextScheduleWidget when data changes
+    await HomeWidget.updateWidget(
+      name: 'NextScheduleWidgetProvider',
+      iOSName: 'NextScheduleWidget',
+      androidName: 'NextScheduleWidgetProvider',
+      qualifiedAndroidName: 'com.wavetogether.fillin.NextScheduleWidgetProvider',
+    );
 
     // Return task/event IDs for listening to conversation summary updates
     return (taskId: nextTask?.id, eventId: nextEvent?.uniqueId);
@@ -1737,7 +1754,8 @@ class Utils {
 
         await Future.wait(futures);
 
-        await updateWidgetCore();
+        // Update inbox widget when inbox data changes
+        await updateInboxWidget();
       });
     }
   }
@@ -1903,7 +1921,8 @@ class Utils {
 
             // 업데이트된 데이터 저장
             await HomeWidget.saveWidgetData<String>('dateGroupedAppointments', jsonEncode(dateGroupedAppointments));
-            await updateWidgetCore();
+            // Update appointment widgets when appointment data changes
+            await updateAppointmentWidgets();
           }
           break;
         case 'delete':
@@ -1943,6 +1962,41 @@ class Utils {
     }
   }
 
+  // Update only appointment-related widgets (Upcoming, Task, CalendarMonth)
+  static Future<void> updateAppointmentWidgets() async {
+    if (!PlatformX.isMobile) return;
+
+    List<Future> futures = [
+      HomeWidget.updateWidget(
+        name: 'UpcomingWidgetProvider',
+        iOSName: 'UpcomingWidget',
+        androidName: 'UpcomingWidgetProvider',
+        qualifiedAndroidName: 'com.wavetogether.fillin.UpcomingWidgetProvider',
+      ),
+      HomeWidget.updateWidget(
+        name: 'TaskWidgetProvider',
+        iOSName: 'TaskWidget',
+        androidName: 'TaskWidgetProvider',
+        qualifiedAndroidName: 'com.wavetogether.fillin.TaskWidgetProvider',
+      ),
+      HomeWidget.updateWidget(
+        name: 'CalendarMonthWidgetProvider',
+        iOSName: 'CalendarMonthWidget',
+        androidName: 'CalendarMonthWidgetProvider',
+        qualifiedAndroidName: 'com.wavetogether.fillin.CalendarMonthWidgetProvider',
+      ),
+    ];
+
+    await Future.wait(futures);
+  }
+
+  // Update only inbox widget (iOS TodayWidget)
+  static Future<void> updateInboxWidget() async {
+    if (!PlatformX.isMobile || !PlatformX.isIOS) return;
+    await HomeWidget.updateWidget(iOSName: 'TodayWidget');
+  }
+
+  // Update all widgets (only used when clearing widget data)
   static Future<void> updateWidgetCore() async {
     if (!PlatformX.isMobile) return;
 
@@ -1965,12 +2019,8 @@ class Utils {
         androidName: 'CalendarMonthWidgetProvider',
         qualifiedAndroidName: 'com.wavetogether.fillin.CalendarMonthWidgetProvider',
       ),
-      HomeWidget.updateWidget(
-        name: 'NextScheduleWidgetProvider',
-        iOSName: 'NextScheduleWidget',
-        androidName: 'NextScheduleWidgetProvider',
-        qualifiedAndroidName: 'com.wavetogether.fillin.NextScheduleWidgetProvider',
-      ),
+      // NextScheduleWidget is updated separately in updateNextScheduleWidgetData
+      // to avoid unnecessary updates when app goes to background/foreground
       if (PlatformX.isIOS) HomeWidget.updateWidget(iOSName: 'TodayWidget'),
     ];
 

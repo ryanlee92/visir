@@ -228,7 +228,8 @@ Future<void> backgroundCallback(Uri? uri) async {
         // 업데이트된 데이터를 다시 저장
         HomeWidget.saveWidgetData('dateGroupedAppointments', json.encode(appointmentsMap)).then((value) {
           if (value == true) {
-            Utils.updateWidgetCore();
+            // Update only appointment widgets when appointment data changes
+            Utils.updateAppointmentWidgets();
           }
         });
       } catch (e) {}

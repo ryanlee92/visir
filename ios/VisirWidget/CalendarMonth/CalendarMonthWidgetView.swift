@@ -171,19 +171,21 @@ struct CalendarMonthWidgetView: View {
                     .padding(.bottom, 4)
 
                     // Calendar grid
-                    let cellWidth = geometry.size.width / 7
-                    let cellHeight = (geometry.size.height - Self.topPadding - 8 - 4 - 16 - 8) / 6
-                    
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 0) {
-                        ForEach(monthDays, id: \.self) { date in
-                            CalendarDayCell(
-                                date: date,
-                                appointments: appointmentsForDate(date),
-                                isToday: isToday(date),
-                                isCurrentMonth: isCurrentMonth(date),
-                                cellWidth: cellWidth,
-                                cellHeight: cellHeight
-                            )
+                    GeometryReader { gridGeometry in
+                        let cellWidth = gridGeometry.size.width / 7
+                        let cellHeight = gridGeometry.size.height / 6
+                        
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 0) {
+                            ForEach(monthDays, id: \.self) { date in
+                                CalendarDayCell(
+                                    date: date,
+                                    appointments: appointmentsForDate(date),
+                                    isToday: isToday(date),
+                                    isCurrentMonth: isCurrentMonth(date),
+                                    cellWidth: cellWidth,
+                                    cellHeight: cellHeight
+                                )
+                            }
                         }
                     }
                     .overlay(
@@ -211,6 +213,7 @@ struct CalendarMonthWidgetView: View {
                         }
                     )
                 }
+                .padding(.bottom, 2)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
