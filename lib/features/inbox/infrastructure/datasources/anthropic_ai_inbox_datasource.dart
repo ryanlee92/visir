@@ -607,6 +607,7 @@ Return only the HTML-formatted email body. Do not include any additional explana
     required String userMessage,
     required List<Map<String, dynamic>> conversationHistory,
     String? projectContext,
+    List<Map<String, dynamic>>? projects,
     String? taggedContext,
     String? channelContext,
     String? inboxContext,
@@ -883,6 +884,25 @@ Use these tags when:
 - Use the appropriate tag for each entity type
 - You can combine these tags with regular HTML/text in your response
 - These tags work in both HTML and Markdown responses''';
+
+      // Add Available Projects section if projects are provided
+      if (projects != null && projects.isNotEmpty) {
+        systemMessage += '\n\n## Available Projects';
+        systemMessage += '\nYou MUST select a project_id from this list when creating tasks. Match the user\'s request to one of these projects by name (case-insensitive, partial matching is OK).';
+        systemMessage += '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
+        systemMessage += '\n\nCRITICAL PROJECT SELECTION RULES:';
+        systemMessage += '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
+        systemMessage += '\n2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:';
+        systemMessage += '\n   - Search through the Available Projects list above';
+        systemMessage += '\n   - Find the project whose name best matches the user\'s request (case-insensitive, partial match is OK)';
+        systemMessage += '\n   - Return the EXACT project_id from the matching project';
+        systemMessage += '\n3. If the user doesn\'t mention a project name or no match is found:';
+        systemMessage += '\n   - If there is a previous task entity, use its project_id';
+        systemMessage += '\n   - If there is a suggested task with a project_id, use that project_id';
+        systemMessage += '\n   - Otherwise, select the first project from the Available Projects list (or the default project if one is marked as default)';
+        systemMessage += '\n   - **NEVER return null for project_id**';
+        systemMessage += '\n4. The project_id MUST be one of the IDs listed in the Available Projects section above. It MUST NOT be null.';
+      }
 
       if (projectContext != null && projectContext.isNotEmpty) {
         systemMessage += '\n\n## Project Context\n$projectContext';

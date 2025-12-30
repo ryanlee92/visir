@@ -347,6 +347,10 @@ class AgentActionController extends _$AgentActionController {
       // Project context 가져오기
       final projectContext = await _buildProjectContext(selectedProject);
 
+      // Projects 리스트 가져오기 (Available Projects 리스트 제공용)
+      final projects = ref.read(projectListControllerProvider);
+      final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
+
       // 태그된 항목들을 컨텍스트로 제공
       final taggedContext = _buildTaggedContext(taggedTasks: taggedTasks, taggedEvents: taggedEvents, taggedConnections: taggedConnections);
 
@@ -448,6 +452,7 @@ class AgentActionController extends _$AgentActionController {
         userMessage: actualUserMessage,
         conversationHistory: messages.map((m) => m.toJson(local: true)).toList(),
         projectContext: projectContext,
+        projects: projectsList,
         taggedContext: taggedContext.isNotEmpty ? taggedContext : null,
         channelContext: channelContext,
         inboxContext: inboxContext,
@@ -2125,11 +2130,16 @@ class AgentActionController extends _$AgentActionController {
         }
       }
 
+      // Projects 리스트 가져오기 (Available Projects 리스트 제공용)
+      final projects = ref.read(projectListControllerProvider);
+      final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
+
       try {
         final functionResponse = await _repository.generateGeneralChat(
           userMessage: functionResultsPrompt,
           conversationHistory: functionResultsMessages.map((m) => m.toJson(local: true)).toList(),
           projectContext: null,
+          projects: projectsList,
           taggedContext: null,
           channelContext: null,
           inboxContext: null,
