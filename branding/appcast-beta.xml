@@ -21,8 +21,8 @@
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
 			<pubDate>Tue, 30 Dec 2025 14:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.exe"
-                sparkle:dsaSignature="MDwCHCWOv3NrbWDowGJ+5lY2Qdly+LB/WxLpqjdAsHICHDF1cjdY0Bo92ZhDy5VRmCd/27PdytN5X7NAW4I=" length="0"
-				sparkle:version="2.0.0+1009"
+                sparkle:dsaSignature="MDwCHBhJxg11h9oAJioZKMIFN8kT+6nslE6olJSY+GsCHBXpxvN60hghCgtHa2qHiVymEaZAhdx3Qaypr40=" length="0"
+				sparkle:version="2.0.0+1010"
 				sparkle:os="windows"
 				type="application/octet-stream" />
 		</item>
