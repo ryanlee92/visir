@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/common/infrastructure/entities/environment.dart';
 import 'package:Visir/flavors.dart';
@@ -827,21 +826,8 @@ class AgentActionController extends _$AgentActionController {
 
           state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
 
-          // 첫 메시지인 경우 (user + assistant만 있는 경우) 제목 생성
-          if (state.conversationSummary == null && updatedMessagesWithResponse.length == 2) {
-            if (state.actionType != null) {
-              // actionType이 있으면 buildActionButtonText의 텍스트를 저장
-              await _generateTitleFromActionType();
-            } else {
-              // actionType이 없으면 AI를 통해 제목 생성
-              await _generateConversationTitle(userMessage, resultMessage, apiKey: apiKey);
-            }
-            // 제목 생성 후 다시 히스토리 저장 (제목이 포함되도록)
-            await _saveChatHistory(taggedProjects: taggedProjects);
-          } else {
-            // 히스토리 저장
-            _saveChatHistory(taggedProjects: taggedProjects);
-          }
+          // 히스토리 저장
+          _saveChatHistory(taggedProjects: taggedProjects);
         } else {
           // 일반 응답
           // AI 응답에서 need_more_action 태그 제거 (사용자에게는 표시하지 않음)
@@ -917,15 +903,8 @@ class AgentActionController extends _$AgentActionController {
 
           state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
 
-          // 첫 메시지이고 actionType이 있으면 제목 생성
-          if (state.conversationSummary == null && updatedMessagesWithResponse.length == 2 && state.actionType != null) {
-            await _generateTitleFromActionType();
-            // 제목 생성 후 다시 히스토리 저장 (제목이 포함되도록)
-            await _saveChatHistory(taggedProjects: taggedProjects);
-          } else {
-            // 히스토리 저장 (제목은 이미 응답에서 추출되었거나 actionType에서 생성됨)
-            _saveChatHistory(taggedProjects: taggedProjects);
-          }
+          // 히스토리 저장
+          _saveChatHistory(taggedProjects: taggedProjects);
         }
       } else {
         state = state.copyWith(messages: messages, isLoading: false);
@@ -2347,187 +2326,6 @@ class AgentActionController extends _$AgentActionController {
       conversationSummary: history.conversationSummary,
       isLoading: false,
     );
-  }
-
-  /// actionType에서 제목을 생성합니다 (buildActionButtonText의 로직과 동일).
-  Future<void> _generateTitleFromActionType() async {
-    if (state.actionType == null) {
-      return;
-    }
-
-    try {
-      // buildActionButtonText의 로직과 동일하게 텍스트 생성
-      // displayText = conversationSummary ?? actionType.getTitle(context)
-      String displayText;
-      switch (state.actionType!) {
-        case AgentActionType.createTask:
-          displayText = Utils.mainContext.tr.create_task;
-          break;
-        case AgentActionType.createEvent:
-          displayText = Utils.mainContext.tr.command_create_event('').replaceAll(' {title}', '');
-          break;
-        case AgentActionType.reply:
-          displayText = Utils.mainContext.tr.mail_reply;
-          break;
-        case AgentActionType.forward:
-          displayText = Utils.mainContext.tr.mail_forward;
-          break;
-        case AgentActionType.send:
-          displayText = Utils.mainContext.tr.mail_send;
-          break;
-        default:
-          displayText = state.actionType!.name;
-          break;
-      }
-
-      String? itemName;
-
-      switch (state.actionType!) {
-        case AgentActionType.createTask:
-        case AgentActionType.createEvent:
-          if (state.inbox != null) {
-            final suggestion = state.inbox!.suggestion;
-            final summary = suggestion?.summary ?? '';
-            itemName = summary.isNotEmpty ? summary : null;
-          }
-          break;
-        case AgentActionType.reply:
-          if (state.inbox != null) {
-            final suggestion = state.inbox!.suggestion;
-            final summary = suggestion?.summary ?? state.inbox!.title;
-            final senderName = suggestion?.sender_name;
-            if (summary.isNotEmpty) {
-              if (senderName != null && senderName.isNotEmpty) {
-                itemName = '$summary ($senderName)';
-              } else {
-                itemName = summary;
-              }
-            } else if (senderName != null && senderName.isNotEmpty) {
-              itemName = senderName;
-            }
-          }
-          break;
-        default:
-          break;
-      }
-
-      String finalTitle;
-      if (itemName != null && itemName.isNotEmpty) {
-        finalTitle = '$displayText · $itemName';
-      } else {
-        finalTitle = displayText;
-      }
-
-      // 50자로 제한
-      if (finalTitle.length > 50) {
-        finalTitle = '${finalTitle.substring(0, 47)}...';
-      }
-
-      state = state.copyWith(conversationSummary: finalTitle);
-    } catch (e) {
-      // 제목 생성 실패는 무시
-    }
-  }
-
-  /// 대화 제목을 생성합니다 (첫 메시지인 경우).
-  Future<void> _generateConversationTitle(String userMessage, String assistantMessage, {String? apiKey}) async {
-    try {
-      // 전달받은 API 키 사용 (AI 메시지 보낼 때 사용한 것과 동일)
-      String? finalApiKey = apiKey;
-
-      if (finalApiKey == null || finalApiKey.isEmpty) {
-        // API 키가 없어도 사용자 메시지 기반으로 제목 생성
-        String fallbackTitle = userMessage.trim();
-        fallbackTitle = fallbackTitle.replaceAll(RegExp(r'<[^>]*>'), '');
-        fallbackTitle = fallbackTitle.replaceAll(RegExp(r'@\w+'), '');
-        fallbackTitle = fallbackTitle.replaceAll(RegExp(r'\s+'), ' ').trim();
-        if (fallbackTitle.length > 50) {
-          fallbackTitle = '${fallbackTitle.substring(0, 47)}...';
-        }
-        if (fallbackTitle.isNotEmpty) {
-          state = state.copyWith(conversationSummary: fallbackTitle);
-        }
-        return;
-      }
-
-      // 사용자 메시지에서 태그 제거
-      String cleanUserMessage = userMessage.trim();
-      cleanUserMessage = cleanUserMessage.replaceAll(RegExp(r'<[^>]*>'), '');
-      cleanUserMessage = cleanUserMessage.replaceAll(RegExp(r'@\w+'), '');
-      cleanUserMessage = cleanUserMessage.replaceAll(RegExp(r'\s+'), ' ').trim();
-
-      // AI 응답에서 태그 제거
-      String cleanAssistantMessage = assistantMessage.trim();
-      cleanAssistantMessage = cleanAssistantMessage.replaceAll(RegExp(r'<[^>]*>'), '');
-      cleanAssistantMessage = cleanAssistantMessage.replaceAll(RegExp(r'\s+'), ' ').trim();
-
-      // AI에게 제목 생성 요청
-      final prompt =
-          '''다음 대화의 제목을 30자 이내로 간단하게 생성해주세요.
-
-사용자: $cleanUserMessage
-AI: $cleanAssistantMessage
-
-제목은 대화의 핵심 내용을 담아야 하며, 간결하고 명확해야 합니다.
-제목만 반환하고 다른 설명은 포함하지 마세요.''';
-
-      final response = await http.post(
-        Uri.parse('https://api.openai.com/v1/chat/completions'),
-        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $finalApiKey'},
-        body: jsonEncode({
-          'model': 'gpt-4o-mini', // 제목 생성은 간단한 모델 사용
-          'messages': [
-            {'role': 'user', 'content': prompt},
-          ],
-          'temperature': 0.3,
-          'max_tokens': 50,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(utf8.decode(response.bodyBytes));
-        final title = decoded['choices']?[0]?['message']?['content'] as String?;
-
-        if (title != null && title.trim().isNotEmpty) {
-          String finalTitle = title.trim();
-          // 50자로 제한
-          if (finalTitle.length > 50) {
-            finalTitle = '${finalTitle.substring(0, 47)}...';
-          }
-          state = state.copyWith(conversationSummary: finalTitle);
-        } else {
-          // AI 응답이 없으면 사용자 메시지 기반으로 간단한 제목 생성
-          String fallbackTitle = cleanUserMessage;
-          if (fallbackTitle.length > 50) {
-            fallbackTitle = '${fallbackTitle.substring(0, 47)}...';
-          }
-          state = state.copyWith(conversationSummary: fallbackTitle);
-        }
-      } else {
-        // API 호출 실패 시 사용자 메시지 기반으로 간단한 제목 생성
-        String fallbackTitle = cleanUserMessage;
-        if (fallbackTitle.length > 50) {
-          fallbackTitle = '${fallbackTitle.substring(0, 47)}...';
-        }
-        state = state.copyWith(conversationSummary: fallbackTitle);
-      }
-    } catch (e) {
-      // 제목 생성 실패 시 사용자 메시지 기반으로 간단한 제목 생성
-      try {
-        String fallbackTitle = userMessage.trim();
-        fallbackTitle = fallbackTitle.replaceAll(RegExp(r'<[^>]*>'), '');
-        fallbackTitle = fallbackTitle.replaceAll(RegExp(r'@\w+'), '');
-        fallbackTitle = fallbackTitle.replaceAll(RegExp(r'\s+'), ' ').trim();
-        if (fallbackTitle.length > 50) {
-          fallbackTitle = '${fallbackTitle.substring(0, 47)}...';
-        }
-        if (fallbackTitle.isNotEmpty) {
-          state = state.copyWith(conversationSummary: fallbackTitle);
-        }
-      } catch (e2) {
-        // 최종 실패는 무시
-      }
-    }
   }
 
   /// 챗 히스토리를 저장합니다 (로컬 + Supabase).
