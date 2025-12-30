@@ -7132,6 +7132,12 @@ abstract class AppLocalizations {
   /// **'Purchase Credits'**
   String get ai_credits_purchase_now;
 
+  /// No description provided for @ai_credits_purchase_on_desktop.
+  ///
+  /// In en, this message translates to:
+  /// **'You can purchase credits on the desktop version'**
+  String get ai_credits_purchase_on_desktop;
+
   /// No description provided for @agent_action_task_proposal_message.
   ///
   /// In en, this message translates to:

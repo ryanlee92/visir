@@ -1557,6 +1557,7 @@
     }
   },
   "ai_credits_purchase_now": "Purchase Credits",
+  "ai_credits_purchase_on_desktop": "You can purchase credits on the desktop version",
   "agent_action_task_proposal_message": "I can create a task with the following details:\n\n**Title**: {title}\n{description}**Project**: {project}\n{startTime}\n\nPlease confirm if you'd like me to create this task, or let me know if you'd like to make any changes.",
   "@agent_action_task_proposal_message": {
     "placeholders": {

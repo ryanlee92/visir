@@ -3949,6 +3949,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ai_credits_purchase_now => 'Purchase Credits';
 
   @override
+  String get ai_credits_purchase_on_desktop =>
+      'You can purchase credits on the desktop version';
+
+  @override
   String agent_action_task_proposal_message(
     String title,
     String description,

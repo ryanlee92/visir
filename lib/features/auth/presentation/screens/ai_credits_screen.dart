@@ -3,6 +3,7 @@ import 'package:Visir/dependency/toasty_box/model/toast_model.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/auth/domain/entities/ai_api_usage_log_entity.dart';
 import 'package:Visir/features/auth/infrastructure/datasources/supabase_ai_usage_log_datasource.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
@@ -220,6 +221,25 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
   }
 
   Widget _buildPurchaseTab(BuildContext context) {
+    // 모바일일 경우 데스크탑에서 결제할 수 있다는 안내 문구 표시
+    if (PlatformX.isMobile) {
+      return VisirListItem(
+        detailsBuilder: (height, baseStyle, verticalSpacing, horizontalSpacing) => Text.rich(
+          TextSpan(
+            children: [
+              WidgetSpan(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 6.0),
+                  child: VisirIcon(type: VisirIconType.caution, size: height - 2, isSelected: true, color: context.error),
+                ),
+              ),
+              TextSpan(text: context.tr.ai_credits_purchase_on_desktop, style: baseStyle?.textColor(context.onSurfaceVariant)),
+            ],
+          ),
+        ),
+      );
+    }
+
     final creditPackages = [
       {'amount': 5.0, 'tokens': AiPricingCalculator.calculateTokensFromPackage(amount: 5.0)},
       {'amount': 10.0, 'tokens': AiPricingCalculator.calculateTokensFromPackage(amount: 10.0)},
