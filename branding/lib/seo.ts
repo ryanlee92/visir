@@ -132,6 +132,20 @@ export const pageSEO: Record<string, SEOData> = {
     keywords: 'Visir integrations, Gmail integration, Slack integration, calendar integration',
     ogType: 'website',
   },
+  '/integration': {
+    title: 'Integration - Visir',
+    description: 'Connecting your account...',
+    keywords: 'Visir integration',
+    ogType: 'website',
+    noindex: true,
+  },
+  '/integration/failed': {
+    title: 'Integration Failed - Visir',
+    description: 'Failed to connect your account.',
+    keywords: 'Visir integration',
+    ogType: 'website',
+    noindex: true,
+  },
 };
 
 // Get SEO data for a specific route

@@ -28,6 +28,8 @@ import { initAnalytics } from './lib/init-analytics';
   const PrivacyPage = () => import('./pages/PrivacyPage.svelte');
   const TermsOfServicePage = () => import('./pages/TermsOfServicePage.svelte');
   const IntegrationsPage = () => import('./pages/IntegrationsPage.svelte');
+  const IntegrationPage = () => import('./pages/IntegrationPage.svelte');
+  const IntegrationFailedPage = () => import('./pages/IntegrationFailedPage.svelte');
 
   // Route definitions
   const routes: Record<string, any> = {
@@ -50,6 +52,8 @@ import { initAnalytics } from './lib/init-analytics';
     '/privacy': PrivacyPage,
     '/terms': TermsOfServicePage,
     '/integrations': IntegrationsPage,
+    '/integration': IntegrationPage,
+    '/integration/failed': IntegrationFailedPage,
   };
 
   // Match route with params
@@ -107,7 +111,8 @@ import { initAnalytics } from './lib/init-analytics';
     const lazyComponents = [PricingPage, DownloadPage, BlogPage, BlogPostPage, LoginPage, SignupPage, 
                            ForFounders, ForDevelopers, ForManagers, ForPersonalUse, 
                            CommunityPage, HelpCenterPage, ChangelogPage, RoadmapPage, 
-                           FeatureRequestsPage, PrivacyPage, TermsOfServicePage, IntegrationsPage];
+                           FeatureRequestsPage, PrivacyPage, TermsOfServicePage, IntegrationsPage,
+                           IntegrationPage, IntegrationFailedPage];
     
     return lazyComponents.includes(component) || isDynamicImport;
   }
