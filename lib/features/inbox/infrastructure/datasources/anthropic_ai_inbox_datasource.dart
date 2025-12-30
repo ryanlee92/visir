@@ -750,7 +750,7 @@ When calling `createTask` or `updateTask`, you MUST use the following field name
 **Task Entity Fields**:
 - `title` (string, required): Task title
 - `description` (string, optional): Task description
-- `projectId` (string, optional): Project ID
+- `projectId` (string, **REQUIRED**): Project ID - **MUST ALWAYS be included, cannot be null or omitted**. If no project is specified, use the first available project ID or the default project ID.
 - `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00")
 - `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00")
 - `isAllDay` (boolean, optional, default: false): Whether the task is all-day
@@ -758,6 +758,8 @@ When calling `createTask` or `updateTask`, you MUST use the following field name
 - `from` (string, optional): Source of the task (e.g., "GitHub", "Email")
 - `subject` (string, optional): Original subject or title
 - `actionNeeded` (string, optional): Action needed description
+
+**CRITICAL: projectId is REQUIRED** - You MUST always include a projectId in your function call arguments. It cannot be null, omitted, or empty. If you cannot determine which project to use, select the first available project ID from the context or use a default project ID.
 
 **Example createTask call**:
 ```json

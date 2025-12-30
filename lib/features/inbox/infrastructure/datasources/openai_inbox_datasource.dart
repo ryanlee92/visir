@@ -238,11 +238,12 @@ Rules
 	•	Generate a concise, action-oriented title (e.g., "Review Q3 Report", "Meeting with John").
 	•	Avoid generic titles like "Forwarded message" or "Re: Hello".
 	11.	Project id:
+	•	**MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response. project_id cannot be null.
 	•	Select the most relevant project ID from the list below based on the item content and project name/description.
 	•	Consider the project hierarchy (parent_id) to understand the context.
-	•	If the item does not clearly belong to any project, set project_id to null.
+	•	If the item does not clearly belong to any project, select the first project from the Available Projects list.
 	•	Available Projects: ${jsonEncode(projects.map((e) => {'id': e.uniqueId, 'name': e.name, 'description': e.description, 'parent_id': e.parentId}).toList())}
-	•	If the item does not clearly belong to any project, set project_id to null.
+	•	**CRITICAL: project_id is REQUIRED and MUST always be included. It cannot be null. If you cannot determine which project to use, select the first project from the Available Projects list.**
 
 Style requirements
 	•	Return valid JSON only.
@@ -1561,18 +1562,26 @@ You MUST select a project_id from this list. Match the user's request to one of 
 ${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}
 
 CRITICAL PROJECT SELECTION RULES:
-1. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:
+1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response. project_id cannot be null.
+
+2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:
    - Search through the Available Projects list above
    - Find the project whose name best matches the user's request (case-insensitive, partial match is OK)
    - Return the EXACT project_id from the matching project
-   - If no match is found, return null for project_id
 
-2. Examples of matching:
+3. If the user doesn't mention a project name or no match is found:
+   - If there is a previous task entity, use its project_id
+   - If there is a suggested task with a project_id, use that project_id
+   - Otherwise, select the first project from the Available Projects list (or the default project if one is marked as default)
+   - **NEVER return null for project_id**
+
+4. Examples of matching:
    - User says "networking project" → Find project with name containing "networking" → Return its project_id
    - User says "marketing" → Find project with name containing "marketing" → Return its project_id
    - User says "change project to [project name]" → Find matching project → Return its project_id
+   - User doesn't mention a project → Use previous task's project_id, or suggested task's project_id, or first available project_id
 
-3. The project_id MUST be one of the IDs listed in the Available Projects section above, or null if no match is found.
+5. The project_id MUST be one of the IDs listed in the Available Projects section above. It MUST NOT be null.
 
 ## Conversation History
 $conversationText
@@ -1601,12 +1610,12 @@ ${previousTaskEntity != null ? '''- IMPORTANT: A previous task entity is provide
   4. LAST: Use default dates (today/tomorrow) only if no actionable dates are found in the inbox item or user request
 - CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "기준", "based on"). If the inbox item contains an actionable date/time (e.g., "Due date: 2024-01-20", "Meeting on January 15th at 3pm", "Deadline: tomorrow"), you MUST extract and use that date/time from the inbox item's content. Do NOT ignore actionable dates mentioned in the inbox item.
 - CRITICAL: If the user requests a date/time change (e.g., "tomorrow", "내일", "change date to X", "make it tomorrow", "I want to create task at tomorrow"), you MUST extract the new date and include it in start_at (LOCAL timezone format: YYYY-MM-DDTHH:mm:ss without Z suffix). Do NOT leave start_at as null or empty. Do NOT use the previous task's date.
-- CRITICAL PROJECT SELECTION: If the user mentions a project name or requests a project change (e.g., "change project to X", "I want to change project to networking project", "set project to Y", "networking project"), you MUST:
+- CRITICAL PROJECT SELECTION: You MUST always include a project_id in your response. project_id cannot be null. If the user mentions a project name or requests a project change (e.g., "change project to X", "I want to change project to networking project", "set project to Y", "networking project"), you MUST:
   1. Look at the Available Projects section above
   2. Find the project whose name best matches the user's request (case-insensitive, partial matching is OK)
   3. Return the EXACT project_id from that project in your response
   4. If the user doesn't mention a project and you're modifying an existing task, keep the previous task's project_id unchanged
-  5. If no matching project is found, return null for project_id
+  5. If no matching project is found, use the previous task's project_id, or the suggested task's project_id, or the first available project_id. NEVER return null for project_id
 - CRITICAL DATE CALCULATION: 
   * TODAY's date is ${todayStr} (see Current Date Information above)
   * TOMORROW's date is ${tomorrowStr} (see Current Date Information above)
@@ -1627,7 +1636,7 @@ ${previousTaskEntity != null ? '''- IMPORTANT: A previous task entity is provide
     * Keep the same time as the previous task, or use 00:00:00 if the previous task was all-day
     * Calculate end_at based on the previous task's duration
   - If user says "as is" or "create as is", use the previous task entity exactly as is (all fields unchanged) - in this case, you can omit start_at from the response or set it to the previous task's start_at.''' : '''- Generate a task title and description based on the inbox item and user request.
-- CRITICAL PROJECT SELECTION: Look at the Available Projects section above. If the user mentions a project name, find the matching project from the list and return its EXACT project_id. Match project names case-insensitively with partial matching. If no project is mentioned or no match is found, use null for project_id.
+- CRITICAL PROJECT SELECTION: Look at the Available Projects section above. You MUST always include a project_id in your response. If the user mentions a project name, find the matching project from the list and return its EXACT project_id. Match project names case-insensitively with partial matching. If no project is mentioned or no match is found, use the previous task's project_id, or the suggested task's project_id, or the first available project_id. NEVER use null for project_id.
 - CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
   1. FIRST: Check the Inbox Item Information (Description section above) for **actionable dates/times** that should be used for the task/event:
      - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20")
@@ -1695,12 +1704,14 @@ Return a JSON object with the following structure:
 {
   "title": "Task title",
   "description": "Task description (can be null)",
-  "project_id": "project-id-or-null",
+  "project_id": "project-id (REQUIRED - must always be included, cannot be null)",
   "start_at": "2024-01-01T10:00:00 or null",
   "rrule": "FREQ=WEEKLY;BYDAY=MO or null",
   "isConfirmed": true or false,
   "message": "<HTML formatted message>"
 }
+
+CRITICAL: The project_id field is REQUIRED and MUST always be included. It cannot be null. If you cannot determine which project to use, select the first project from the Available Projects list, or use the previous task's project_id if modifying an existing task.
 
 IMPORTANT: The start_at field must be in LOCAL timezone format (YYYY-MM-DDTHH:mm:ss) WITHOUT the Z suffix. Do NOT convert to UTC. Use the same timezone as the previous task entity or the user's local timezone.
 For example: "2024-01-01T10:00:00" (local time) NOT "2024-01-01T10:00:00Z" (UTC).
@@ -1728,7 +1739,8 @@ Return only the JSON object, no additional text or explanations.
                 "type": ["string", "null"],
               },
               "project_id": {
-                "type": ["string", "null"],
+                "type": "string",
+                "description": "REQUIRED - must always be included, cannot be null",
               },
               "start_at": {
                 "type": ["string", "null"],
@@ -1744,7 +1756,7 @@ Return only the JSON object, no additional text or explanations.
               },
               "message": {"type": "string"},
             },
-            "required": ["title", "description", "project_id", "start_at", "rrule", "isConfirmed", "action_type_change", "message"],
+            "required": ["title", "project_id", "isConfirmed", "message"],
             "additionalProperties": false,
           },
           "strict": true,
@@ -1839,7 +1851,8 @@ ${projects.map((p) => '- ${p['name']} (id: ${p['id']})${p['description'] != null
 
 ## Requirements
 - Generate a task title and description based on the inbox item.
-- Select the most appropriate project ID from the available projects list, or use null if no project matches.
+- **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response. project_id cannot be null.
+- Select the most appropriate project ID from the available projects list. If no project clearly matches, select the first project from the list.
 - Keep the task title concise and action-oriented.
 - The description should include relevant details from the inbox item.
 
@@ -1848,8 +1861,10 @@ Return a JSON object with the following structure:
 {
   "title": "Task title",
   "description": "Task description (can be null)",
-  "project_id": "project-id-or-null"
+  "project_id": "project-id (REQUIRED - must always be included, cannot be null)"
 }
+
+CRITICAL: The project_id field is REQUIRED and MUST always be included. It cannot be null. If you cannot determine which project to use, select the first project from the Available Projects list.
 
 Return only the JSON object, no additional text or explanations.
 ''';
@@ -1874,10 +1889,11 @@ Return only the JSON object, no additional text or explanations.
                 "type": ["string", "null"],
               },
               "project_id": {
-                "type": ["string", "null"],
+                "type": "string",
+                "description": "REQUIRED - must always be included, cannot be null",
               },
             },
-            "required": ["title"],
+            "required": ["title", "project_id"],
             "additionalProperties": false,
           },
           "strict": true,
