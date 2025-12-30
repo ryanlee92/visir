@@ -313,7 +313,7 @@ class InboxEntity {
     List<InboxProvider> providers = [];
     final localPref = Utils.ref.read(localPrefControllerProvider).value;
     if (localPref == null) return providers; // localPref가 null이면 빈 리스트 반환
-    
+
     if (linkedMail != null) {
       final oauth = localPref.mailOAuths?.firstWhereOrNull((e) => e.email == linkedMail!.hostMail);
       providers.add(InboxProvider(icon: linkedMail!.type.icon, name: linkedMail!.fromName, datetime: linkedMail!.date, avatarUrl: oauth?.notificationUrl));
@@ -383,17 +383,15 @@ class InboxEntity {
       }
       return false;
     }
-    
+
     if (isEncryptedData(title)) {
       try {
         String decrypted = Utils.decryptAESCryptoJS(title, aesKey);
-        
+
         // 복호화된 결과가 여전히 암호화된 형식인지 확인 (중첩 암호화 처리)
         // base64 디코딩을 시도하지 않고, 길이와 시작 문자열만 확인
-        bool isStillEncrypted = decrypted.length >= 16 && 
-            decrypted.startsWith('U2FsdGVkX1') && 
-            (decrypted.length % 4 == 0 || decrypted.length % 4 == 1); // base64 길이 패턴
-        
+        bool isStillEncrypted = decrypted.length >= 16 && decrypted.startsWith('U2FsdGVkX1') && (decrypted.length % 4 == 0 || decrypted.length % 4 == 1); // base64 길이 패턴
+
         if (isStillEncrypted) {
           try {
             // 실제로 base64 디코딩이 가능한지 확인
@@ -405,7 +403,7 @@ class InboxEntity {
             // base64 디코딩 실패 = 평문이므로 첫 번째 복호화 결과 반환
           }
         }
-        
+
         return decrypted;
       } catch (e) {
         return title; // 복호화 실패 시 원본 반환
@@ -423,6 +421,8 @@ class InboxEntity {
 
   String get messageChannelId => linkedMessage?.channelId ?? '';
 
+  bool get isRead => config?.isRead ?? false;
+
   bool getIsUnread(List<MessageChannelEntity> channels) {
     if (config?.isRead != null) return !config!.isRead!;
     if (linkedMail != null) {
@@ -438,11 +438,9 @@ class InboxEntity {
   }
 
   static String Function(MailEntity mail) getInboxIdFromMail = (MailEntity mail) => 'mail_${mail.type.name}_${mail.hostEmail}_${mail.id}';
-  static String Function(LinkedMailEntity mail) getInboxIdFromLinkedMail = (LinkedMailEntity mail) =>
-      'mail_${mail.type.name}_${mail.hostMail}_${mail.messageId}';
+  static String Function(LinkedMailEntity mail) getInboxIdFromLinkedMail = (LinkedMailEntity mail) => 'mail_${mail.type.name}_${mail.hostMail}_${mail.messageId}';
   static String Function(MessageEntity chat) getInboxIdFromChat = (MessageEntity chat) => 'message_${chat.type.name}_${chat.teamId}_${chat.id}';
-  static String Function(LinkedMessageEntity chat) getInboxIdFromLinkedChat = (LinkedMessageEntity chat) =>
-      'message_${chat.type.name}_${chat.teamId}_${chat.messageId}';
+  static String Function(LinkedMessageEntity chat) getInboxIdFromLinkedChat = (LinkedMessageEntity chat) => 'message_${chat.type.name}_${chat.teamId}_${chat.messageId}';
 }
 
 class InboxProvider {

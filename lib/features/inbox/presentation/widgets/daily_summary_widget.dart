@@ -1,5 +1,6 @@
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/dependency/contextmenu/src/ContextMenuArea.dart';
+import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/calendar/presentation/widgets/calendar_simple_create_widget.dart';
@@ -9,6 +10,9 @@ import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
+import 'package:Visir/features/inbox/application/inbox_controller.dart';
+import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
 import 'package:Visir/l10n/app_localizations.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
@@ -39,6 +43,7 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class DailySummaryWidget extends ConsumerWidget {
   final List<EventEntity> events;
@@ -777,6 +782,26 @@ class DailySummaryWidget extends ConsumerWidget {
                     hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
                     forceShiftOffset: Offset(0, -36),
                     beforePopup: () {
+                      if (item.inbox?.isRead != true) {
+                        final userId = Utils.ref.read(authControllerProvider).value?.id;
+                        if (userId == null) return;
+                        ref
+                            .read(inboxConfigListControllerProvider.notifier)
+                            .updateInboxConfig(
+                              configs: [
+                                (item.inbox?.config?.copyWith(isRead: true) ??
+                                    InboxConfigEntity(
+                                      id: item.inbox!.uniqueId,
+                                      userId: userId,
+                                      dateTime: DateTime.now(),
+                                      updatedAt: DateTime.now(),
+                                      isRead: true,
+                                      inboxUniqueId: item.inbox!.uniqueId,
+                                    )),
+                              ],
+                            );
+                      }
+
                       if (item.inbox!.linkedMessage != null) {
                         final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
                         final channel = channels.firstWhereOrNull((e) => e.id == item.inbox!.linkedMessage!.channelId);

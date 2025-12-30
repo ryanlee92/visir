@@ -3,6 +3,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/platform_ext
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
+import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
@@ -361,42 +362,19 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
   List<McpActionSuggestion> _generateSuggestions(BuildContext context, WidgetRef ref) {
     final suggestions = <McpActionSuggestion>[];
     final linkedTasksData = ref.watch(inboxLinkedTaskControllerProvider);
+    final linkedConfigData = ref.watch(inboxConfigListControllerProvider);
 
     // Inbox 기반 액션 추천
-    for (final inbox in inboxes.take(5)) {
+    for (final inbox in inboxes) {
       final suggestion = inbox.suggestion;
       if (suggestion == null) continue;
+      if (linkedTasksData?.linkedTasks.any((t) => t.inboxId == inbox.id) == true) continue;
+      if (linkedConfigData?.configs.firstWhereOrNull((c) => c.inboxUniqueId == inbox.uniqueId)?.isRead == true) continue;
 
       // MCP 함수 추천
       final recommendedFunctions = _getRecommendedMcpFunctions(suggestion, inbox);
 
       for (final functionName in recommendedFunctions) {
-        // createTask나 createEvent인 경우 이미 생성된 task/event가 있는지 확인
-        if (functionName == 'createTask' || functionName == 'createEvent') {
-          // inbox.linkedTask에서 확인
-          final linkedTasks = inbox.linkedTask?.tasks ?? [];
-
-          // inboxLinkedTaskController에서 확인
-          final linkedTaskEntity = linkedTasksData?.linkedTasks.firstWhereOrNull((lt) => lt.inboxId == inbox.id);
-          final linkedTasksFromController = linkedTaskEntity?.tasks ?? [];
-
-          // 모든 linked tasks 합치기
-          final allLinkedTasks = [...linkedTasks, ...linkedTasksFromController];
-
-          // if (functionName == 'createTask') {
-          //   // createTask인 경우: 일반 task가 있으면 제외 (event task는 제외)
-          //   final hasRegularTask = allLinkedTasks.any((task) => !task.isEvent);
-          //   if (hasRegularTask) {
-          //     continue;
-          //   }
-          // } else if (functionName == 'createEvent') {
-          //   // createEvent인 경우: event task가 있으면 제외
-          //   final hasEventTask = allLinkedTasks.any((task) => task.isEvent);
-          //   if (hasEventTask) {
-          //     continue;
-          //   }
-          // }
-        }
         final summary = suggestion.summary ?? '';
         String? itemName;
 
