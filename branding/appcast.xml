@@ -19,10 +19,10 @@
 		<item>
 			<title>Version 2.0.0</title>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Mon, 29 Dec 2025 20:00:00 +0900</pubDate>
+			<pubDate>Tue, 30 Dec 2025 14:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-setup.exe"
-                sparkle:dsaSignature="MDwCHDmBfY2YGXNYz2B30V9daoweV4PkFUf04B8fGEQCHBg1q96cW+6AN65FIjU0UbBVL6VQN1cJ/K8tYN4=" length="0"
-				sparkle:version="2.0.0+1001"
+                sparkle:dsaSignature="MDwCHD3n/p2wZRfWsYEvG9AN/eWR06l6ANReX7tHlowCHG6M2ujE+zlXDXxU1ex56FbtEkaelpbjnhXb26U=" length="0"
+				sparkle:version="2.0.0+1010"
 				sparkle:os="windows"
 				type="application/octet-stream" />
 		</item>
