@@ -71,7 +71,6 @@ const isDesktopData = (data: sendFcmData) => {
 }
 
 const sendFcmWithData = async (data: sendFcmData[]) => {
-	console.log('#########', data);
 	const desktopData = data.filter((e) => isDesktopData(e));
 	const apnsData = data.filter((e) => e.apnsToken && !isDesktopData(e) && false);
 	const notApnsData = data.filter((e) => !isDesktopData(e));
@@ -146,9 +145,8 @@ const sendApns = async (data: sendFcmData[]) => {
 	notifications.forEach(async (n) => {
 		try {
 			await prodClient.send(n);
-			console.log('###### success apns prod', n);
 		} catch (err: any) {
-			console.log('###### failed apns prod', err);
+			// Error handled silently
 		}
 	});
 };
@@ -182,15 +180,14 @@ const sendDevApns = async (data: sendFcmData[]) => {
 	notifications.forEach(async (n) => {
 		try {
 			await devClient.send(n);
-			console.log('###### success apns dev', n);
 		} catch (err: any) {
-			console.log('###### failed apns dev', err);
+			// Error handled silently
 		}
 	});
 };
 
 const sendFcm = async (data: sendFcmData[]) => {
-	const result = await admin.messaging().sendEach(
+	await admin.messaging().sendEach(
 		data.map((d) => {
 			if (d.notification) {
 				return {
@@ -255,10 +252,6 @@ const sendFcm = async (data: sendFcmData[]) => {
 			};
 
 		}),
-	);
-	console.log(
-		'####### sendFcmResult:',
-		result.responses.map((e) => e.error?.message),
 	);
 };
 
@@ -376,13 +369,7 @@ type Reminders = {
 export const scheduledfcmcalendargoogle = v2.scheduler.onSchedule(
 	'* * * * *',
 	async (_) => {
-		fetch('https://slack-rtm-server.fly.dev/ping').then((res) => {
-			if (!res.ok) {
-				console.error('Server is not responding');
-			} else {
-				console.log('Server is responding', res);
-			}
-		});
+		fetch('https://slack-rtm-server.fly.dev/ping');
 
 		const supabase = createClient(
 			defineString('SUPABASE_URL').value(),
@@ -630,7 +617,6 @@ export const handleslacknotification = v2.https.onRequest(
 		});
 
 		if (request.body.event.type === 'presence_change') {
-			console.log('presence_change', request.body);
 			const presenceUpdateUrl = 'https://slack-rtm-server.fly.dev/presence/update';
 			if (request.body.event.user) {
 				const body = {
@@ -722,7 +708,7 @@ export const handleoutlookmailnotification = v2.https.onRequest(
 						notificationPlatform[token] = user.n.platform;
 						sentToken.push(token);
 					} catch (e) {
-						console.error('[🔥] Failed to process user data:', e);
+						// Error handled silently
 					}
 				}
 
@@ -744,7 +730,7 @@ export const handleoutlookmailnotification = v2.https.onRequest(
 						serverRedirectUrl = user.n.platform == 'windows' ? 'https://azukhxinzrivjforwnsc.supabase.co/functions/v1/microsoft_auth' : 'com.wavetogether.fillin://auth';
 					}
 				} catch (e) {
-					console.error('[🔥] Failed to process user data2:', e);
+					// Error handled silently
 				}
 
 			});
@@ -785,8 +771,6 @@ export const handleoutlookmailnotification = v2.https.onRequest(
 				Date.parse(credentials.expiry) <= Date.now();
 
 			if (isExpired) {
-				console.log(`[🔁] Token expired or missing expiry_date, refreshing...`);
-
 				const tokenUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'; // 예시 URL
 				const clientId = defineString('OUTLOOK_CLIENT_ID').value();
 				const redirectUrl = serverRedirectUrl || defineString('OUTLOOK_REDIRECT_URL').value();
@@ -807,8 +791,6 @@ export const handleoutlookmailnotification = v2.https.onRequest(
 					body: params.toString()
 				});
 
-				console.log('########params', params);
-
 				if (response.ok) {
 					const data = await response.json();
 					const newAccessToken = data['access_token'];
@@ -825,7 +807,6 @@ export const handleoutlookmailnotification = v2.https.onRequest(
 					};
 					refreshToken = newRefreshToken;
 				} else {
-					console.warn('[⚠️] Failed to refresh access token. Skipping update.', await response.json());
 					return;
 				}
 
@@ -843,15 +824,11 @@ export const handleoutlookmailnotification = v2.https.onRequest(
 							},
 						})
 						.eq('id', serverCodeNotificationId);
-					console.log(`[🆗] Notification table updated for ${user_mail}`);
 				} catch (updateErr) {
-					console.error('[🔥] Failed to update Supabase notification row:', updateErr);
+					// Error handled silently
 				}
-			} else {
-				console.log(`[🟢] Token still valid. Skipping refresh.`);
 			}
 		} catch (error) {
-			console.error('[🔥] Error during credential processing:', error);
 			return;
 		}
 
@@ -2149,7 +2126,7 @@ export const handlegmailnotification = v2.pubsub.onMessagePublished(
 
 							sentToken.push(token);
 						} catch (e) {
-							console.error('[🔥] Failed to process user data:', e);
+							// Error handled silently
 						}
 					}
 				});
@@ -2186,16 +2163,11 @@ export const handlegmailnotification = v2.pubsub.onMessagePublished(
 					credentials.expiry_date <= Date.now();
 
 				if (isExpired) {
-					console.log(`[🔁] Token expired or missing expiry_date, refreshing...`);
-
 					const refreshed = await oauth2Client.getAccessToken();
 
 					if (!refreshed?.token) {
-						console.warn('[⚠️] Failed to refresh access token. Skipping update.');
 						return;
 					}
-
-					console.log(`[✅] Token refreshed. Updating notification table...`);
 
 					try {
 						await supabase
@@ -2209,15 +2181,11 @@ export const handlegmailnotification = v2.pubsub.onMessagePublished(
 								},
 							})
 							.eq('id', serverCodeNotificationId);
-						console.log(`[🆗] Notification table updated for ${user_mail}`);
 					} catch (updateErr) {
-						console.error('[🔥] Failed to update Supabase notification row:', updateErr);
+						// Error handled silently
 					}
-				} else {
-					console.log(`[🟢] Token still valid. Skipping refresh.`);
 				}
 			} catch (error) {
-				console.error('[🔥] Error during credential processing:', error);
 				return;
 			}
 
