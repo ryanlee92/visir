@@ -6,6 +6,6 @@ serve(async (req) => {
   const redirectUrl = `com.wavetogether.fillin://google?code=${code}`;
   const urlEncodedRedirectUrl = encodeURIComponent(redirectUrl);
   return Response.redirect(
-    `https://app.taskey.work/integration?provider=${encodeURIComponent('Gmail')}&icon=https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo//gmail.png&href=${urlEncodedRedirectUrl}`
+    `https://visir.pro/integration?provider=${encodeURIComponent('Gmail')}&icon=https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo//gmail.png&href=${urlEncodedRedirectUrl}`
   );
 });

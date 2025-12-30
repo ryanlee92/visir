@@ -5,6 +5,6 @@ serve(async (req) => {
   const redirectUrl = `com.wavetogether.fillin://outlook?code=${code}`;
   const urlEncodedRedirectUrl = encodeURIComponent(redirectUrl);
   return Response.redirect(
-    `https://app.taskey.work/integration?provider=${encodeURIComponent('Outlook Mail')}&icon=https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo//outlook.png&href=${urlEncodedRedirectUrl}`
+    `https://visir.pro/integration?provider=${encodeURIComponent('Outlook Mail')}&icon=https://azukhxinzrivjforwnsc.supabase.co/storage/v1/object/public/logo//outlook.png&href=${urlEncodedRedirectUrl}`
   );
 });
