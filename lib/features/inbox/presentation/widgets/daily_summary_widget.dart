@@ -153,12 +153,42 @@ class DailySummaryWidget extends ConsumerWidget {
           )
         : null;
 
-    // 인박스 그룹화 및 정렬 (Provider로 캐싱)
-    final inboxesByReason = ref.watch(inboxesByReasonProvider(filteredInboxes));
+    // Checked 아이템 필터링 (linkedTask가 있거나 isRead == true인 inbox들)
+    final checkedInboxes = filteredInboxes.where((i) => (i.linkedTask?.tasks.isNotEmpty == true || i.isRead == true)).toList();
+    final checkedItems = checkedInboxes.map((i) {
+      // Get project from inbox: first try linkedTask, then suggestion.project_id
+      String? projectId;
+      if (i.linkedTask?.tasks.isNotEmpty == true) {
+        projectId = i.linkedTask!.tasks.first.projectId;
+      } else if (i.suggestion?.project_id != null) {
+        projectId = i.suggestion!.project_id;
+      }
+      final project = projectId != null ? projects.firstWhereOrNull((p) => p.project.uniqueId == projectId) : null;
+      final defaultProject = projects.firstWhereOrNull((p) => p.project.isDefault);
+      final finalProject = project?.project ?? defaultProject?.project;
+
+      return _DashboardItem(
+        title: i.suggestion?.decryptedSummary ?? i.decryptedTitle,
+        subtitle: i.linkedMail?.fromName ?? i.linkedMessage?.userName ?? i.suggestion?.sender_name,
+        urgency: i.suggestion?.urgency ?? InboxSuggestionUrgency.none,
+        icon: finalProject?.icon ?? VisirIconType.inbox,
+        projectId: projectId,
+        inbox: i,
+      );
+    }).toList();
+
+    // Checked 아이템을 제외한 inbox 리스트 (다른 컬럼에서 제외하기 위해)
+    final inboxesExcludingChecked = filteredInboxes.where((i) => !checkedInboxes.contains(i)).toList();
+
+    // 인박스 그룹화 및 정렬 (Provider로 캐싱) - checked 아이템 제외
+    final inboxesByReason = ref.watch(inboxesByReasonProvider(inboxesExcludingChecked));
     final sortedReasons = ref.watch(sortedReasonsProvider(inboxesByReason));
 
     // 지연된 태스크를 대시보드 아이템으로 변환 (Provider로 캐싱)
-    final overdueDashboardItems = ref.watch(overdueDashboardItemsProvider(overdueTasks, projects, context.tr.daily_summary_overdue_task));
+    // checked inbox와 연결된 task도 제외
+    final checkedTaskIds = checkedInboxes.where((i) => i.linkedTask?.tasks.isNotEmpty == true).expand((i) => i.linkedTask!.tasks.map((t) => t.id)).toSet();
+    final overdueTasksExcludingChecked = overdueTasks.where((t) => !checkedTaskIds.contains(t.id)).toList();
+    final overdueDashboardItems = ref.watch(overdueDashboardItemsProvider(overdueTasksExcludingChecked, projects, context.tr.daily_summary_overdue_task));
     final allOverdueItems = overdueDashboardItems
         .map(
           (item) =>
@@ -401,6 +431,35 @@ class DailySummaryWidget extends ConsumerWidget {
                                   }
                                   return reasonWidgets;
                                 }(),
+                                // Show checked column if any
+                                if (checkedItems.isNotEmpty) ...[
+                                  SizedBox(width: columnSpacing),
+                                  Container(
+                                    width: columnWidth,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 8, left: 8),
+                                          child: SizedBox(
+                                            height: 26,
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                VisirIcon(type: VisirIconType.taskCheck, size: 14, color: context.onSurfaceVariant, isSelected: true),
+                                                const SizedBox(width: 8),
+                                                Expanded(child: Text('Checked', style: context.titleMedium?.textBold.textColor(context.onBackground).appFont(context))),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Container(color: context.outline.withValues(alpha: 0.15), height: 1, margin: EdgeInsets.symmetric(horizontal: 4)),
+                                        _buildColumnList(context: context, ref: ref, items: checkedItems, emptyMessage: 'No checked items'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ];
 
                               // Show empty state if no columns to display
@@ -478,7 +537,7 @@ class DailySummaryWidget extends ConsumerWidget {
                                   builder: (context, constraints) {
                                     const columnWidth = 240.0;
                                     const columnSpacing = 16.0;
-                                    final totalColumnCount = (allOverdueItems.isNotEmpty ? 1 : 0) + sortedReasons.length;
+                                    final totalColumnCount = (allOverdueItems.isNotEmpty ? 1 : 0) + sortedReasons.length + (checkedItems.isNotEmpty ? 1 : 0);
                                     final totalWidth = (totalColumnCount * columnWidth) + ((totalColumnCount - 1) * columnSpacing) + (horizontalMargin * 2);
                                     final needsScroll = totalWidth > constraints.maxWidth;
 
@@ -677,6 +736,36 @@ class DailySummaryWidget extends ConsumerWidget {
                                         }
                                         return reasonWidgets;
                                       }(),
+                                      // Show checked column if any
+                                      if (checkedItems.isNotEmpty) ...[
+                                        SizedBox(width: columnSpacing),
+                                        Container(
+                                          width: columnWidth,
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(right: 8, left: 8),
+                                                child: SizedBox(
+                                                  height: 26,
+                                                  child: Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      VisirIcon(type: VisirIconType.taskCheck, size: 14, color: context.onSurfaceVariant, isSelected: true),
+                                                      const SizedBox(width: 8),
+                                                      Expanded(child: Text('Checked', style: context.titleMedium?.textBold.textColor(context.onBackground).appFont(context))),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Container(color: context.outline.withValues(alpha: 0.15), height: 1, margin: EdgeInsets.symmetric(horizontal: 4)),
+                                              Expanded(
+                                                child: _buildColumnList(context: context, ref: ref, items: checkedItems, emptyMessage: 'No checked items'),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ];
 
                                     // Show empty state if no columns to display
