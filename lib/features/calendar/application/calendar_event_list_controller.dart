@@ -572,7 +572,6 @@ class CalendarEventListControllerInternal extends _$CalendarEventListControllerI
   }
 
   Future<void> load({bool? showLoading, bool? isChunkUpdate}) async {
-    if (!ref.read(isSignedInProvider)) return;
     if (ref.read(shouldUseMockDataProvider)) return;
     final pref = ref.read(localPrefControllerProvider).value;
     if (pref == null) throw Failure.unauthorized(StackTrace.current);
