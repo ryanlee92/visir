@@ -26,6 +26,21 @@ function getVersionFromPubspec(): string {
 function copyReleaseFiles(): Plugin {
   return {
     name: 'copy-release-files',
+    configureServer(server) {
+      // Serve rn.shtml in development
+      const rootDir = __dirname;
+      const rnShtmlSource = path.join(rootDir, 'rn.shtml');
+      
+      server.middlewares.use('/rn.shtml', (req, res, next) => {
+        if (existsSync(rnShtmlSource)) {
+          const content = readFileSync(rnShtmlSource, 'utf-8');
+          res.setHeader('Content-Type', 'text/html');
+          res.end(content);
+        } else {
+          next();
+        }
+      });
+    },
     writeBundle() {
       const rootDir = __dirname;
       const distDir = path.join(rootDir, 'dist');

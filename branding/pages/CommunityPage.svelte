@@ -21,6 +21,7 @@
 
     <!-- Community Sections -->
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <!-- Discord section commented out
       <div class="p-8 rounded-3xl bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 hover:border-visir-primary/30 transition-all backdrop-blur-xl shadow-lg">
         <div class="w-12 h-12 rounded-xl bg-visir-primary/10 text-visir-primary flex items-center justify-center mb-4">
           <Icon name="MessageSquare" size={24} />
@@ -33,6 +34,7 @@
           Join Discord <Icon name="ArrowRight" size={16} />
         </a>
       </div>
+      -->
 
       <div class="p-8 rounded-3xl bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 hover:border-visir-primary/30 transition-all backdrop-blur-xl shadow-lg">
         <div class="w-12 h-12 rounded-xl bg-visir-primary/10 text-visir-primary flex items-center justify-center mb-4">

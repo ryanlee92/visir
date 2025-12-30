@@ -44,6 +44,7 @@
         <p class="text-visir-text-muted text-sm leading-relaxed mb-6 font-sans font-light max-w-sm">
           The command center for high-performance professionals. Visir consolidates your tools into a single, intelligent timeline.
         </p>
+        <!-- Social links commented out
         <div class="flex gap-4">
           <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" class="w-8 h-8 flex items-center justify-center rounded-full bg-visir-surface/50 text-visir-text-muted hover:text-visir-primary hover:bg-visir-surface transition-colors duration-200">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -66,6 +67,7 @@
             </svg>
           </a>
         </div>
+        -->
       </div>
       
       <!-- Link Columns - Right Aligned -->
@@ -86,7 +88,7 @@
           <h3 class="text-visir-text font-semibold mb-4 font-display">Resources</h3>
           <ul class="space-y-3 text-sm text-visir-text-muted font-sans font-light">
             <li><a href="/blog" use:link class="hover:text-visir-primary transition-colors">Blog</a></li>
-            <li><a href="/community" use:link class="hover:text-visir-primary transition-colors">Community</a></li>
+            <!-- <li><a href="/community" use:link class="hover:text-visir-primary transition-colors">Community</a></li> -->
             <li><a href="/help" use:link class="hover:text-visir-primary transition-colors">Help Center</a></li>
           </ul>
         </div>

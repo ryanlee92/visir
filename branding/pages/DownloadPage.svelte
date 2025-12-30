@@ -12,6 +12,35 @@
     link.click();
     document.body.removeChild(link);
   }
+
+  // Import rn.shtml at build time to get the latest version
+  const rnModule = import.meta.glob('../rn.shtml', { 
+    as: 'raw',
+    eager: true 
+  }) as Record<string, string>;
+
+  // Parse version from rn.shtml (first version header)
+  function getLatestVersion(): string {
+    const rnPath = Object.keys(rnModule)[0];
+    const content = rnPath ? rnModule[rnPath] : null;
+    
+    if (!content) {
+      return import.meta.env.VITE_APP_VERSION || '2.0.0'; // fallback
+    }
+    
+    // Match first version header (h3 or h4)
+    const versionMatch = content.match(/<h[34]>(Version[^<]+)<\/h[34]>/);
+    if (versionMatch) {
+      // Extract version number (e.g., "Version 2.0.0+1010" -> "2.0.0")
+      const fullVersion = versionMatch[1].replace(/Version\s+/i, '').trim();
+      // Return only the part before "+"
+      return fullVersion.split('+')[0];
+    }
+    
+    return import.meta.env.VITE_APP_VERSION || '2.0.0'; // fallback
+  }
+
+  const latestVersion = getLatestVersion();
 </script>
 
 <div class="pt-32 pb-24 min-h-screen relative">
@@ -19,7 +48,7 @@
     
     <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-visir-surface/30 border border-visir-outline/20 text-visir-primary text-xs font-medium uppercase tracking-wide mb-8 backdrop-blur-xl">
       <Icon name="Download" size={14} />
-      <span class="font-display tracking-wide">Version 1.0.45 Live</span>
+      <span class="font-display tracking-wide">Version {latestVersion} Live</span>
     </div>
 
     <h1 class="text-4xl sm:text-6xl font-medium font-display tracking-tight text-visir-text mb-6">

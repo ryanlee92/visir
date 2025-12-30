@@ -11,7 +11,8 @@
 
   function parseReleaseNotes(htmlContent: string): ChangelogEntry[] {
     const entries: ChangelogEntry[] = [];
-    const versionRegex = /<h3>(Version[^<]+)<\/h3>([\s\S]*?)(?=<h3>Version|$)/g;
+    // Support both <h3> and <h4> for version headers
+    const versionRegex = /<h[34]>(Version[^<]+)<\/h[34]>([\s\S]*?)(?=<h[34]>Version|$)/g;
     let match;
     
     while ((match = versionRegex.exec(htmlContent)) !== null) {
@@ -54,8 +55,7 @@
     return entries;
   }
 
-  import { onMount } from 'svelte';
-
+  // Import rn.shtml at build time - Vite will detect changes and rebuild
   const rnModule = import.meta.glob('../rn.shtml', { 
     as: 'raw',
     eager: true 
@@ -89,9 +89,8 @@
     }
   }
 
-  onMount(() => {
-    loadChangelog();
-  });
+  // Load changelog immediately (no async needed since it's eager loaded)
+  loadChangelog();
 
   function toggleVersion(version: string) {
     expandedVersions = new Set(expandedVersions);
