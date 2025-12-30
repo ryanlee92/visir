@@ -39,6 +39,7 @@ import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/presentation/widgets/tourlist_widget.dart';
 import 'package:Visir/features/common/provider.dart';
+import 'package:Visir/features/inbox/application/inbox_conversation_summary_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
@@ -261,6 +262,9 @@ class MainCalendarWidgetState extends ConsumerState<MainCalendarWidget> with Aut
 
   bool onDragEdit = false;
   bool onDragCancel = false;
+
+  String? _nextScheduleTaskId;
+  String? _nextScheduleEventId;
 
   double timeLabelWidth = 60;
   double? prevTimeIntervalHeight;
@@ -2264,7 +2268,18 @@ class MainCalendarWidgetState extends ConsumerState<MainCalendarWidget> with Aut
         Utils.updateWidgetData(userEmail: user.email ?? '', appointments: Utils.sortWidgetAppointmentsData(data), themeMode: ref.read(themeSwitchProvider));
 
         // Next Schedule 위젯 데이터 업데이트
-        Utils.updateNextScheduleWidgetData(ref: ref, result: result, events: newEvents, projects: ref.read(projectListControllerProvider));
+        final nextScheduleIds = await Utils.updateNextScheduleWidgetData(ref: ref, result: result, events: newEvents, projects: ref.read(projectListControllerProvider));
+        if (nextScheduleIds != null) {
+          final oldTaskId = _nextScheduleTaskId;
+          final oldEventId = _nextScheduleEventId;
+          _nextScheduleTaskId = nextScheduleIds.taskId;
+          _nextScheduleEventId = nextScheduleIds.eventId;
+          print('NextScheduleWidget: Updated IDs - taskId: $_nextScheduleTaskId, eventId: $_nextScheduleEventId (old: taskId=$oldTaskId, eventId=$oldEventId)');
+        } else {
+          _nextScheduleTaskId = null;
+          _nextScheduleEventId = null;
+          print('NextScheduleWidget: Cleared IDs (no next schedule)');
+        }
       });
     }
   }
@@ -2593,6 +2608,17 @@ class MainCalendarWidgetState extends ConsumerState<MainCalendarWidget> with Aut
       updateCalendarDatasource();
       updateDefaultCreationData();
     });
+
+    if (PlatformX.isMobileView && (_nextScheduleTaskId != null || _nextScheduleEventId != null)) {
+      ref.listen(inboxConversationSummaryProvider(_nextScheduleTaskId, _nextScheduleEventId), (previous, next) {
+        if (next.hasValue && next.value != null && next.value!.isNotEmpty) {
+          final taskResult = ref.read(calendarTaskListControllerProvider(tabType: widget.tabType));
+          final eventResult = ref.read(calendarEventListControllerProvider(tabType: widget.tabType));
+          final projects = ref.read(projectListControllerProvider);
+          Utils.updateNextScheduleWidgetData(ref: ref, result: taskResult.tasksOnView, events: eventResult.eventsOnView, projects: projects);
+        }
+      });
+    }
 
     final scale = ref.watch(calendarIntervalScaleProvider(widget.tabType));
     final homeSecondaryTimezone = ref.watch(secondaryTimezoneProvider);

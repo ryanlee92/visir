@@ -1489,13 +1489,13 @@ class Utils {
     await updateWidgetCore();
   }
 
-  static Future<void> updateNextScheduleWidgetData({
+  static Future<({String? taskId, String? eventId})?> updateNextScheduleWidgetData({
     required WidgetRef ref,
     required List<TaskEntity> result,
     required List<EventEntity> events,
     required List<ProjectEntity> projects,
   }) async {
-    if (!PlatformX.isMobile) return;
+    if (!PlatformX.isMobile) return null;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -1594,7 +1594,7 @@ class Utils {
     if (nextItem == null) {
       await HomeWidget.saveWidgetData<String>('nextSchedule', '');
       await updateWidgetCore();
-      return;
+      return null;
     }
 
     final nextEvent = nextItem['event'] as EventEntity?;
@@ -1612,18 +1612,19 @@ class Utils {
     String? conversationSummary;
     try {
       final summaryAsync = ref.read(inboxConversationSummaryProvider(nextTask?.id, nextEvent?.uniqueId));
+      // AsyncValue에서 값 가져오기 (AsyncData일 때만 값이 있음)
       conversationSummary = summaryAsync.value;
+      print(
+        'NextScheduleWidget: conversationSummary = ${conversationSummary?.substring(0, conversationSummary.length.clamp(0, 50))}... (hasValue: ${summaryAsync.hasValue}, isLoading: ${summaryAsync.isLoading})',
+      );
     } catch (e) {
       // 에러 발생 시 무시하고 계속 진행
+      print('NextScheduleWidget: Error getting conversation summary: $e');
     }
 
     // previousContext는 conversation summary 텍스트로 설정
-    Map<String, dynamic>? previousContext;
-    if (conversationSummary != null && conversationSummary.isNotEmpty) {
-      previousContext = {'summary': conversationSummary};
-    }
-
-    final nextScheduleData = {
+    // null일 때는 JSON에 포함하지 않아서 이전 값을 유지할 수 있도록 함
+    final nextScheduleData = <String, dynamic>{
       'title': nextItem['title'] as String,
       'startTimeMs': startTime.millisecondsSinceEpoch,
       'endTimeMs': endTime.millisecondsSinceEpoch,
@@ -1634,13 +1635,39 @@ class Utils {
       'colorInt': (nextItem['color'] as Color).value,
       'location': nextEvent?.location,
       'conferenceLink': nextTask?.conferenceLink ?? nextEvent?.conferenceLink,
-      'projectName': nextProject?.name,
-      'calendarName': nextCalendar?.name,
-      'previousContext': previousContext,
+      'projectName': nextProject?.name ?? '',
+      'calendarName': nextCalendar?.name ?? '',
     };
+
+    // previousContext는 값이 있을 때만 추가 (null이면 JSON에 포함하지 않음)
+    // 하지만 이전에 저장된 값을 확인해서 없을 때만 제거하도록 함
+    final existingData = await HomeWidget.getWidgetData<String>('nextSchedule');
+    Map<String, dynamic>? existingPreviousContext;
+    if (existingData != null && existingData.isNotEmpty) {
+      try {
+        final existingJson = jsonDecode(existingData) as Map<String, dynamic>;
+        existingPreviousContext = existingJson['previousContext'] as Map<String, dynamic>?;
+      } catch (e) {
+        // Ignore parse errors
+      }
+    }
+
+    if (conversationSummary != null && conversationSummary.isNotEmpty) {
+      nextScheduleData['previousContext'] = {'summary': conversationSummary};
+      print('NextScheduleWidget: previousContext set with summary length: ${conversationSummary.length}');
+    } else if (existingPreviousContext != null) {
+      // 이전 값이 있으면 유지
+      nextScheduleData['previousContext'] = existingPreviousContext;
+      print('NextScheduleWidget: previousContext preserved from existing data');
+    } else {
+      print('NextScheduleWidget: previousContext not set (summary is null or empty and no existing value)');
+    }
 
     await HomeWidget.saveWidgetData<String>('nextSchedule', jsonEncode(nextScheduleData));
     await updateWidgetCore();
+
+    // Return task/event IDs for listening to conversation summary updates
+    return (taskId: nextTask?.id, eventId: nextEvent?.uniqueId);
   }
 
   static Future<void> insertInboxWidgetDataFromNotification({required RemoteMessage message}) async {

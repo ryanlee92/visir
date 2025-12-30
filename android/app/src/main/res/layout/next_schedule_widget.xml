@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Please login"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:visibility="gone"
@@ -57,7 +57,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:fontFamily="@font/suite_medium"
                         android:maxLines="2"
                         android:ellipsize="end"
@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:fontFamily="@font/suite_medium"
                     android:maxLines="2"
                     android:ellipsize="end"
@@ -82,8 +82,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="0dp"
+                    android:layout_marginTop="8dp"
                     android:padding="8dp"
+                    android:background="@drawable/previous_context_background"
                     android:visibility="gone">
 
                     <LinearLayout
@@ -96,7 +97,7 @@
                             android:id="@+id/previous_context_icon"
                             android:layout_width="16dp"
                             android:layout_height="16dp"
-                            android:src="@android:drawable/ic_menu_info_details" />
+                            android:src="@drawable/ic_brain" />
 
                         <TextView
                             android:id="@+id/previous_context_title"
@@ -104,7 +105,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:text="Previous Context"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             android:fontFamily="@font/suite_medium"
                             android:typeface="normal" />
                     </LinearLayout>
@@ -114,7 +115,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:textSize="11sp"
+                        android:textSize="13sp"
                         android:fontFamily="@font/suite_medium"
                         android:lineSpacingMultiplier="1.2"
                         android:typeface="normal" />

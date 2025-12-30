@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -116,7 +117,7 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                 return
             }
             
-                try {
+            try {
                 Log.d(TAG, "Parsing next schedule JSON")
                 val nextSchedule = JSONObject(nextScheduleJson)
                 
@@ -151,20 +152,43 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                 try {
                     val startTimeMs = nextSchedule.optLong("startTimeMs", 0)
                     val duration = nextSchedule.optInt("duration", 0)
-                    val projectName = nextSchedule.optString("projectName", "")
-                    val calendarName = nextSchedule.optString("calendarName", "")
+                    var projectName = nextSchedule.optString("projectName", null) ?: ""
+                    var calendarName = nextSchedule.optString("calendarName", null) ?: ""
+                    
+                    // Handle "null" string case (JSON null serialized as string)
+                    if (projectName == "null" || projectName == null) projectName = ""
+                    if (calendarName == "null" || calendarName == null) calendarName = ""
+                    
+                    Log.d(TAG, "Project name: '$projectName', Calendar name: '$calendarName'")
                     
                     if (startTimeMs > 0) {
                         val startDate = Date(startTimeMs)
                         val dateFormatter = SimpleDateFormat("EEE, MMM d, yyyy h:mm a", Locale.ENGLISH)
                         val dateString = dateFormatter.format(startDate)
                         
-                        val typeString = if (projectName.isNotEmpty()) projectName else calendarName
-                        val detailsText = "$dateString • $duration min • $typeString"
+                        val typeString = when {
+                            projectName.isNotEmpty() -> projectName
+                            calendarName.isNotEmpty() -> calendarName
+                            else -> ""
+                        }
+                        val detailsText = if (typeString.isNotEmpty()) {
+                            "$dateString • $duration min • $typeString"
+                        } else {
+                            "$dateString • $duration min"
+                        }
                         views.setTextViewText(R.id.event_details, detailsText)
                     } else {
-                        val typeString = if (projectName.isNotEmpty()) projectName else calendarName
-                        val detailsText = if (duration > 0) "$duration min • $typeString" else typeString
+                        val typeString = when {
+                            projectName.isNotEmpty() -> projectName
+                            calendarName.isNotEmpty() -> calendarName
+                            else -> ""
+                        }
+                        val detailsText = when {
+                            duration > 0 && typeString.isNotEmpty() -> "$duration min • $typeString"
+                            duration > 0 -> "$duration min"
+                            typeString.isNotEmpty() -> typeString
+                            else -> ""
+                        }
                         views.setTextViewText(R.id.event_details, detailsText)
                     }
                     views.setInt(R.id.event_details, "setTextColor", colors.onInverseSurface)
@@ -174,34 +198,47 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                 }
                 
                 // Previous Context
+                // previousContext가 JSON에 있으면 업데이트, 없으면 이전 값 유지
                 try {
-                    val previousContext = nextSchedule.optJSONObject("previousContext")
-                    if (previousContext != null) {
-                        val summary = previousContext.optString("summary", "")
-                        if (summary.isNotEmpty()) {
-                            views.setViewVisibility(R.id.previous_context_container, android.view.View.VISIBLE)
-                            views.setTextViewText(R.id.previous_context_text, summary)
-                            views.setInt(R.id.previous_context_title, "setTextColor", colors.onBackground)
-                            views.setInt(R.id.previous_context_text, "setTextColor", colors.onBackground)
-                            views.setInt(R.id.previous_context_icon, "setColorFilter", colors.onBackground)
-                            // Set background color to surface with 0.5 alpha (same as Flutter app)
-                            val surfaceColor = colors.surface
-                            val surfaceColorWithAlpha = Color.argb(
-                                (Color.alpha(surfaceColor) * 0.5).toInt(),
-                                Color.red(surfaceColor),
-                                Color.green(surfaceColor),
-                                Color.blue(surfaceColor)
-                            )
-                            views.setInt(R.id.previous_context_container, "setBackgroundColor", surfaceColorWithAlpha)
-                            Log.d(TAG, "Previous context set successfully")
+                    if (nextSchedule.has("previousContext")) {
+                        val previousContext = nextSchedule.optJSONObject("previousContext")
+                        Log.d(TAG, "Previous context JSON: ${previousContext?.toString()}")
+                        if (previousContext != null) {
+                            var summary = previousContext.optString("summary", null)
+                            // Handle "null" string case
+                            if (summary == "null" || summary == null) summary = ""
+                            Log.d(TAG, "Previous context summary: '$summary' (length: ${summary?.length ?: 0})")
+                            if (summary != null && summary.isNotEmpty()) {
+                                views.setViewVisibility(R.id.previous_context_container, android.view.View.VISIBLE)
+                                views.setTextViewText(R.id.previous_context_text, summary)
+                                views.setInt(R.id.previous_context_title, "setTextColor", colors.onBackground)
+                                views.setInt(R.id.previous_context_text, "setTextColor", colors.onBackground)
+                                views.setInt(R.id.previous_context_icon, "setColorFilter", colors.onBackground)
+                                // Set background color to surface with 0.5 alpha (same as Flutter app)
+                                // Use drawable resources for light/dark mode to preserve borderRadius
+                                val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+                                val drawableRes = if (isDarkMode) {
+                                    R.drawable.previous_context_background_dark
+                                } else {
+                                    R.drawable.previous_context_background_light
+                                }
+                                views.setInt(R.id.previous_context_container, "setBackgroundResource", drawableRes)
+                                Log.d(TAG, "Previous context set successfully with summary length: ${summary.length}")
+                            } else {
+                                views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
+                                Log.d(TAG, "Previous context hidden: summary is empty or null")
+                            }
                         } else {
                             views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
+                            Log.d(TAG, "Previous context hidden: previousContext JSON is null")
                         }
                     } else {
-                        views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
+                        Log.d(TAG, "Previous context not in JSON - preserving existing state")
+                        // previousContext가 JSON에 없으면 visibility를 변경하지 않음 (이전 값 유지)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error setting previous context", e)
+                    e.printStackTrace()
                 }
                 
             } catch (e: Exception) {

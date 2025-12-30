@@ -49,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:typeface="normal" />
                 <TextView
                     android:id="@+id/year_text"
@@ -56,6 +57,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:layout_marginStart="4dp"
                     android:typeface="normal" />
             </LinearLayout>
@@ -74,6 +76,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
                 <TextView
@@ -83,6 +86,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
                 <TextView
@@ -92,6 +96,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
                 <TextView
@@ -101,6 +106,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
                 <TextView
@@ -110,6 +116,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
                 <TextView
@@ -119,6 +126,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
                 <TextView
@@ -128,6 +136,7 @@
                     android:layout_weight="1"
                     android:textSize="10sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/suite_medium"
                     android:gravity="center"
                     android:typeface="normal" />
             </LinearLayout>

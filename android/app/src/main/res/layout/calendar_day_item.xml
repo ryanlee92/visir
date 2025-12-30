@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:textSize="11sp"
             android:textStyle="normal"
+            android:fontFamily="@font/suite_medium"
             android:paddingTop="0dp"
             android:paddingBottom="0dp" />
 
