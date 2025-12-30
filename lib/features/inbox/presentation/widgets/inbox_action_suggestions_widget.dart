@@ -427,16 +427,16 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
     }
 
     // 태그 높이 계산 (padding + icon + text + spacing)
-    const tagHeight = 6.0 + 6.0 + 12.0 + 6.0; // vertical padding + icon height + text height + spacing
+    // const tagHeight = 6.0 + 6.0 + 12.0 + 6.0; // vertical padding + icon height + text height + spacing
 
     // 모바일에서는 가로 스크롤이므로 한 줄만 필요, 데스크톱에서는 여러 줄 가능
-    final maxHeight = tagHeight;
+    // final maxHeight = tagHeight;
     final suggestionWidgets = suggestions.map((suggestion) {
       return IntrinsicWidth(
         child: VisirButton(
           type: VisirButtonAnimationType.scaleAndOpacity,
           style: VisirButtonStyle(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             backgroundColor: context.surface.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
@@ -471,7 +471,7 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.only(top: 8),
       width: double.maxFinite,
-      constraints: PlatformX.isMobileView ? null : BoxConstraints(maxHeight: maxHeight),
+      constraints: null,
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(left: 12, right: 12),
         scrollDirection: Axis.horizontal,
