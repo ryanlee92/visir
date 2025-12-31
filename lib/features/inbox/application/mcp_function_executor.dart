@@ -315,7 +315,7 @@ class McpFunctionExecutor {
         case 'searchProject':
           return await _executeSearchProject(arguments);
         case 'linkToProject':
-          return await _executeLinkToProject(arguments, tabType: tabType, availableInboxes: availableInboxes);
+          return await _executeLinkToProject(arguments, tabType: tabType, availableInboxes: availableInboxes, availableTasks: availableTasks);
         case 'moveProject':
           return await _executeMoveProject(arguments);
         case 'inviteUserToProject':
@@ -451,18 +451,10 @@ class McpFunctionExecutor {
     final statusStr = args['status'] as String? ?? 'none';
     final inboxId = args['inboxId'] as String?;
 
-    // Find matching inbox by id first, then by linkedMail/linkedMessage
+    // Find matching inbox by id only if inboxId is explicitly provided
     InboxEntity? matchingInbox;
-    if (availableInboxes != null && availableInboxes.isNotEmpty) {
-      // First, try to find inbox by id if provided
-      if (inboxId != null && inboxId.isNotEmpty) {
-        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
-      }
-
-      // If not found by id, try to find inbox that has linkedMail or linkedMessage
-      if (matchingInbox == null) {
-        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMail != null || inbox.linkedMessage != null);
-      }
+    if (availableInboxes != null && availableInboxes.isNotEmpty && inboxId != null && inboxId.isNotEmpty) {
+      matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
     }
 
     // If projectId is not provided, try to get it from inbox suggestion, then lastUsedProject, then defaultProject
@@ -613,8 +605,21 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'taskId is required'};
     }
 
-    final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
-    final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
+    // availableTasks에서 먼저 찾기
+    TaskEntity? task;
+    if (availableTasks != null && availableTasks.isNotEmpty) {
+      task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    if (task == null) {
+      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      task = allTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    if (task == null) {
+      return {'success': false, 'error': 'Task not found'};
+    }
 
     final title = args['title'] as String? ?? task.title;
     final description = args['description'] as String? ?? task.description;
@@ -682,8 +687,21 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'taskId is required'};
     }
 
-    final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
-    final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
+    // availableTasks에서 먼저 찾기
+    TaskEntity? task;
+    if (availableTasks != null && availableTasks.isNotEmpty) {
+      task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    if (task == null) {
+      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      task = allTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    if (task == null) {
+      return {'success': false, 'error': 'Task not found'};
+    }
 
     await TaskAction.deleteTask(
       task: task,
@@ -703,8 +721,21 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'taskId is required'};
     }
 
-    final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
-    final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
+    // availableTasks에서 먼저 찾기
+    TaskEntity? task;
+    if (availableTasks != null && availableTasks.isNotEmpty) {
+      task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    if (task == null) {
+      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      task = allTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    if (task == null) {
+      return {'success': false, 'error': 'Task not found'};
+    }
 
     await TaskAction.toggleStatus(task: task, startAt: task.startAt ?? DateTime.now(), endAt: task.endAt ?? DateTime.now(), tabType: tabType, showToast: false);
 
@@ -2074,8 +2105,21 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'projectId is required'};
     }
 
-    final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
-    final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
+    // availableTasks에서 먼저 찾기
+    TaskEntity? task;
+    if (availableTasks != null && availableTasks.isNotEmpty) {
+      task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    if (task == null) {
+      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      task = allTasks.firstWhereOrNull((t) => t.id == taskId);
+    }
+    
+    if (task == null) {
+      return {'success': false, 'error': 'Task not found'};
+    }
 
     final updatedTask = task.copyWith(projectId: projectId, updatedAt: DateTime.now());
     await TaskAction.upsertTask(task: updatedTask, originalTask: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
@@ -3467,15 +3511,38 @@ class McpFunctionExecutor {
     }
   }
 
-  Future<Map<String, dynamic>> _executeLinkToProject(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
+  Future<Map<String, dynamic>> _executeLinkToProject(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes, List<TaskEntity>? availableTasks}) async {
     final inboxId = args['inboxId'] as String?;
+    final taskId = args['taskId'] as String?;
     final projectId = args['projectId'] as String?;
 
-    if (inboxId == null) {
-      return {'success': false, 'error': 'inboxId is required'};
-    }
     if (projectId == null) {
       return {'success': false, 'error': 'projectId is required'};
+    }
+
+    // If taskId is provided, directly update the task's project
+    if (taskId != null && taskId.isNotEmpty) {
+      final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
+
+      if (task == null) {
+        return {'success': false, 'error': 'Task not found'};
+      }
+
+      final updatedTask = task.copyWith(projectId: projectId, updatedAt: DateTime.now());
+      await TaskAction.upsertTask(
+        task: updatedTask,
+        originalTask: task,
+        calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag,
+        tabType: tabType,
+        showToast: false,
+      );
+      return {'success': true, 'taskId': updatedTask.id, 'message': 'Task moved to project successfully'};
+    }
+
+    // If inboxId is provided, use the existing logic
+    if (inboxId == null || inboxId.isEmpty) {
+      return {'success': false, 'error': 'Either inboxId or taskId is required'};
     }
 
     // Find inbox and create/update linked task with project

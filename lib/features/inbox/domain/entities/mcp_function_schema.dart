@@ -374,9 +374,10 @@ class McpFunctionRegistry {
       ),
       McpFunctionSchema(
         name: 'linkToProject',
-        description: 'Links an inbox item to a project by creating or updating a linked task.',
+        description: 'Links an inbox item or task to a project by creating or updating a linked task. Use taskId if you want to move an existing task to a different project, or use inboxId if you want to link an inbox item to a project.',
         parameters: [
-          McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID', required: true),
+          McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID (required if taskId is not provided)', required: false),
+          McpFunctionParameter(name: 'taskId', type: 'string', description: 'Task ID (required if inboxId is not provided). Use this to move an existing task to a different project.', required: false),
           McpFunctionParameter(name: 'projectId', type: 'string', description: 'Project ID', required: true),
         ],
       ),

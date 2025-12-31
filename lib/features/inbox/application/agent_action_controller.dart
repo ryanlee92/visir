@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/common/infrastructure/entities/environment.dart';
 import 'package:Visir/flavors.dart';
@@ -45,8 +46,9 @@ part 'agent_action_controller.g.dart';
 class AgentActionMessage {
   final String role; // 'user' or 'assistant'
   final String content;
+  final bool excludeFromHistory; // conversation history에서 제외할지 여부 (함수 실행 결과 메시지용)
 
-  AgentActionMessage({required this.role, required this.content});
+  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false});
 
   Map<String, dynamic> toJson({bool? local}) {
     return {
@@ -56,6 +58,7 @@ class AgentActionMessage {
                 ? content
                 : Utils.encryptAESCryptoJS(content, aesKey)
           : '',
+      'exclude_from_history': excludeFromHistory,
     };
   }
 
@@ -64,7 +67,7 @@ class AgentActionMessage {
     // local이 true면 평문, false면 isEncrypted 플래그에 따라 복호화
     final decryptedContent = contentStr.isNotEmpty && local != true && (isEncrypted == true) ? Utils.decryptAESCryptoJS(contentStr, aesKey) : contentStr;
 
-    return AgentActionMessage(role: json['role'] as String, content: decryptedContent);
+    return AgentActionMessage(role: json['role'] as String, content: decryptedContent, excludeFromHistory: json['exclude_from_history'] as bool? ?? false);
   }
 }
 
@@ -81,6 +84,8 @@ class AgentActionState {
   final Set<int> loadedInboxNumbers; // Inbox item numbers that have been fully loaded (with full content)
   final List<Map<String, dynamic>>? pendingFunctionCalls; // Function calls waiting for user confirmation
   final Set<String> selectedActionIds; // Action IDs selected for batch confirmation
+  final List<String> recentTaskIds; // Recently created/updated task IDs (for AI context)
+  final List<String> recentEventIds; // Recently created/updated event IDs (for AI context)
 
   AgentActionState({
     this.actionType,
@@ -97,9 +102,13 @@ class AgentActionState {
     Set<int>? loadedInboxNumbers,
     this.pendingFunctionCalls,
     Set<String>? selectedActionIds,
+    List<String>? recentTaskIds,
+    List<String>? recentEventIds,
   }) : messages = messages ?? [],
        loadedInboxNumbers = loadedInboxNumbers ?? {},
-       selectedActionIds = selectedActionIds ?? {};
+       selectedActionIds = selectedActionIds ?? {},
+       recentTaskIds = recentTaskIds ?? [],
+       recentEventIds = recentEventIds ?? [];
 
   AgentActionState copyWith({
     AgentActionType? actionType,
@@ -114,6 +123,8 @@ class AgentActionState {
     Set<int>? loadedInboxNumbers,
     List<Map<String, dynamic>>? pendingFunctionCalls,
     Set<String>? selectedActionIds,
+    List<String>? recentTaskIds,
+    List<String>? recentEventIds,
   }) {
     return AgentActionState(
       actionType: actionType ?? this.actionType,
@@ -128,6 +139,8 @@ class AgentActionState {
       loadedInboxNumbers: loadedInboxNumbers ?? this.loadedInboxNumbers,
       pendingFunctionCalls: pendingFunctionCalls ?? this.pendingFunctionCalls,
       selectedActionIds: selectedActionIds ?? this.selectedActionIds,
+      recentTaskIds: recentTaskIds ?? this.recentTaskIds,
+      recentEventIds: recentEventIds ?? this.recentEventIds,
     );
   }
 
@@ -313,6 +326,10 @@ class AgentActionController extends _$AgentActionController {
     // updatedMessages가 제공되지 않으면 새로 생성
     final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: userMessage)];
 
+    // 디버깅: _generateGeneralChat 시작 시 state 확인
+    print('############# _generateGeneralChat: state.recentTaskIds: ${state.recentTaskIds}');
+    print('############# _generateGeneralChat: userMessage: $userMessage');
+
     // 재귀 호출인 경우, conversation history의 마지막 user 메시지를 사용
     // (이미 updatedMessages에 첫 번째 응답이 포함되어 있으므로, 같은 userMessage를 다시 추가하지 않음)
     final actualUserMessage = isRecursiveCall && updatedMessages != null && messages.isNotEmpty
@@ -438,6 +455,49 @@ class AgentActionController extends _$AgentActionController {
       final systemPromptProvider = ref.read(agentSystemPromptProvider);
       String systemPrompt = systemPromptProvider is String ? systemPromptProvider : '';
 
+      // 최근 생성/수정된 taskId/eventId를 system prompt에 추가 (AI가 참조할 수 있도록)
+      // IMPORTANT: state.recentTaskIds/recentEventIds를 직접 참조하여 최신 상태 사용
+      final currentState = state; // 최신 state 참조
+      if (currentState.recentTaskIds.isNotEmpty || currentState.recentEventIds.isNotEmpty) {
+        String contextInfo = '\n\n## CRITICAL: Recent Task/Event IDs (MUST USE THESE WHEN USER REQUESTS MODIFICATIONS):';
+        if (currentState.recentTaskIds.isNotEmpty) {
+          // 가장 최근 taskId를 명확히 표시
+          final mostRecentTaskId = currentState.recentTaskIds.last;
+          contextInfo += '\n- MOST RECENT task ID: $mostRecentTaskId (use this EXACT one!)';
+          if (currentState.recentTaskIds.length > 1) {
+            contextInfo += '\n- All recent task IDs: ${currentState.recentTaskIds.join(', ')}';
+            contextInfo += '\n  The LAST one in the list ($mostRecentTaskId) is the MOST RECENT.';
+          }
+          contextInfo += '\n  These taskIds were JUST created/updated in this conversation.';
+          contextInfo += '\n  When user says "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", etc., you MUST use this EXACT taskId: $mostRecentTaskId';
+          contextInfo += '\n  DO NOT say "taskId가 보이지 않아서" or "taskId가 이 대화에 표시되어 있지 않아서" - the taskId is RIGHT HERE: $mostRecentTaskId';
+          contextInfo += '\n  DO NOT create a new task - use updateTask with taskId: $mostRecentTaskId';
+        }
+        if (currentState.recentEventIds.isNotEmpty) {
+          // 가장 최근 eventId를 명확히 표시
+          final mostRecentEventId = currentState.recentEventIds.last;
+          contextInfo += '\n- MOST RECENT event ID: $mostRecentEventId (use this EXACT one!)';
+          if (currentState.recentEventIds.length > 1) {
+            contextInfo += '\n- All recent event IDs: ${currentState.recentEventIds.join(', ')}';
+            contextInfo += '\n  The LAST one in the list ($mostRecentEventId) is the MOST RECENT.';
+          }
+          contextInfo += '\n  These eventIds were JUST created/updated in this conversation.';
+          contextInfo += '\n  When user requests to modify an event, use this EXACT eventId: $mostRecentEventId';
+          contextInfo += '\n  DO NOT say "eventId가 보이지 않아서" - the eventId is RIGHT HERE: $mostRecentEventId';
+          contextInfo += '\n  DO NOT create a new event - use updateEvent with eventId: $mostRecentEventId';
+        }
+        contextInfo +=
+            '\n\nABSOLUTE RULE: When a user requests to modify or update a task/event (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", "음.. 이거 visir 프로젝트로 옮겨줘"), you MUST:';
+        contextInfo += '\n1. Use the MOST RECENT taskId/eventId from above (it is explicitly listed as "MOST RECENT")';
+        contextInfo += '\n2. Call updateTask/updateEvent with that taskId/eventId ONCE (do not call it multiple times)';
+        contextInfo += '\n3. DO NOT create a new task/event - the task/event already exists';
+        contextInfo += '\n4. DO NOT call createTask/createEvent - ONLY call updateTask/updateEvent';
+        contextInfo += '\n5. DO NOT say "taskId가 보이지 않아서" or "taskId가 이 대화에 표시되어 있지 않아서" or "cannot find taskId" or "대상 작업을 찾지 못해" - the taskId is provided above';
+        contextInfo += '\n6. DO NOT call the same function multiple times - if you already called updateTask, do not call it again';
+        contextInfo += '\n7. CRITICAL: If recentTaskIds/recentEventIds are provided above, you MUST use them. DO NOT create new tasks/events.';
+        systemPrompt += contextInfo;
+      }
+
       // 첫 메시지이고 conversationSummary가 없으면 제목 생성 요청 추가
       if (isFirstMessage && state.conversationSummary == null && state.actionType == null) {
         systemPrompt +=
@@ -447,9 +507,43 @@ class AgentActionController extends _$AgentActionController {
       // 일반적인 AI 응답 생성 (MCP 함수 호출 지원)
       // AI에 전달할 때는 평문이어야 하므로 local: true 사용
       // 재귀 호출인 경우 conversation history의 마지막 user 메시지를 사용
+      // conversation history에서 함수 실행 결과 메시지 제거 (excludeFromHistory 플래그 사용)
+      // 룰베이스 제거: 함수 호출 태그나 JSON 배열 제거하지 않음
+      final filteredHistory = messages
+          .where((m) => !m.excludeFromHistory) // excludeFromHistory가 true인 메시지는 제외
+          .map((m) => m.toJson(local: true))
+          .toList();
+
+      // 최근 생성된 taskId/eventId를 user message에 추가하여 AI가 직접 참조할 수 있도록 함
+      // IMPORTANT: state.recentTaskIds/recentEventIds를 직접 참조하여 최신 상태 사용
+      String enhancedUserMessage = actualUserMessage;
+      final latestState = state; // 최신 state 참조
+      if (latestState.recentTaskIds.isNotEmpty || latestState.recentEventIds.isNotEmpty) {
+        String contextSuffix = '';
+        if (latestState.recentTaskIds.isNotEmpty) {
+          // 가장 최근 taskId를 명확히 표시 (리스트의 마지막 항목)
+          final mostRecentTaskId = latestState.recentTaskIds.last;
+          contextSuffix +=
+              '\n\n[CRITICAL CONTEXT: The MOST RECENT task ID is: $mostRecentTaskId. When user requests to modify a task (e.g., "이거 visir 프로젝트로 변경해줘", "이거 프로젝트로 바꿔줘", "음.. 이거 visir 프로젝트로 옮겨줘"), you MUST use this EXACT taskId: $mostRecentTaskId. DO NOT create a new task - ONLY use updateTask with taskId: $mostRecentTaskId. DO NOT call createTask. DO NOT say "taskId가 보이지 않아서" or "taskId가 이 대화에 표시되어 있지 않아서" or "대상 작업을 찾지 못해" - the taskId is RIGHT HERE: $mostRecentTaskId.]';
+          if (latestState.recentTaskIds.length > 1) {
+            contextSuffix += '\n[All recent task IDs: ${latestState.recentTaskIds.join(', ')}. The last one ($mostRecentTaskId) is the most recent.]';
+          }
+        }
+        if (latestState.recentEventIds.isNotEmpty) {
+          // 가장 최근 eventId를 명확히 표시 (리스트의 마지막 항목)
+          final mostRecentEventId = latestState.recentEventIds.last;
+          contextSuffix +=
+              '\n\n[CRITICAL CONTEXT: The MOST RECENT event ID is: $mostRecentEventId. When user requests to modify an event, you MUST use this EXACT eventId: $mostRecentEventId. DO NOT create a new event - use updateEvent with eventId: $mostRecentEventId. DO NOT say "eventId가 보이지 않아서" - the eventId is RIGHT HERE: $mostRecentEventId.]';
+          if (latestState.recentEventIds.length > 1) {
+            contextSuffix += '\n[All recent event IDs: ${latestState.recentEventIds.join(', ')}. The last one ($mostRecentEventId) is the most recent.]';
+          }
+        }
+        enhancedUserMessage = actualUserMessage + contextSuffix;
+      }
+
       final response = await _repository.generateGeneralChat(
-        userMessage: actualUserMessage,
-        conversationHistory: messages.map((m) => m.toJson(local: true)).toList(),
+        userMessage: enhancedUserMessage,
+        conversationHistory: filteredHistory,
         projectContext: projectContext,
         projects: projectsList,
         taggedContext: taggedContext.isNotEmpty ? taggedContext : null,
@@ -490,55 +584,109 @@ class AgentActionController extends _$AgentActionController {
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
 
-        // 첫 메시지인 경우 응답에서 제목 추출
+        // HTML 엔티티 unescape 처리
+        final unescape = HtmlUnescape();
+        aiMessage = unescape.convert(aiMessage);
+
+        // 첫 메시지인 경우 conversation_title 태그에서 제목 추출
         if (isFirstMessage && state.conversationSummary == null && state.actionType == null) {
-          final titleMatch = RegExp(r'<conversation_title>(.*?)</conversation_title>', dotAll: true).firstMatch(aiMessage);
+          // conversation_title 태그에서 제목 추출
+          final conversationTitleRegex = RegExp(r'<conversation_title>(.*?)</conversation_title>', dotAll: true);
+          final escapedTitleRegex = RegExp(r'&lt;conversation_title&gt;(.*?)&lt;/conversation_title&gt;', dotAll: true);
+
+          String? extractedTitle;
+          final titleMatch = conversationTitleRegex.firstMatch(aiMessage);
           if (titleMatch != null) {
-            final extractedTitle = titleMatch.group(1)?.trim() ?? '';
-            if (extractedTitle.isNotEmpty) {
-              String finalTitle = extractedTitle;
-              if (finalTitle.length > 50) {
-                finalTitle = '${finalTitle.substring(0, 47)}...';
-              }
+            extractedTitle = titleMatch.group(1)?.trim();
+          } else {
+            final escapedMatch = escapedTitleRegex.firstMatch(aiMessage);
+            if (escapedMatch != null) {
+              extractedTitle = escapedMatch.group(1)?.trim();
+            }
+          }
+
+          if (extractedTitle != null && extractedTitle.isNotEmpty) {
+            // 최대 50자로 제한
+            String finalTitle = extractedTitle.length > 50 ? '${extractedTitle.substring(0, 47)}...' : extractedTitle;
+            state = state.copyWith(conversationSummary: finalTitle);
+          } else {
+            // conversation_title이 없으면 AI 응답의 처음 부분을 제목으로 사용
+            final firstLine = aiMessage.split('\n').first.trim();
+            if (firstLine.isNotEmpty && !firstLine.contains('conversation_title')) {
+              String finalTitle = firstLine.length > 50 ? '${firstLine.substring(0, 47)}...' : firstLine;
               state = state.copyWith(conversationSummary: finalTitle);
-              // 응답에서 제목 태그 제거
-              aiMessage = aiMessage.replaceAll(RegExp(r'<conversation_title>.*?</conversation_title>', dotAll: true), '').trim();
             }
           }
         }
+
+        // conversation_title 태그를 제거 (제목 추출 후)
+        aiMessage = aiMessage.replaceAll(RegExp(r'<conversation_title>.*?</conversation_title>', dotAll: true), '');
+        aiMessage = aiMessage.replaceAll(RegExp(r'&lt;conversation_title&gt;.*?&lt;/conversation_title&gt;', dotAll: true), '');
 
         // MCP 함수 호출 감지 및 실행
         final executor = McpFunctionExecutor();
-        final functionCalls = executor.parseFunctionCalls(aiMessage);
+        final allFunctionCalls = executor.parseFunctionCalls(aiMessage);
 
-        // 함수 호출 태그를 제거한 메시지 추출 (AI가 생성한 메시지 부분)
-        String aiMessageWithoutFunctionCalls = aiMessage;
-        // function_call 태그 제거
-        aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(RegExp(r'<function_call.*?</function_call>', dotAll: true), '').trim();
-        // JSON 배열 형식의 함수 호출 제거
-        final arrayStart = aiMessageWithoutFunctionCalls.indexOf('[');
-        final arrayEnd = aiMessageWithoutFunctionCalls.lastIndexOf(']');
-        if (arrayStart != -1 && arrayEnd != -1 && arrayEnd > arrayStart) {
-          try {
-            final arrayStr = aiMessageWithoutFunctionCalls.substring(arrayStart, arrayEnd + 1);
-            final parsed = jsonDecode(arrayStr) as List<dynamic>?;
-            if (parsed != null && parsed.isNotEmpty) {
-              bool isFunctionCallArray = false;
-              for (final item in parsed) {
-                if (item is Map<String, dynamic> && item.containsKey('function') && item.containsKey('arguments')) {
-                  isFunctionCallArray = true;
-                  break;
-                }
-              }
-              if (isFunctionCallArray) {
-                // 함수 호출 배열 제거
-                aiMessageWithoutFunctionCalls = (aiMessageWithoutFunctionCalls.substring(0, arrayStart) + aiMessageWithoutFunctionCalls.substring(arrayEnd + 1)).trim();
-              }
-            }
-          } catch (e) {
-            // JSON 파싱 실패 시 무시
+        // recentTaskIds/recentEventIds가 있고 사용자가 수정을 요청한 경우 createTask/createEvent 호출 차단
+        final currentState = state;
+        final hasRecentTaskIds = currentState.recentTaskIds.isNotEmpty;
+        final hasRecentEventIds = currentState.recentEventIds.isNotEmpty;
+
+        // 사용자 메시지가 수정/변경 요청인지 확인 (한국어/영어 패턴)
+        // 더 넓은 패턴으로 수정 요청 감지 (음, 음.., 음... 포함)
+        final isModificationRequest = RegExp(
+          r'(이거|이것|이|그거|그것|그|방금|지금|만든|생성한|만들어진|생성된|음|음\.\.|음\.\.\.).*(프로젝트|프로젝트로|변경|바꿔|옮겨|수정|업데이트|이동|move|change|update|modify|옮기)',
+          caseSensitive: false,
+        ).hasMatch(actualUserMessage);
+
+        // 디버깅: recentTaskIds와 isModificationRequest 상태 출력
+        if (hasRecentTaskIds) {
+          print('############# recentTaskIds: ${currentState.recentTaskIds}');
+          print('############# isModificationRequest: $isModificationRequest');
+          print('############# actualUserMessage: $actualUserMessage');
+        }
+
+        // 중복 함수 호출 제거 및 createTask/createEvent 차단
+        final functionCalls = <Map<String, dynamic>>[];
+        final seenFunctionSignatures = <String>{};
+        for (final call in allFunctionCalls) {
+          final functionName = call['function'] as String? ?? '';
+          final functionArgs = call['arguments'] as Map<String, dynamic>? ?? {};
+
+          // recentTaskIds가 있고 수정 요청인 경우 createTask 차단
+          if (hasRecentTaskIds && isModificationRequest && functionName == 'createTask') {
+            // createTask 호출을 무시하고 계속 진행
+            continue;
+          }
+
+          // recentEventIds가 있고 수정 요청인 경우 createEvent 차단
+          if (hasRecentEventIds && isModificationRequest && functionName == 'createEvent') {
+            // createEvent 호출을 무시하고 계속 진행
+            continue;
+          }
+
+          // signature 생성 (중복 확인용)
+          String signature = functionName;
+          if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
+            final title = functionArgs['title'] as String? ?? '';
+            final taskId = functionArgs['taskId'] as String? ?? '';
+            final eventId = functionArgs['eventId'] as String? ?? '';
+            final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
+            final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
+            signature = '$functionName|$taskId|$eventId|$title|$startAt|$endAt';
+          } else {
+            // 다른 함수들은 arguments 전체를 signature로 사용
+            signature = '$functionName|${jsonEncode(functionArgs)}';
+          }
+
+          if (!seenFunctionSignatures.contains(signature)) {
+            seenFunctionSignatures.add(signature);
+            functionCalls.add(call);
           }
         }
+
+        // 룰베이스 제거: 함수 호출 태그나 JSON 배열 제거하지 않음
+        String aiMessageWithoutFunctionCalls = aiMessage;
 
         if (functionCalls.isNotEmpty) {
           // 여러 개의 함수 호출이 감지되면 순차적으로 실행
@@ -765,10 +913,86 @@ class AgentActionController extends _$AgentActionController {
                 }
 
                 final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-                successMessages.add(successMessage);
+                final taskId = result['taskId'] as String?;
+                final eventId = result['eventId'] as String?;
+
+                // createTask 실행 후 새로 생성된 Task를 updatedTaggedTasks에 추가
+                if (functionName == 'createTask' && taskId != null && taskId.isNotEmpty) {
+                  // Task가 저장될 때까지 약간의 지연 (provider 업데이트 대기)
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  final allTasks = ref.read(taskListControllerProvider).tasks;
+                  final createdTask = allTasks.firstWhereOrNull((task) => task.id == taskId && !task.isEventDummyTask);
+                  if (createdTask != null) {
+                    final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
+                    if (!existingIds.contains(createdTask.id)) {
+                      updatedTaggedTasks = [...(updatedTaggedTasks ?? []), createdTask];
+                    }
+                  }
+                }
+
+                // createEvent 실행 후 새로 생성된 Event를 updatedTaggedEvents에 추가
+                if (functionName == 'createEvent' && eventId != null && eventId.isNotEmpty) {
+                  // Event가 저장될 때까지 약간의 지연 (provider 업데이트 대기)
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+                  final createdEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == eventId);
+                  if (createdEvent != null) {
+                    final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+                    if (!existingIds.contains(createdEvent.uniqueId)) {
+                      updatedTaggedEvents = [...(updatedTaggedEvents ?? []), createdEvent];
+                    }
+                  }
+                }
+
+                var messageWithId = successMessage;
+                if (taskId != null && taskId.isNotEmpty) {
+                  messageWithId += ' (taskId: $taskId)';
+                }
+                if (eventId != null && eventId.isNotEmpty) {
+                  messageWithId += ' (eventId: $eventId)';
+                }
+                successMessages.add(messageWithId);
               } else if (result['success'] == true) {
                 final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-                successMessages.add(successMessage);
+                final taskId = result['taskId'] as String?;
+                final eventId = result['eventId'] as String?;
+
+                // createTask 실행 후 새로 생성된 Task를 updatedTaggedTasks에 추가
+                if (functionName == 'createTask' && taskId != null && taskId.isNotEmpty) {
+                  // Task가 저장될 때까지 약간의 지연 (provider 업데이트 대기)
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  final allTasks = ref.read(taskListControllerProvider).tasks;
+                  final createdTask = allTasks.firstWhereOrNull((task) => task.id == taskId && !task.isEventDummyTask);
+                  if (createdTask != null) {
+                    final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
+                    if (!existingIds.contains(createdTask.id)) {
+                      updatedTaggedTasks = [...(updatedTaggedTasks ?? []), createdTask];
+                    }
+                  }
+                }
+
+                // createEvent 실행 후 새로 생성된 Event를 updatedTaggedEvents에 추가
+                if (functionName == 'createEvent' && eventId != null && eventId.isNotEmpty) {
+                  // Event가 저장될 때까지 약간의 지연 (provider 업데이트 대기)
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+                  final createdEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == eventId);
+                  if (createdEvent != null) {
+                    final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+                    if (!existingIds.contains(createdEvent.uniqueId)) {
+                      updatedTaggedEvents = [...(updatedTaggedEvents ?? []), createdEvent];
+                    }
+                  }
+                }
+
+                var messageWithId = successMessage;
+                if (taskId != null && taskId.isNotEmpty) {
+                  messageWithId += ' (taskId: $taskId)';
+                }
+                if (eventId != null && eventId.isNotEmpty) {
+                  messageWithId += ' (eventId: $eventId)';
+                }
+                successMessages.add(messageWithId);
               } else {
                 final errorMessage = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
                 errorMessages.add('$functionName: $errorMessage');
@@ -788,20 +1012,82 @@ class AgentActionController extends _$AgentActionController {
           final pendingCallsForMessage = state.pendingFunctionCalls ?? [];
           final hasPendingCalls = pendingCallsForMessage.isNotEmpty;
 
-          // 메시지가 비어있으면 기본 메시지 생성
+          // 메시지가 비어있으면 AI에게 메시지 생성 요청
           if (resultMessage.trim().isEmpty) {
             if (hasPendingCalls) {
-              // 확인이 필요한 함수가 있는 경우, 기본 확인 메시지 생성
+              // 확인이 필요한 함수가 있는 경우, AI에게 확인 메시지 생성 요청
               final pendingFunctionNames = pendingCallsForMessage.map((call) => call['function_name'] as String? ?? '').where((name) => name.isNotEmpty).toList();
               if (pendingFunctionNames.isNotEmpty) {
-                // 함수 이름에 따라 적절한 메시지 생성
-                if (pendingFunctionNames.contains('createTask')) {
-                  resultMessage = 'A new task has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your tasks.';
-                } else if (pendingFunctionNames.contains('createEvent')) {
-                  resultMessage = 'A new event has been prepared from the inbox item and is waiting for your confirmation. Once you confirm, it will be created in your calendar.';
-                } else if (pendingFunctionNames.contains('sendMail') || pendingFunctionNames.contains('replyMail') || pendingFunctionNames.contains('forwardMail')) {
-                  resultMessage = 'A new email has been prepared and is waiting for your confirmation. Once you confirm, it will be sent.';
-                } else {
+                // pendingFunctionCalls 정보를 AI에게 전달하여 확인 메시지 생성
+                final pendingCallsInfo = pendingCallsForMessage
+                    .map((call) {
+                      final functionName = call['function_name'] as String? ?? '';
+                      final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                      return '$functionName: ${functionArgs.toString()}';
+                    })
+                    .join('\n');
+
+                final confirmationPrompt =
+                    'The following ${pendingFunctionNames.length} function call(s) are waiting for user confirmation:\n$pendingCallsInfo\n\nPlease provide a natural, user-friendly message informing the user that these actions are prepared and waiting for confirmation. Be concise and clear. Do NOT mention "from the inbox item" unless the action is specifically related to creating a task or event from an inbox item.';
+
+                try {
+                  final me = ref.read(authControllerProvider).value;
+                  final userId = me?.id;
+                  final selectedModel = this.selectedModel;
+                  String? apiKey;
+                  if (useUserApiKey) {
+                    final apiKeys = ref.read(aiApiKeysProvider);
+                    apiKey = apiKeys[selectedModel.provider.name];
+                  } else {
+                    try {
+                      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
+                      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
+                      apiKey = env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null;
+                    } catch (e) {
+                      // 환경 변수 읽기 실패
+                    }
+                  }
+
+                  final projects = ref.read(projectListControllerProvider);
+                  final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
+
+                  final confirmationMessages = [...messages, AgentActionMessage(role: 'user', content: confirmationPrompt)];
+
+                  // conversation history에서 함수 실행 결과 메시지 제거 (excludeFromHistory 플래그 사용)
+                  // 룰베이스 제거: 함수 호출 태그나 JSON 배열 제거하지 않음
+                  final filteredConfirmationHistory = confirmationMessages
+                      .where((m) => !m.excludeFromHistory) // excludeFromHistory가 true인 메시지는 제외
+                      .map((m) => m.toJson(local: true))
+                      .toList();
+
+                  final confirmationResponse = await _repository.generateGeneralChat(
+                    userMessage: confirmationPrompt,
+                    conversationHistory: filteredConfirmationHistory,
+                    projectContext: null,
+                    projects: projectsList,
+                    taggedContext: null,
+                    channelContext: null,
+                    inboxContext: null,
+                    model: selectedModel.modelName,
+                    apiKey: apiKey,
+                    userId: userId,
+                    systemPrompt:
+                        'You are a helpful assistant. Provide a brief, natural message informing the user that actions are prepared and waiting for confirmation. Be concise and clear. Do NOT mention "from the inbox item" unless the action is specifically related to creating a task or event from an inbox item.\n\nABSOLUTE RULE: DO NOT call any functions. Only provide a message describing what actions are waiting for confirmation. DO NOT call createTask, updateTask, or any other functions.',
+                  );
+
+                  final confirmationAiResponse = confirmationResponse.fold((failure) => null, (response) => response);
+                  if (confirmationAiResponse != null && confirmationAiResponse['message'] != null) {
+                    resultMessage = confirmationAiResponse['message'] as String;
+                    // HTML 엔티티 unescape 처리
+                    final unescape = HtmlUnescape();
+                    resultMessage = unescape.convert(resultMessage);
+                    // 룰베이스 제거: 함수 호출 태그 제거하지 않음
+                  } else {
+                    // AI 호출 실패 시 기본 메시지 사용
+                    resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
+                  }
+                } catch (e) {
+                  // AI 호출 실패 시 기본 메시지 사용
                   resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
                 }
               } else {
@@ -830,14 +1116,14 @@ class AgentActionController extends _$AgentActionController {
           _saveChatHistory(taggedProjects: taggedProjects);
         } else {
           // 일반 응답
-          // AI 응답에서 need_more_action 태그 제거 (사용자에게는 표시하지 않음)
-          final cleanedAiMessage = aiMessage.replaceAll(RegExp(r'<need_more_action>.*?</need_more_action>', dotAll: true), '').trim();
-          final assistantMessage = AgentActionMessage(role: 'assistant', content: cleanedAiMessage);
+          // 룰베이스 제거: need_more_action 태그 제거하지 않음
+          final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
           final updatedMessagesWithResponse = [...messages, assistantMessage];
 
-          // AI 응답에서 need_more_action 태그 파싱 (재귀 호출이 아닌 경우에만)
+          // 룰베이스 제거: need_more_action 태그 파싱하지 않음
           if (!isRecursiveCall) {
-            final needMoreActionData = _parseNeedMoreActionTag(aiMessage);
+            // need_more_action 기능 비활성화 (룰베이스 제거)
+            final needMoreActionData = null;
 
             if (needMoreActionData != null && inboxes != null && inboxes.isNotEmpty) {
               // 태그에서 inbox 번호 추출
@@ -1665,31 +1951,11 @@ class AgentActionController extends _$AgentActionController {
   }
 
   /// AI 응답에서 need_more_action 태그를 파싱합니다.
-  /// 태그 형식: <need_more_action>{"inbox_numbers": [1, 2, 3]}</need_more_action>
+  /// 룰베이스 제거로 인해 더 이상 사용되지 않음
+  @Deprecated('룰베이스 제거로 인해 사용되지 않음')
   Map<String, dynamic>? _parseNeedMoreActionTag(String aiResponse) {
-    final tagPattern = RegExp(r'<need_more_action>(.*?)</need_more_action>', dotAll: true);
-    final match = tagPattern.firstMatch(aiResponse);
-
-    if (match == null) return null;
-
-    try {
-      final jsonStr = match.group(1)?.trim() ?? '{}';
-      final jsonData = jsonDecode(jsonStr) as Map<String, dynamic>;
-
-      // inbox_numbers를 Set<int>로 변환
-      if (jsonData.containsKey('inbox_numbers')) {
-        final numbers = jsonData['inbox_numbers'];
-        if (numbers is List) {
-          final numberSet = numbers.map((n) => n is int ? n : int.tryParse(n.toString())).whereType<int>().toSet();
-          return {'inbox_numbers': numberSet};
-        }
-      }
-
-      return jsonData;
-    } catch (e) {
-      // JSON 파싱 실패 시 null 반환
-      return null;
-    }
+    // 룰베이스 제거: 항상 null 반환
+    return null;
   }
 
   /// 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 관련 inbox를 자동으로 감지합니다.
@@ -1794,14 +2060,20 @@ class AgentActionController extends _$AgentActionController {
     );
 
     // 사용자 메시지 추가
-    final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: messageWithTags)];
+    // IMPORTANT: 최신 state를 다시 읽어서 recentTaskIds/recentEventIds가 반영되었는지 확인
+    final currentState = state;
+    final updatedMessages = [...currentState.messages, AgentActionMessage(role: 'user', content: messageWithTags)];
     state = state.copyWith(messages: updatedMessages, isLoading: true);
 
     // 사용자 메시지 추가 후 히스토리 저장
     _saveChatHistory(taggedProjects: taggedProjects);
 
+    // 디버깅: sendMessage에서 state 확인
+    print('############# sendMessage: state.recentTaskIds: ${state.recentTaskIds}');
+
     try {
       // MCP 함수 호출을 통한 일반적인 AI 챗 진행
+      // IMPORTANT: state가 최신 상태인지 확인하기 위해 다시 읽기
       await _generateGeneralChat(
         userMessage,
         updatedMessages: updatedMessages,
@@ -2011,6 +2283,11 @@ class AgentActionController extends _$AgentActionController {
     final functionResults = <Map<String, dynamic>>[];
 
     // 각 액션을 순차적으로 실행 (의존성 고려)
+    // updatedTaggedTasks와 updatedTaggedEvents를 동적으로 업데이트하기 위해 변수로 선언
+    // 첫 번째 호출의 updated_tagged_tasks를 초기값으로 사용
+    List<TaskEntity>? currentTaggedTasks = callsToExecute.isNotEmpty ? (callsToExecute.first['updated_tagged_tasks'] as List<TaskEntity>?) : null;
+    List<EventEntity>? currentTaggedEvents = callsToExecute.isNotEmpty ? (callsToExecute.first['updated_tagged_events'] as List<EventEntity>?) : null;
+
     for (final pendingCall in callsToExecute) {
       // 타입 안전하게 데이터 추출
       final functionName = pendingCall['function_name'] as String?;
@@ -2020,9 +2297,9 @@ class AgentActionController extends _$AgentActionController {
         continue;
       }
 
-      // 타입 안전하게 컨텍스트 데이터 추출
-      final updatedTaggedTasks = pendingCall['updated_tagged_tasks'] as List<TaskEntity>?;
-      final updatedTaggedEvents = pendingCall['updated_tagged_events'] as List<EventEntity>?;
+      // 타입 안전하게 컨텍스트 데이터 추출 (동적으로 업데이트된 currentTaggedTasks 사용)
+      final updatedTaggedTasks = currentTaggedTasks ?? (pendingCall['updated_tagged_tasks'] as List<TaskEntity>?);
+      final updatedTaggedEvents = currentTaggedEvents ?? (pendingCall['updated_tagged_events'] as List<EventEntity>?);
       final taggedConnections = pendingCall['tagged_connections'] as List<ConnectionEntity>?;
       final updatedAvailableInboxes = pendingCall['updated_available_inboxes'] as List<InboxEntity>?;
       final remainingCredits = (pendingCall['remaining_credits'] as num?)?.toDouble() ?? 0.0;
@@ -2045,7 +2322,45 @@ class AgentActionController extends _$AgentActionController {
 
         if (result['success'] == true) {
           final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
-          functionResults.add({'function_name': functionName, 'success': true, 'message': message});
+          final taskId = result['taskId'] as String?;
+          final eventId = result['eventId'] as String?;
+          final projectId = result['projectId'] as String?;
+
+          // createTask 실행 후 새로 생성된 Task를 currentTaggedTasks에 추가
+          if (functionName == 'createTask' && taskId != null && taskId.isNotEmpty) {
+            // Task가 저장될 때까지 약간의 지연 (provider 업데이트 대기)
+            await Future.delayed(const Duration(milliseconds: 100));
+            final allTasks = ref.read(taskListControllerProvider).tasks;
+            final createdTask = allTasks.firstWhereOrNull((task) => task.id == taskId && !task.isEventDummyTask);
+            if (createdTask != null) {
+              final existingIds = currentTaggedTasks?.map((e) => e.id).toSet() ?? {};
+              if (!existingIds.contains(createdTask.id)) {
+                currentTaggedTasks = [...(currentTaggedTasks ?? []), createdTask];
+              }
+            }
+          }
+
+          // createEvent 실행 후 새로 생성된 Event를 currentTaggedEvents에 추가
+          if (functionName == 'createEvent' && eventId != null && eventId.isNotEmpty) {
+            await Future.delayed(const Duration(milliseconds: 100));
+            final allEvents = ref.read(calendarEventListControllerProvider(tabType: tabType)).eventsOnView;
+            final createdEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == eventId);
+            if (createdEvent != null) {
+              final existingIds = currentTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+              if (!existingIds.contains(createdEvent.uniqueId)) {
+                currentTaggedEvents = [...(currentTaggedEvents ?? []), createdEvent];
+              }
+            }
+          }
+
+          functionResults.add({
+            'function_name': functionName,
+            'success': true,
+            'message': message,
+            if (taskId != null) 'taskId': taskId,
+            if (eventId != null) 'eventId': eventId,
+            if (projectId != null) 'projectId': projectId,
+          });
         } else {
           final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
           functionResults.add({'function_name': functionName, 'success': false, 'error': error});
@@ -2066,11 +2381,24 @@ class AgentActionController extends _$AgentActionController {
 
       if (success) {
         final message = result['message'] as String? ?? '';
-        if (message.isNotEmpty) {
-          functionResultsSummary.add('$functionName: $message');
-        } else {
-          functionResultsSummary.add('$functionName: completed successfully');
+        final taskId = result['taskId'] as String?;
+        final eventId = result['eventId'] as String?;
+        final projectId = result['projectId'] as String?;
+
+        var summaryMessage = message.isNotEmpty ? message : 'completed successfully';
+
+        // taskId, eventId, projectId가 있으면 메시지에 포함
+        if (taskId != null && taskId.isNotEmpty) {
+          summaryMessage += ' (taskId: $taskId)';
         }
+        if (eventId != null && eventId.isNotEmpty) {
+          summaryMessage += ' (eventId: $eventId)';
+        }
+        if (projectId != null && projectId.isNotEmpty) {
+          summaryMessage += ' (projectId: $projectId)';
+        }
+
+        functionResultsSummary.add('$functionName: $summaryMessage');
       } else {
         final error = result['error'] as String? ?? '';
         functionResultsSummary.add('$functionName: failed - $error');
@@ -2085,8 +2413,21 @@ class AgentActionController extends _$AgentActionController {
     // 함수 실행 결과를 AI에게 전달하여 메시지 생성
     if (functionResultsSummary.isNotEmpty) {
       final functionResultsText = functionResultsSummary.join('\n');
+
+      // taskId, eventId가 포함된 결과를 명확히 표시
+      final taskIds = functionResults.where((r) => r['taskId'] != null).map((r) => r['taskId'] as String).toList();
+      final eventIds = functionResults.where((r) => r['eventId'] != null).map((r) => r['eventId'] as String).toList();
+
+      String additionalInfo = '';
+      if (taskIds.isNotEmpty) {
+        additionalInfo += '\n\nIMPORTANT: Created task IDs: ${taskIds.join(', ')}. These taskIds can be used in subsequent updateTask or linkToProject function calls.';
+      }
+      if (eventIds.isNotEmpty) {
+        additionalInfo += '\n\nIMPORTANT: Created event IDs: ${eventIds.join(', ')}. These eventIds can be used in subsequent updateEvent function calls.';
+      }
+
       final functionResultsPrompt =
-          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.';
+          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "작업 ID: xxx" in Korean.\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
 
       // 함수 실행 결과를 포함한 메시지로 AI 호출
       final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt)];
@@ -2113,10 +2454,17 @@ class AgentActionController extends _$AgentActionController {
       final projects = ref.read(projectListControllerProvider);
       final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
 
+      // conversation history에서 함수 실행 결과 메시지 제거 (excludeFromHistory 플래그 사용)
+      // 룰베이스 제거: 함수 호출 태그나 JSON 배열 제거하지 않음
+      final filteredFunctionResultsHistory = functionResultsMessages
+          .where((m) => !m.excludeFromHistory) // excludeFromHistory가 true인 메시지는 제외
+          .map((m) => m.toJson(local: true))
+          .toList();
+
       try {
         final functionResponse = await _repository.generateGeneralChat(
           userMessage: functionResultsPrompt,
-          conversationHistory: functionResultsMessages.map((m) => m.toJson(local: true)).toList(),
+          conversationHistory: filteredFunctionResultsHistory,
           projectContext: null,
           projects: projectsList,
           taggedContext: null,
@@ -2125,20 +2473,39 @@ class AgentActionController extends _$AgentActionController {
           model: selectedModel.modelName,
           apiKey: apiKey,
           userId: userId,
-          systemPrompt: 'You are a helpful assistant. Provide a brief, natural summary of the function execution results.',
+          systemPrompt:
+              'You are a helpful assistant. Provide a brief, natural summary of the function execution results. CRITICAL: If any taskId or eventId is mentioned in the function results (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Always include taskId/eventId in the format "(taskId: xxx)" or "(작업 ID: xxx)" in Korean responses.\n\nABSOLUTE RULE: The functions mentioned in the user message have ALREADY been executed. DO NOT call any functions. Only provide a summary message describing what was done. DO NOT call createTask, updateTask, or any other functions.',
         );
 
         final functionAiResponse = functionResponse.fold((failure) => null, (response) => response);
         if (functionAiResponse != null && functionAiResponse['message'] != null) {
           resultMessage = functionAiResponse['message'] as String;
-          // 함수 호출 태그 제거
-          resultMessage = resultMessage.replaceAll(RegExp(r'<function_call>.*?</function_call>', dotAll: true), '').trim();
+          // HTML 엔티티 unescape 처리
+          final unescape = HtmlUnescape();
+          resultMessage = unescape.convert(resultMessage);
+          // 룰베이스 제거: 함수 호출 태그 제거하지 않음
         } else {
-          // AI 호출 실패 시 기본 메시지 사용
+          // AI 호출 실패 시 기본 메시지 사용 (taskId 포함)
           final successResults = functionResults.where((r) => r['success'] == true).toList();
           final errorResults = functionResults.where((r) => r['success'] == false).toList();
           if (errorResults.isEmpty) {
-            final messages = successResults.map((r) => r['message'] as String? ?? '').where((m) => m.isNotEmpty).toList();
+            final messages = successResults
+                .map((r) {
+                  final message = r['message'] as String? ?? '';
+                  final taskId = r['taskId'] as String?;
+                  final eventId = r['eventId'] as String?;
+                  if (message.isEmpty) return '';
+                  var msg = message;
+                  if (taskId != null && taskId.isNotEmpty) {
+                    msg += ' (taskId: $taskId)';
+                  }
+                  if (eventId != null && eventId.isNotEmpty) {
+                    msg += ' (eventId: $eventId)';
+                  }
+                  return msg;
+                })
+                .where((m) => m.isNotEmpty)
+                .toList();
             resultMessage = messages.isNotEmpty ? messages.join('\n\n') : '';
           } else {
             final errors = errorResults.map((r) => '${r['function_name']}: ${r['error']}').toList();
@@ -2146,11 +2513,27 @@ class AgentActionController extends _$AgentActionController {
           }
         }
       } catch (e) {
-        // AI 호출 실패 시 기본 메시지 사용
+        // AI 호출 실패 시 기본 메시지 사용 (taskId 포함)
         final successResults = functionResults.where((r) => r['success'] == true).toList();
         final errorResults = functionResults.where((r) => r['success'] == false).toList();
         if (errorResults.isEmpty) {
-          final messages = successResults.map((r) => r['message'] as String? ?? '').where((m) => m.isNotEmpty).toList();
+          final messages = successResults
+              .map((r) {
+                final message = r['message'] as String? ?? '';
+                final taskId = r['taskId'] as String?;
+                final eventId = r['eventId'] as String?;
+                if (message.isEmpty) return '';
+                var msg = message;
+                if (taskId != null && taskId.isNotEmpty) {
+                  msg += ' (taskId: $taskId)';
+                }
+                if (eventId != null && eventId.isNotEmpty) {
+                  msg += ' (eventId: $eventId)';
+                }
+                return msg;
+              })
+              .where((m) => m.isNotEmpty)
+              .toList();
           resultMessage = messages.isNotEmpty ? messages.join('\n\n') : '';
         } else {
           final errors = errorResults.map((r) => '${r['function_name']}: ${r['error']}').toList();
@@ -2158,11 +2541,27 @@ class AgentActionController extends _$AgentActionController {
         }
       }
     } else {
-      // 함수 실행 결과가 없으면 기본 메시지 사용
+      // 함수 실행 결과가 없으면 기본 메시지 사용 (taskId 포함)
       final successResults = functionResults.where((r) => r['success'] == true).toList();
       final errorResults = functionResults.where((r) => r['success'] == false).toList();
       if (errorResults.isEmpty) {
-        final messages = successResults.map((r) => r['message'] as String? ?? '').where((m) => m.isNotEmpty).toList();
+        final messages = successResults
+            .map((r) {
+              final message = r['message'] as String? ?? '';
+              final taskId = r['taskId'] as String?;
+              final eventId = r['eventId'] as String?;
+              if (message.isEmpty) return '';
+              var msg = message;
+              if (taskId != null && taskId.isNotEmpty) {
+                msg += ' (taskId: $taskId)';
+              }
+              if (eventId != null && eventId.isNotEmpty) {
+                msg += ' (eventId: $eventId)';
+              }
+              return msg;
+            })
+            .where((m) => m.isNotEmpty)
+            .toList();
         resultMessage = messages.isNotEmpty ? messages.join('\n\n') : '';
       } else {
         final errors = errorResults.map((r) => '${r['function_name']}: ${r['error']}').toList();
@@ -2170,7 +2569,31 @@ class AgentActionController extends _$AgentActionController {
       }
     }
 
-    final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage);
+    // 함수 실행 결과에서 taskId/eventId 추출하여 state에 저장 (다음 요청에서 AI가 참조할 수 있도록)
+    final newTaskIds = functionResults.where((r) => r['success'] == true && r['taskId'] != null).map((r) => r['taskId'] as String).toList();
+    final newEventIds = functionResults.where((r) => r['success'] == true && r['eventId'] != null).map((r) => r['eventId'] as String).toList();
+
+    // 디버깅: taskId 추출 결과 출력
+    if (newTaskIds.isNotEmpty) {
+      print('############# confirmActions: newTaskIds extracted: $newTaskIds');
+      print('############# confirmActions: current state.recentTaskIds: ${state.recentTaskIds}');
+    }
+
+    // 기존 taskId/eventId에 새로운 것 추가 (최근 10개만 유지)
+    // 중복 제거: 같은 ID가 이미 있으면 추가하지 않음
+    final existingTaskIds = state.recentTaskIds.toSet();
+    final existingEventIds = state.recentEventIds.toSet();
+    final updatedTaskIds = [...state.recentTaskIds, ...newTaskIds.where((id) => !existingTaskIds.contains(id))].take(10).toList();
+    final updatedEventIds = [...state.recentEventIds, ...newEventIds.where((id) => !existingEventIds.contains(id))].take(10).toList();
+
+    // 디버깅: 업데이트된 taskIds 출력
+    if (updatedTaskIds.isNotEmpty) {
+      print('############# confirmActions: updatedTaskIds: $updatedTaskIds');
+    }
+
+    // 함수 실행 결과 메시지는 conversation history에서 제외하도록 플래그 설정
+    // 룰베이스로 텍스트를 변경하지 않음 - excludeFromHistory 플래그로 처리
+    final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage, excludeFromHistory: true);
     final updatedMessages = [...state.messages, assistantMessage];
 
     // pendingFunctionCalls에서 실행된 항목 제거 (entity block은 유지)
@@ -2179,9 +2602,15 @@ class AgentActionController extends _$AgentActionController {
       return callActionId == null || !actionIds.contains(callActionId);
     }).toList();
 
-    state = state.copyWith(messages: updatedMessages, pendingFunctionCalls: updatedPendingCalls.isEmpty ? null : updatedPendingCalls, isLoading: false);
+    state = state.copyWith(
+      messages: updatedMessages,
+      pendingFunctionCalls: updatedPendingCalls.isEmpty ? null : updatedPendingCalls,
+      isLoading: false,
+      recentTaskIds: updatedTaskIds,
+      recentEventIds: updatedEventIds,
+    );
 
-    // 히스토리 저장
+    // 히스토리 저장 (함수 실행 결과 메시지는 excludeFromHistory 플래그로 인해 conversation history에서 제외됨)
     _saveChatHistory();
   }
 

@@ -35,6 +35,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:uuid/uuid.dart';
 
@@ -266,9 +267,9 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       'id': jsonData['id'],
       'title': jsonData['title'],
       'description': jsonData['description'],
-      'calendar_id': jsonData['calendar_id'],
-      'start_at': jsonData['start_at'],
-      'end_at': jsonData['end_at'],
+      'calendar_id': jsonData['calendar_id'] ?? jsonData['calendarId'], // calendarId도 지원
+      'start_at': jsonData['start_at'] ?? jsonData['startAt'],
+      'end_at': jsonData['end_at'] ?? jsonData['endAt'],
       'location': jsonData['location'],
       'rrule': jsonData['rrule'],
       'attendees': jsonData['attendees'] as List<dynamic>? ?? [],
@@ -280,8 +281,16 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
   Widget _buildEventWidget(BuildContext context, Map<String, dynamic> eventData, bool isUser) {
     final calendarMap = ref.read(calendarListControllerProvider);
     final calendarList = calendarMap.values.expand((e) => e).toList();
-    final calendarId = eventData['calendar_id'] as String?;
-    final calendar = calendarId != null ? calendarList.firstWhereOrNull((c) => c.uniqueId == calendarId) : null;
+    // calendar_id 또는 calendarId 모두 지원
+    final calendarId = eventData['calendar_id'] as String? ?? eventData['calendarId'] as String?;
+    CalendarEntity? calendar;
+    if (calendarId != null && calendarId.isNotEmpty) {
+      calendar = calendarList.firstWhereOrNull((c) => c.uniqueId == calendarId);
+    }
+    // calendarId가 없거나 찾지 못한 경우 첫 번째 캘린더 사용
+    if (calendar == null && calendarList.isNotEmpty) {
+      calendar = calendarList.first;
+    }
 
     final startAtStr = eventData['start_at'] as String?;
     final endAtStr = eventData['end_at'] as String?;
@@ -747,40 +756,87 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     return writeActions.contains(functionName);
   }
 
-  Widget _buildTaskEntityWithConfirm(BuildContext context, Map<String, dynamic> functionArgs, String actionId, bool isUser) {
+  Widget _buildTaskEntityWithConfirm(BuildContext context, Map<String, dynamic> functionArgs, String actionId, bool isUser, {String? functionName, List<dynamic>? updatedTaggedTasks}) {
     try {
       final user = ref.read(authControllerProvider).requireValue;
-      final title = functionArgs['title'] as String? ?? '';
-      final description = functionArgs['description'] as String? ?? '';
-      final projectId = functionArgs['projectId'] as String?;
+      
+      // updateTask인 경우 taskId로 기존 task 찾기
+      final taskId = functionArgs['taskId'] as String?;
+      TaskEntity? existingTask;
+      
+      // 먼저 updatedTaggedTasks에서 찾기
+      if (updatedTaggedTasks != null && taskId != null && taskId.isNotEmpty) {
+        for (final taskData in updatedTaggedTasks) {
+          if (taskData is TaskEntity && taskData.id == taskId) {
+            existingTask = taskData;
+            break;
+          } else if (taskData is Map<String, dynamic> && taskData['id'] == taskId) {
+            // Map 형태인 경우 TaskEntity로 변환 시도
+            try {
+              existingTask = TaskEntity.fromJson(taskData);
+            } catch (_) {}
+            break;
+          }
+        }
+      }
+      
+      // updatedTaggedTasks에서 찾지 못하면 taskId로 컨트롤러에서 찾기
+      if (existingTask == null && taskId != null && taskId.isNotEmpty) {
+        // taskListController에서 찾기
+        try {
+          final taskListState = ref.read(taskListControllerProvider);
+          existingTask = taskListState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
+        } catch (_) {}
+        
+        // 찾지 못하면 calendarTaskListController에서 찾기
+        if (existingTask == null) {
+          try {
+            final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+            existingTask = calendarState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
+          } catch (_) {}
+        }
+      }
+      
+      // functionArgs에서 업데이트할 정보 가져오기
+      final title = functionArgs['title'] as String? ?? existingTask?.title ?? '';
+      final description = functionArgs['description'] as String? ?? existingTask?.description ?? '';
+      final projectId = functionArgs['projectId'] as String? ?? existingTask?.projectId;
       final startAtStr = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String?;
       final endAtStr = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String?;
-      final isAllDay = functionArgs['isAllDay'] as bool? ?? false;
+      final isAllDay = functionArgs['isAllDay'] as bool? ?? existingTask?.isAllDay ?? false;
 
-      DateTime? startAt;
-      DateTime? endAt;
+      DateTime? startAt = existingTask?.startAt;
+      DateTime? endAt = existingTask?.endAt;
+      
       if (startAtStr != null) {
         try {
           startAt = DateTime.parse(startAtStr).toLocal();
         } catch (e) {
-          startAt = DateTime.now();
+          startAt = startAt ?? DateTime.now();
         }
       } else {
-        startAt = DateTime.now();
+        startAt = startAt ?? DateTime.now();
       }
 
       if (endAtStr != null) {
         try {
           endAt = DateTime.parse(endAtStr).toLocal();
         } catch (e) {
-          endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+          endAt = endAt ?? startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
         }
       } else {
-        endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+        endAt = endAt ?? startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
       }
 
-      final task = TaskEntity(
-        id: const Uuid().v4(),
+      final task = existingTask?.copyWith(
+        title: title,
+        description: description,
+        projectId: projectId,
+        startAt: startAt,
+        endAt: endAt,
+        isAllDay: isAllDay,
+      ) ?? TaskEntity(
+        id: taskId ?? const Uuid().v4(),
         ownerId: user.id,
         title: title,
         description: description,
@@ -788,8 +844,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         startAt: startAt,
         endAt: endAt,
         isAllDay: isAllDay,
-        createdAt: DateTime.now(),
-        status: TaskStatus.none,
+        createdAt: existingTask?.createdAt ?? DateTime.now(),
+        status: existingTask?.status ?? TaskStatus.none,
       );
 
       return _buildTaskWidget(context, task, isUser);
@@ -934,6 +990,18 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
     // Clean up any extra whitespace or newlines left behind
     cleanedContent = cleanedContent.replaceAll(RegExp(r'\n\s*\n\s*\n+'), '\n\n').trim();
+
+    // Remove <function_call> tags and their content (only show as block, don't render content)
+    final functionCallTagRegex = RegExp(r'<function_call[^>]*>.*?</function_call>', dotAll: true);
+    cleanedContent = cleanedContent.replaceAll(functionCallTagRegex, '');
+
+    // Remove conversation_title tags completely (they should not be rendered)
+    cleanedContent = cleanedContent.replaceAll(RegExp(r'<conversation_title>.*?</conversation_title>', dotAll: true), '');
+    cleanedContent = cleanedContent.replaceAll(RegExp(r'&lt;conversation_title&gt;.*?&lt;/conversation_title&gt;', dotAll: true), '');
+
+    // 전역적으로 모든 HTML 엔티티 unescape 처리 (특정 태그가 아니라 모든 엔티티)
+    final unescape = HtmlUnescape();
+    cleanedContent = unescape.convert(cleanedContent);
 
     // Extract tagged items from HTML tags first
     final Map<String, Map<String, dynamic>> taggedItems = {};
@@ -1108,13 +1176,20 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         // Note: The markdown parser may escape custom tags like <inapp_task>, so we need to restore them
         final htmlFromMarkdown = md.markdownToHtml(contentToConvert);
 
+        // 전역적으로 모든 HTML 엔티티 unescape 처리 (markdown 변환 후)
+        final unescape = HtmlUnescape();
+        String restoredHtml = unescape.convert(htmlFromMarkdown);
+
+        // Remove conversation_title tags completely (they should not be rendered)
+        restoredHtml = restoredHtml.replaceAll(RegExp(r'<conversation_title>.*?</conversation_title>', dotAll: true), '');
+
         // Restore escaped inapp_ and tagged_ tags
-        // The markdown parser escapes < and > in unknown tags, so we need to unescape them
-        String restoredHtml = htmlFromMarkdown;
+        // The markdown parser escapes < and > in unknown tags, so we need to restore them
 
         // First, restore escaped tag pairs: &lt;inapp_xxx&gt;...&lt;/inapp_xxx&gt; -> <inapp_xxx>...</inapp_xxx>
+        // Also restore conversation_title tags
         // Match the entire tag pair including escaped content (non-greedy, dotall mode)
-        final escapedTagPairRegex = RegExp(r'&lt;(inapp_|tagged_)([a-z_]+)&gt;([\s\S]*?)&lt;/(inapp_|tagged_)([a-z_]+)&gt;', caseSensitive: false, dotAll: true);
+        final escapedTagPairRegex = RegExp(r'&lt;(inapp_|tagged_|conversation_)([a-z_]+)&gt;([\s\S]*?)&lt;/(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false, dotAll: true);
 
         restoredHtml = restoredHtml.replaceAllMapped(escapedTagPairRegex, (match) {
           final openingPrefix = match.group(1)!;
@@ -1141,10 +1216,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
         // Also handle cases where tags might be on separate lines or have different escaping
         // Restore any remaining escaped opening tags (standalone, not part of a pair)
-        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;(inapp_|tagged_)([a-z_]+)&gt;', caseSensitive: false), (match) => '<${match.group(1)}${match.group(2)}>');
+        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false), (match) => '<${match.group(1)}${match.group(2)}>');
 
         // Restore any remaining escaped closing tags (standalone, not part of a pair)
-        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;/(inapp_|tagged_)([a-z_]+)&gt;', caseSensitive: false), (match) => '</${match.group(1)}${match.group(2)}>');
+        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;/(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false), (match) => '</${match.group(1)}${match.group(2)}>');
 
         // Also restore JSON quotes that might still be escaped in restored tags
         // Find all restored tag pairs and unescape their content
@@ -1217,6 +1292,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
           textStyle: htmlTextStyle,
           renderMode: RenderMode.column,
           customWidgetBuilder: (element) {
+            // Hide conversation_title tags completely
+            if (element.localName == 'conversation_title') {
+              return const SizedBox.shrink();
+            }
             // Handle tagged mentions in HTML text
             if (element.localName == 'span' && element.classes.contains('tagged-mention')) {
               final mentionName = element.attributes['data-mention'] ?? '';
@@ -1872,6 +1951,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             if (element.localName == 'tagged_project' || element.localName == 'tagged_channel' || element.localName == 'tagged_connection') {
               return {'font-size': '0', 'line-height': '0', 'color': 'transparent', 'display': 'inline-block'};
             }
+            // Hide conversation_title tags completely
+            if (element.localName == 'conversation_title') {
+              return {'display': 'none'};
+            }
             if (element.localName == 'div' && element.classes.contains('inbox-section')) {
               return {
                 'background-color': (isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surface).toHex(),
@@ -2184,11 +2267,13 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                           final functionName = call['function_name'] as String? ?? '';
                                           final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
                                           final actionId = call['action_id'] as String? ?? '';
+                                          // updateTask인 경우 updated_tagged_tasks에서 task 정보 가져오기
+                                          final updatedTaggedTasks = call['updated_tagged_tasks'] as List<dynamic>?;
 
                                           if (functionName == 'createTask' || functionName == 'updateTask') {
                                             return Padding(
                                               padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                              child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser),
+                                              child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser, functionName: functionName, updatedTaggedTasks: updatedTaggedTasks),
                                             );
                                           } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
                                             return Padding(

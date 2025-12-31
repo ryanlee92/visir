@@ -2659,7 +2659,15 @@ Return only the JSON object, no additional text or explanations.
 
 When calculating dates for repetitive tasks, use TODAY's date ($todayStr) as the starting point.
 
-You can help users manage tasks, events, and emails by calling functions. When the user mentions actions like "toggle task status", "create task", "delete event", etc., you should call the appropriate function.
+## CRITICAL: Do NOT Re-execute Already Executed Functions
+**ABSOLUTE RULE**: If the conversation history mentions that a function was already executed (e.g., "Task created successfully", "테스크를 생성했어요", "created", "생성", "executed", "처리됐어요"), you MUST NOT call that function again. The function has already been executed and the result is already in the system. Only call NEW functions that haven't been executed yet.
+
+**Examples**:
+- If history says "Task created successfully (taskId: xxx)", DO NOT call createTask again - the task already exists.
+- If history says "테스크를 생성했어요", DO NOT call createTask again - the task already exists.
+- If the user asks to modify an existing task (e.g., "이거 프로젝트로 옮겨줘"), use updateTask with the taskId from history, NOT createTask.
+
+You can help users manage tasks, events, and emails by calling functions. When the user mentions actions like "toggle task status", "create task", "delete event", etc., you should call the appropriate function. However, NEVER call a function that has already been executed according to the conversation history.
 
 ## Available Functions
 
@@ -2818,7 +2826,22 @@ The user can then click the confirm button or press Command+Enter (Mac) / Ctrl+E
 7. For repetitive tasks, calculate dates correctly and create separate function calls for each occurrence.
 8. **Function Chaining**: When chaining functions (e.g., search → action), call all functions in a single response. The system will execute them sequentially and automatically pass results between functions.
 9. **User Confirmation**: Functions that require confirmation will automatically show a confirmation UI. You don't need to ask the user separately - just call the function and the system will handle the confirmation flow.
-10. **Parallel Execution and Dependency Analysis**: When calling multiple functions, analyze dependencies and mark functions that can run in parallel:
+10. **CRITICAL - Task/Event Modification After Creation**: When a user requests to modify a task or event that was just created (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 다른 프로젝트로 옮겨줘", "이거 visir 프로젝트로 바꿔줘", "이거 visir 프로젝트로 옮겨줘"), you MUST:
+    - **FIRST**: Look at the conversation history (especially recent assistant messages) to find the most recent function execution result
+    - **Look for these patterns in the conversation history**:
+      * "createTask: ... (taskId: xxx)" - extract the taskId from parentheses
+      * "Created task IDs: xxx" - use this taskId directly
+      * Function result messages that mention "taskId: xxx" or "eventId: xxx"
+      * Any message that shows a taskId in parentheses like "(taskId: xxx)" or "(taskld: xxx)"
+    - **If you find a taskId**: Use `updateTask` function with that `taskId` and the new `projectId` (or other fields to modify)
+    - **Example 1**: If conversation shows "createTask: Task created successfully (taskId: abc-123)" and user says "이거 visir 프로젝트로 바꿔줘", call `updateTask` with `taskId: "abc-123"` and `projectId: "visir-project-id"`
+    - **Example 2**: If conversation shows "Created task IDs: xyz-789", use `taskId: "xyz-789"` in `updateTask`
+    - **Example 3**: If conversation shows "내일 **종일 '운동하기'** 테스크를 1개 생성했어요. (taskld: 5fd31ac8-afa9-4f45-96d0-3527645a0036)" and user says "이거 visir 프로젝트로 옮겨줘", extract taskId "5fd31ac8-afa9-4f45-96d0-3527645a0036" and call `updateTask` with that taskId
+    - **If you cannot find the taskId**: Use `searchTask` first to find the task by title (e.g., search for "운동하기" if that was the task title), then use `updateTask` with the found taskId
+    - **CRITICAL**: **DO NOT** call `createTask` again when modifying an existing task - **ALWAYS** use `updateTask` to modify existing tasks
+    - **CRITICAL**: **DO NOT** create a new task when the user asks to modify/move an existing task - **ONLY** use `updateTask`
+    - **DO NOT** use `linkToProject` with inboxId - use `updateTask` with taskId instead
+11. **Parallel Execution and Dependency Analysis**: When calling multiple functions, analyze dependencies and mark functions that can run in parallel:
     - **Independent search functions** (`searchInbox`, `searchTask`, `searchCalendarEvent`) can run in parallel - set `can_parallelize: true`
     - **Functions that depend on previous results** (e.g., creating a task after searching) must run sequentially - set `can_parallelize: false` and optionally include `depends_on: ["functionName"]`
     - **Functions modifying the same resource** must run sequentially - set `can_parallelize: false`
