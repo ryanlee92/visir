@@ -1748,7 +1748,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                             final sortedProjects = projects.sortedProjectWithDepth;
                                             return SelectionWidget<ProjectEntity?>(
                                               current: contextProject,
-                                              items: [null, ...sortedProjects.map((e) => e.project).toList()],
+                                              items: [...sortedProjects.map((e) => e.project).toList()],
                                               options: (project) => VisirButtonOptions(
                                                 tooltipLocation: project?.description?.isNotEmpty == true ? VisirButtonTooltipLocation.right : VisirButtonTooltipLocation.none,
                                                 message: project?.description,
@@ -1807,6 +1807,17 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                       if (contextProject != null) SizedBox(width: 4),
                                       if (contextProject != null) Text(contextProject!.name, style: context.bodyLarge?.textColor(context.onBackground)),
                                       if (contextProject != null) SizedBox(width: 3),
+                                      if (contextProject != null)
+                                        VisirButton(
+                                          style: VisirButtonStyle(padding: EdgeInsets.all(4), hoverColor: Colors.transparent, borderRadius: BorderRadius.circular(6)),
+                                          options: VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.top, message: context.tr.agent_select_project_remove),
+                                          onTap: () {
+                                            contextProject = null;
+                                            widget.onProjectChanged?.call(null);
+                                            setState(() {});
+                                          },
+                                          child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, isSelected: true),
+                                        ),
                                     ],
                                   ),
                                 ),
