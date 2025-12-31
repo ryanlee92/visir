@@ -552,6 +552,7 @@
   "task_label_less": "Less",
   "task_no_tasks_today": "No tasks today",
   "task_no_completed_tasks": "No completed tasks",
+  "task_no_overdue_tasks": "No overdue tasks",
   "task_no_unscheduled_tasks": "No unscheduled tasks",
   "task_no_title": "No title",
   "task_save_recurring_changes" : "Save recurring changes",

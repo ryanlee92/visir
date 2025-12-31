@@ -18,8 +18,10 @@ import 'package:Visir/features/common/presentation/widgets/keyboard_shortcut.dar
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
+import 'package:Visir/features/common/presentation/widgets/visir_empty_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/provider.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:Visir/features/task/actions.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
@@ -212,24 +214,41 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
   }
 
   MasterItemBase placeholder({required TaskLabelEntity currentTaskLabel, required double height}) {
+    final isLoading = ref.read(loadingStatusProvider.select((v) => v[TaskListController.stringKey] == LoadingState.loading));
+    
     return MasterItem(
       'placeholder',
       'placeholder',
       customWidget: (selected) {
         return Container(
           height: height,
-          child: Center(
-            child: Text(
-              currentTaskLabel.type == TaskLabelType.today
-                  ? context.tr.task_no_tasks_today
-                  : currentTaskLabel.type == TaskLabelType.completed
-                  ? context.tr.task_no_completed_tasks
-                  : currentTaskLabel.type == TaskLabelType.unscheduled
-                  ? context.tr.task_no_unscheduled_tasks
-                  : 'onLoading',
-              style: context.titleMedium?.textColor(context.surfaceTint),
-            ),
-          ),
+          child: isLoading
+              ? Center(
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      TypewriterAnimatedText(
+                        'loading...',
+                        textStyle: context.titleMedium?.textColor(context.surfaceTint),
+                        speed: const Duration(milliseconds: 100),
+                      ),
+                    ],
+                    repeatForever: true,
+                    pause: const Duration(milliseconds: 500),
+                    displayFullTextOnTap: true,
+                  ),
+                )
+              : VisirEmptyWidget(
+                  height: height,
+                  message: currentTaskLabel.type == TaskLabelType.today
+                      ? context.tr.task_no_tasks_today
+                      : currentTaskLabel.type == TaskLabelType.completed
+                      ? context.tr.task_no_completed_tasks
+                      : currentTaskLabel.type == TaskLabelType.overdue
+                      ? context.tr.task_no_overdue_tasks
+                      : currentTaskLabel.type == TaskLabelType.unscheduled
+                      ? context.tr.task_no_unscheduled_tasks
+                      : null,
+                ),
         );
       },
       onTap: () {},

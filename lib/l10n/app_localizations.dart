@@ -3358,6 +3358,12 @@ abstract class AppLocalizations {
   /// **'No completed tasks'**
   String get task_no_completed_tasks;
 
+  /// No description provided for @task_no_overdue_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No overdue tasks'**
+  String get task_no_overdue_tasks;
+
   /// No description provided for @task_no_unscheduled_tasks.
   ///
   /// In en, this message translates to:

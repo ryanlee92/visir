@@ -1710,6 +1710,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get task_no_completed_tasks => 'No completed tasks';
 
   @override
+  String get task_no_overdue_tasks => 'No overdue tasks';
+
+  @override
   String get task_no_unscheduled_tasks => 'No unscheduled tasks';
 
   @override
