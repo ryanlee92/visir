@@ -35,8 +35,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:html_unescape/html_unescape.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:uuid/uuid.dart';
 
@@ -50,7 +48,6 @@ class AgentActionMessagesWidget extends ConsumerStatefulWidget {
 
 class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesWidget> {
   final ScrollController _scrollController = ScrollController();
-  final HtmlUnescape _htmlUnescape = HtmlUnescape();
 
   @override
   void dispose() {
@@ -886,66 +883,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
   }
 
   /// Extract tagged projects from message content
-  List<Map<String, dynamic>> _extractTaggedProjects(String content) {
-    final List<Map<String, dynamic>> projects = [];
-    // Use non-greedy matching with dotAll to match across newlines
-    final RegExp taggedProjectRegex = RegExp(r'<tagged_project>([\s\S]*?)</tagged_project>', multiLine: true);
-
-    for (final match in taggedProjectRegex.allMatches(content)) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          // Ensure we have at least a name or id
-          if ((jsonData['name'] as String? ?? '').isNotEmpty || (jsonData['id'] as String? ?? '').isNotEmpty) {
-            projects.add(jsonData);
-          }
-        }
-      } catch (e) {
-        // Skip invalid JSON
-      }
-    }
-
-    return projects;
-  }
-
-  /// Build project tag widget to display above message
-  Widget _buildProjectTagWidget(BuildContext context, Map<String, dynamic> projectData, bool isUser) {
-    final name = projectData['name'] as String? ?? '';
-    final projectId = projectData['id'] as String? ?? '';
-
-    if (name.isEmpty) return const SizedBox.shrink();
-
-    // Get project from project list controller to get color and icon
-    final projects = ref.read(projectListControllerProvider);
-    final project = projects.firstWhereOrNull((p) => p.uniqueId == projectId);
-
-    final projectColor = project?.color ?? context.primaryContainer;
-    final projectIcon = project?.icon ?? VisirIconType.project;
-    final iconColor = isUser ? context.onPrimaryContainer : (projectColor.computeLuminance() > 0.5 ? context.onSurface : Colors.white);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: projectColor.withValues(alpha: isUser ? 0.3 : 0.15),
-        border: Border.all(color: projectColor.withValues(alpha: isUser ? 0.5 : 0.3), width: 1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          VisirIcon(type: projectIcon, size: 14, color: iconColor, isSelected: true),
-          const SizedBox(width: 6),
-          Text(
-            name,
-            style: context.bodySmall?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurface, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMessageContent(BuildContext context, String content, bool isUser) {
     final baseStyle = context.bodyLarge?.textColor(context.onSurfaceVariant);
 
@@ -1002,9 +939,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     final Map<String, Map<String, dynamic>> taggedItems = {};
     final RegExp taggedTaskRegex = RegExp(r'<tagged_task>(.*?)</tagged_task>', dotAll: true);
     final RegExp taggedEventRegex = RegExp(r'<tagged_event>(.*?)</tagged_event>', dotAll: true);
-    final RegExp taggedConnectionRegex = RegExp(r'<tagged_connection>(.*?)</tagged_connection>', dotAll: true);
-    final RegExp taggedChannelRegex = RegExp(r'<tagged_channel>(.*?)</tagged_channel>', dotAll: true);
-    final RegExp taggedProjectRegex = RegExp(r'<tagged_project>(.*?)</tagged_project>', dotAll: true);
+    // tagged_connection, tagged_channel, tagged_project are handled inline via customWidgetBuilder
 
     // Extract tagged tasks
     for (final match in taggedTaskRegex.allMatches(cleanedContent)) {
@@ -1038,55 +973,9 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       }
     }
 
-    // Extract tagged connections
-    for (final match in taggedConnectionRegex.allMatches(cleanedContent)) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          final name = jsonData['name'] as String? ?? '';
-          final email = jsonData['email'] as String? ?? '';
-          final displayName = name.isNotEmpty && name != 'No name' ? name : (email.isNotEmpty ? email : '');
-          if (displayName.isNotEmpty) {
-            taggedItems['@$displayName'] = {'type': 'connection', 'data': jsonData};
-          }
-        }
-      } catch (e) {
-        // Skip invalid JSON
-      }
-    }
-
-    // Extract tagged channels
-    for (final match in taggedChannelRegex.allMatches(cleanedContent)) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          final name = jsonData['name'] as String? ?? '';
-          if (name.isNotEmpty) {
-            taggedItems['@$name'] = {'type': 'channel', 'data': jsonData};
-          }
-        }
-      } catch (e) {
-        // Skip invalid JSON
-      }
-    }
-
-    // Extract tagged projects
-    for (final match in taggedProjectRegex.allMatches(cleanedContent)) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          final name = jsonData['name'] as String? ?? '';
-          if (name.isNotEmpty) {
-            taggedItems['@$name'] = {'type': 'project', 'data': jsonData};
-          }
-        }
-      } catch (e) {
-        // Skip invalid JSON
-      }
-    }
+    // Note: We don't extract tagged_connection, tagged_channel, or tagged_project to taggedItems
+    // because they are rendered inline via customWidgetBuilder.
+    // Adding them to taggedItems would cause duplicate rendering (@mention + tagged_xxx tag)
 
     // Convert tagged_item tags to inapp_entity tags for UI rendering
     // (cleanedContent already initialized above with function call JSON removed)
@@ -1127,210 +1016,170 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     // They will be handled by HtmlWidget's customWidgetBuilder
     // The text content will be hidden via customStylesBuilder
 
+    // Remove @mention text that matches tagged_project, tagged_channel, or tagged_connection names
+    // to prevent duplicate rendering (both @mention and tagged_xxx tag)
+    final Set<String> namesToRemove = {};
+
+    // Extract project names from tagged_project tags
+    final taggedProjectMatches = RegExp(r'<tagged_project>(.*?)</tagged_project>', dotAll: true).allMatches(cleanedContent);
+    for (final match in taggedProjectMatches) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final name = jsonData['name'] as String? ?? '';
+          if (name.isNotEmpty) {
+            namesToRemove.add('@$name');
+          }
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Extract channel names from tagged_channel tags
+    final taggedChannelMatches = RegExp(r'<tagged_channel>(.*?)</tagged_channel>', dotAll: true).allMatches(cleanedContent);
+    for (final match in taggedChannelMatches) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final name = jsonData['name'] as String? ?? '';
+          if (name.isNotEmpty) {
+            namesToRemove.add('@$name');
+          }
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Extract connection names from tagged_connection tags
+    final taggedConnectionMatches = RegExp(r'<tagged_connection>(.*?)</tagged_connection>', dotAll: true).allMatches(cleanedContent);
+    for (final match in taggedConnectionMatches) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final name = jsonData['name'] as String? ?? '';
+          final email = jsonData['email'] as String? ?? '';
+          final displayName = name.isNotEmpty && name != 'No name' ? name : (email.isNotEmpty ? email : '');
+          if (displayName.isNotEmpty) {
+            namesToRemove.add('@$displayName');
+          }
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Remove @mention text that matches the names (but keep the tags)
+    for (final mentionToRemove in namesToRemove) {
+      final escapedMention = RegExp.escape(mentionToRemove);
+      // Remove @mentions that are not inside HTML tags (including tagged_xxx tags)
+      cleanedContent = cleanedContent.replaceAllMapped(
+        RegExp('(?<!<[^>]*)$escapedMention(?!<[^>]*>)', multiLine: true),
+        (match) => '', // Remove the @mention text
+      );
+    }
+
     // Wrap content in <div> if it doesn't start with < (to make it HTML)
     if (!cleanedContent.trim().startsWith('<')) {
       cleanedContent = '<div>$cleanedContent</div>';
     }
 
-    // Check if content contains inapp_ tags (these should be treated as HTML)
-    final inappTagRegex = RegExp(r'<inapp_[a-z_]+>', caseSensitive: false);
-    final hasInappTags = inappTagRegex.hasMatch(cleanedContent);
-
-    // Check if content is HTML (contains HTML tags, but exclude custom inapp tags)
-    final htmlTagRegex = RegExp(r'<(?!/?(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
-    // Always treat as HTML now since we wrap non-HTML content in <div>
-    final isHtml = true;
-
     // Check if content is Markdown (contains Markdown patterns)
     final isMarkdown = _isMarkdownContent(cleanedContent);
 
-    // If both HTML and Markdown are present, convert Markdown parts to HTML
+    // If content is markdown, convert it to HTML
+    // <inapp_> and <tagged_> tags will be preserved as-is since they're already HTML tags
     String finalContent = cleanedContent;
-    if (isHtml && isMarkdown) {
-      // Extract HTML tags (both opening and closing) and their positions
-      // This regex matches both opening tags (<tag>) and closing tags (</tag>)
-      // Excludes custom inapp_ and tagged_ tags
-      final htmlTagRegexFull = RegExp(r'</?(?!(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
-
-      // Track HTML tag pairs (opening + closing) to identify HTML content ranges
-      final htmlTagPairs = <({int openStart, int openEnd, int closeStart, int closeEnd, String tagName})>[];
-      final htmlTagMatches = htmlTagRegexFull.allMatches(cleanedContent).toList();
-
-      // Build a stack to track nested HTML tags and find their closing tags
-      final tagStack = <({int start, int end, String tagName})>[];
-      final processedIndices = <int>{};
-
-      for (final match in htmlTagMatches) {
-        if (processedIndices.contains(match.start)) continue;
-
-        final tagContent = match.group(0)!;
-        final isClosingTag = tagContent.startsWith('</');
-
-        if (isClosingTag) {
-          // Find matching opening tag
-          final tagName = tagContent.substring(2, tagContent.length - 1).split(' ')[0].toLowerCase();
-          while (tagStack.isNotEmpty) {
-            final opening = tagStack.removeLast();
-            if (opening.tagName == tagName) {
-              // Found matching pair
-              htmlTagPairs.add((openStart: opening.start, openEnd: opening.end, closeStart: match.start, closeEnd: match.end, tagName: tagName));
-              processedIndices.add(opening.start);
-              processedIndices.add(match.start);
-              break;
-            }
-          }
-        } else {
-          // Opening tag - extract tag name
-          final tagName = tagContent.substring(1, tagContent.length - 1).split(' ')[0].toLowerCase();
-          // Skip self-closing tags (like <br/>, <img/>, etc.)
-          if (!tagContent.endsWith('/>')) {
-            tagStack.add((start: match.start, end: match.end, tagName: tagName));
-          } else {
-            // Self-closing tag - no inner content to process
-            processedIndices.add(match.start);
-          }
-        }
-      }
-
-      // Sort pairs by start position
-      htmlTagPairs.sort((a, b) => a.openStart.compareTo(b.openStart));
-
-      // Process HTML tag pairs in reverse order to maintain positions
-      String processedContent = cleanedContent;
-
-      // First, convert markdown inside HTML tags
-      for (final pair in htmlTagPairs.reversed) {
-        // Extract inner content (between opening and closing tags)
-        final innerContent = cleanedContent.substring(pair.openEnd, pair.closeStart);
-
-        if (innerContent.trim().isNotEmpty) {
-          try {
-            // Check if inner content contains markdown patterns
-            final hasMarkdownInInner = _isMarkdownContent(innerContent);
-
-            if (hasMarkdownInInner) {
-              // Convert markdown inside HTML tag to HTML
-              final htmlFromMarkdown = md.markdownToHtml(innerContent);
-              // Clean up the converted HTML (remove outer <p> tags if the parent is already a block element)
-              String cleanedInnerHtml = htmlFromMarkdown;
-
-              // If markdown converter wrapped content in <p> tags, we might want to remove them
-              // for inline elements, but keep them for block elements
-              final blockElements = {'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li'};
-              if (!blockElements.contains(pair.tagName)) {
-                // For inline elements, remove outer <p> tags
-                cleanedInnerHtml = cleanedInnerHtml.replaceAllMapped(RegExp(r'^<p>(.*?)</p>$', dotAll: true), (m) => m.group(1) ?? '');
-              }
-
-              // Replace inner content with converted HTML
-              processedContent = processedContent.substring(0, pair.openEnd) + cleanedInnerHtml + processedContent.substring(pair.closeStart);
-            }
-          } catch (e) {
-            // If conversion fails, keep original inner content
-          }
-        }
-      }
-
-      // Update cleanedContent to reflect inner conversions
-      cleanedContent = processedContent;
-
-      // Now find and convert markdown sections outside HTML tags
-      // Re-extract HTML tag positions after inner conversions
-      final updatedHtmlTagMatches = htmlTagRegexFull.allMatches(cleanedContent).toList();
-      final updatedHtmlRanges = <({int start, int end})>[];
-      final updatedTagStack = <({int start, String tagName})>[];
-      final updatedProcessedIndices = <int>{};
-
-      for (final match in updatedHtmlTagMatches) {
-        if (updatedProcessedIndices.contains(match.start)) continue;
-
-        final tagContent = match.group(0)!;
-        final isClosingTag = tagContent.startsWith('</');
-
-        if (isClosingTag) {
-          final tagName = tagContent.substring(2, tagContent.length - 1).split(' ')[0].toLowerCase();
-          while (updatedTagStack.isNotEmpty) {
-            final opening = updatedTagStack.removeLast();
-            if (opening.tagName == tagName) {
-              updatedHtmlRanges.add((start: opening.start, end: match.end));
-              updatedProcessedIndices.add(opening.start);
-              updatedProcessedIndices.add(match.start);
-              break;
-            }
-          }
-        } else {
-          final tagName = tagContent.substring(1, tagContent.length - 1).split(' ')[0].toLowerCase();
-          if (!tagContent.endsWith('/>')) {
-            updatedTagStack.add((start: match.start, tagName: tagName));
-          } else {
-            updatedHtmlRanges.add((start: match.start, end: match.end));
-            updatedProcessedIndices.add(match.start);
-          }
-        }
-      }
-
-      updatedHtmlRanges.sort((a, b) => a.start.compareTo(b.start));
-
-      // Find markdown sections (outside HTML tags)
-      final markdownSections = <({int start, int end})>[];
-      int lastEnd = 0;
-
-      for (final htmlRange in updatedHtmlRanges) {
-        if (htmlRange.start > lastEnd) {
-          markdownSections.add((start: lastEnd, end: htmlRange.start));
-        }
-        lastEnd = htmlRange.end > lastEnd ? htmlRange.end : lastEnd;
-      }
-
-      if (lastEnd < cleanedContent.length) {
-        markdownSections.add((start: lastEnd, end: cleanedContent.length));
-      }
-
-      // Convert markdown sections outside HTML tags to HTML
-      for (final section in markdownSections.reversed) {
-        final markdownText = cleanedContent.substring(section.start, section.end);
-        if (markdownText.trim().isNotEmpty) {
-          try {
-            // Check if this section looks like a code block (starts with 4+ spaces or tabs)
-            final isCodeBlock = RegExp(r'^[ \t]{4,}', multiLine: true).hasMatch(markdownText);
-            if (isCodeBlock) {
-              // Skip converting code blocks - keep as plain text wrapped in <p>
-              final escapedText = markdownText.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('\n', '<br>');
-              processedContent = processedContent.substring(0, section.start) + '<p>$escapedText</p>' + processedContent.substring(section.end);
-            } else {
-              final htmlFromMarkdown = md.markdownToHtml(markdownText);
-              // Remove <pre><code> blocks that were incorrectly created from indented text
-              // Convert them to regular paragraphs
-              final cleanedHtml = htmlFromMarkdown.replaceAllMapped(RegExp(r'<pre><code[^>]*>([\s\S]*?)</code></pre>', caseSensitive: false), (match) {
-                final codeContent = match.group(1) ?? '';
-                // Unescape HTML entities and convert to paragraph
-                final unescaped = codeContent.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&').replaceAll('&quot;', '"').replaceAll('&#39;', "'");
-                // Split by newlines and wrap each line in <p> tags
-                final lines = unescaped.split('\n');
-                return lines.map((line) => line.trim().isNotEmpty ? '<p>${line.replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>' : '').join('');
-              });
-              processedContent = processedContent.substring(0, section.start) + cleanedHtml + processedContent.substring(section.end);
-            }
-          } catch (e) {
-            // If conversion fails, keep original markdown text
-          }
-        }
-      }
-
-      finalContent = processedContent;
-    }
-
-    // For HTML content, we need to process @mentions in the text and replace them with inline badges
-    // We'll do this by wrapping HtmlWidget and processing the text content
-    // If content is markdown only (no HTML tags except our wrapper), convert markdown to HTML first
-    if (isMarkdown && !hasInappTags && !htmlTagRegex.hasMatch(cleanedContent.replaceAll(RegExp(r'^<div>|</div>$'), ''))) {
+    if (isMarkdown) {
       try {
-        // Remove wrapper div temporarily, convert markdown, then wrap again
-        final contentWithoutWrapper = cleanedContent.replaceAll(RegExp(r'^<div>|</div>$'), '');
-        final htmlFromMarkdown = md.markdownToHtml(contentWithoutWrapper);
-        finalContent = '<div>$htmlFromMarkdown</div>';
+        // If content doesn't start with <, wrap it in <div> first
+        String contentToConvert = cleanedContent;
+        bool wasWrapped = false;
+        if (!contentToConvert.trim().startsWith('<')) {
+          contentToConvert = '<div>$contentToConvert</div>';
+          wasWrapped = true;
+        }
+
+        // Convert markdown to HTML
+        // Note: The markdown parser may escape custom tags like <inapp_task>, so we need to restore them
+        final htmlFromMarkdown = md.markdownToHtml(contentToConvert);
+
+        // Restore escaped inapp_ and tagged_ tags
+        // The markdown parser escapes < and > in unknown tags, so we need to unescape them
+        String restoredHtml = htmlFromMarkdown;
+
+        // First, restore escaped tag pairs: &lt;inapp_xxx&gt;...&lt;/inapp_xxx&gt; -> <inapp_xxx>...</inapp_xxx>
+        // Match the entire tag pair including escaped content (non-greedy, dotall mode)
+        final escapedTagPairRegex = RegExp(r'&lt;(inapp_|tagged_)([a-z_]+)&gt;([\s\S]*?)&lt;/(inapp_|tagged_)([a-z_]+)&gt;', caseSensitive: false, dotAll: true);
+
+        restoredHtml = restoredHtml.replaceAllMapped(escapedTagPairRegex, (match) {
+          final openingPrefix = match.group(1)!;
+          final openingTagName = match.group(2)!;
+          final content = match.group(3)!;
+          final closingPrefix = match.group(4)!;
+          final closingTagName = match.group(5)!;
+
+          // Verify that opening and closing tags match
+          if (openingPrefix == closingPrefix && openingTagName == closingTagName) {
+            // Restore HTML entities in the JSON content
+            final restoredContent = content
+                .replaceAll('&quot;', '"')
+                .replaceAll('&amp;', '&')
+                .replaceAll('&#39;', "'")
+                .replaceAll('&#x27;', "'")
+                .replaceAll('&lt;', '<')
+                .replaceAll('&gt;', '>');
+            return '<$openingPrefix$openingTagName>$restoredContent</$closingPrefix$closingTagName>';
+          }
+          // If tags don't match, return original
+          return match.group(0)!;
+        });
+
+        // Also handle cases where tags might be on separate lines or have different escaping
+        // Restore any remaining escaped opening tags (standalone, not part of a pair)
+        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;(inapp_|tagged_)([a-z_]+)&gt;', caseSensitive: false), (match) => '<${match.group(1)}${match.group(2)}>');
+
+        // Restore any remaining escaped closing tags (standalone, not part of a pair)
+        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;/(inapp_|tagged_)([a-z_]+)&gt;', caseSensitive: false), (match) => '</${match.group(1)}${match.group(2)}>');
+
+        // Also restore JSON quotes that might still be escaped in restored tags
+        // Find all restored tag pairs and unescape their content
+        final restoredTagPairRegex = RegExp(r'<(inapp_|tagged_)([a-z_]+)>([\s\S]*?)</(inapp_|tagged_)([a-z_]+)>', caseSensitive: false, dotAll: true);
+
+        restoredHtml = restoredHtml.replaceAllMapped(restoredTagPairRegex, (match) {
+          final openingPrefix = match.group(1)!;
+          final openingTagName = match.group(2)!;
+          final content = match.group(3)!;
+          final closingPrefix = match.group(4)!;
+          final closingTagName = match.group(5)!;
+
+          // Verify that opening and closing tags match
+          if (openingPrefix == closingPrefix && openingTagName == closingTagName) {
+            // Restore any remaining HTML entities in the JSON content
+            final restoredContent = content.replaceAll('&quot;', '"').replaceAll('&amp;', '&').replaceAll('&#39;', "'").replaceAll('&#x27;', "'");
+            return '<$openingPrefix$openingTagName>$restoredContent</$closingPrefix$closingTagName>';
+          }
+          return match.group(0)!;
+        });
+
+        // If we wrapped it, remove the outer <div> wrapper that markdown parser might have added
+        if (wasWrapped) {
+          // Remove wrapper div if markdown parser added another one
+          finalContent = restoredHtml.replaceAllMapped(RegExp(r'^<div>\s*(.*?)\s*</div>$', dotAll: true), (m) => m.group(1) ?? restoredHtml);
+          // If no wrapper was added, ensure we have one
+          if (!finalContent.trim().startsWith('<')) {
+            finalContent = '<div>$finalContent</div>';
+          }
+        } else {
+          finalContent = restoredHtml;
+        }
       } catch (e) {
         // If conversion fails, keep original content
+        finalContent = cleanedContent;
       }
     }
 
@@ -1357,6 +1206,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
       // baseStyle에서 fontFamily를 제거하여 기본 폰트 사용
       final htmlTextStyle = baseStyle?.copyWith(fontFamily: null);
+
+      print('############# html: ${processedHtml}');
 
       return Container(
         decoration: isUser ? BoxDecoration(color: context.primary.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(6)) : null,
@@ -2280,7 +2131,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                 final message = agentAction.messages[index];
                                 final isUser = message.role == 'user';
 
-                                final taggedProjects = _extractTaggedProjects(message.content);
                                 final isLastMessage = index == agentAction.messages.length - 1;
 
                                 final writeActionsForMessage = <Map<String, dynamic>>[];
@@ -2317,15 +2167,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      // Display project tags if any
-                                      if (taggedProjects.isNotEmpty)
-                                        Wrap(
-                                          spacing: 6,
-                                          runSpacing: 6,
-                                          children: taggedProjects.map((projectData) => _buildProjectTagWidget(context, projectData, isUser)).toList(),
-                                        ),
-                                      if (taggedProjects.isNotEmpty) const SizedBox(height: 8),
-                                      // Message content
+                                      // Message content (project tags are now rendered inline via customWidgetBuilder)
                                       Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
