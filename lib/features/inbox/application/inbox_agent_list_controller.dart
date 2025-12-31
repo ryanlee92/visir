@@ -32,9 +32,9 @@ part 'inbox_agent_list_controller.g.dart';
 @riverpod
 class InboxAgentListController extends _$InboxAgentListController {
   List<InboxListControllerInternalProvider> _dateControllers = [];
-  List<InboxSuggestionControllerInternalProvider> _suggestionControllers = [];
-  List<InboxLinkedTaskControllerInternalProvider> _linkedTaskControllers = [];
-  List<InboxConfigControllerInternalProvider> _configControllers = [];
+  List<InboxSuggestionControllerProvider> _suggestionControllers = [];
+  List<InboxLinkedTaskControllerProvider> _linkedTaskControllers = [];
+  List<InboxConfigListControllerProvider> _configControllers = [];
   DateTime? _lastAppOpenCloseDate;
 
   static String stringKey = '${TabType.home.name}:inboxes:agent';
@@ -120,7 +120,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     while (!currentDate.isAfter(today)) {
       final dateController = inboxListControllerInternalProvider(isSignedIn: isSignedIn, isSearch: false, year: currentDate.year, month: currentDate.month, day: currentDate.day);
 
-      final suggestionController = inboxSuggestionControllerInternalProvider(
+      final suggestionController = inboxSuggestionControllerProvider(
         isSearch: false,
         year: currentDate.year,
         month: currentDate.month,
@@ -128,7 +128,7 @@ class InboxAgentListController extends _$InboxAgentListController {
         isSignedIn: isSignedIn,
       );
 
-      final linkedTaskController = inboxLinkedTaskControllerInternalProvider(
+      final linkedTaskController = inboxLinkedTaskControllerProvider(
         isSearch: false,
         year: currentDate.year,
         month: currentDate.month,
@@ -136,13 +136,7 @@ class InboxAgentListController extends _$InboxAgentListController {
         isSignedIn: isSignedIn,
       );
 
-      final configController = inboxConfigControllerInternalProvider(
-        isSearch: false,
-        year: currentDate.year,
-        month: currentDate.month,
-        day: currentDate.day,
-        isSignedIn: isSignedIn,
-      );
+      final configController = inboxConfigListControllerProvider(isSearch: false, year: currentDate.year, month: currentDate.month, day: currentDate.day, isSignedIn: isSignedIn);
 
       _dateControllers.add(dateController);
       _suggestionControllers.add(suggestionController);
@@ -253,13 +247,13 @@ class InboxAgentListController extends _$InboxAgentListController {
     // Combine suggestions from all date controllers
     final allSuggestions = <InboxSuggestionEntity>[];
     for (final controller in _suggestionControllers) {
-      final controllerSuggestions = ref.read(controller).value?.suggestions ?? [];
+      final controllerSuggestions = ref.read(controller)?.suggestions ?? [];
       allSuggestions.addAll(controllerSuggestions);
     }
 
     // Create InboxSuggestionFetchListEntity with combined suggestions
     final firstController = _suggestionControllers.isNotEmpty ? _suggestionControllers.first : null;
-    suggestions = InboxSuggestionFetchListEntity(suggestions: allSuggestions, sequence: firstController != null ? ref.read(firstController).value?.sequence ?? 0 : 0);
+    suggestions = InboxSuggestionFetchListEntity(suggestions: allSuggestions, sequence: firstController != null ? ref.read(firstController)?.sequence ?? 0 : 0);
 
     updateData();
   }
@@ -268,13 +262,13 @@ class InboxAgentListController extends _$InboxAgentListController {
     // Combine linked tasks from all date controllers
     final allLinkedTasks = <InboxLinkedTaskEntity>[];
     for (final controller in _linkedTaskControllers) {
-      final controllerLinkedTasks = ref.read(controller).value?.linkedTasks ?? [];
+      final controllerLinkedTasks = ref.read(controller)?.linkedTasks ?? [];
       allLinkedTasks.addAll(controllerLinkedTasks);
     }
 
     // Create InboxLinkedTaskFetchListEntity with combined linked tasks
     final firstController = _linkedTaskControllers.isNotEmpty ? _linkedTaskControllers.first : null;
-    linkedTasks = InboxLinkedTaskFetchListEntity(linkedTasks: allLinkedTasks, sequence: firstController != null ? ref.read(firstController).value?.sequence ?? 0 : 0);
+    linkedTasks = InboxLinkedTaskFetchListEntity(linkedTasks: allLinkedTasks, sequence: firstController != null ? ref.read(firstController)?.sequence ?? 0 : 0);
 
     updateData();
   }
@@ -283,13 +277,13 @@ class InboxAgentListController extends _$InboxAgentListController {
     // Combine configs from all date controllers
     final allConfigs = <InboxConfigEntity>[];
     for (final controller in _configControllers) {
-      final controllerConfigs = ref.read(controller).value?.configs ?? [];
+      final controllerConfigs = ref.read(controller)?.configs ?? [];
       allConfigs.addAll(controllerConfigs);
     }
 
     // Create InboxConfigFetchListEntity with combined configs
     final firstController = _configControllers.isNotEmpty ? _configControllers.first : null;
-    configs = InboxConfigFetchListEntity(configs: allConfigs, sequence: firstController != null ? ref.read(firstController).value?.sequence ?? 0 : 0);
+    configs = InboxConfigFetchListEntity(configs: allConfigs, sequence: firstController != null ? ref.read(firstController)?.sequence ?? 0 : 0);
 
     updateData();
   }
