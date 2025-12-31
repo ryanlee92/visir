@@ -118,6 +118,8 @@
                         android:textSize="13sp"
                         android:fontFamily="@font/suite_medium"
                         android:lineSpacingMultiplier="1.2"
+                        android:maxLines="5"
+                        android:ellipsize="end"
                         android:typeface="normal" />
                 </LinearLayout>
 

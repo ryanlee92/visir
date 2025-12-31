@@ -1625,13 +1625,7 @@ class Utils {
       final summaryAsync = ref.read(inboxConversationSummaryProvider(nextTask?.id, nextEvent?.uniqueId));
       // AsyncValue에서 값 가져오기 (AsyncData일 때만 값이 있음)
       conversationSummary = summaryAsync.value;
-      print(
-        'NextScheduleWidget: conversationSummary = ${conversationSummary?.substring(0, conversationSummary.length.clamp(0, 50))}... (hasValue: ${summaryAsync.hasValue}, isLoading: ${summaryAsync.isLoading})',
-      );
-    } catch (e) {
-      // 에러 발생 시 무시하고 계속 진행
-      print('NextScheduleWidget: Error getting conversation summary: $e');
-    }
+    } catch (e) {}
 
     // previousContext는 항상 추가 (conversation summary가 있으면 사용, 없으면 "Cannot find any previous context" 메시지 표시)
     final nextScheduleData = <String, dynamic>{
@@ -1647,16 +1641,8 @@ class Utils {
       'conferenceLink': nextTask?.conferenceLink ?? nextEvent?.conferenceLink,
       'projectName': nextProject?.name ?? '',
       'calendarName': nextCalendar?.name ?? '',
-      'previousContext': {
-        'summary': (conversationSummary != null && conversationSummary.isNotEmpty)
-            ? conversationSummary
-            : 'Cannot find any previous context',
-      },
+      'previousContext': {'summary': (conversationSummary != null && conversationSummary.isNotEmpty) ? conversationSummary : 'Cannot find any previous context'},
     };
-
-    print(
-      'NextScheduleWidget: previousContext set with summary length: ${nextScheduleData['previousContext']!['summary'].toString().length}',
-    );
 
     await HomeWidget.saveWidgetData<String>('nextSchedule', jsonEncode(nextScheduleData));
     // Update only NextScheduleWidget when data changes
