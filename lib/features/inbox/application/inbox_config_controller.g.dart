@@ -10,7 +10,7 @@ part of 'inbox_config_controller.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(InboxConfigListController)
-const inboxConfigListControllerProvider = InboxConfigListControllerProvider._();
+const inboxConfigListControllerProvider = InboxConfigListControllerFamily._();
 
 final class InboxConfigListControllerProvider
     extends
@@ -18,19 +18,27 @@ final class InboxConfigListControllerProvider
           InboxConfigListController,
           InboxConfigFetchListEntity?
         > {
-  const InboxConfigListControllerProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'inboxConfigListControllerProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  const InboxConfigListControllerProvider._({
+    required InboxConfigListControllerFamily super.from,
+    required ({bool isSearch, int year, int month, int day, bool isSignedIn})
+    super.argument,
+  }) : super(
+         retry: null,
+         name: r'inboxConfigListControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$inboxConfigListControllerHash();
+
+  @override
+  String toString() {
+    return r'inboxConfigListControllerProvider'
+        ''
+        '$argument';
+  }
 
   @$internal
   @override
@@ -43,18 +51,89 @@ final class InboxConfigListControllerProvider
       providerOverride: $SyncValueProvider<InboxConfigFetchListEntity?>(value),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is InboxConfigListControllerProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$inboxConfigListControllerHash() =>
-    r'a8ba59fb43b6d8af7efc5c8e1b4a8048ae2ff555';
+    r'00dd75f0844319111000bdf112e5ded8af1a6318';
+
+final class InboxConfigListControllerFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          InboxConfigListController,
+          InboxConfigFetchListEntity?,
+          InboxConfigFetchListEntity?,
+          InboxConfigFetchListEntity?,
+          ({bool isSearch, int year, int month, int day, bool isSignedIn})
+        > {
+  const InboxConfigListControllerFamily._()
+    : super(
+        retry: null,
+        name: r'inboxConfigListControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  InboxConfigListControllerProvider call({
+    required bool isSearch,
+    required int year,
+    required int month,
+    required int day,
+    required bool isSignedIn,
+  }) => InboxConfigListControllerProvider._(
+    argument: (
+      isSearch: isSearch,
+      year: year,
+      month: month,
+      day: day,
+      isSignedIn: isSignedIn,
+    ),
+    from: this,
+  );
+
+  @override
+  String toString() => r'inboxConfigListControllerProvider';
+}
 
 abstract class _$InboxConfigListController
     extends $Notifier<InboxConfigFetchListEntity?> {
-  InboxConfigFetchListEntity? build();
+  late final _$args =
+      ref.$arg
+          as ({bool isSearch, int year, int month, int day, bool isSignedIn});
+  bool get isSearch => _$args.isSearch;
+  int get year => _$args.year;
+  int get month => _$args.month;
+  int get day => _$args.day;
+  bool get isSignedIn => _$args.isSignedIn;
+
+  InboxConfigFetchListEntity? build({
+    required bool isSearch,
+    required int year,
+    required int month,
+    required int day,
+    required bool isSignedIn,
+  });
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
+    final created = build(
+      isSearch: _$args.isSearch,
+      year: _$args.year,
+      month: _$args.month,
+      day: _$args.day,
+      isSignedIn: _$args.isSignedIn,
+    );
     final ref =
         this.ref
             as $Ref<InboxConfigFetchListEntity?, InboxConfigFetchListEntity?>;
@@ -122,7 +201,7 @@ final class InboxConfigControllerInternalProvider
 }
 
 String _$inboxConfigControllerInternalHash() =>
-    r'70242f70e600cb02b17303f712c366533b62c75b';
+    r'7fc37f0eef82baaec6f729223cd6038aefa7876b';
 
 final class InboxConfigControllerInternalFamily extends $Family
     with

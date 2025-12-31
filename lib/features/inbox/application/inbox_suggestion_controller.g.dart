@@ -10,7 +10,7 @@ part of 'inbox_suggestion_controller.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(InboxSuggestionController)
-const inboxSuggestionControllerProvider = InboxSuggestionControllerProvider._();
+const inboxSuggestionControllerProvider = InboxSuggestionControllerFamily._();
 
 final class InboxSuggestionControllerProvider
     extends
@@ -18,19 +18,27 @@ final class InboxSuggestionControllerProvider
           InboxSuggestionController,
           InboxSuggestionFetchListEntity?
         > {
-  const InboxSuggestionControllerProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'inboxSuggestionControllerProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  const InboxSuggestionControllerProvider._({
+    required InboxSuggestionControllerFamily super.from,
+    required ({bool isSearch, int year, int month, int day, bool isSignedIn})
+    super.argument,
+  }) : super(
+         retry: null,
+         name: r'inboxSuggestionControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$inboxSuggestionControllerHash();
+
+  @override
+  String toString() {
+    return r'inboxSuggestionControllerProvider'
+        ''
+        '$argument';
+  }
 
   @$internal
   @override
@@ -45,18 +53,89 @@ final class InboxSuggestionControllerProvider
       ),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is InboxSuggestionControllerProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$inboxSuggestionControllerHash() =>
-    r'265bbc4f5ad28416c42922eb7cc99f72e7bf8cac';
+    r'02bd481ae17bf17bd9bc2e0cc5152505bc17db0b';
+
+final class InboxSuggestionControllerFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          InboxSuggestionController,
+          InboxSuggestionFetchListEntity?,
+          InboxSuggestionFetchListEntity?,
+          InboxSuggestionFetchListEntity?,
+          ({bool isSearch, int year, int month, int day, bool isSignedIn})
+        > {
+  const InboxSuggestionControllerFamily._()
+    : super(
+        retry: null,
+        name: r'inboxSuggestionControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  InboxSuggestionControllerProvider call({
+    required bool isSearch,
+    required int year,
+    required int month,
+    required int day,
+    required bool isSignedIn,
+  }) => InboxSuggestionControllerProvider._(
+    argument: (
+      isSearch: isSearch,
+      year: year,
+      month: month,
+      day: day,
+      isSignedIn: isSignedIn,
+    ),
+    from: this,
+  );
+
+  @override
+  String toString() => r'inboxSuggestionControllerProvider';
+}
 
 abstract class _$InboxSuggestionController
     extends $Notifier<InboxSuggestionFetchListEntity?> {
-  InboxSuggestionFetchListEntity? build();
+  late final _$args =
+      ref.$arg
+          as ({bool isSearch, int year, int month, int day, bool isSignedIn});
+  bool get isSearch => _$args.isSearch;
+  int get year => _$args.year;
+  int get month => _$args.month;
+  int get day => _$args.day;
+  bool get isSignedIn => _$args.isSignedIn;
+
+  InboxSuggestionFetchListEntity? build({
+    required bool isSearch,
+    required int year,
+    required int month,
+    required int day,
+    required bool isSignedIn,
+  });
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
+    final created = build(
+      isSearch: _$args.isSearch,
+      year: _$args.year,
+      month: _$args.month,
+      day: _$args.day,
+      isSignedIn: _$args.isSignedIn,
+    );
     final ref =
         this.ref
             as $Ref<
@@ -129,7 +208,7 @@ final class InboxSuggestionControllerInternalProvider
 }
 
 String _$inboxSuggestionControllerInternalHash() =>
-    r'06d681fcb9a199cf0969f5aa8a29b7f13da47716';
+    r'c71118ded00dcd0f2017a321544ad5eb724035ff';
 
 final class InboxSuggestionControllerInternalFamily extends $Family
     with

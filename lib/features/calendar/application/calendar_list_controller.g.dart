@@ -48,7 +48,7 @@ final class CalendarListControllerProvider
 }
 
 String _$calendarListControllerHash() =>
-    r'8d6ed89d663a8d49e1ce4419be8ac1fb421df909';
+    r'f628cfd8b43d5c4666a52bbbeff59aa77f75b08d';
 
 abstract class _$CalendarListController
     extends $Notifier<Map<String, List<CalendarEntity>>> {
@@ -126,7 +126,7 @@ final class CalendarListControllerInternalProvider
 }
 
 String _$calendarListControllerInternalHash() =>
-    r'e5f5dbd4dce75a785724a60e5242baef29cf7402';
+    r'98f421daa81ef7035324693781c8bf2127d36f55';
 
 final class CalendarListControllerInternalFamily extends $Family
     with

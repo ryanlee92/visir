@@ -52,7 +52,7 @@ final class InboxConversationSummaryProvider
 }
 
 String _$inboxConversationSummaryHash() =>
-    r'98fada5ff46893cf94bcdad7ea7d083b3ee2a56b';
+    r'c4a99fe1d68198bcec00eb94a46099aa4ad62c6b';
 
 final class InboxConversationSummaryFamily extends $Family
     with

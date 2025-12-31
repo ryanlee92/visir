@@ -65,7 +65,7 @@ final class CalendarTaskListControllerProvider
 }
 
 String _$calendarTaskListControllerHash() =>
-    r'db3d1d63224450cb5f4018b3c889e83f9190a09c';
+    r'0322a5a2d55923f29ee855e9366d0de21893867c';
 
 final class CalendarTaskListControllerFamily extends $Family
     with
@@ -180,7 +180,7 @@ final class CalendarTaskListControllerInternalProvider
 }
 
 String _$calendarTaskListControllerInternalHash() =>
-    r'304f9817016da4c4ed90ccfaad407295e544763f';
+    r'0f88d59530da343eb1d88a8f71778fe2cc9f07cb';
 
 final class CalendarTaskListControllerInternalFamily extends $Family
     with

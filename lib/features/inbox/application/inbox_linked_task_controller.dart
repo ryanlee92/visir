@@ -32,13 +32,10 @@ class InboxLinkedTaskController extends _$InboxLinkedTaskController {
   static String stringKey = '${TabType.home.name}:inboxLinkedTasks';
 
   @override
-  InboxLinkedTaskFetchListEntity? build() {
-    final isSearch = ref.watch(inboxListIsSearchProvider);
-    final date = ref.watch(inboxListDateProvider);
-    final isSignedIn = ref.watch(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-    _controller = ref.watch(inboxLinkedTaskControllerInternalProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier);
+  InboxLinkedTaskFetchListEntity? build({required bool isSearch, required int year, required int month, required int day, required bool isSignedIn}) {
+    _controller = ref.watch(inboxLinkedTaskControllerInternalProvider(isSearch: isSearch, year: year, month: month, day: day, isSignedIn: isSignedIn).notifier);
 
-    ref.listen(inboxLinkedTaskControllerInternalProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn), (prev, next) {
+    ref.listen(inboxLinkedTaskControllerInternalProvider(isSearch: isSearch, year: year, month: month, day: day, isSignedIn: isSignedIn), (prev, next) {
       updateState(next.value);
     });
 

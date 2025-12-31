@@ -38,6 +38,7 @@ import 'package:Visir/features/common/presentation/widgets/tutorial/feature_tuto
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_controller.dart';
+import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/mail/application/mail_label_list_controller.dart';
 import 'package:Visir/features/mail/application/mail_list_controller.dart';
 import 'package:Visir/features/mail/application/mail_thread_list_controller.dart';
@@ -682,7 +683,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             onUpdateMessageUnread: (unread) {
               ref.read(chatChannelListControllerProvider.notifier).setChannelRead(teamId: unread.teamId, channelId: unread.channelId, lastReadAt: unread.lastMessageUserReadAt);
             },
-            onUpdateInboxConfig: (config) => ref.read(inboxConfigListControllerProvider.notifier).updateInboxConfig(configs: [config], onlyLocal: true),
+            onUpdateInboxConfig: (config) {
+              final date = ref.read(inboxListDateProvider);
+              final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+              ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [config], onlyLocal: true);
+            },
             onDeleteInboxConfig: (configId) => {},
           );
 

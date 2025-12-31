@@ -172,7 +172,7 @@ final class ChatEmojiListControllerInternalProvider
 }
 
 String _$chatEmojiListControllerInternalHash() =>
-    r'2cf08b573fb34c5ae0d87feb51a00557cff58a2a';
+    r'32b50092cc8137db8b78530cd93508a56b58639c';
 
 final class ChatEmojiListControllerInternalFamily extends $Family
     with

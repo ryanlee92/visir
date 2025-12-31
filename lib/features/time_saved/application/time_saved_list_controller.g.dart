@@ -57,7 +57,7 @@ final class TimeSavedListControllerInternalProvider
 }
 
 String _$timeSavedListControllerInternalHash() =>
-    r'8b5895cffc47b6cea304d6c5f52090baf79f0c62';
+    r'3f12c4dc177fe2c9483d4ff12fb70ab994752fcf';
 
 final class TimeSavedListControllerInternalFamily extends $Family
     with

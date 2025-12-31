@@ -42,7 +42,7 @@ final class InboxAgentListControllerProvider
 }
 
 String _$inboxAgentListControllerHash() =>
-    r'9a8a33d578344ac91d8a5c66b2b5a2e97dca77a9';
+    r'73a9618ac895448b3df063b0d760a7c8f76065c9';
 
 abstract class _$InboxAgentListController
     extends $Notifier<InboxFetchListEntity?> {

@@ -57,7 +57,7 @@ final class NotificationControllerInternalProvider
 }
 
 String _$notificationControllerInternalHash() =>
-    r'4243bb1fbd5584bc8981178ef3b235b1eea7b3c5';
+    r'0181f81691e545de4e23e7fedf444a6050319018';
 
 final class NotificationControllerInternalFamily extends $Family
     with

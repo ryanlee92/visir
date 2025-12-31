@@ -162,7 +162,7 @@ final class ChatListControllerInternalProvider
 }
 
 String _$chatListControllerInternalHash() =>
-    r'7a97f8dd358f4e0d66d0e149031daf20c701eb0a';
+    r'710061325902b5548c47766c81ca86ae6e82c21a';
 
 final class ChatListControllerInternalFamily extends $Family
     with

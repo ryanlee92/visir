@@ -54,7 +54,7 @@ final class LocalPrefControllerInternalProvider
 }
 
 String _$localPrefControllerInternalHash() =>
-    r'67b48d5d8a4d9b685601da5385bd7ad31c09773b';
+    r'952395b35d72826c36f1c560fad9eac2b4d1df33';
 
 final class LocalPrefControllerInternalFamily extends $Family
     with

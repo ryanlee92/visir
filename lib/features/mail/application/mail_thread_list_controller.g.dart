@@ -167,7 +167,7 @@ final class MailThreadListControllerInternalProvider
 }
 
 String _$mailThreadListControllerInternalHash() =>
-    r'c3f11609f20fb1a14765958bb1f26744d0b4c807';
+    r'5be14897e99dacbcea159103859d426dd99cc9d5';
 
 final class MailThreadListControllerInternalFamily extends $Family
     with

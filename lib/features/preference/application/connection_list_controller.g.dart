@@ -38,7 +38,7 @@ final class ConnectionListControllerProvider
 }
 
 String _$connectionListControllerHash() =>
-    r'7c763b27003eb431e0ee1d84de59e3e3e84a3b23';
+    r'd915debb2f949c51bd1a9f8586beb39030c2a5b4';
 
 abstract class _$ConnectionListController
     extends $AsyncNotifier<Map<String, List<ConnectionEntity>>> {

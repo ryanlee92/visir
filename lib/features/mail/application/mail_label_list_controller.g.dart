@@ -126,7 +126,7 @@ final class MailLabelListControllerInternalProvider
 }
 
 String _$mailLabelListControllerInternalHash() =>
-    r'3701422978a6fb287a5d21e500470233aea180dc';
+    r'd06a7ee4ccd4d4d422e52d34193dc00d904d654a';
 
 final class MailLabelListControllerInternalFamily extends $Family
     with

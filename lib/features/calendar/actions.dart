@@ -7,16 +7,22 @@ import 'package:Visir/features/calendar/presentation/widgets/calendar_simple_cre
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
+import 'package:Visir/features/inbox/providers.dart';
 import 'package:flutter/cupertino.dart';
 
 class CalendarAction {
   static void upsertLinkedTaskForInboxIfLinked(EventEntity event) {
-    Utils.ref.read(inboxLinkedTaskControllerProvider.notifier).upsertLinkedEventForInbox(event);
+    final date = Utils.ref.read(inboxListDateProvider);
+    final isSignedIn = Utils.ref.read(authControllerProvider).requireValue.isSignedIn;
+    Utils.ref.read(inboxLinkedTaskControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).upsertLinkedEventForInbox(event);
   }
 
   static void deleteLinkedTaskForInboxIfLinked(EventEntity event) {
-    Utils.ref.read(inboxLinkedTaskControllerProvider.notifier).deleteLinkedEventForInbox(event);
+    final date = Utils.ref.read(inboxListDateProvider);
+    final isSignedIn = Utils.ref.read(authControllerProvider).requireValue.isSignedIn;
+    Utils.ref.read(inboxLinkedTaskControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).deleteLinkedEventForInbox(event);
   }
 
   static Future<void> responseCalendarInvitation({

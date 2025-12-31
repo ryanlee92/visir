@@ -42,7 +42,7 @@ final class InboxListControllerProvider
 }
 
 String _$inboxListControllerHash() =>
-    r'f048cb6666fda01d7cd2f8e72c8877d58b74e1c5';
+    r'b3df02ec52aff15e0c0aa5c64f75c97298032fb5';
 
 abstract class _$InboxListController extends $Notifier<InboxFetchListEntity?> {
   InboxFetchListEntity? build();
@@ -112,7 +112,7 @@ final class InboxListControllerInternalProvider
 }
 
 String _$inboxListControllerInternalHash() =>
-    r'2293d8d79714fa19d02cc4ccf091b8212c68f01d';
+    r'd6599d8d9832caa10cda61c9d84f8122a3850fb1';
 
 final class InboxListControllerInternalFamily extends $Family
     with

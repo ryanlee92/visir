@@ -66,15 +66,15 @@ class InboxListController extends _$InboxListController {
       inboxes = next.value;
       updateData();
     });
-    ref.listen(inboxConfigListControllerProvider, (prev, next) {
+    ref.listen(inboxConfigListControllerProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn), (prev, next) {
       configs = next;
       updateData();
     });
-    ref.listen(inboxSuggestionControllerProvider, (prev, next) {
+    ref.listen(inboxSuggestionControllerProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn), (prev, next) {
       suggestions = next;
       updateData();
     });
-    ref.listen(inboxLinkedTaskControllerProvider, (prev, next) {
+    ref.listen(inboxLinkedTaskControllerProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn), (prev, next) {
       linkedTasks = next;
       updateData();
     });
@@ -92,9 +92,9 @@ class InboxListController extends _$InboxListController {
     });
 
     inboxes = ref.read(_controller).value;
-    suggestions = ref.read(inboxSuggestionControllerProvider);
-    configs = ref.read(inboxConfigListControllerProvider);
-    linkedTasks = ref.read(inboxLinkedTaskControllerProvider);
+    suggestions = ref.read(inboxSuggestionControllerProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+    configs = ref.read(inboxConfigListControllerProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+    linkedTasks = ref.read(inboxLinkedTaskControllerProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
     channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
     members = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.members).toList()));
     groups = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.groups).toList()));

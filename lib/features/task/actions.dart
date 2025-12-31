@@ -8,6 +8,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/ui_extension
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
+import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
@@ -17,12 +18,20 @@ import 'package:flutter/services.dart';
 class TaskAction {
   static void upsertLinkedTaskForInboxIfLinked(TaskEntity task) {
     if (task.linkedMails.isEmpty && task.linkedMessages.isEmpty) return;
-    Utils.ref.read(inboxLinkedTaskControllerProvider.notifier).upsertLinkedTaskForInbox(task);
+    final date = Utils.ref.read(inboxListDateProvider);
+    final isSignedIn = Utils.ref.read(authControllerProvider).requireValue.isSignedIn;
+    Utils.ref
+        .read(inboxLinkedTaskControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+        .upsertLinkedTaskForInbox(task);
   }
 
   static void deleteLinkedTaskForInboxIfLinked(TaskEntity task) {
     if (task.linkedMails.isEmpty && task.linkedMessages.isEmpty) return;
-    Utils.ref.read(inboxLinkedTaskControllerProvider.notifier).deleteLinkedTaskForInbox(task);
+    final date = Utils.ref.read(inboxListDateProvider);
+    final isSignedIn = Utils.ref.read(authControllerProvider).requireValue.isSignedIn;
+    Utils.ref
+        .read(inboxLinkedTaskControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+        .deleteLinkedTaskForInbox(task);
   }
 
   static Future<void> toggleStatus({
@@ -176,7 +185,7 @@ class TaskAction {
     bool showToast = true,
   }) async {
     debugPrint('[TaskAction] upsertTask 시작: task.id=${task.id}, task.title=${task.title}, tabType=$tabType, originalTask=${originalTask?.id}');
-    
+
     if (task.isUnscheduled) tabType = TabType.task;
 
     if (tabType == TabType.task) {

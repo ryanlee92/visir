@@ -28,11 +28,8 @@ class InboxSuggestionController extends _$InboxSuggestionController {
   static String stringKey = '${TabType.home.name}:suggestions';
 
   @override
-  InboxSuggestionFetchListEntity? build() {
-    final isSearch = ref.watch(inboxListIsSearchProvider);
-    final date = ref.watch(inboxListDateProvider);
-    final isSignedIn = ref.watch(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-    final provider = inboxSuggestionControllerInternalProvider(isSearch: isSearch, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn);
+  InboxSuggestionFetchListEntity? build({required bool isSearch, required int year, required int month, required int day, required bool isSignedIn}) {
+    final provider = inboxSuggestionControllerInternalProvider(isSearch: isSearch, year: year, month: month, day: day, isSignedIn: isSignedIn);
 
     _controller = ref.watch(provider.notifier);
     ref.listen(provider, (prev, next) {

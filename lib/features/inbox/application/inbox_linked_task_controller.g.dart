@@ -10,7 +10,7 @@ part of 'inbox_linked_task_controller.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(InboxLinkedTaskController)
-const inboxLinkedTaskControllerProvider = InboxLinkedTaskControllerProvider._();
+const inboxLinkedTaskControllerProvider = InboxLinkedTaskControllerFamily._();
 
 final class InboxLinkedTaskControllerProvider
     extends
@@ -18,19 +18,27 @@ final class InboxLinkedTaskControllerProvider
           InboxLinkedTaskController,
           InboxLinkedTaskFetchListEntity?
         > {
-  const InboxLinkedTaskControllerProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'inboxLinkedTaskControllerProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
+  const InboxLinkedTaskControllerProvider._({
+    required InboxLinkedTaskControllerFamily super.from,
+    required ({bool isSearch, int year, int month, int day, bool isSignedIn})
+    super.argument,
+  }) : super(
+         retry: null,
+         name: r'inboxLinkedTaskControllerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$inboxLinkedTaskControllerHash();
+
+  @override
+  String toString() {
+    return r'inboxLinkedTaskControllerProvider'
+        ''
+        '$argument';
+  }
 
   @$internal
   @override
@@ -45,18 +53,89 @@ final class InboxLinkedTaskControllerProvider
       ),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is InboxLinkedTaskControllerProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$inboxLinkedTaskControllerHash() =>
-    r'e400976489b45b9f3187de43b497d7f3ead66a86';
+    r'c038d5f2eca33c3c28345f3046d4a1199a05aef9';
+
+final class InboxLinkedTaskControllerFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          InboxLinkedTaskController,
+          InboxLinkedTaskFetchListEntity?,
+          InboxLinkedTaskFetchListEntity?,
+          InboxLinkedTaskFetchListEntity?,
+          ({bool isSearch, int year, int month, int day, bool isSignedIn})
+        > {
+  const InboxLinkedTaskControllerFamily._()
+    : super(
+        retry: null,
+        name: r'inboxLinkedTaskControllerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  InboxLinkedTaskControllerProvider call({
+    required bool isSearch,
+    required int year,
+    required int month,
+    required int day,
+    required bool isSignedIn,
+  }) => InboxLinkedTaskControllerProvider._(
+    argument: (
+      isSearch: isSearch,
+      year: year,
+      month: month,
+      day: day,
+      isSignedIn: isSignedIn,
+    ),
+    from: this,
+  );
+
+  @override
+  String toString() => r'inboxLinkedTaskControllerProvider';
+}
 
 abstract class _$InboxLinkedTaskController
     extends $Notifier<InboxLinkedTaskFetchListEntity?> {
-  InboxLinkedTaskFetchListEntity? build();
+  late final _$args =
+      ref.$arg
+          as ({bool isSearch, int year, int month, int day, bool isSignedIn});
+  bool get isSearch => _$args.isSearch;
+  int get year => _$args.year;
+  int get month => _$args.month;
+  int get day => _$args.day;
+  bool get isSignedIn => _$args.isSignedIn;
+
+  InboxLinkedTaskFetchListEntity? build({
+    required bool isSearch,
+    required int year,
+    required int month,
+    required int day,
+    required bool isSignedIn,
+  });
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
+    final created = build(
+      isSearch: _$args.isSearch,
+      year: _$args.year,
+      month: _$args.month,
+      day: _$args.day,
+      isSignedIn: _$args.isSignedIn,
+    );
     final ref =
         this.ref
             as $Ref<
@@ -129,7 +208,7 @@ final class InboxLinkedTaskControllerInternalProvider
 }
 
 String _$inboxLinkedTaskControllerInternalHash() =>
-    r'0bb84d118ff34de0fe65089f54d0826a27503826';
+    r'8a8e3fb9f55327b77f473b6ea922515f8172b50f';
 
 final class InboxLinkedTaskControllerInternalFamily extends $Family
     with

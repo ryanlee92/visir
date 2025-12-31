@@ -244,7 +244,9 @@ Future<String?> _searchAndGenerateContext(
             },
             (threadMails) async {
               // Convert all thread mails to InboxEntity
-              final configs = ref.read(inboxConfigListControllerProvider);
+              final date = ref.read(inboxListDateProvider);
+              final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+              final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
               for (final mail in threadMails) {
                 final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
                 searchResults.add(InboxEntity.fromMail(mail, config));
@@ -281,7 +283,9 @@ Future<String?> _searchAndGenerateContext(
                 final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
                 final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
                 final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
-                final configs = ref.read(inboxConfigListControllerProvider);
+                final date = ref.read(inboxListDateProvider);
+                final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
 
                 for (final message in threadData.messages) {
                   final msgChannel = _channels.firstWhereOrNull((c) => c.id == message.channelId && c.teamId == message.teamId);
@@ -370,7 +374,9 @@ Future<String?> _searchAndGenerateContext(
                 },
                 (threadMails) async {
                   // Convert all thread mails to InboxEntity
-                  final configs = ref.read(inboxConfigListControllerProvider);
+                  final date = ref.read(inboxListDateProvider);
+                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                  final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
                   for (final mail in threadMails) {
                     final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
                     searchResults.add(InboxEntity.fromMail(mail, config));
@@ -453,7 +459,9 @@ Future<String?> _searchAndGenerateContext(
                   // Convert all thread messages to InboxEntity
                   final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
                   final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
-                  final configs = ref.read(inboxConfigListControllerProvider);
+                  final date = ref.read(inboxListDateProvider);
+                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                  final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
 
                   for (final message in threadData.messages) {
                     final member = _members.firstWhereOrNull((m) => m.id == message.userId);

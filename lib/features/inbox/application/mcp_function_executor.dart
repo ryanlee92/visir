@@ -42,6 +42,7 @@ import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_list_controller.dart';
+import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/task/providers.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/date_time_extension.dart';
 import 'package:flutter/material.dart';
@@ -3492,7 +3493,9 @@ class McpFunctionExecutor {
     }
 
     // Check if task already exists for this inbox
-    final linkedTasksData = ref.read(inboxLinkedTaskControllerProvider);
+    final date = ref.read(inboxListDateProvider);
+    final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+    final linkedTasksData = ref.read(inboxLinkedTaskControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
     final linkedTask = linkedTasksData?.linkedTasks.firstWhereOrNull((lt) => lt.inboxId == inboxId);
 
     final user = ref.read(authControllerProvider).requireValue;

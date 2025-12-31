@@ -114,7 +114,7 @@ final class UserActionSwitchListControllerInternalProvider
 }
 
 String _$userActionSwitchListControllerInternalHash() =>
-    r'1f5725a10c0d0b9e39376f53c534418b0dfb8f9b';
+    r'b58ba1cf339d5d73f44da7a60d012a82af40b382';
 
 final class UserActionSwitchListControllerInternalFamily extends $Family
     with

@@ -12,6 +12,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/ui_extension
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_controller.dart';
+import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
 import 'package:Visir/l10n/app_localizations.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
@@ -873,8 +874,10 @@ class DailySummaryWidget extends ConsumerWidget {
                       if (item.inbox?.isRead != true) {
                         final userId = Utils.ref.read(authControllerProvider).value?.id;
                         if (userId == null) return;
+                        final date = ref.read(inboxListDateProvider);
+                        final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
                         ref
-                            .read(inboxConfigListControllerProvider.notifier)
+                            .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
                             .updateInboxConfig(
                               configs: [
                                 (item.inbox?.config?.copyWith(isRead: true) ??
@@ -1110,8 +1113,10 @@ class DailySummaryWidget extends ConsumerWidget {
                                 if (item.inbox?.isRead != true) {
                                   final userId = Utils.ref.read(authControllerProvider).value?.id;
                                   if (userId == null) return;
+                                  final date = ref.read(inboxListDateProvider);
+                                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
                                   ref
-                                      .read(inboxConfigListControllerProvider.notifier)
+                                      .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
                                       .updateInboxConfig(
                                         configs: [
                                           (item.inbox?.config?.copyWith(isRead: true) ??

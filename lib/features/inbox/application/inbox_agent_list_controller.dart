@@ -33,6 +33,8 @@ part 'inbox_agent_list_controller.g.dart';
 class InboxAgentListController extends _$InboxAgentListController {
   List<InboxListControllerInternalProvider> _dateControllers = [];
   List<InboxSuggestionControllerInternalProvider> _suggestionControllers = [];
+  List<InboxLinkedTaskControllerInternalProvider> _linkedTaskControllers = [];
+  List<InboxConfigControllerInternalProvider> _configControllers = [];
   DateTime? _lastAppOpenCloseDate;
 
   static String stringKey = '${TabType.home.name}:inboxes:agent';
@@ -111,6 +113,8 @@ class InboxAgentListController extends _$InboxAgentListController {
     // lastDate의 날짜부터 오늘까지 모든 날짜의 컨트롤러 생성
     _dateControllers = [];
     _suggestionControllers = [];
+    _linkedTaskControllers = [];
+    _configControllers = [];
     DateTime currentDate = startDate;
 
     while (!currentDate.isAfter(today)) {
@@ -124,11 +128,31 @@ class InboxAgentListController extends _$InboxAgentListController {
         isSignedIn: isSignedIn,
       );
 
+      final linkedTaskController = inboxLinkedTaskControllerInternalProvider(
+        isSearch: false,
+        year: currentDate.year,
+        month: currentDate.month,
+        day: currentDate.day,
+        isSignedIn: isSignedIn,
+      );
+
+      final configController = inboxConfigControllerInternalProvider(
+        isSearch: false,
+        year: currentDate.year,
+        month: currentDate.month,
+        day: currentDate.day,
+        isSignedIn: isSignedIn,
+      );
+
       _dateControllers.add(dateController);
       _suggestionControllers.add(suggestionController);
+      _linkedTaskControllers.add(linkedTaskController);
+      _configControllers.add(configController);
 
       ref.watch(dateController.notifier);
       ref.watch(suggestionController.notifier);
+      ref.watch(linkedTaskController.notifier);
+      ref.watch(configController.notifier);
 
       ref.listen(dateController, (prev, next) {
         if (next.value != null) {
@@ -140,17 +164,16 @@ class InboxAgentListController extends _$InboxAgentListController {
         _updateSuggestionsFromControllers();
       });
 
+      ref.listen(linkedTaskController, (prev, next) {
+        _updateLinkedTasksFromControllers();
+      });
+
+      ref.listen(configController, (prev, next) {
+        _updateConfigsFromControllers();
+      });
+
       currentDate = currentDate.add(const Duration(days: 1));
     }
-
-    ref.listen(inboxConfigListControllerProvider, (prev, next) {
-      configs = next;
-      updateData();
-    });
-    ref.listen(inboxLinkedTaskControllerProvider, (prev, next) {
-      linkedTasks = next;
-      updateData();
-    });
     ref.listen(chatChannelListControllerProvider, (prev, next) {
       channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
       updateData();
@@ -164,8 +187,6 @@ class InboxAgentListController extends _$InboxAgentListController {
       updateData();
     });
 
-    configs = ref.read(inboxConfigListControllerProvider);
-    linkedTasks = ref.read(inboxLinkedTaskControllerProvider);
     channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
     members = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.members).toList()));
     groups = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.groups).toList()));
@@ -174,6 +195,8 @@ class InboxAgentListController extends _$InboxAgentListController {
       // Initial update if data is already available (from cache)
       _updateInboxesFromControllers();
       _updateSuggestionsFromControllers();
+      _updateConfigsFromControllers();
+      _updateLinkedTasksFromControllers();
       // Then refresh to load new data
       refresh();
     });
@@ -237,6 +260,36 @@ class InboxAgentListController extends _$InboxAgentListController {
     // Create InboxSuggestionFetchListEntity with combined suggestions
     final firstController = _suggestionControllers.isNotEmpty ? _suggestionControllers.first : null;
     suggestions = InboxSuggestionFetchListEntity(suggestions: allSuggestions, sequence: firstController != null ? ref.read(firstController).value?.sequence ?? 0 : 0);
+
+    updateData();
+  }
+
+  void _updateLinkedTasksFromControllers() {
+    // Combine linked tasks from all date controllers
+    final allLinkedTasks = <InboxLinkedTaskEntity>[];
+    for (final controller in _linkedTaskControllers) {
+      final controllerLinkedTasks = ref.read(controller).value?.linkedTasks ?? [];
+      allLinkedTasks.addAll(controllerLinkedTasks);
+    }
+
+    // Create InboxLinkedTaskFetchListEntity with combined linked tasks
+    final firstController = _linkedTaskControllers.isNotEmpty ? _linkedTaskControllers.first : null;
+    linkedTasks = InboxLinkedTaskFetchListEntity(linkedTasks: allLinkedTasks, sequence: firstController != null ? ref.read(firstController).value?.sequence ?? 0 : 0);
+
+    updateData();
+  }
+
+  void _updateConfigsFromControllers() {
+    // Combine configs from all date controllers
+    final allConfigs = <InboxConfigEntity>[];
+    for (final controller in _configControllers) {
+      final controllerConfigs = ref.read(controller).value?.configs ?? [];
+      allConfigs.addAll(controllerConfigs);
+    }
+
+    // Create InboxConfigFetchListEntity with combined configs
+    final firstController = _configControllers.isNotEmpty ? _configControllers.first : null;
+    configs = InboxConfigFetchListEntity(configs: allConfigs, sequence: firstController != null ? ref.read(firstController).value?.sequence ?? 0 : 0);
 
     updateData();
   }
