@@ -29,18 +29,12 @@ class TaskLabelEntity {
   String get id => type.name + (colorString ?? '');
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type.name,
-      'colorString': colorString,
-    };
+    return {'type': type.name, 'colorString': colorString};
   }
 
   factory TaskLabelEntity.fromJson(Map<String, dynamic> json) {
     return TaskLabelEntity(
-      type: TaskLabelType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => TaskLabelType.all,
-      ),
+      type: TaskLabelType.values.firstWhere((e) => e.name == json['type'], orElse: () => TaskLabelType.all),
       colorString: json['colorString'] as String?,
     );
   }
