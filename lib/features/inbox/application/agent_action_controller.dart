@@ -327,8 +327,6 @@ class AgentActionController extends _$AgentActionController {
     final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: userMessage)];
 
     // 디버깅: _generateGeneralChat 시작 시 state 확인
-    print('############# _generateGeneralChat: state.recentTaskIds: ${state.recentTaskIds}');
-    print('############# _generateGeneralChat: userMessage: $userMessage');
 
     // 재귀 호출인 경우, conversation history의 마지막 user 메시지를 사용
     // (이미 updatedMessages에 첫 번째 응답이 포함되어 있으므로, 같은 userMessage를 다시 추가하지 않음)
@@ -2040,7 +2038,6 @@ class AgentActionController extends _$AgentActionController {
     _saveChatHistory(taggedProjects: taggedProjects);
 
     // 디버깅: sendMessage에서 state 확인
-    print('############# sendMessage: state.recentTaskIds: ${state.recentTaskIds}');
 
     try {
       // MCP 함수 호출을 통한 일반적인 AI 챗 진행
@@ -2559,10 +2556,7 @@ class AgentActionController extends _$AgentActionController {
     final newEventIds = functionResults.where((r) => r['success'] == true && r['eventId'] != null).map((r) => r['eventId'] as String).toList();
 
     // 디버깅: taskId 추출 결과 출력
-    if (newTaskIds.isNotEmpty) {
-      print('############# confirmActions: newTaskIds extracted: $newTaskIds');
-      print('############# confirmActions: current state.recentTaskIds: ${state.recentTaskIds}');
-    }
+    if (newTaskIds.isNotEmpty) {}
 
     // 기존 taskId/eventId에 새로운 것 추가 (최근 10개만 유지)
     // 중복 제거: 같은 ID가 이미 있으면 추가하지 않음
@@ -2570,11 +2564,6 @@ class AgentActionController extends _$AgentActionController {
     final existingEventIds = state.recentEventIds.toSet();
     final updatedTaskIds = [...state.recentTaskIds, ...newTaskIds.where((id) => !existingTaskIds.contains(id))].take(10).toList();
     final updatedEventIds = [...state.recentEventIds, ...newEventIds.where((id) => !existingEventIds.contains(id))].take(10).toList();
-
-    // 디버깅: 업데이트된 taskIds 출력
-    if (updatedTaskIds.isNotEmpty) {
-      print('############# confirmActions: updatedTaskIds: $updatedTaskIds');
-    }
 
     // 함수 실행 결과 메시지는 conversation history에서 제외하도록 플래그 설정
     // 룰베이스로 텍스트를 변경하지 않음 - excludeFromHistory 플래그로 처리
