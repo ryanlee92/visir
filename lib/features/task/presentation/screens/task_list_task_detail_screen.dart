@@ -210,6 +210,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
 
   @override
   void dispose() {
+    save(onEnd: true);
     saveTimer?.cancel();
     titleEditingController.dispose();
     descriptionEditingController.dispose();
@@ -270,10 +271,10 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
   }
 
   bool doNotSave = false;
-  Future<void> save() async {
+  Future<void> save({bool? onEnd}) async {
     if (doNotSave) return;
 
-    EasyDebounce.debounce('saveTaskOnTaskList', const Duration(milliseconds: 500), () async {
+    Future<void> _save() async {
       if (isSameWithOriginalTask) return;
       if (!isEdited) return;
       if (title?.isNotEmpty != true) return;
@@ -328,7 +329,15 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
       );
 
       UserActionSwtichAction.onTaskAction();
+    }
 
+    if (onEnd == true) {
+      await _save();
+      return;
+    }
+
+    EasyDebounce.debounce('saveTaskOnTaskList', const Duration(milliseconds: 500), () async {
+      _save();
       isEdited = false;
       setState(() {});
     });
