@@ -472,11 +472,14 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 8),
       width: double.maxFinite,
       constraints: null,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 12, right: 12),
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(right: 6), child: widget))],
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(left: 12, right: 12),
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(right: 6), child: widget))],
+          ),
         ),
       ),
     );
