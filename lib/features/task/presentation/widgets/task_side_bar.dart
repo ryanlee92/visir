@@ -117,7 +117,7 @@ class _TaskSideBarState extends SideBarState {
           isSection: true,
           children: [
             // 메인에 표시할 label들: all, today, upcoming
-            ...[TaskLabelType.all, TaskLabelType.today, TaskLabelType.upcoming].map((type) {
+            ...[TaskLabelType.all, TaskLabelType.today, TaskLabelType.upcoming, TaskLabelType.overdue, TaskLabelType.unscheduled, TaskLabelType.completed].map((type) {
               final l = filteredTaskLabelList.firstWhere((label) => label.type == type);
               bool isColorLabel = l.colorString != null;
               return AdminMenuItem(
@@ -149,40 +149,34 @@ class _TaskSideBarState extends SideBarState {
               );
             }).toList(),
             // More 섹션: overdue, unscheduled, completed
-            AdminMenuItem(
-              route: context.tr.task_label_more,
-              titleOnExpanded: context.tr.task_label_less,
-              children: [TaskLabelType.overdue, TaskLabelType.unscheduled, TaskLabelType.completed]
-                  .where((type) => filteredTaskLabelList.any((label) => label.type == type))
-                  .map((type) {
-                final l = filteredTaskLabelList.firstWhere((label) => label.type == type);
-                bool isColorLabel = l.colorString != null;
-                return AdminMenuItem(
-                  route: l.id,
-                  isSelected: label.id == l.id,
-                  title: l.type.getTitle(context, l.colorString),
-                  color: l.colorString == null ? null : ColorX.fromHex(l.colorString!),
-                  subtext: isColorLabel,
-                  badge: null,
-                  height: PlatformX.isMobileView
-                      ? isColorLabel
-                            ? 32
-                            : 40
-                      : isColorLabel
-                      ? 25
-                      : 32,
-                );
-              }).toList(),
-            ),
+            // AdminMenuItem(
+            //   route: context.tr.task_label_more,
+            //   titleOnExpanded: context.tr.task_label_less,
+            //   children: [TaskLabelType.overdue, TaskLabelType.unscheduled, TaskLabelType.completed].where((type) => filteredTaskLabelList.any((label) => label.type == type)).map((
+            //     type,
+            //   ) {
+            //     final l = filteredTaskLabelList.firstWhere((label) => label.type == type);
+            //     bool isColorLabel = l.colorString != null;
+            //     return AdminMenuItem(
+            //       route: l.id,
+            //       isSelected: label.id == l.id,
+            //       title: l.type.getTitle(context, l.colorString),
+            //       color: l.colorString == null ? null : ColorX.fromHex(l.colorString!),
+            //       subtext: isColorLabel,
+            //       badge: null,
+            //       height: PlatformX.isMobileView
+            //           ? isColorLabel
+            //                 ? 32
+            //                 : 40
+            //           : isColorLabel
+            //           ? 25
+            //           : 32,
+            //     );
+            //   }).toList(),
+            // ),
           ],
         ),
-        AdminMenuItem(
-          route: 'projects',
-          title: context.tr.project_pref_title,
-          isSelected: false,
-          isSection: true,
-          children: buildProjectMenuItem(null, projects, projectHide),
-        ),
+        AdminMenuItem(route: 'projects', title: context.tr.project_pref_title, isSelected: false, isSection: true, children: buildProjectMenuItem(null, projects, projectHide)),
       ],
     );
   }
@@ -225,9 +219,7 @@ class _TaskSideBarState extends SideBarState {
           title: e.name,
           isSelected: false,
           subtext: children.isEmpty,
-          options: children.isEmpty && e.description?.isNotEmpty == true
-              ? VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.right, message: e.description)
-              : null,
+          options: children.isEmpty && e.description?.isNotEmpty == true ? VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.right, message: e.description) : null,
           icon: children.isNotEmpty
               ? null
               : (size) => Container(
