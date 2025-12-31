@@ -486,15 +486,25 @@ class AgentActionController extends _$AgentActionController {
           contextInfo += '\n  DO NOT say "eventId가 보이지 않아서" - the eventId is RIGHT HERE: $mostRecentEventId';
           contextInfo += '\n  DO NOT create a new event - use updateEvent with eventId: $mostRecentEventId';
         }
+        contextInfo += '\n\n## CRITICAL RULE: Understanding User Intent for Task/Event Actions';
+        contextInfo += '\nWhen recentTaskIds/recentEventIds are provided above, you MUST carefully analyze the user\'s request to determine their intent:';
+        contextInfo += '\n1. **MODIFICATION REQUEST** (use updateTask/updateEvent):';
         contextInfo +=
-            '\n\nABSOLUTE RULE: When a user requests to modify or update a task/event (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", "음.. 이거 visir 프로젝트로 옮겨줘"), you MUST:';
-        contextInfo += '\n1. Use the MOST RECENT taskId/eventId from above (it is explicitly listed as "MOST RECENT")';
-        contextInfo += '\n2. Call updateTask/updateEvent with that taskId/eventId ONCE (do not call it multiple times)';
-        contextInfo += '\n3. DO NOT create a new task/event - the task/event already exists';
-        contextInfo += '\n4. DO NOT call createTask/createEvent - ONLY call updateTask/updateEvent';
-        contextInfo += '\n5. DO NOT say "taskId가 보이지 않아서" or "taskId가 이 대화에 표시되어 있지 않아서" or "cannot find taskId" or "대상 작업을 찾지 못해" - the taskId is provided above';
-        contextInfo += '\n6. DO NOT call the same function multiple times - if you already called updateTask, do not call it again';
-        contextInfo += '\n7. CRITICAL: If recentTaskIds/recentEventIds are provided above, you MUST use them. DO NOT create new tasks/events.';
+            '\n   - User wants to modify/change an EXISTING task/event (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", "음.. 이거 visir 프로젝트로 옮겨줘", "이거 옮겨줘", "이거 바꿔줘", "이거 수정해줘")';
+        contextInfo += '\n   - User refers to a task/event that was JUST created (e.g., "방금 만든 거", "지금 만든 거", "이거")';
+        contextInfo += '\n   - **ACTION**: Use updateTask/updateEvent with the MOST RECENT taskId/eventId from above';
+        contextInfo += '\n   - **DO NOT** call createTask/createEvent - the task/event already exists';
+        contextInfo += '\n2. **NEW CREATION REQUEST** (use createTask/createEvent):';
+        contextInfo += '\n   - User explicitly asks to create a NEW task/event (e.g., "하나 더 만들어줘", "또 하나 생성해줘", "새로운 테스크 만들어줘", "create another one", "make one more")';
+        contextInfo += '\n   - User provides completely new task/event details that are different from the recent one';
+        contextInfo += '\n   - **ACTION**: Call createTask/createEvent with the new details';
+        contextInfo += '\n3. **KEY PRINCIPLE**: Base your decision on the USER\'S EXPLICIT REQUEST, not on whether recentTaskIds exists.';
+        contextInfo += '\n   - If user says "이거 바꿔줘" → use updateTask (modification)';
+        contextInfo += '\n   - If user says "하나 더 만들어줘" → use createTask (new creation)';
+        contextInfo += '\n   - If user says "이거 visir 프로젝트로 옮겨줘" → use updateTask (modification)';
+        contextInfo += '\n   - If user says "새로운 테스크 만들어줘" → use createTask (new creation)';
+        contextInfo += '\n4. **WHEN TO USE MOST RECENT ID**: Only when the user\'s request is clearly a MODIFICATION request.';
+        contextInfo += '\n5. **WHEN TO CREATE NEW**: Only when the user explicitly asks for a NEW task/event to be created.';
         systemPrompt += contextInfo;
       }
 
@@ -524,7 +534,7 @@ class AgentActionController extends _$AgentActionController {
           // 가장 최근 taskId를 명확히 표시 (리스트의 마지막 항목)
           final mostRecentTaskId = latestState.recentTaskIds.last;
           contextSuffix +=
-              '\n\n[CRITICAL CONTEXT: The MOST RECENT task ID is: $mostRecentTaskId. When user requests to modify a task (e.g., "이거 visir 프로젝트로 변경해줘", "이거 프로젝트로 바꿔줘", "음.. 이거 visir 프로젝트로 옮겨줘"), you MUST use this EXACT taskId: $mostRecentTaskId. DO NOT create a new task - ONLY use updateTask with taskId: $mostRecentTaskId. DO NOT call createTask. DO NOT say "taskId가 보이지 않아서" or "taskId가 이 대화에 표시되어 있지 않아서" or "대상 작업을 찾지 못해" - the taskId is RIGHT HERE: $mostRecentTaskId.]';
+              '\n\n[CRITICAL CONTEXT: The MOST RECENT task ID is: $mostRecentTaskId. This task was JUST created/updated in this conversation. Analyze the user\'s request carefully: 1) If user wants to MODIFY this task (e.g., "이거 visir 프로젝트로 변경해줘", "이거 프로젝트로 바꿔줘", "음.. 이거 visir 프로젝트로 옮겨줘", "이거 옮겨줘", "이거 바꿔줘"), use updateTask with taskId: $mostRecentTaskId. 2) If user explicitly asks to CREATE A NEW task (e.g., "하나 더 만들어줘", "또 하나 생성해줘", "새로운 테스크 만들어줘"), use createTask. Base your decision on the USER\'S EXPLICIT REQUEST, not on whether recentTaskIds exists. The taskId $mostRecentTaskId is available if you need to modify the existing task.]';
           if (latestState.recentTaskIds.length > 1) {
             contextSuffix += '\n[All recent task IDs: ${latestState.recentTaskIds.join(', ')}. The last one ($mostRecentTaskId) is the most recent.]';
           }
@@ -627,43 +637,12 @@ class AgentActionController extends _$AgentActionController {
         final executor = McpFunctionExecutor();
         final allFunctionCalls = executor.parseFunctionCalls(aiMessage);
 
-        // recentTaskIds/recentEventIds가 있고 사용자가 수정을 요청한 경우 createTask/createEvent 호출 차단
-        final currentState = state;
-        final hasRecentTaskIds = currentState.recentTaskIds.isNotEmpty;
-        final hasRecentEventIds = currentState.recentEventIds.isNotEmpty;
-
-        // 사용자 메시지가 수정/변경 요청인지 확인 (한국어/영어 패턴)
-        // 더 넓은 패턴으로 수정 요청 감지 (음, 음.., 음... 포함)
-        final isModificationRequest = RegExp(
-          r'(이거|이것|이|그거|그것|그|방금|지금|만든|생성한|만들어진|생성된|음|음\.\.|음\.\.\.).*(프로젝트|프로젝트로|변경|바꿔|옮겨|수정|업데이트|이동|move|change|update|modify|옮기)',
-          caseSensitive: false,
-        ).hasMatch(actualUserMessage);
-
-        // 디버깅: recentTaskIds와 isModificationRequest 상태 출력
-        if (hasRecentTaskIds) {
-          print('############# recentTaskIds: ${currentState.recentTaskIds}');
-          print('############# isModificationRequest: $isModificationRequest');
-          print('############# actualUserMessage: $actualUserMessage');
-        }
-
-        // 중복 함수 호출 제거 및 createTask/createEvent 차단
+        // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
         final seenFunctionSignatures = <String>{};
         for (final call in allFunctionCalls) {
           final functionName = call['function'] as String? ?? '';
           final functionArgs = call['arguments'] as Map<String, dynamic>? ?? {};
-
-          // recentTaskIds가 있고 수정 요청인 경우 createTask 차단
-          if (hasRecentTaskIds && isModificationRequest && functionName == 'createTask') {
-            // createTask 호출을 무시하고 계속 진행
-            continue;
-          }
-
-          // recentEventIds가 있고 수정 요청인 경우 createEvent 차단
-          if (hasRecentEventIds && isModificationRequest && functionName == 'createEvent') {
-            // createEvent 호출을 무시하고 계속 진행
-            continue;
-          }
 
           // signature 생성 (중복 확인용)
           String signature = functionName;
@@ -1950,14 +1929,6 @@ class AgentActionController extends _$AgentActionController {
     return buffer.toString();
   }
 
-  /// AI 응답에서 need_more_action 태그를 파싱합니다.
-  /// 룰베이스 제거로 인해 더 이상 사용되지 않음
-  @Deprecated('룰베이스 제거로 인해 사용되지 않음')
-  Map<String, dynamic>? _parseNeedMoreActionTag(String aiResponse) {
-    // 룰베이스 제거: 항상 null 반환
-    return null;
-  }
-
   /// 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 관련 inbox를 자동으로 감지합니다.
   Set<int> _detectInboxesFromUserQuery(String userQuery, List<InboxEntity> inboxes) {
     final detectedNumbers = <int>{};
@@ -2244,7 +2215,7 @@ class AgentActionController extends _$AgentActionController {
       return callActionId != null && actionIds.contains(callActionId);
     }).toList();
 
-    // 중복 제거: 같은 함수와 인자를 가진 호출은 하나만 실행
+    // 중복 제거: 같은 함수와 인자를 가진 호출은 하나만 실행 (AI가 스스로 판단하도록 룰베이스 제거)
     final callsToExecute = <Map<String, dynamic>>[];
     final seenActionIds = <String>{};
     final seenFunctionSignatures = <String>{};
@@ -2426,8 +2397,22 @@ class AgentActionController extends _$AgentActionController {
         additionalInfo += '\n\nIMPORTANT: Created event IDs: ${eventIds.join(', ')}. These eventIds can be used in subsequent updateEvent function calls.';
       }
 
+      // recentTaskIds/recentEventIds가 있으면 함수 실행 결과 프롬프트에 명시
+      final currentStateForPrompt = state;
+      String recentIdsWarning = '';
+      if (currentStateForPrompt.recentTaskIds.isNotEmpty) {
+        final mostRecentTaskId = currentStateForPrompt.recentTaskIds.last;
+        recentIdsWarning +=
+            '\n\nCRITICAL: There is a RECENT task ID ($mostRecentTaskId) that was JUST created/updated. If the user requests to modify this task, you MUST use updateTask with this taskId. DO NOT call createTask - the task already exists.';
+      }
+      if (currentStateForPrompt.recentEventIds.isNotEmpty) {
+        final mostRecentEventId = currentStateForPrompt.recentEventIds.last;
+        recentIdsWarning +=
+            '\n\nCRITICAL: There is a RECENT event ID ($mostRecentEventId) that was JUST created/updated. If the user requests to modify this event, you MUST use updateEvent with this eventId. DO NOT call createEvent - the event already exists.';
+      }
+
       final functionResultsPrompt =
-          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "작업 ID: xxx" in Korean.\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
+          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo$recentIdsWarning\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "작업 ID: xxx" in Korean.\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
 
       // 함수 실행 결과를 포함한 메시지로 AI 호출
       final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt)];
@@ -2474,7 +2459,7 @@ class AgentActionController extends _$AgentActionController {
           apiKey: apiKey,
           userId: userId,
           systemPrompt:
-              'You are a helpful assistant. Provide a brief, natural summary of the function execution results. CRITICAL: If any taskId or eventId is mentioned in the function results (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Always include taskId/eventId in the format "(taskId: xxx)" or "(작업 ID: xxx)" in Korean responses.\n\nABSOLUTE RULE: The functions mentioned in the user message have ALREADY been executed. DO NOT call any functions. Only provide a summary message describing what was done. DO NOT call createTask, updateTask, or any other functions.',
+              'You are a helpful assistant. Provide a brief, natural summary of the function execution results. CRITICAL: If any taskId or eventId is mentioned in the function results (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Always include taskId/eventId in the format "(taskId: xxx)" or "(작업 ID: xxx)" in Korean responses.\n\nABSOLUTE RULE: The functions mentioned in the user message have ALREADY been executed. DO NOT call any functions. Only provide a summary message describing what was done. DO NOT call createTask, updateTask, createEvent, updateEvent, or any other functions. If the user message mentions "recentTaskIds" or "recentEventIds" or "RECENT task ID", it means a task/event was JUST created. DO NOT call createTask/createEvent again - only provide a summary message.',
         );
 
         final functionAiResponse = functionResponse.fold((failure) => null, (response) => response);

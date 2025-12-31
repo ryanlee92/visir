@@ -2826,20 +2826,23 @@ The user can then click the confirm button or press Command+Enter (Mac) / Ctrl+E
 7. For repetitive tasks, calculate dates correctly and create separate function calls for each occurrence.
 8. **Function Chaining**: When chaining functions (e.g., search → action), call all functions in a single response. The system will execute them sequentially and automatically pass results between functions.
 9. **User Confirmation**: Functions that require confirmation will automatically show a confirmation UI. You don't need to ask the user separately - just call the function and the system will handle the confirmation flow.
-10. **CRITICAL - Task/Event Modification After Creation**: When a user requests to modify a task or event that was just created (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 다른 프로젝트로 옮겨줘", "이거 visir 프로젝트로 바꿔줘", "이거 visir 프로젝트로 옮겨줘"), you MUST:
-    - **FIRST**: Look at the conversation history (especially recent assistant messages) to find the most recent function execution result
-    - **Look for these patterns in the conversation history**:
-      * "createTask: ... (taskId: xxx)" - extract the taskId from parentheses
-      * "Created task IDs: xxx" - use this taskId directly
-      * Function result messages that mention "taskId: xxx" or "eventId: xxx"
-      * Any message that shows a taskId in parentheses like "(taskId: xxx)" or "(taskld: xxx)"
-    - **If you find a taskId**: Use `updateTask` function with that `taskId` and the new `projectId` (or other fields to modify)
-    - **Example 1**: If conversation shows "createTask: Task created successfully (taskId: abc-123)" and user says "이거 visir 프로젝트로 바꿔줘", call `updateTask` with `taskId: "abc-123"` and `projectId: "visir-project-id"`
-    - **Example 2**: If conversation shows "Created task IDs: xyz-789", use `taskId: "xyz-789"` in `updateTask`
-    - **Example 3**: If conversation shows "내일 **종일 '운동하기'** 테스크를 1개 생성했어요. (taskld: 5fd31ac8-afa9-4f45-96d0-3527645a0036)" and user says "이거 visir 프로젝트로 옮겨줘", extract taskId "5fd31ac8-afa9-4f45-96d0-3527645a0036" and call `updateTask` with that taskId
-    - **If you cannot find the taskId**: Use `searchTask` first to find the task by title (e.g., search for "운동하기" if that was the task title), then use `updateTask` with the found taskId
-    - **CRITICAL**: **DO NOT** call `createTask` again when modifying an existing task - **ALWAYS** use `updateTask` to modify existing tasks
-    - **CRITICAL**: **DO NOT** create a new task when the user asks to modify/move an existing task - **ONLY** use `updateTask`
+10. **CRITICAL - Understanding User Intent for Task/Event Actions**: When "MOST RECENT task ID" or "recentTaskIds" is mentioned in the system context, you MUST carefully analyze the user's request to determine their intent:
+    - **MODIFICATION REQUEST** (use updateTask/updateEvent):
+      * User wants to modify/change an EXISTING task/event (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", "이거 옮겨줘", "이거 바꿔줘", "이거 수정해줘")
+      * User refers to a task/event that was JUST created (e.g., "방금 만든 거", "지금 만든 거", "이거")
+      * **ACTION**: Use updateTask/updateEvent with the MOST RECENT taskId/eventId
+      * **DO NOT** call createTask/createEvent - the task/event already exists
+    - **NEW CREATION REQUEST** (use createTask/createEvent):
+      * User explicitly asks to create a NEW task/event (e.g., "하나 더 만들어줘", "또 하나 생성해줘", "새로운 테스크 만들어줘", "create another one", "make one more")
+      * User provides completely new task/event details that are different from the recent one
+      * **ACTION**: Call createTask/createEvent with the new details
+    - **KEY PRINCIPLE**: Base your decision on the USER'S EXPLICIT REQUEST, not on whether recentTaskIds exists.
+      * If user says "이거 바꿔줘" → use updateTask (modification)
+      * If user says "하나 더 만들어줘" → use createTask (new creation)
+      * If user says "이거 visir 프로젝트로 옮겨줘" → use updateTask (modification)
+      * If user says "새로운 테스크 만들어줘" → use createTask (new creation)
+    - **WHEN TO USE MOST RECENT ID**: Only when the user's request is clearly a MODIFICATION request.
+    - **WHEN TO CREATE NEW**: Only when the user explicitly asks for a NEW task/event to be created.
     - **DO NOT** use `linkToProject` with inboxId - use `updateTask` with taskId instead
 11. **Parallel Execution and Dependency Analysis**: When calling multiple functions, analyze dependencies and mark functions that can run in parallel:
     - **Independent search functions** (`searchInbox`, `searchTask`, `searchCalendarEvent`) can run in parallel - set `can_parallelize: true`
