@@ -233,8 +233,8 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                 )
               : VisirEmptyWidget(
                   height: height,
-                  message: currentTaskLabel.type == TaskLabelType.today
-                      ? context.tr.task_no_tasks_today
+                  message: currentTaskLabel.type == TaskLabelType.scheduled
+                      ? context.tr.task_no_scheduled_tasks
                       : currentTaskLabel.type == TaskLabelType.completed
                       ? context.tr.task_no_completed_tasks
                       : currentTaskLabel.type == TaskLabelType.overdue
@@ -345,11 +345,18 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
         }
         filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
-      case TaskLabelType.today:
-        final today = DateUtils.dateOnly(DateTime.now());
+      case TaskLabelType.scheduled:
+        // all tasks에서 unscheduled와 overdue를 제외한 뷰
         filteredTasks = <TaskEntity>[];
         for (final t in tasksOnView) {
-          if (t.status == TaskStatus.none && !t.isOverdue && t.editedStartTime != null && t.editedStartDateOnly == today) {
+          if (completedTaskOptionType == CompletedTaskOptionType.show ? true : t.status == TaskStatus.none) {
+            if (completedTaskOptionType == CompletedTaskOptionType.show && t.isOverdue && t.status == TaskStatus.done) {
+              continue;
+            }
+            // unscheduled와 overdue 제외
+            if (t.isUnscheduled || t.isOverdue) {
+              continue;
+            }
             filteredTasks.add(t);
           }
         }
@@ -383,16 +390,6 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
         }
         filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
         break;
-      case TaskLabelType.upcoming:
-        final now = DateUtils.dateOnly(DateTime.now());
-        filteredTasks = <TaskEntity>[];
-        for (final t in tasksOnView) {
-          if (t.status == TaskStatus.none && !t.isOverdue && !t.isUnscheduled && t.editedStartTime != null && t.editedStartDateOnly.isAfter(now)) {
-            filteredTasks.add(t);
-          }
-        }
-        filteredTasks.sort((a, b) => taskSorter(a: a, b: b));
-        break;
     }
 
     final dateTaskMapList =
@@ -405,7 +402,9 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
             return {date: tasksOnDate.unique((e) => e.getEditedUniqueId(date)).toList()..sort((a, b) => taskSorter(a: a, b: b))};
           }).toList()
           ..removeWhere((e) => e.keys.first == null && e.values.first.isEmpty)
-          ..removeWhere((e) => e.keys.first == DateTime(1000) && e.values.first.isEmpty);
+          ..removeWhere((e) => e.keys.first == DateTime(1000) && e.values.first.isEmpty)
+          // scheduled 뷰에서는 overdue(DateTime(1000)) 제외
+          ..removeWhere((e) => currentTaskLabel.type == TaskLabelType.scheduled && e.keys.first == DateTime(1000));
 
     final closableDrawer = ref.watch(resizableClosableDrawerProvider(tabType));
 
@@ -485,7 +484,9 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                             : null,
                         detailBackgroundColor: context.background,
                         onLoading:
-                            (currentTaskLabel.type == TaskLabelType.today || currentTaskLabel.type == TaskLabelType.overdue || currentTaskLabel.type == TaskLabelType.unscheduled)
+                            (currentTaskLabel.type == TaskLabelType.scheduled ||
+                                currentTaskLabel.type == TaskLabelType.overdue ||
+                                currentTaskLabel.type == TaskLabelType.unscheduled)
                             ? null
                             : () async {
                                 final hasMoreData = await ref.read(taskListControllerProvider.notifier).getMoreTasks();
@@ -550,57 +551,6 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
                                         onTap: () {},
                                       );
                                     }).toList()
-                            : currentTaskLabel.type == TaskLabelType.today
-                            ? filteredTasks.isEmpty
-                                  ? [placeholder(currentTaskLabel: currentTaskLabel, height: constraints.maxHeight - appbarSize)]
-                                  : [
-                                      ...filteredTasks.toList().mapIndexed((taskIndex, task) {
-                                        final date = DateUtils.dateOnly(DateTime.now());
-                                        return MasterItem(
-                                          task.getEditedUniqueId(date),
-                                          task.getEditedUniqueId(date),
-                                          customWidget: (selected) {
-                                            return TaskListElementWidget(
-                                              task: task,
-                                              prevItem: taskIndex > 0 ? filteredTasks[taskIndex - 1] : null,
-                                              isSelected: selected,
-                                              openDetails: () => openDetails(task, date),
-                                              tabType: TabType.task,
-                                              date: date,
-                                              onAddTask: widget.dateOnAddTask == null ? false : DateUtils.dateOnly(widget.dateOnAddTask!) == DateUtils.dateOnly(date),
-                                              setDateOnAddTask: widget.setDateOnAddTask,
-                                              addTaskWidget: TaskListAddTaskWidget(
-                                                key: widget.addTaskWidgetKey,
-                                                dateOnAddTask: widget.dateOnAddTask,
-                                                closeAddTaskWidget: closeAddTaskWidget,
-                                              ),
-                                              tasksOnSameDate: filteredTasks,
-                                              isUnscheduled: false,
-                                              isOverdue: false,
-                                              hideFooter: true,
-                                              isCompletedTab: false,
-                                              isFirst: taskIndex == 0,
-                                              showAddTaskBottomSheet: showAddTaskBottomSheet,
-                                              currentTaskLabelType: currentTaskLabel.type,
-                                            );
-                                          },
-                                          detailsBuilder: (context, isSmall, onClose) {
-                                            return TaskListTaskDetailScreen(
-                                              key: ValueKey('task_list_task_details_screen_${task.getEditedUniqueId(date)}_${focusTextFieldOnDetails}'),
-                                              task: task,
-                                              close: widget.closeDetails,
-                                              tabType: TabType.task,
-                                              autoFocus: focusTextFieldOnDetails,
-                                              showDetilas: (details) {
-                                                selectedDetails = details;
-                                                setState(() {});
-                                              },
-                                            );
-                                          },
-                                          onTap: () {},
-                                        );
-                                      }).toList(),
-                                    ]
                             : [
                                 ...dateTaskMapList
                                     .mapIndexed((dateIndex, e) {

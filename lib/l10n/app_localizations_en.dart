@@ -1677,7 +1677,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get task_label_all => 'All Tasks';
 
   @override
-  String get task_label_today => 'Today';
+  String get task_label_scheduled => 'Scheduled';
 
   @override
   String get task_label_completed => 'Completed';
@@ -1687,9 +1687,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get task_label_unscheduled => 'Unscheduled';
-
-  @override
-  String get task_label_upcoming => 'Upcoming';
 
   @override
   String get task_label_this_week => 'This Week';
@@ -1705,6 +1702,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get task_no_tasks_today => 'No tasks today';
+
+  @override
+  String get task_no_scheduled_tasks => 'No scheduled tasks';
 
   @override
   String get task_no_completed_tasks => 'No completed tasks';

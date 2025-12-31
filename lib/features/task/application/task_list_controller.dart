@@ -39,8 +39,7 @@ class TaskListController extends _$TaskListController {
 
   List<TaskLabelEntity> get taskLabelList => [
     TaskLabelEntity(type: TaskLabelType.all),
-    TaskLabelEntity(type: TaskLabelType.today),
-    TaskLabelEntity(type: TaskLabelType.upcoming),
+    TaskLabelEntity(type: TaskLabelType.scheduled),
     TaskLabelEntity(type: TaskLabelType.overdue),
     TaskLabelEntity(type: TaskLabelType.unscheduled),
     TaskLabelEntity(type: TaskLabelType.completed),
@@ -58,14 +57,15 @@ class TaskListController extends _$TaskListController {
       taskLabelType = TaskLabelType.all;
     } else if (labelId.startsWith('completed')) {
       taskLabelType = TaskLabelType.completed;
-    } else if (labelId.startsWith('today')) {
-      taskLabelType = TaskLabelType.today;
+    } else if (labelId.startsWith('scheduled')) {
+      taskLabelType = TaskLabelType.scheduled;
     } else if (labelId.startsWith('overdue')) {
       taskLabelType = TaskLabelType.overdue;
     } else if (labelId.startsWith('unscheduled')) {
       taskLabelType = TaskLabelType.unscheduled;
-    } else if (labelId.startsWith('upcoming')) {
-      taskLabelType = TaskLabelType.upcoming;
+    } else if (labelId.startsWith('today') || labelId.startsWith('upcoming')) {
+      // 기존 today/upcoming을 scheduled로 마이그레이션
+      taskLabelType = TaskLabelType.scheduled;
     }
 
     // Initialize state with empty result
@@ -78,16 +78,16 @@ class TaskListController extends _$TaskListController {
         taskLabelType == TaskLabelType.completed ||
         taskLabelType == TaskLabelType.overdue ||
         taskLabelType == TaskLabelType.unscheduled ||
-        taskLabelType == TaskLabelType.upcoming) {
-      // all, completed, overdue, unscheduled, upcoming, thisWeek, thisMonth: TaskListControllerInternal listen
+        taskLabelType == TaskLabelType.scheduled) {
+      // all, completed, overdue, unscheduled, scheduled: TaskListControllerInternal listen
       _controller = ref.watch(taskListControllerInternalProvider(isSignedIn: isSignedIn, labelId: labelId).notifier);
       ref.listen(taskListControllerInternalProvider(isSignedIn: isSignedIn, labelId: labelId), (prev, next) {
         _updateFromInternalControllers(isSignedIn: isSignedIn, labelId: labelId);
       });
     }
 
-    if (taskLabelType == TaskLabelType.all || taskLabelType == TaskLabelType.today || taskLabelType == TaskLabelType.upcoming) {
-      // all, today: TaskListDateControllerInternal 사용
+    if (taskLabelType == TaskLabelType.all || taskLabelType == TaskLabelType.scheduled) {
+      // all, scheduled: TaskListDateControllerInternal 사용
       _dateController = ref.watch(taskListDateControllerInternalProvider(isSignedIn: isSignedIn).notifier);
       ref.listen(taskListDateControllerInternalProvider(isSignedIn: isSignedIn), (prev, next) {
         _updateFromInternalControllers(isSignedIn: isSignedIn, labelId: labelId);
@@ -266,14 +266,15 @@ class TaskListController extends _$TaskListController {
       taskLabelType = TaskLabelType.all;
     } else if (labelId.startsWith('completed')) {
       taskLabelType = TaskLabelType.completed;
-    } else if (labelId.startsWith('today')) {
-      taskLabelType = TaskLabelType.today;
+    } else if (labelId.startsWith('scheduled')) {
+      taskLabelType = TaskLabelType.scheduled;
     } else if (labelId.startsWith('overdue')) {
       taskLabelType = TaskLabelType.overdue;
     } else if (labelId.startsWith('unscheduled')) {
       taskLabelType = TaskLabelType.unscheduled;
-    } else if (labelId.startsWith('upcoming')) {
-      taskLabelType = TaskLabelType.upcoming;
+    } else if (labelId.startsWith('today') || labelId.startsWith('upcoming')) {
+      // 기존 today/upcoming을 scheduled로 마이그레이션
+      taskLabelType = TaskLabelType.scheduled;
     }
 
     Completer<bool> completer = Completer<bool>();
@@ -346,14 +347,15 @@ class TaskListController extends _$TaskListController {
       taskLabelType = TaskLabelType.all;
     } else if (labelId.startsWith('completed')) {
       taskLabelType = TaskLabelType.completed;
-    } else if (labelId.startsWith('today')) {
-      taskLabelType = TaskLabelType.today;
+    } else if (labelId.startsWith('scheduled')) {
+      taskLabelType = TaskLabelType.scheduled;
     } else if (labelId.startsWith('overdue')) {
       taskLabelType = TaskLabelType.overdue;
     } else if (labelId.startsWith('unscheduled')) {
       taskLabelType = TaskLabelType.unscheduled;
-    } else if (labelId.startsWith('upcoming')) {
-      taskLabelType = TaskLabelType.upcoming;
+    } else if (labelId.startsWith('today') || labelId.startsWith('upcoming')) {
+      // 기존 today/upcoming을 scheduled로 마이그레이션
+      taskLabelType = TaskLabelType.scheduled;
     }
 
     Completer<void> completer = Completer<void>();
@@ -382,8 +384,8 @@ class TaskListController extends _$TaskListController {
           });
     }
 
-    // all, today일 때 dateController도 load
-    if ((taskLabelType == TaskLabelType.all || taskLabelType == TaskLabelType.today) && _dateController != null) {
+    // all, scheduled일 때 dateController도 load
+    if ((taskLabelType == TaskLabelType.all || taskLabelType == TaskLabelType.scheduled) && _dateController != null) {
       totalCount++;
       _dateController!
           .loadAll(isRefresh: isRefresh)
@@ -828,14 +830,15 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       taskLabelType = TaskLabelType.all;
     } else if (labelId.startsWith('completed')) {
       taskLabelType = TaskLabelType.completed;
-    } else if (labelId.startsWith('today')) {
-      taskLabelType = TaskLabelType.today;
+    } else if (labelId.startsWith('scheduled')) {
+      taskLabelType = TaskLabelType.scheduled;
     } else if (labelId.startsWith('overdue')) {
       taskLabelType = TaskLabelType.overdue;
     } else if (labelId.startsWith('unscheduled')) {
       taskLabelType = TaskLabelType.unscheduled;
-    } else if (labelId.startsWith('upcoming')) {
-      taskLabelType = TaskLabelType.upcoming;
+    } else if (labelId.startsWith('today') || labelId.startsWith('upcoming')) {
+      // 기존 today/upcoming을 scheduled로 마이그레이션
+      taskLabelType = TaskLabelType.scheduled;
     }
 
     // all 탭의 경우: overdue만 가져오므로 레이지로딩 불필요 (TaskListDateControllerInternal에서 처리)
@@ -876,14 +879,15 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
       taskLabelType = TaskLabelType.all;
     } else if (labelId.startsWith('completed')) {
       taskLabelType = TaskLabelType.completed;
-    } else if (labelId.startsWith('today')) {
-      taskLabelType = TaskLabelType.today;
+    } else if (labelId.startsWith('scheduled')) {
+      taskLabelType = TaskLabelType.scheduled;
     } else if (labelId.startsWith('overdue')) {
       taskLabelType = TaskLabelType.overdue;
     } else if (labelId.startsWith('unscheduled')) {
       taskLabelType = TaskLabelType.unscheduled;
-    } else if (labelId.startsWith('upcoming')) {
-      taskLabelType = TaskLabelType.upcoming;
+    } else if (labelId.startsWith('today') || labelId.startsWith('upcoming')) {
+      // 기존 today/upcoming을 scheduled로 마이그레이션
+      taskLabelType = TaskLabelType.scheduled;
     }
 
     // taskLabel에 따라 필요한 데이터만 가져오기
@@ -925,8 +929,8 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
           overdueAndCompletedTasks.addAll(filtered);
         });
         break;
-      case TaskLabelType.today:
-        // today: overdue만 필요 (오늘 날짜는 calendarTaskListControllerInternal에서 가져옴)
+      case TaskLabelType.scheduled:
+        // scheduled: overdue만 필요 (오늘 및 미래 날짜는 calendarTaskListControllerInternal에서 가져옴)
         final overdueStartDate = now.subtract(Duration(days: 365)); // 1년 전부터
         final overdueEndDate = now.subtract(Duration(days: 1)); // 어제까지
 
@@ -956,7 +960,6 @@ class TaskListControllerInternal extends _$TaskListControllerInternal {
           overdueAndCompletedTasks.addAll(unscheduledTasks);
         });
         break;
-      case TaskLabelType.upcoming:
     }
 
     // completed 탭의 경우: 데이터베이스에서 updated_at 정렬로 가져온 순서 그대로 사용 (정렬 없음)
@@ -1675,8 +1678,7 @@ class TaskListResultEntity {
 
     taskLabelList = [
       TaskLabelEntity(type: TaskLabelType.all),
-      TaskLabelEntity(type: TaskLabelType.today),
-      TaskLabelEntity(type: TaskLabelType.upcoming),
+      TaskLabelEntity(type: TaskLabelType.scheduled),
       TaskLabelEntity(type: TaskLabelType.overdue),
       TaskLabelEntity(type: TaskLabelType.unscheduled),
       TaskLabelEntity(type: TaskLabelType.completed),

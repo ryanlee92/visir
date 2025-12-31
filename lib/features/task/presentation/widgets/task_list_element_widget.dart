@@ -111,20 +111,20 @@ class _TaskListTaskWidgetState extends ConsumerState<TaskListElementWidget> {
   bool get showTimeString => isCompletedTaskLabel ? true : ((task?.isAllDay ?? false) ? (task?.isOverdue ?? false) : true) && !isUnscheduled;
 
   bool get showUnscheduledHeader =>
-      (widget.currentTaskLabelType == TaskLabelType.all || widget.currentTaskLabelType == TaskLabelType.upcoming) &&
+      (widget.currentTaskLabelType == TaskLabelType.all || widget.currentTaskLabelType == TaskLabelType.scheduled) &&
       isUnscheduled &&
       widget.prevItem?.isBraindump != false &&
       task != null &&
       task!.isBraindump != true;
 
   bool get showBraindumpHeader =>
-      (widget.currentTaskLabelType == TaskLabelType.all || widget.currentTaskLabelType == TaskLabelType.upcoming) &&
+      (widget.currentTaskLabelType == TaskLabelType.all || widget.currentTaskLabelType == TaskLabelType.scheduled) &&
       widget.prevItem == null &&
       task != null &&
       task!.isBraindump == true;
 
   bool get showOverdueHeader =>
-      (widget.currentTaskLabelType == TaskLabelType.all || widget.currentTaskLabelType == TaskLabelType.upcoming) && isOverdue && isFirstTaskInGroup && task != null;
+      (widget.currentTaskLabelType == TaskLabelType.all || widget.currentTaskLabelType == TaskLabelType.scheduled) && isOverdue && isFirstTaskInGroup && task != null;
 
   bool get showCompletedHeader => false;
 

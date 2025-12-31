@@ -3292,11 +3292,11 @@ abstract class AppLocalizations {
   /// **'All Tasks'**
   String get task_label_all;
 
-  /// No description provided for @task_label_today.
+  /// No description provided for @task_label_scheduled.
   ///
   /// In en, this message translates to:
-  /// **'Today'**
-  String get task_label_today;
+  /// **'Scheduled'**
+  String get task_label_scheduled;
 
   /// No description provided for @task_label_completed.
   ///
@@ -3315,12 +3315,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unscheduled'**
   String get task_label_unscheduled;
-
-  /// No description provided for @task_label_upcoming.
-  ///
-  /// In en, this message translates to:
-  /// **'Upcoming'**
-  String get task_label_upcoming;
 
   /// No description provided for @task_label_this_week.
   ///
@@ -3351,6 +3345,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No tasks today'**
   String get task_no_tasks_today;
+
+  /// No description provided for @task_no_scheduled_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No scheduled tasks'**
+  String get task_no_scheduled_tasks;
 
   /// No description provided for @task_no_completed_tasks.
   ///

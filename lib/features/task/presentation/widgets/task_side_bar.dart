@@ -11,7 +11,6 @@ import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
-import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_label_entity.dart';
 import 'package:Visir/features/task/providers.dart';
 import 'package:collection/collection.dart';
@@ -58,7 +57,6 @@ class _TaskSideBarState extends SideBarState {
   Widget build(BuildContext context) {
     ref.watch(taskListControllerProvider);
     ref.watch(themeSwitchProvider);
-    final tasksOnView = ref.watch(taskListControllerProvider.select((v) => v.tasksOnView.where((t) => !t.isCancelled).toList()));
     final completedTaskOptionType = ref.watch(authControllerProvider.select((e) => e.requireValue.userCompletedTaskOptionType));
     final taskLabelList = ref.watch(taskListControllerProvider.select((v) => v.taskLabelList));
     final filteredTaskLabelList = List<TaskLabelEntity>.from(taskLabelList);
@@ -116,8 +114,8 @@ class _TaskSideBarState extends SideBarState {
           isSelected: false,
           isSection: true,
           children: [
-            // 메인에 표시할 label들: all, today, upcoming
-            ...[TaskLabelType.all, TaskLabelType.today, TaskLabelType.upcoming, TaskLabelType.overdue, TaskLabelType.unscheduled, TaskLabelType.completed].map((type) {
+            // 메인에 표시할 label들: all, scheduled
+            ...[TaskLabelType.all, TaskLabelType.scheduled, TaskLabelType.overdue, TaskLabelType.unscheduled, TaskLabelType.completed].map((type) {
               final l = filteredTaskLabelList.firstWhere((label) => label.type == type);
               bool isColorLabel = l.colorString != null;
               return AdminMenuItem(
@@ -126,19 +124,7 @@ class _TaskSideBarState extends SideBarState {
                 title: l.type.getTitle(context, l.colorString),
                 color: l.colorString == null ? null : ColorX.fromHex(l.colorString!),
                 subtext: isColorLabel,
-                badge: l.type == TaskLabelType.today
-                    ? tasksOnView
-                          .where(
-                            (t) =>
-                                !t.isOriginalRecurrenceTask &&
-                                t.status == TaskStatus.none &&
-                                !t.isOverdue &&
-                                t.editedStartTime != null &&
-                                t.editedStartDateOnly == DateUtils.dateOnly(DateTime.now()),
-                          )
-                          .toList()
-                          .length
-                    : null,
+                badge: null,
                 height: PlatformX.isMobileView
                     ? isColorLabel
                           ? 32
