@@ -1125,6 +1125,12 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
     // Keep tagged_connection, tagged_channel, tagged_project for inline badge rendering
     // They will be handled by HtmlWidget's customWidgetBuilder
+    // The text content will be hidden via customStylesBuilder
+
+    // Wrap content in <div> if it doesn't start with < (to make it HTML)
+    if (!cleanedContent.trim().startsWith('<')) {
+      cleanedContent = '<div>$cleanedContent</div>';
+    }
 
     // Check if content contains inapp_ tags (these should be treated as HTML)
     final inappTagRegex = RegExp(r'<inapp_[a-z_]+>', caseSensitive: false);
@@ -1132,7 +1138,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
     // Check if content is HTML (contains HTML tags, but exclude custom inapp tags)
     final htmlTagRegex = RegExp(r'<(?!/?(?:inapp_|tagged_)[a-z_]+)[a-z][^>]*>', caseSensitive: false);
-    final isHtml = htmlTagRegex.hasMatch(cleanedContent) || hasInappTags;
+    // Always treat as HTML now since we wrap non-HTML content in <div>
+    final isHtml = true;
 
     // Check if content is Markdown (contains Markdown patterns)
     final isMarkdown = _isMarkdownContent(cleanedContent);
@@ -1315,14 +1322,20 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
     // For HTML content, we need to process @mentions in the text and replace them with inline badges
     // We'll do this by wrapping HtmlWidget and processing the text content
-    if (isHtml && taggedItems.isNotEmpty) {
-      // Extract text content and replace @mentions with inline badges
-      // But HtmlWidget doesn't easily support inline widgets in text, so we need a different approach
-      // We'll use customWidgetBuilder to handle tagged_task, tagged_event, tagged_connection tags
-      // But we also need to handle @mentions in the plain text parts
+    // If content is markdown only (no HTML tags except our wrapper), convert markdown to HTML first
+    if (isMarkdown && !hasInappTags && !htmlTagRegex.hasMatch(cleanedContent.replaceAll(RegExp(r'^<div>|</div>$'), ''))) {
+      try {
+        // Remove wrapper div temporarily, convert markdown, then wrap again
+        final contentWithoutWrapper = cleanedContent.replaceAll(RegExp(r'^<div>|</div>$'), '');
+        final htmlFromMarkdown = md.markdownToHtml(contentWithoutWrapper);
+        finalContent = '<div>$htmlFromMarkdown</div>';
+      } catch (e) {
+        // If conversion fails, keep original content
+      }
     }
 
-    if (isHtml || (isHtml && isMarkdown)) {
+    // All content is now HTML (isHtml is always true), process @mentions
+    {
       // For HTML content (or mixed HTML/Markdown), we need to handle @mentions in text nodes
       // HtmlWidget doesn't easily support inline widgets in text, so we'll process the HTML string
       // and replace @mentions with special markers that we can handle in customWidgetBuilder
@@ -1345,726 +1358,180 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       // baseStyle에서 fontFamily를 제거하여 기본 폰트 사용
       final htmlTextStyle = baseStyle?.copyWith(fontFamily: null);
 
-      return HtmlWidget(
-        processedHtml,
-        textStyle: htmlTextStyle,
-        renderMode: RenderMode.column,
-        customWidgetBuilder: (element) {
-          // Handle tagged mentions in HTML text
-          if (element.localName == 'span' && element.classes.contains('tagged-mention')) {
-            final mentionName = element.attributes['data-mention'] ?? '';
-            final mentionText = '@$mentionName';
-            // Find matching tagged item
-            String? matchedKey;
-            if (taggedItems.containsKey(mentionText)) {
-              matchedKey = mentionText;
-            } else {
-              // Try case-insensitive match
-              final normalizedMentionName = mentionName.trim().toLowerCase();
-              for (final key in taggedItems.keys) {
-                final keyName = key.substring(1).trim().toLowerCase();
-                if (keyName == normalizedMentionName) {
-                  matchedKey = key;
-                  break;
-                }
-              }
-            }
-
-            if (matchedKey != null && taggedItems.containsKey(matchedKey)) {
-              final itemData = taggedItems[matchedKey]!;
-              final itemType = itemData['type'] as String;
-              final displayText = matchedKey.substring(1); // Remove @
-
-              // Determine icon based on item type
-              VisirIconType iconType;
-              switch (itemType) {
-                case 'task':
-                  iconType = VisirIconType.task;
-                  break;
-                case 'event':
-                  iconType = VisirIconType.calendar;
-                  break;
-                case 'connection':
-                  iconType = VisirIconType.attendee;
-                  break;
-                case 'channel':
-                  iconType = VisirIconType.chatChannel;
-                  break;
-                case 'project':
-                  iconType = VisirIconType.project;
-                  break;
-                default:
-                  iconType = VisirIconType.task;
-              }
-
-              return InlineCustomWidget(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: context.surface,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: context.outline.withValues(alpha: 0.2)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      VisirIcon(type: iconType, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          displayText,
-                          style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
-                            color: isUser ? context.onPrimaryContainer : context.onSurface,
-                            fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                            height: 1.0,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-          }
-          if (element.localName == 'inapp_inbox') {
-            try {
-              final jsonText = element.text.trim();
-              final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              final inbox = InboxEntity.fromJson(jsonData, local: true);
-              return _buildInboxWidget(context, inbox, isUser);
-            } catch (e) {
-              return Text('Error parsing inbox: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_task') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              // Extract first valid JSON object if multiple JSON objects are concatenated
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                // Try to extract first JSON object using regex
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              // Filter out null values and string "null" values
-              final cleanedData = <String, dynamic>{};
-              jsonData.forEach((key, value) {
-                if (value != null && value != 'null' && !(value is String && value.toLowerCase() == 'null')) {
-                  cleanedData[key] = value;
-                }
-              });
-
-              // Convert camelCase to snake_case for TaskEntity.fromJson
-              final normalizedData = <String, dynamic>{};
-              cleanedData.forEach((key, value) {
-                String snakeKey = key;
-                if (key == 'startAt') {
-                  snakeKey = 'start_at';
-                } else if (key == 'endAt') {
-                  snakeKey = 'end_at';
-                } else if (key == 'projectId') {
-                  snakeKey = 'project_id';
-                } else if (key == 'createdAt') {
-                  snakeKey = 'created_at';
-                } else if (key == 'updatedAt') {
-                  snakeKey = 'updated_at';
-                } else if (key == 'isAllDay') {
-                  snakeKey = 'is_all_day';
-                } else if (key == 'recurrenceEndAt') {
-                  snakeKey = 'recurrence_end_at';
-                } else if (key == 'recurringTaskId') {
-                  snakeKey = 'recurring_task_id';
-                } else if (key == 'excludedRecurrenceDate') {
-                  snakeKey = 'excluded_recurrence_date';
-                } else if (key == 'editedRecurrenceTaskIds') {
-                  snakeKey = 'edited_recurrence_task_ids';
-                } else if (key == 'doNotApplyDateOffset') {
-                  snakeKey = 'do_not_apply_date_offset';
-                }
-                normalizedData[snakeKey] = value;
-              });
-
-              // Normalize rrule if present
-              if (normalizedData['rrule'] != null && normalizedData['rrule'] is String) {
-                final rruleStr = normalizedData['rrule'] as String;
-                if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
-                  normalizedData['rrule'] = 'RRULE:$rruleStr';
-                }
-              }
-
-              var task = TaskEntity.fromJson(normalizedData, local: true);
-
-              // If id is null, try to find task from controllers
-              if (task.id == null || task.id!.isEmpty) {
-                final title = normalizedData['title'] as String?;
-                TaskEntity? foundTask;
-
-                // Try to find task by title from controllers
-                if (title != null && title.isNotEmpty) {
-                  try {
-                    final taskListState = ref.read(taskListControllerProvider);
-                    final allTasks = taskListState.tasks;
-                    foundTask = allTasks.firstWhereOrNull((t) => t.title == title);
-                  } catch (_) {}
-
-                  if (foundTask == null) {
-                    try {
-                      final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
-                      final calendarTasks = calendarState.tasks;
-                      foundTask = calendarTasks.firstWhereOrNull((t) => t.title == title);
-                    } catch (_) {}
-                  }
-
-                  if (foundTask != null) {
-                    // Update task with found id and other fields
-                    task = foundTask;
-                  }
-                }
-              }
-
-              return _buildTaskWidget(context, task, isUser);
-            } catch (e) {
-              // 디버깅을 위해 에러 메시지 표시
-              return Text('${context.tr.agent_action_task_generation_failed}: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_event') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              // Extract first valid JSON object if multiple JSON objects are concatenated
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                // Try to extract first JSON object using regex
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              // Debug: Log raw JSON data
-              // Normalize rrule if present
-              if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
-                final rruleStr = jsonData['rrule'] as String;
-                if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
-                  jsonData['rrule'] = 'RRULE:$rruleStr';
-                }
-              }
-
-              final eventData = _parseEventFromJson(jsonData);
-              return _buildEventWidget(context, eventData, isUser);
-            } catch (e) {
-              // 디버깅을 위해 에러 메시지 표시
-              return Text(context.tr.agent_action_task_generation_failed.replaceAll('task', 'event'), style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_mail_summary') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              // Extract first valid JSON object if multiple JSON objects are concatenated
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                // Try to extract first JSON object using regex
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final summary = jsonData['summary'] as String? ?? '';
-              if (summary.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              return _buildMailSummaryWidget(context, summary, isUser);
-            } catch (e) {
-              return Text('Error parsing mail summary: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_mail') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              // Extract first valid JSON object if multiple JSON objects are concatenated
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                // Try to extract first JSON object using regex
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final mailData = jsonData;
-              if (mailData['reply'] == null && mailData['message'] != null) {
-                mailData['reply'] = mailData['message'];
-              }
-              return _buildMailReplyWidget(context, mailData, isUser);
-            } catch (e) {
-              return Text('Error parsing mail: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_mail_entity') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final mail = MailEntity.fromJson(jsonData);
-              return _buildMailEntityWidget(context, mail, isUser);
-            } catch (e) {
-              return Text('Error parsing mail entity: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_message') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-              final message = MessageEntity.fromJson(jsonData);
-              return _buildMessageWidget(context, message, isUser);
-            } catch (e) {
-              return Text('Error parsing message: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_calendar') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-              final calendar = CalendarEntity.fromJson(jsonData);
-              return _buildCalendarWidget(context, calendar, isUser);
-            } catch (e) {
-              return Text('Error parsing calendar: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          if (element.localName == 'inapp_event_entity') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-              final event = EventEntity.fromJson(jsonData);
-              return _buildEventEntityWidget(context, event, isUser);
-            } catch (e) {
-              return Text('Error parsing event entity: $e', style: baseStyle?.copyWith(color: context.error));
-            }
-          }
-          // Tagged items rendering - inline badges
-          if (element.localName == 'tagged_task') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final taskTitle = jsonData['title'] as String? ?? 'Untitled';
-              return InlineCustomWidget(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      VisirIcon(type: VisirIconType.task, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          taskTitle,
-                          style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
-                            color: isUser ? context.onPrimaryContainer : context.onSurface,
-                            fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                            height: 1.0,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } catch (e) {
-              return const SizedBox.shrink();
-            }
-          }
-          if (element.localName == 'tagged_event') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final eventTitle = jsonData['title'] as String? ?? 'Untitled';
-              return InlineCustomWidget(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      VisirIcon(type: VisirIconType.calendar, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          eventTitle,
-                          style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
-                            color: isUser ? context.onPrimaryContainer : context.onSurface,
-                            fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                            height: 1.0,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } catch (e) {
-              return const SizedBox.shrink();
-            }
-          }
-          if (element.localName == 'tagged_connection') {
-            try {
-              final jsonText = element.text.trim();
-              if (jsonText.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              Map<String, dynamic> jsonData;
-              try {
-                jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-              } catch (e) {
-                final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-                if (jsonMatch != null) {
-                  jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
-                } else {
-                  rethrow;
-                }
-              }
-
-              final name = jsonData['name'] as String? ?? '';
-              final email = jsonData['email'] as String? ?? '';
-              final displayName = name.isNotEmpty && name != 'No name' ? name : (email.isNotEmpty ? email : 'Unknown');
-
-              return InlineCustomWidget(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      VisirIcon(type: VisirIconType.attendee, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          displayName,
-                          style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
-                            color: isUser ? context.onPrimaryContainer : context.onSurface,
-                            fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                            height: 1.0,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } catch (e) {
-              return const SizedBox.shrink();
-            }
-          }
-          return null;
-        },
-        customStylesBuilder: (element) {
-          if (element.localName == 'div' && element.classes.contains('inbox-section')) {
-            return {
-              'background-color': (isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surface).toHex(),
-              'border': '1px solid ${(isUser ? context.primaryContainer : context.outline.withValues(alpha: 0.3)).toHex()}',
-              'border-radius': '8px',
-              'padding': '12px',
-              'margin-bottom': '12px',
-            };
-          }
-          if (element.localName == 'div' && element.classes.contains('section-title')) {
-            return {'font-weight': 'bold', 'color': (isUser ? context.onPrimaryContainer : context.primary).toHex(), 'margin-bottom': '12px'};
-          }
-          if (element.localName == 'div' && element.classes.contains('title-content')) {
-            return {
-              'font-weight': 'bold',
-              'font-size': '1.1em',
-              'color': (isUser ? context.onPrimaryContainer : context.onSurface).toHex(),
-              'margin-bottom': '8px',
-              'line-height': '1.4',
-            };
-          }
-          if (element.localName == 'div' && element.classes.contains('description-content')) {
-            return {'color': (isUser ? context.onPrimaryContainer : context.onSurfaceVariant).toHex(), 'line-height': '1.5', 'white-space': 'pre-wrap'};
-          }
-          if (element.localName == 'div' && element.classes.contains('field')) {
-            return {'margin-bottom': '6px'};
-          }
-          if (element.localName == 'span' && element.classes.contains('label')) {
-            return {'font-weight': 'bold', 'color': (isUser ? context.onPrimaryContainer : context.primary).toHex()};
-          }
-          if (element.localName == 'span' && element.classes.contains('value')) {
-            return {'color': (isUser ? context.onPrimaryContainer : context.onSurfaceVariant).toHex()};
-          }
-          return null;
-        },
-      );
-    } else if (isMarkdown) {
-      // Render Markdown content with entity tag support
-      final unescapedContent = _htmlUnescape.convert(cleanedContent);
-
-      // Extract entity tags from markdown content
-      final List<({String placeholder, Widget widget, int position})> entityWidgets = [];
-      final RegExp entityTagRegex = RegExp(
-        r'<(inapp_task|inapp_event|inapp_mail|inapp_mail_entity|inapp_message|inapp_calendar|inapp_event_entity|inapp_inbox|inapp_mail_summary|inapp_action_confirm)>([\s\S]*?)</\1>',
-        multiLine: true,
-      );
-
-      String markdownContent = unescapedContent;
-      int placeholderIndex = 0;
-
-      // Replace entity tags with placeholders and store widgets
-      for (final match in entityTagRegex.allMatches(unescapedContent)) {
-        final tagName = match.group(1)!;
-        final jsonText = match.group(2)?.trim() ?? '';
-        final position = match.start;
-
-        if (jsonText.isNotEmpty) {
-          try {
-            Map<String, dynamic> jsonData;
-            try {
-              jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-            } catch (e) {
-              final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
-              if (jsonMatch != null) {
-                jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+      return Container(
+        decoration: isUser ? BoxDecoration(color: context.primary.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(6)) : null,
+        padding: isUser ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6) : null,
+        child: HtmlWidget(
+          processedHtml,
+          textStyle: htmlTextStyle,
+          renderMode: RenderMode.column,
+          customWidgetBuilder: (element) {
+            // Handle tagged mentions in HTML text
+            if (element.localName == 'span' && element.classes.contains('tagged-mention')) {
+              final mentionName = element.attributes['data-mention'] ?? '';
+              final mentionText = '@$mentionName';
+              // Find matching tagged item
+              String? matchedKey;
+              if (taggedItems.containsKey(mentionText)) {
+                matchedKey = mentionText;
               } else {
-                continue;
+                // Try case-insensitive match
+                final normalizedMentionName = mentionName.trim().toLowerCase();
+                for (final key in taggedItems.keys) {
+                  final keyName = key.substring(1).trim().toLowerCase();
+                  if (keyName == normalizedMentionName) {
+                    matchedKey = key;
+                    break;
+                  }
+                }
+              }
+
+              if (matchedKey != null && taggedItems.containsKey(matchedKey)) {
+                final itemData = taggedItems[matchedKey]!;
+                final itemType = itemData['type'] as String;
+                final displayText = matchedKey.substring(1); // Remove @
+
+                // Determine icon based on item type
+                VisirIconType iconType;
+                switch (itemType) {
+                  case 'task':
+                    iconType = VisirIconType.task;
+                    break;
+                  case 'event':
+                    iconType = VisirIconType.calendar;
+                    break;
+                  case 'connection':
+                    iconType = VisirIconType.attendee;
+                    break;
+                  case 'channel':
+                    iconType = VisirIconType.chatChannel;
+                    break;
+                  case 'project':
+                    iconType = VisirIconType.project;
+                    break;
+                  default:
+                    iconType = VisirIconType.task;
+                }
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: context.outline.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: iconType, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            displayText,
+                            style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                              color: isUser ? context.onPrimaryContainer : context.onSurface,
+                              fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
+                              height: 1.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
             }
-
-            Widget? widget;
-            switch (tagName) {
-              case 'inapp_task':
+            if (element.localName == 'inapp_inbox') {
+              try {
+                final jsonText = element.text.trim();
+                final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                final inbox = InboxEntity.fromJson(jsonData, local: true);
+                return _buildInboxWidget(context, inbox, isUser);
+              } catch (e) {
+                return Text('Error parsing inbox: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_task') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                // Extract first valid JSON object if multiple JSON objects are concatenated
+                Map<String, dynamic> jsonData;
                 try {
-                  // Convert camelCase to snake_case for TaskEntity.fromJson
-                  // Also filter out null values and string "null" values
-                  final normalizedData = <String, dynamic>{};
-                  jsonData.forEach((key, value) {
-                    // Skip null values and string "null"
-                    if (value == null || value == 'null' || (value is String && value.toLowerCase() == 'null')) {
-                      return;
-                    }
-
-                    String snakeKey = key;
-                    if (key == 'startAt') {
-                      snakeKey = 'start_at';
-                    } else if (key == 'endAt') {
-                      snakeKey = 'end_at';
-                    } else if (key == 'projectId') {
-                      snakeKey = 'project_id';
-                    } else if (key == 'createdAt') {
-                      snakeKey = 'created_at';
-                    } else if (key == 'updatedAt') {
-                      snakeKey = 'updated_at';
-                    } else if (key == 'isAllDay') {
-                      snakeKey = 'is_all_day';
-                    } else if (key == 'recurrenceEndAt') {
-                      snakeKey = 'recurrence_end_at';
-                    } else if (key == 'recurringTaskId') {
-                      snakeKey = 'recurring_task_id';
-                    } else if (key == 'excludedRecurrenceDate') {
-                      snakeKey = 'excluded_recurrence_date';
-                    } else if (key == 'editedRecurrenceTaskIds') {
-                      snakeKey = 'edited_recurrence_task_ids';
-                    } else if (key == 'doNotApplyDateOffset') {
-                      snakeKey = 'do_not_apply_date_offset';
-                    }
-                    normalizedData[snakeKey] = value;
-                  });
-
-                  if (normalizedData['rrule'] != null && normalizedData['rrule'] is String) {
-                    final rruleStr = normalizedData['rrule'] as String;
-                    if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
-                      normalizedData['rrule'] = 'RRULE:$rruleStr';
-                    }
-                  }
-                  var task = TaskEntity.fromJson(normalizedData, local: true);
-
-                  // If id is null, try to find task from controllers
-                  if (task.id == null || task.id!.isEmpty) {
-                    final title = normalizedData['title'] as String?;
-                    TaskEntity? foundTask;
-
-                    // Try to find task by title from controllers
-                    if (title != null && title.isNotEmpty) {
-                      try {
-                        final taskListState = ref.read(taskListControllerProvider);
-                        final allTasks = taskListState.tasks;
-                        foundTask = allTasks.firstWhereOrNull((t) => t.title == title);
-                      } catch (_) {}
-
-                      if (foundTask == null) {
-                        try {
-                          final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
-                          final calendarTasks = calendarState.tasks;
-                          foundTask = calendarTasks.firstWhereOrNull((t) => t.title == title);
-                        } catch (_) {}
-                      }
-
-                      if (foundTask != null) {
-                        // Update task with found id and other fields
-                        task = foundTask;
-                      }
-                    }
-                  }
-
-                  widget = _buildTaskWidget(context, task, isUser);
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
                 } catch (e) {
-                  // If parsing fails, try to find task from controllers
-
-                  TaskEntity? foundTask;
-                  final taskId = jsonData['id'] as String?;
-                  final title = jsonData['title'] as String?;
-
-                  // Try to find task by ID or title from controllers
-                  if (taskId != null && taskId.isNotEmpty) {
-                    // Search in task list controller
-                    try {
-                      final taskListState = ref.read(taskListControllerProvider);
-                      final allTasks = taskListState.tasks;
-                      foundTask = allTasks.firstWhereOrNull((t) => t.id == taskId);
-                    } catch (_) {}
-
-                    // If not found, search in calendar task list controller
-                    if (foundTask == null) {
-                      try {
-                        final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
-                        final calendarTasks = calendarState.tasks;
-                        foundTask = calendarTasks.firstWhereOrNull((t) => t.id == taskId);
-                      } catch (_) {}
-                    }
+                  // Try to extract first JSON object using regex
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
                   }
+                }
 
-                  // If still not found and title exists, try searching by title
-                  if (foundTask == null && title != null && title.isNotEmpty) {
+                // Filter out null values and string "null" values
+                final cleanedData = <String, dynamic>{};
+                jsonData.forEach((key, value) {
+                  if (value != null && value != 'null' && !(value is String && value.toLowerCase() == 'null')) {
+                    cleanedData[key] = value;
+                  }
+                });
+
+                // Convert camelCase to snake_case for TaskEntity.fromJson
+                final normalizedData = <String, dynamic>{};
+                cleanedData.forEach((key, value) {
+                  String snakeKey = key;
+                  if (key == 'startAt') {
+                    snakeKey = 'start_at';
+                  } else if (key == 'endAt') {
+                    snakeKey = 'end_at';
+                  } else if (key == 'projectId') {
+                    snakeKey = 'project_id';
+                  } else if (key == 'createdAt') {
+                    snakeKey = 'created_at';
+                  } else if (key == 'updatedAt') {
+                    snakeKey = 'updated_at';
+                  } else if (key == 'isAllDay') {
+                    snakeKey = 'is_all_day';
+                  } else if (key == 'recurrenceEndAt') {
+                    snakeKey = 'recurrence_end_at';
+                  } else if (key == 'recurringTaskId') {
+                    snakeKey = 'recurring_task_id';
+                  } else if (key == 'excludedRecurrenceDate') {
+                    snakeKey = 'excluded_recurrence_date';
+                  } else if (key == 'editedRecurrenceTaskIds') {
+                    snakeKey = 'edited_recurrence_task_ids';
+                  } else if (key == 'doNotApplyDateOffset') {
+                    snakeKey = 'do_not_apply_date_offset';
+                  }
+                  normalizedData[snakeKey] = value;
+                });
+
+                // Normalize rrule if present
+                if (normalizedData['rrule'] != null && normalizedData['rrule'] is String) {
+                  final rruleStr = normalizedData['rrule'] as String;
+                  if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
+                    normalizedData['rrule'] = 'RRULE:$rruleStr';
+                  }
+                }
+
+                var task = TaskEntity.fromJson(normalizedData, local: true);
+
+                // If id is null, try to find task from controllers
+                if (task.id == null || task.id!.isEmpty) {
+                  final title = normalizedData['title'] as String?;
+                  TaskEntity? foundTask;
+
+                  // Try to find task by title from controllers
+                  if (title != null && title.isNotEmpty) {
                     try {
                       final taskListState = ref.read(taskListControllerProvider);
                       final allTasks = taskListState.tasks;
@@ -2078,506 +1545,522 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                         foundTask = calendarTasks.firstWhereOrNull((t) => t.title == title);
                       } catch (_) {}
                     }
-                  }
 
-                  if (foundTask != null) {
-                    widget = _buildTaskWidget(context, foundTask, isUser);
+                    if (foundTask != null) {
+                      // Update task with found id and other fields
+                      task = foundTask;
+                    }
+                  }
+                }
+
+                return _buildTaskWidget(context, task, isUser);
+              } catch (e) {
+                // 디버깅을 위해 에러 메시지 표시
+                return Text('${context.tr.agent_action_task_generation_failed}: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_event') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                // Extract first valid JSON object if multiple JSON objects are concatenated
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  // Try to extract first JSON object using regex
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
                   } else {
-                    // If task not found, try one more time with cleaned JSON (without null values)
-                    try {
-                      final cleanedJsonData = <String, dynamic>{};
-                      jsonData.forEach((key, value) {
-                        if (value != null && value != 'null' && !(value is String && value.toLowerCase() == 'null')) {
-                          cleanedJsonData[key] = value;
-                        }
-                      });
+                    rethrow;
+                  }
+                }
 
-                      if (cleanedJsonData.isNotEmpty) {
-                        // Convert camelCase to snake_case
-                        final normalizedData = <String, dynamic>{};
-                        cleanedJsonData.forEach((key, value) {
-                          String snakeKey = key;
-                          if (key == 'startAt')
-                            snakeKey = 'start_at';
-                          else if (key == 'endAt')
-                            snakeKey = 'end_at';
-                          else if (key == 'projectId')
-                            snakeKey = 'project_id';
-                          else if (key == 'createdAt')
-                            snakeKey = 'created_at';
-                          else if (key == 'updatedAt')
-                            snakeKey = 'updated_at';
-                          else if (key == 'isAllDay')
-                            snakeKey = 'is_all_day';
-                          else if (key == 'recurrenceEndAt')
-                            snakeKey = 'recurrence_end_at';
-                          else if (key == 'recurringTaskId')
-                            snakeKey = 'recurring_task_id';
-                          else if (key == 'excludedRecurrenceDate')
-                            snakeKey = 'excluded_recurrence_date';
-                          else if (key == 'editedRecurrenceTaskIds')
-                            snakeKey = 'edited_recurrence_task_ids';
-                          else if (key == 'doNotApplyDateOffset')
-                            snakeKey = 'do_not_apply_date_offset';
-                          normalizedData[snakeKey] = value;
-                        });
+                // Debug: Log raw JSON data
+                // Normalize rrule if present
+                if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
+                  final rruleStr = jsonData['rrule'] as String;
+                  if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
+                    jsonData['rrule'] = 'RRULE:$rruleStr';
+                  }
+                }
 
-                        var task = TaskEntity.fromJson(normalizedData, local: true);
-                        if (task.id == null || task.id!.isEmpty) {
-                          final taskTitle = normalizedData['title'] as String?;
-                          if (taskTitle != null && taskTitle.isNotEmpty) {
-                            try {
-                              final taskListState = ref.read(taskListControllerProvider);
-                              final allTasks = taskListState.tasks;
-                              final found = allTasks.firstWhereOrNull((t) => t.title == taskTitle);
-                              if (found != null) task = found;
-                            } catch (_) {}
-
-                            if (task.id == null || task.id!.isEmpty) {
-                              try {
-                                final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
-                                final calendarTasks = calendarState.tasks;
-                                final found = calendarTasks.firstWhereOrNull((t) => t.title == taskTitle);
-                                if (found != null) task = found;
-                              } catch (_) {}
-                            }
-                          }
-                        }
-                        widget = _buildTaskWidget(context, task, isUser);
-                      }
-                    } catch (_) {
-                      // If still fails, create a fallback widget with basic info
-                      widget = Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(color: context.surfaceVariant.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(8)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(title ?? 'Unknown Task', style: context.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text('Error parsing task: $e', style: context.bodySmall?.copyWith(color: context.error)),
-                          ],
-                        ),
-                      );
-                    }
-                  }
-                }
-                break;
-              case 'inapp_event':
-                try {
-                  if (jsonData['rrule'] != null && jsonData['rrule'] is String) {
-                    final rruleStr = jsonData['rrule'] as String;
-                    if (rruleStr.isNotEmpty && !rruleStr.toUpperCase().startsWith('RRULE:')) {
-                      jsonData['rrule'] = 'RRULE:$rruleStr';
-                    }
-                  }
-                  final eventData = _parseEventFromJson(jsonData);
-                  widget = _buildEventWidget(context, eventData, isUser);
-                } catch (e) {
-                  // Skip invalid event
-                }
-                break;
-              case 'inapp_mail_entity':
-                try {
-                  // 필수 필드 체크 및 기본값 설정
-                  if (jsonData['hostEmail'] == null || jsonData['hostEmail'] is! String) {
-                    String? fromEmail;
-                    if (jsonData['from'] is Map) {
-                      final fromMap = jsonData['from'] as Map;
-                      fromEmail = fromMap['email'] is String ? fromMap['email'] as String : null;
-                    }
-                    jsonData['hostEmail'] = fromEmail ?? '';
-                  }
-                  if (jsonData['type'] == null || jsonData['type'] is! String) {
-                    jsonData['type'] = 'google';
-                  }
-
-                  final mail = MailEntity.fromJson(jsonData);
-                  widget = _buildMailEntityWidget(context, mail, isUser);
-                } catch (e) {
-                  // Skip invalid mail
-                }
-                break;
-              case 'inapp_message':
-                try {
-                  final message = MessageEntity.fromJson(jsonData);
-                  widget = _buildMessageWidget(context, message, isUser);
-                } catch (e) {
-                  // Skip invalid message
-                }
-                break;
-              case 'inapp_calendar':
-                try {
-                  final calendar = CalendarEntity.fromJson(jsonData);
-                  widget = _buildCalendarWidget(context, calendar, isUser);
-                } catch (e) {
-                  // Skip invalid calendar
-                }
-                break;
-              case 'inapp_event_entity':
-                try {
-                  final event = EventEntity.fromJson(jsonData);
-                  widget = _buildEventEntityWidget(context, event, isUser);
-                } catch (e) {
-                  // Skip invalid event entity
-                }
-                break;
-              case 'inapp_inbox':
-                try {
-                  final inbox = InboxEntity.fromJson(jsonData, local: true);
-                  widget = _buildInboxWidget(context, inbox, isUser);
-                } catch (e) {
-                  // Skip invalid inbox
-                }
-                break;
-              case 'inapp_mail_summary':
-                try {
-                  final summary = jsonData['summary'] as String? ?? '';
-                  if (summary.isNotEmpty) {
-                    widget = _buildMailSummaryWidget(context, summary, isUser);
-                  }
-                } catch (e) {
-                  // Skip invalid summary
-                }
-                break;
-              case 'inapp_mail':
-                try {
-                  final mailData = jsonData;
-                  if (mailData['reply'] == null && mailData['message'] != null) {
-                    mailData['reply'] = mailData['message'];
-                  }
-                  widget = _buildMailReplyWidget(context, mailData, isUser);
-                } catch (e) {
-                  // Skip invalid mail reply
-                }
-                break;
+                final eventData = _parseEventFromJson(jsonData);
+                return _buildEventWidget(context, eventData, isUser);
+              } catch (e) {
+                // 디버깅을 위해 에러 메시지 표시
+                return Text(context.tr.agent_action_task_generation_failed.replaceAll('task', 'event'), style: baseStyle?.copyWith(color: context.error));
+              }
             }
+            if (element.localName == 'inapp_mail_summary') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                // Extract first valid JSON object if multiple JSON objects are concatenated
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  // Try to extract first JSON object using regex
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
 
-            // Always create a widget, even if parsing fails (to avoid placeholder being left)
-            final finalWidget =
-                widget ??
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: context.surfaceVariant.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(4)),
-                  child: Text('Failed to render entity', style: context.bodySmall?.copyWith(color: context.error)),
+                final summary = jsonData['summary'] as String? ?? '';
+                if (summary.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return _buildMailSummaryWidget(context, summary, isUser);
+              } catch (e) {
+                return Text('Error parsing mail summary: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_mail') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                // Extract first valid JSON object if multiple JSON objects are concatenated
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  // Try to extract first JSON object using regex
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+
+                final mailData = jsonData;
+                if (mailData['reply'] == null && mailData['message'] != null) {
+                  mailData['reply'] = mailData['message'];
+                }
+                return _buildMailReplyWidget(context, mailData, isUser);
+              } catch (e) {
+                return Text('Error parsing mail: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_mail_entity') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+
+                final mail = MailEntity.fromJson(jsonData);
+                return _buildMailEntityWidget(context, mail, isUser);
+              } catch (e) {
+                return Text('Error parsing mail entity: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_message') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+                final message = MessageEntity.fromJson(jsonData);
+                return _buildMessageWidget(context, message, isUser);
+              } catch (e) {
+                return Text('Error parsing message: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_calendar') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+                final calendar = CalendarEntity.fromJson(jsonData);
+                return _buildCalendarWidget(context, calendar, isUser);
+              } catch (e) {
+                return Text('Error parsing calendar: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'inapp_event_entity') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+                final event = EventEntity.fromJson(jsonData);
+                return _buildEventEntityWidget(context, event, isUser);
+              } catch (e) {
+                return Text('Error parsing event entity: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            // Tagged items rendering - inline badges
+            if (element.localName == 'tagged_task') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+
+                final taskTitle = jsonData['title'] as String? ?? 'Untitled';
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.task, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            taskTitle,
+                            style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                              color: isUser ? context.onPrimaryContainer : context.onSurface,
+                              fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
+                              height: 1.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
-
-            final placeholder = '___ENTITY_PLACEHOLDER_${placeholderIndex++}___';
-            entityWidgets.add((placeholder: placeholder, widget: finalWidget, position: position));
-            markdownContent = markdownContent.replaceFirst(match.group(0)!, placeholder);
-          } catch (e) {
-            // If even error widget creation fails, remove the tag entirely
-            markdownContent = markdownContent.replaceFirst(match.group(0)!, '');
-          }
-        }
-      }
-
-      // Sort entity widgets by position (reverse order for replacement)
-      entityWidgets.sort((a, b) => b.position.compareTo(a.position));
-
-      // baseStyle에서 fontFamily를 제거하여 기본 폰트 사용
-      final defaultStyle = baseStyle?.copyWith(fontFamily: null);
-      final baseFontSize = defaultStyle?.fontSize ?? 14;
-      final baseColor = defaultStyle?.color ?? context.onSurfaceVariant;
-
-      // 모든 header에 기본 폰트를 명시적으로 설정 (완전히 새로운 TextStyle 생성)
-      final createHeaderStyle = (double fontSize) => TextStyle(
-        fontSize: fontSize,
-        fontWeight: FontWeight.bold,
-        color: baseColor,
-        fontFamily: null, // 기본 폰트 사용
-        inherit: false, // 상속 비활성화
-      );
-
-      // If there are entity widgets, we need to split markdown and insert widgets
-      if (entityWidgets.isEmpty) {
-        // No entity widgets, just render markdown normally
-        return MarkdownBody(
-          data: markdownContent,
-          styleSheet: MarkdownStyleSheet(
-            p: defaultStyle,
-            h1: createHeaderStyle(baseFontSize * 1.5),
-            h2: createHeaderStyle(baseFontSize * 1.3),
-            h3: createHeaderStyle(baseFontSize * 1.1),
-            h4: createHeaderStyle(baseFontSize * 1.05),
-            h5: createHeaderStyle(baseFontSize),
-            h6: createHeaderStyle(baseFontSize * 0.95),
-            code: defaultStyle?.copyWith(
-              backgroundColor: Colors.transparent,
-              color: context.primaryContainer,
-              fontFamily: 'monospace',
-              leadingDistribution: TextLeadingDistribution.even,
-            ),
-            codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
-            blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
-            blockquoteDecoration: BoxDecoration(
-              border: Border(left: BorderSide(color: context.outline, width: 3)),
-            ),
-            listBullet: defaultStyle,
-            tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
-            tableBody: defaultStyle,
-          ),
-        );
-      } else {
-        // Split markdown by placeholders and insert widgets
-        final List<Widget> children = [];
-        String remainingContent = markdownContent;
-
-        // Sort by position in reverse order to replace from end to start
-        final sortedWidgets = List.from(entityWidgets)
-          ..sort((a, b) {
-            final indexA = markdownContent.indexOf(a.placeholder);
-            final indexB = markdownContent.indexOf(b.placeholder);
-            return indexB.compareTo(indexA);
-          });
-
-        for (final entityWidget in sortedWidgets) {
-          final placeholderIndex = remainingContent.indexOf(entityWidget.placeholder);
-          if (placeholderIndex != -1) {
-            // Add markdown before placeholder
-            final beforeText = remainingContent.substring(0, placeholderIndex);
-            if (beforeText.trim().isNotEmpty) {
-              children.add(
-                MarkdownBody(
-                  data: beforeText,
-                  styleSheet: MarkdownStyleSheet(
-                    p: defaultStyle,
-                    h1: createHeaderStyle(baseFontSize * 1.5),
-                    h2: createHeaderStyle(baseFontSize * 1.3),
-                    h3: createHeaderStyle(baseFontSize * 1.1),
-                    h4: createHeaderStyle(baseFontSize * 1.05),
-                    h5: createHeaderStyle(baseFontSize),
-                    h6: createHeaderStyle(baseFontSize * 0.95),
-                    code: defaultStyle?.copyWith(
-                      backgroundColor: Colors.transparent,
-                      color: context.primaryContainer,
-                      fontFamily: 'monospace',
-                      leadingDistribution: TextLeadingDistribution.even,
-                    ),
-                    codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
-                    blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
-                    blockquoteDecoration: BoxDecoration(
-                      border: Border(left: BorderSide(color: context.outline, width: 3)),
-                    ),
-                    listBullet: defaultStyle,
-                    tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
-                    tableBody: defaultStyle,
-                  ),
-                ),
-              );
+              } catch (e) {
+                return const SizedBox.shrink();
+              }
             }
+            if (element.localName == 'tagged_event') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
 
-            // Add entity widget
-            children.add(entityWidget.widget);
-
-            // Update remaining content
-            remainingContent = remainingContent.substring((placeholderIndex + entityWidget.placeholder.length).toInt());
-          }
-        }
-
-        // Add remaining markdown
-        if (remainingContent.trim().isNotEmpty) {
-          children.add(
-            MarkdownBody(
-              data: remainingContent,
-              styleSheet: MarkdownStyleSheet(
-                p: defaultStyle,
-                h1: createHeaderStyle(baseFontSize * 1.5),
-                h2: createHeaderStyle(baseFontSize * 1.3),
-                h3: createHeaderStyle(baseFontSize * 1.1),
-                h4: createHeaderStyle(baseFontSize * 1.05),
-                h5: createHeaderStyle(baseFontSize),
-                h6: createHeaderStyle(baseFontSize * 0.95),
-                code: defaultStyle?.copyWith(
-                  backgroundColor: Colors.transparent,
-                  color: context.primaryContainer,
-                  fontFamily: 'monospace',
-                  leadingDistribution: TextLeadingDistribution.even,
-                ),
-                codeblockDecoration: BoxDecoration(color: context.onBackground.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(6)),
-                blockquote: defaultStyle?.copyWith(color: context.onSurfaceVariant, fontStyle: FontStyle.italic, fontFamily: null),
-                blockquoteDecoration: BoxDecoration(
-                  border: Border(left: BorderSide(color: context.outline, width: 3)),
-                ),
-                listBullet: defaultStyle,
-                tableHead: defaultStyle?.copyWith(fontWeight: FontWeight.bold, fontFamily: null),
-                tableBody: defaultStyle,
-              ),
-            ),
-          );
-        }
-
-        return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: children);
-      }
-    } else {
-      final unescapedContent = _htmlUnescape.convert(cleanedContent);
-
-      // Build inline badges for tagged items in text
-      // First, find all known tagged items in the text by searching for their keys
-      final List<InlineSpan> spans = [];
-      int lastIndex = 0;
-
-      // Find all mentions of tagged items in the text
-      final List<({int start, int end, String key, String type})> taggedMentions = [];
-      for (final entry in taggedItems.entries) {
-        final key = entry.key;
-        final itemData = entry.value;
-        final itemType = itemData['type'] as String;
-        final mentionName = key.substring(1); // Remove @
-        // Create a pattern that matches the mention with optional zero-width spaces between words
-        final words = mentionName.split(' ');
-        final pattern = words.map((word) => RegExp.escape(word)).join(r'\s*\u200b?\s*');
-        final regex = RegExp('@$pattern', caseSensitive: false);
-        final matches = regex.allMatches(unescapedContent);
-        for (final match in matches) {
-          taggedMentions.add((start: match.start, end: match.end, key: key, type: itemType));
-        }
-      }
-
-      // Sort by start position
-      taggedMentions.sort((a, b) => a.start.compareTo(b.start));
-
-      // Process text and replace mentions with badges
-      for (final mention in taggedMentions) {
-        // Add text before the mention
-        if (mention.start > lastIndex) {
-          spans.add(TextSpan(text: unescapedContent.substring(lastIndex, mention.start), style: baseStyle));
-        }
-
-        final displayText = mention.key.substring(1); // Remove @ from key
-        final itemType = mention.type;
-        final itemData = taggedItems[mention.key]?['data'] as Map<String, dynamic>?;
-
-        // Determine icon based on item type
-        VisirIconType iconType;
-        Color? iconColor;
-        Color? backgroundColor;
-        Color? borderColor;
-
-        switch (itemType) {
-          case 'task':
-            iconType = VisirIconType.task;
-            break;
-          case 'event':
-            iconType = VisirIconType.calendar;
-            break;
-          case 'connection':
-            iconType = VisirIconType.attendee;
-            break;
-          case 'channel':
-            iconType = VisirIconType.chatChannel;
-            break;
-          case 'project':
-            // Get project from project list controller to get color and icon
-            final projects = ref.read(projectListControllerProvider);
-            final projectId = itemData?['id'] as String?;
-            final project = projectId != null ? projects.firstWhereOrNull((p) => p.uniqueId == projectId) : null;
-
-            iconType = project?.icon ?? VisirIconType.project;
-            if (project != null && project.color != null) {
-              backgroundColor = project.color!.withValues(alpha: isUser ? 0.3 : 0.15);
-              borderColor = project.color!.withValues(alpha: isUser ? 0.5 : 0.3);
-              iconColor = isUser ? context.onPrimaryContainer : (project.color!.computeLuminance() > 0.5 ? context.onSurface : Colors.white);
-            } else {
-              iconColor = isUser ? context.onPrimaryContainer : context.onSurface;
-            }
-            break;
-          default:
-            iconType = VisirIconType.task;
-        }
-
-        // Create inline badge widget with icon and max width
-        spans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 200),
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              padding: const EdgeInsets.only(left: 4, right: 6, top: 2, bottom: 2),
-              decoration: BoxDecoration(
-                color: backgroundColor ?? context.surface,
-                borderRadius: BorderRadius.circular(4),
-                border: borderColor != null ? Border.all(color: borderColor, width: 1) : null,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (itemType == 'project' && itemData?['id'] != null)
-                    Builder(
-                      builder: (context) {
-                        final projects = ref.read(projectListControllerProvider);
-                        final projectId = itemData?['id'] as String?;
-                        final project = projectId != null ? projects.firstWhereOrNull((p) => p.uniqueId == projectId) : null;
-
-                        if (project != null && project.color != null) {
-                          return Container(
-                            width: 12,
-                            height: 12,
-                            alignment: Alignment.center,
-                            child: project.icon == null ? null : VisirIcon(type: project.icon!, size: 12, color: project.color ?? context.onBackground, isSelected: true),
-                          );
-                        } else {
-                          return VisirIcon(type: iconType, size: 12, color: iconColor ?? (isUser ? context.onPrimaryContainer : context.onSurface), isSelected: true);
-                        }
-                      },
-                    )
-                  else
-                    VisirIcon(type: iconType, size: 12, color: iconColor ?? (isUser ? context.onPrimaryContainer : context.onSurface), isSelected: true),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      displayText,
-                      style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
-                        color: isUser ? context.onPrimaryContainer : context.onSurface,
-                        fontSize: (baseStyle?.fontSize ?? 14),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-
-        lastIndex = mention.end;
-      }
-
-      // Add remaining text
-      if (lastIndex < unescapedContent.length) {
-        spans.add(TextSpan(text: unescapedContent.substring(lastIndex), style: baseStyle));
-      }
-
-      return Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          Expanded(
-            child: isUser
-                ? IntrinsicWidth(
-                    child: Container(
-                      decoration: BoxDecoration(color: context.primary.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                      child: Text.rich(
-                        TextSpan(
-                          children: spans.isEmpty ? [TextSpan(text: unescapedContent, style: baseStyle)] : spans,
+                final eventTitle = jsonData['title'] as String? ?? 'Untitled';
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.calendar, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            eventTitle,
+                            style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                              color: isUser ? context.onPrimaryContainer : context.onSurface,
+                              fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
+                              height: 1.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        style: baseStyle,
-                      ),
+                      ],
                     ),
-                  )
-                : Text.rich(
-                    TextSpan(
-                      children: spans.isEmpty ? [TextSpan(text: unescapedContent, style: baseStyle)] : spans,
-                    ),
-                    style: baseStyle,
                   ),
-          ),
-        ],
+                );
+              } catch (e) {
+                return const SizedBox.shrink();
+              }
+            }
+            if (element.localName == 'tagged_connection') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+
+                final name = jsonData['name'] as String? ?? '';
+                final email = jsonData['email'] as String? ?? '';
+                final displayName = name.isNotEmpty && name != 'No name' ? name : (email.isNotEmpty ? email : 'Unknown');
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.attendee, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            displayName,
+                            style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                              color: isUser ? context.onPrimaryContainer : context.onSurface,
+                              fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
+                              height: 1.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } catch (e) {
+                return const SizedBox.shrink();
+              }
+            }
+            if (element.localName == 'tagged_project') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+
+                final name = jsonData['name'] as String? ?? '';
+                if (name.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.project, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                              color: isUser ? context.onPrimaryContainer : context.onSurface,
+                              fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
+                              height: 1.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } catch (e) {
+                return const SizedBox.shrink();
+              }
+            }
+            if (element.localName == 'tagged_channel') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                Map<String, dynamic> jsonData;
+                try {
+                  jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                } catch (e) {
+                  final jsonMatch = RegExp(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}').firstMatch(jsonText);
+                  if (jsonMatch != null) {
+                    jsonData = jsonDecode(jsonMatch.group(0)!) as Map<String, dynamic>;
+                  } else {
+                    rethrow;
+                  }
+                }
+
+                final name = jsonData['name'] as String? ?? '';
+                if (name.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(4)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.chatChannel, size: 12, color: isUser ? context.onPrimaryContainer : context.onSurface, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
+                              color: isUser ? context.onPrimaryContainer : context.onSurface,
+                              fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
+                              height: 1.0,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } catch (e) {
+                return const SizedBox.shrink();
+              }
+            }
+            return null;
+          },
+          customStylesBuilder: (element) {
+            // Hide text content of tagged_project, tagged_channel, tagged_connection tags
+            // customWidgetBuilder will render widgets for these, so we don't want the raw text to show
+            if (element.localName == 'tagged_project' || element.localName == 'tagged_channel' || element.localName == 'tagged_connection') {
+              return {'font-size': '0', 'line-height': '0', 'color': 'transparent', 'display': 'inline-block'};
+            }
+            if (element.localName == 'div' && element.classes.contains('inbox-section')) {
+              return {
+                'background-color': (isUser ? context.primaryContainer.withValues(alpha: 0.3) : context.surface).toHex(),
+                'border': '1px solid ${(isUser ? context.primaryContainer : context.outline.withValues(alpha: 0.3)).toHex()}',
+                'border-radius': '8px',
+                'padding': '12px',
+                'margin-bottom': '12px',
+              };
+            }
+            if (element.localName == 'div' && element.classes.contains('section-title')) {
+              return {'font-weight': 'bold', 'color': (isUser ? context.onPrimaryContainer : context.primary).toHex(), 'margin-bottom': '12px'};
+            }
+            if (element.localName == 'div' && element.classes.contains('title-content')) {
+              return {
+                'font-weight': 'bold',
+                'font-size': '1.1em',
+                'color': (isUser ? context.onPrimaryContainer : context.onSurface).toHex(),
+                'margin-bottom': '8px',
+                'line-height': '1.4',
+              };
+            }
+            if (element.localName == 'div' && element.classes.contains('description-content')) {
+              return {'color': (isUser ? context.onPrimaryContainer : context.onSurfaceVariant).toHex(), 'line-height': '1.5', 'white-space': 'pre-wrap'};
+            }
+            if (element.localName == 'div' && element.classes.contains('field')) {
+              return {'margin-bottom': '6px'};
+            }
+            if (element.localName == 'span' && element.classes.contains('label')) {
+              return {'font-weight': 'bold', 'color': (isUser ? context.onPrimaryContainer : context.primary).toHex()};
+            }
+            if (element.localName == 'span' && element.classes.contains('value')) {
+              return {'color': (isUser ? context.onPrimaryContainer : context.onSurfaceVariant).toHex()};
+            }
+            return null;
+          },
+        ),
       );
     }
+    // All content is now HTML (wrapped in <div> if needed), so we always render as HTML
+    // HTML content with markdown inside will be processed above
   }
 
   Widget _buildActionButtonText(BuildContext context, ({AgentActionType? actionType, InboxEntity? inbox, String? conversationSummary}) agentAction) {
@@ -2614,8 +2097,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             } else {
               itemName = summary;
             }
-          } else if (senderName != null && senderName.isNotEmpty) {
-            itemName = senderName;
           }
         }
         break;
