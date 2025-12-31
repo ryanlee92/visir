@@ -1,15 +1,10 @@
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
-import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
-import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
-import 'package:Visir/features/inbox/application/inbox_controller.dart';
-import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -472,15 +467,39 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 8),
       width: double.maxFinite,
       constraints: null,
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 12, right: 12),
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(right: 6), child: widget))],
+      child: Row(
+        children: [
+          VisirButton(
+            type: VisirButtonAnimationType.scaleAndOpacity,
+            style: VisirButtonStyle(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              backgroundColor: context.surface.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(16),
+              margin: EdgeInsets.symmetric(horizontal: 12),
+              border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+            ),
+            onTap: () {},
+            child: VisirIcon(type: VisirIconType.add, size: 12, color: context.onSurface, isSelected: true),
           ),
-        ),
+          Container(
+            width: 2,
+            height: 24,
+            decoration: BoxDecoration(color: context.outline, borderRadius: BorderRadius.circular(12)),
+          ),
+
+          Expanded(
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(right: 6), child: widget))],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
