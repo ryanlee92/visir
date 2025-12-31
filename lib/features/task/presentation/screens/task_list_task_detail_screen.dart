@@ -60,15 +60,7 @@ class TaskListTaskDetailScreen extends ConsumerStatefulWidget {
 
   final void Function(Widget? details)? showDetilas;
 
-  const TaskListTaskDetailScreen({
-    super.key,
-    required this.task,
-    required this.close,
-    required this.tabType,
-    required this.autoFocus,
-    this.backgroundColor,
-    this.showDetilas,
-  });
+  const TaskListTaskDetailScreen({super.key, required this.task, required this.close, required this.tabType, required this.autoFocus, this.backgroundColor, this.showDetilas});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _TaskListTaskDetailScreenState();
@@ -202,6 +194,18 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
 
     titleFocusNode.onKeyEvent = onKeyEventTextField;
     descriptionFocusNode.onKeyEvent = onKeyEventTextField;
+
+    // 포커스가 변경될 때 저장
+    titleFocusNode.addListener(() {
+      if (!titleFocusNode.hasFocus) {
+        save();
+      }
+    });
+    descriptionFocusNode.addListener(() {
+      if (!descriptionFocusNode.hasFocus) {
+        save();
+      }
+    });
   }
 
   @override
@@ -361,8 +365,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
   }
 
   bool _onKeyDown(KeyEvent event, {bool? justReturnResult}) {
-    if (ServicesBinding.instance.keyboard.logicalKeysPressed.length == 1 &&
-        ServicesBinding.instance.keyboard.logicalKeysPressed.contains(LogicalKeyboardKey.tab)) {
+    if (ServicesBinding.instance.keyboard.logicalKeysPressed.length == 1 && ServicesBinding.instance.keyboard.logicalKeysPressed.contains(LogicalKeyboardKey.tab)) {
       if (justReturnResult == true) return true;
       if (titleFocusNode.hasFocus) {
         descriptionFocusNode.requestFocus();
@@ -444,10 +447,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                     options: VisirButtonOptions(
                       tabType: widget.tabType,
                       shortcuts: [
-                        VisirButtonKeyboardShortcut(
-                          message: settings?.large != true ? context.tr.go_back : context.tr.close,
-                          keys: [LogicalKeyboardKey.escape],
-                        ),
+                        VisirButtonKeyboardShortcut(message: settings?.large != true ? context.tr.go_back : context.tr.close, keys: [LogicalKeyboardKey.escape]),
                       ],
                     ),
                     onTap: () {
@@ -477,11 +477,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                       shortcuts: [
                         VisirButtonKeyboardShortcut(
                           message: context.tr.delete,
-                          keys: [
-                            LogicalKeyboardKey.backspace,
-                            if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                            if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                          ],
+                          keys: [LogicalKeyboardKey.backspace, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                           subkeys: [
                             [LogicalKeyboardKey.delete, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                           ],
@@ -597,12 +593,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                           Container(
                                             width: Utils.linkedPopupSize.width,
                                             height: Utils.linkedPopupSize.height,
-                                            child: MailDetailScreen(
-                                              tabType: widget.tabType,
-                                              taskMail: m,
-                                              anchorMailId: m.messageId,
-                                              close: Navigator.of(context).pop,
-                                            ),
+                                            child: MailDetailScreen(tabType: widget.tabType, taskMail: m, anchorMailId: m.messageId, close: Navigator.of(context).pop),
                                           ),
                                         ),
                                   style: VisirButtonStyle(
@@ -694,9 +685,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                   scrollPhysics: NeverScrollableScrollPhysics(),
                                   beforePopup: () {
                                     if (channel == null) return;
-                                    ref
-                                        .read(chatConditionProvider(widget.tabType).notifier)
-                                        .setThreadAndChannel(m.threadId, channel, targetMessageId: m.messageId);
+                                    ref.read(chatConditionProvider(widget.tabType).notifier).setThreadAndChannel(m.threadId, channel, targetMessageId: m.messageId);
                                   },
                                   popup: Container(
                                     width: Utils.linkedPopupSize.width,
@@ -840,12 +829,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                                     isUnscheduled = true;
                                                     setState(() {});
                                                   },
-                                                  child: VisirIcon(
-                                                    type: VisirIconType.closeWithCircle,
-                                                    size: 12,
-                                                    color: context.outlineVariant,
-                                                    isSelected: true,
-                                                  ),
+                                                  child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, color: context.outlineVariant, isSelected: true),
                                                 ),
                                               ],
                                             ),
@@ -868,11 +852,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                               endDateTime: endDate,
                                               height: timeFieldPopupHeight,
                                             ),
-                                            style: VisirButtonStyle(
-                                              padding: EdgeInsets.all(5),
-                                              backgroundColor: context.surface,
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
+                                            style: VisirButtonStyle(padding: EdgeInsets.all(5), backgroundColor: context.surface, borderRadius: BorderRadius.circular(4)),
                                             child: Text(EventEntity.getTimeForEdit(startDate), style: context.bodyLarge?.textColor(context.outlineVariant)),
                                           ),
                                         Padding(
@@ -894,11 +874,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                                 backgroundColor: context.surfaceVariant,
                                                 onDateChanged: setEndDateTime,
                                               ),
-                                              style: VisirButtonStyle(
-                                                padding: EdgeInsets.only(left: 5),
-                                                backgroundColor: context.surface,
-                                                borderRadius: BorderRadius.circular(4),
-                                              ),
+                                              style: VisirButtonStyle(padding: EdgeInsets.only(left: 5), backgroundColor: context.surface, borderRadius: BorderRadius.circular(4)),
                                               child: Row(
                                                 children: [
                                                   Text(EventEntity.getDateForEditSimple(endDate), style: context.bodyLarge?.textColor(context.outlineVariant)),
@@ -910,12 +886,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                                       isUnscheduled = true;
                                                       setState(() {});
                                                     },
-                                                    child: VisirIcon(
-                                                      type: VisirIconType.closeWithCircle,
-                                                      size: 12,
-                                                      color: context.outlineVariant,
-                                                      isSelected: true,
-                                                    ),
+                                                    child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, color: context.outlineVariant, isSelected: true),
                                                   ),
                                                 ],
                                               ),
@@ -939,11 +910,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                               endDateTime: endDate,
                                               height: timeFieldPopupHeight,
                                             ),
-                                            style: VisirButtonStyle(
-                                              padding: EdgeInsets.all(5),
-                                              backgroundColor: context.surface,
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
+                                            style: VisirButtonStyle(padding: EdgeInsets.all(5), backgroundColor: context.surface, borderRadius: BorderRadius.circular(4)),
                                             child: Text(EventEntity.getTimeForEdit(endDate), style: context.bodyLarge?.textColor(context.outlineVariant)),
                                           ),
                                       ],
@@ -970,13 +937,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                               startDate = DateUtils.dateOnly(startDateTime);
                                               endDate = DateUtils.dateOnly(endDateTime);
                                             } else {
-                                              final startDateTime = DateTime(
-                                                startDate.year,
-                                                startDate.month,
-                                                startDate.day,
-                                                savedStartDate.hour,
-                                                savedStartDate.minute,
-                                              );
+                                              final startDateTime = DateTime(startDate.year, startDate.month, startDate.day, savedStartDate.hour, savedStartDate.minute);
                                               final endDateTime = DateTime(endDate.year, endDate.month, endDate.day, savedEndDate.hour, savedEndDate.minute);
 
                                               startDate = startDateTime;
@@ -987,10 +948,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                             isEdited = true;
                                             setState(() {});
                                           },
-                                          child: Text(
-                                            context.tr.all_day,
-                                            style: context.bodyLarge?.textColor(isAllDay ? context.onPrimary : context.outlineVariant),
-                                          ),
+                                          child: Text(context.tr.all_day, style: context.bodyLarge?.textColor(isAllDay ? context.onPrimary : context.outlineVariant)),
                                         ),
                                         const SizedBox(width: 4),
                                         Flexible(
@@ -1052,13 +1010,10 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                               overflow: TextOverflow.ellipsis,
                                               rruleL10n == null || rrule == null
                                                   ? context.tr.calendar_event_edit_repeat
-                                                  : recurrenceOptionType == RecurrenceOptionType.annualy ||
-                                                        recurrenceOptionType == RecurrenceOptionType.weekdays
+                                                  : recurrenceOptionType == RecurrenceOptionType.annualy || recurrenceOptionType == RecurrenceOptionType.weekdays
                                                   ? recurrenceOptionType.getSelectionOptionTitle(rruleL10n, startDate, context)
                                                   : rrule!.toText(l10n: rruleL10n!),
-                                              style: context.bodyLarge?.textColor(
-                                                rruleL10n == null || rrule == null ? context.outlineVariant : context.onPrimary,
-                                              ),
+                                              style: context.bodyLarge?.textColor(rruleL10n == null || rrule == null ? context.outlineVariant : context.onPrimary),
                                             ),
                                           ),
                                         ),
@@ -1111,12 +1066,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                                 reminders.remove(e);
                                                 setState(() {});
                                               },
-                                              child: VisirIcon(
-                                                type: VisirIconType.closeWithCircle,
-                                                size: 12,
-                                                color: context.outlineVariant,
-                                                isSelected: true,
-                                              ),
+                                              child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, color: context.outlineVariant, isSelected: true),
                                             ),
                                           ],
                                         ),
@@ -1155,9 +1105,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                   current: project,
                                   items: sortedProjects.map((e) => e.project).toList(),
                                   options: (project) => VisirButtonOptions(
-                                    tooltipLocation: project.description?.isNotEmpty == true
-                                        ? VisirButtonTooltipLocation.right
-                                        : VisirButtonTooltipLocation.none,
+                                    tooltipLocation: project.description?.isNotEmpty == true ? VisirButtonTooltipLocation.right : VisirButtonTooltipLocation.none,
                                     message: project.description,
                                   ),
                                   getChild: (project) {
@@ -1174,12 +1122,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                         ),
                                         SizedBox(width: 6),
                                         Expanded(
-                                          child: Text(
-                                            project.name,
-                                            style: context.bodyMedium!.textColor(context.shadow),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                          child: Text(project.name, style: context.bodyMedium!.textColor(context.shadow), maxLines: 1, overflow: TextOverflow.ellipsis),
                                         ),
                                         SizedBox(width: 12),
                                       ],
@@ -1234,15 +1177,8 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                         ? [TaskReminderOptionType.nineHoursAfter, TaskReminderOptionType.fifteenHoursBefore]
                                         : List<TaskReminderOptionType>.from(TaskReminderOptionType.values)
                                     ..removeWhere(
-                                      (e) =>
-                                          (isAllDay
-                                                  ? []
-                                                  : [
-                                                      TaskReminderOptionType.none,
-                                                      TaskReminderOptionType.fifteenHoursBefore,
-                                                      TaskReminderOptionType.nineHoursAfter,
-                                                    ])
-                                              .contains(e),
+                                      (e) => (isAllDay ? [] : [TaskReminderOptionType.none, TaskReminderOptionType.fifteenHoursBefore, TaskReminderOptionType.nineHoursAfter])
+                                          .contains(e),
                                     ),
                               getTitle: (type) => type.getSelectionOptionTitle(context, isAllDay),
                               getChildIsPopup: (type) => type == TaskReminderOptionType.custom,
@@ -1306,9 +1242,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                               onTap: () {
                                 EasyThrottle.throttle('toggleTaskStatus${widget.task.id}', Duration(milliseconds: 50), () {
                                   final list = ref.read(taskListControllerProvider);
-                                  final editedRecurringTask = list.tasks.firstWhereOrNull(
-                                    (e) => e.recurringTaskId == widget.task.id && e.startAt == widget.task.editedStartTime,
-                                  );
+                                  final editedRecurringTask = list.tasks.firstWhereOrNull((e) => e.recurringTaskId == widget.task.id && e.startAt == widget.task.editedStartTime);
 
                                   TaskEntity? targetTask = widget.task.isOriginalRecurrenceTask
                                       ? taskStatus == TaskStatus.none
