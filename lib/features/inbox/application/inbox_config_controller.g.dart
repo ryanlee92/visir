@@ -201,7 +201,7 @@ final class InboxConfigControllerInternalProvider
 }
 
 String _$inboxConfigControllerInternalHash() =>
-    r'7fc37f0eef82baaec6f729223cd6038aefa7876b';
+    r'3cfeca4e2e8a670c683588ccf2c8a6a5afb83699';
 
 final class InboxConfigControllerInternalFamily extends $Family
     with

@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:Visir/config/providers.dart';
+import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_label_entity.dart';
 import 'package:Visir/features/task/domain/repositories/project_repository.dart';
@@ -45,10 +49,31 @@ class TaskDates extends _$TaskDates {
 class TaskLabel extends _$TaskLabel {
   @override
   TaskLabelEntity build() {
-    return TaskLabelEntity(type: TaskLabelType.all);
+    if (ref.watch(shouldUseMockDataProvider)) {
+      return TaskLabelEntity(type: TaskLabelType.all);
+    }
+
+    // SharedPreferences에서 읽기
+    final sharedPrefAsync = ref.read(sharedPreferencesProvider);
+    final sharedPref = sharedPrefAsync.asData?.value;
+    if (sharedPref == null) return TaskLabelEntity(type: TaskLabelType.all);
+
+    final labelJson = sharedPref.getString('task_label');
+    if (labelJson == null || labelJson.isEmpty) {
+      return TaskLabelEntity(type: TaskLabelType.all);
+    }
+
+    try {
+      return TaskLabelEntity.fromJson(jsonDecode(labelJson) as Map<String, dynamic>);
+    } catch (e) {
+      return TaskLabelEntity(type: TaskLabelType.all);
+    }
   }
 
-  void updateLabel(TaskLabelEntity label) {
+  Future<void> updateLabel(TaskLabelEntity label) async {
+    // SharedPreferences에 저장
+    final sharedPref = await ref.read(sharedPreferencesProvider.future);
+    await sharedPref.setString('task_label', jsonEncode(label.toJson()));
     state = label;
   }
 }
@@ -58,10 +83,7 @@ class TaskListCurrentLoadedMonths extends _$TaskListCurrentLoadedMonths {
   @override
   Set<DateTime> build() {
     final now = DateTime.now();
-    return {
-      DateTime(now.year, now.month),
-      DateTime(now.year, now.month + 1),
-    };
+    return {DateTime(now.year, now.month), DateTime(now.year, now.month + 1)};
   }
 
   void addMonth(DateTime month) {

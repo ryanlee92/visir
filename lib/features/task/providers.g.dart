@@ -278,7 +278,7 @@ final class TaskLabelProvider
   }
 }
 
-String _$taskLabelHash() => r'3a8e135c355a6c4ab914ec47c93a147425261724';
+String _$taskLabelHash() => r'9442c653282607245175e473b267a36b0ee7d73e';
 
 abstract class _$TaskLabel extends $Notifier<TaskLabelEntity> {
   TaskLabelEntity build();
