@@ -215,7 +215,7 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
 
   MasterItemBase placeholder({required TaskLabelEntity currentTaskLabel, required double height}) {
     final isLoading = ref.read(loadingStatusProvider.select((v) => v[TaskListController.stringKey] == LoadingState.loading));
-    
+
     return MasterItem(
       'placeholder',
       'placeholder',
@@ -225,13 +225,7 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
           child: isLoading
               ? Center(
                   child: AnimatedTextKit(
-                    animatedTexts: [
-                      TypewriterAnimatedText(
-                        'loading...',
-                        textStyle: context.titleMedium?.textColor(context.surfaceTint),
-                        speed: const Duration(milliseconds: 100),
-                      ),
-                    ],
+                    animatedTexts: [TypewriterAnimatedText('loading...', textStyle: context.titleMedium?.textColor(context.surfaceTint), speed: const Duration(milliseconds: 100))],
                     repeatForever: true,
                     pause: const Duration(milliseconds: 500),
                     displayFullTextOnTap: true,
