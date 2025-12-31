@@ -1104,6 +1104,8 @@ class DailySummaryWidget extends ConsumerWidget {
                               hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
                               forceShiftOffset: Offset(0, -36),
                               beforePopup: () {
+                                if (item.task != null && item.inbox == null) return;
+
                                 if (item.inbox?.isRead != true) {
                                   final userId = Utils.ref.read(authControllerProvider).value?.id;
                                   if (userId == null) return;
@@ -1146,7 +1148,7 @@ class DailySummaryWidget extends ConsumerWidget {
                                 mailViewportSyncVisibleNotifier[TabType.home]!.value = false;
                               },
                               // doNotResizePopup: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null,
-                              width: 480,
+                              width: item.task != null && item.inbox == null ? 320 : 480,
                               // height: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? context.height * 2 / 3 : null,
                               popup: item.inbox != null
                                   ? item.inbox!.linkedMail != null
