@@ -63,6 +63,17 @@ class _CollapsingTextFormFieldState extends State<CollapsingTextFormField> {
     super.dispose();
   }
 
+  String _truncateText(String text, int? maxLines) {
+    if (maxLines == null || maxLines <= 0) return text;
+    
+    final lines = text.split('\n');
+    if (lines.length <= maxLines) return text;
+    
+    // maxLines만큼만 표시하고 나머지는 ellipsis로 처리
+    final truncatedLines = lines.take(maxLines).join('\n');
+    return truncatedLines;
+  }
+
   @override
   Widget build(BuildContext context) {
     final text = _controller?.text ?? '';
@@ -76,6 +87,14 @@ class _CollapsingTextFormFieldState extends State<CollapsingTextFormField> {
           ? '${hintText.substring(0, 100).trim()}...'
           : hintText,
     );
+
+    // collapsedLines를 넘는 경우 텍스트를 잘라내고 ellipsis 표시
+    final displayText = text.isEmpty 
+        ? text 
+        : _truncateText(text, widget.collapsedLines);
+    final hasMoreLines = text.isNotEmpty && 
+        widget.collapsedLines != null && 
+        text.split('\n').length > widget.collapsedLines!;
 
     return AnimatedCrossFade(
       duration: const Duration(milliseconds: 160),
@@ -98,7 +117,12 @@ class _CollapsingTextFormFieldState extends State<CollapsingTextFormField> {
             isEmpty: text.isEmpty,
             child: text.isEmpty
                 ? Text(decoration.hintText ?? '', style: widget.decoration.hintStyle)
-                : Text(text, maxLines: widget.collapsedLines, overflow: TextOverflow.ellipsis, style: widget.style),
+                : Text(
+                    hasMoreLines ? '$displayText...' : displayText,
+                    maxLines: widget.collapsedLines,
+                    overflow: TextOverflow.ellipsis,
+                    style: widget.style,
+                  ),
           ),
         ),
       ),
