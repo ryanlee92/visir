@@ -1633,8 +1633,7 @@ class Utils {
       print('NextScheduleWidget: Error getting conversation summary: $e');
     }
 
-    // previousContext는 conversation summary 텍스트로 설정
-    // null일 때는 JSON에 포함하지 않아서 이전 값을 유지할 수 있도록 함
+    // previousContext는 항상 추가 (conversation summary가 있으면 사용, 없으면 "Cannot find any previous context" 메시지 표시)
     final nextScheduleData = <String, dynamic>{
       'title': nextItem['title'] as String,
       'startTimeMs': startTime.millisecondsSinceEpoch,
@@ -1648,31 +1647,16 @@ class Utils {
       'conferenceLink': nextTask?.conferenceLink ?? nextEvent?.conferenceLink,
       'projectName': nextProject?.name ?? '',
       'calendarName': nextCalendar?.name ?? '',
+      'previousContext': {
+        'summary': (conversationSummary != null && conversationSummary.isNotEmpty)
+            ? conversationSummary
+            : 'Cannot find any previous context',
+      },
     };
 
-    // previousContext는 값이 있을 때만 추가 (null이면 JSON에 포함하지 않음)
-    // 하지만 이전에 저장된 값을 확인해서 없을 때만 제거하도록 함
-    final existingData = await HomeWidget.getWidgetData<String>('nextSchedule');
-    Map<String, dynamic>? existingPreviousContext;
-    if (existingData != null && existingData.isNotEmpty) {
-      try {
-        final existingJson = jsonDecode(existingData) as Map<String, dynamic>;
-        existingPreviousContext = existingJson['previousContext'] as Map<String, dynamic>?;
-      } catch (e) {
-        // Ignore parse errors
-      }
-    }
-
-    if (conversationSummary != null && conversationSummary.isNotEmpty) {
-      nextScheduleData['previousContext'] = {'summary': conversationSummary};
-      print('NextScheduleWidget: previousContext set with summary length: ${conversationSummary.length}');
-    } else if (existingPreviousContext != null) {
-      // 이전 값이 있으면 유지
-      nextScheduleData['previousContext'] = existingPreviousContext;
-      print('NextScheduleWidget: previousContext preserved from existing data');
-    } else {
-      print('NextScheduleWidget: previousContext not set (summary is null or empty and no existing value)');
-    }
+    print(
+      'NextScheduleWidget: previousContext set with summary length: ${nextScheduleData['previousContext']!['summary'].toString().length}',
+    );
 
     await HomeWidget.saveWidgetData<String>('nextSchedule', jsonEncode(nextScheduleData));
     // Update only NextScheduleWidget when data changes

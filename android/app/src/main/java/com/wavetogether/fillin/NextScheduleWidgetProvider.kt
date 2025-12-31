@@ -7,6 +7,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -141,9 +143,24 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                         (colorInt shr 8) and 0xFF,
                         colorInt and 0xFF
                     )
-                    // Create a solid color drawable for ImageView
-                    views.setInt(R.id.color_bar, "setBackgroundColor", colorBar)
-                    Log.d(TAG, "Color bar set successfully")
+                    // Create a rounded rectangle drawable with borderRadius
+                    val drawable = GradientDrawable().apply {
+                        setColor(colorBar)
+                        // borderRadius: 2dp (half of width 4dp)
+                        cornerRadius = 2f * context.resources.displayMetrics.density
+                    }
+                    // Convert drawable to bitmap
+                    val bitmap = Bitmap.createBitmap(
+                        (4 * context.resources.displayMetrics.density).toInt(),
+                        (20 * context.resources.displayMetrics.density).toInt(),
+                        Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = Canvas(bitmap)
+                    drawable.setBounds(0, 0, canvas.width, canvas.height)
+                    drawable.draw(canvas)
+                    // Set bitmap to ImageView
+                    views.setImageViewBitmap(R.id.color_bar, bitmap)
+                    Log.d(TAG, "Color bar set successfully with borderRadius")
                 } catch (e: Exception) {
                     Log.e(TAG, "Error setting color bar", e)
                 }
@@ -198,7 +215,7 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                 }
                 
                 // Previous Context
-                // previousContext가 JSON에 있으면 업데이트, 없으면 이전 값 유지
+                // previousContext는 항상 표시 (값이 없으면 "Cannot find any previous context" 메시지 표시)
                 try {
                     if (nextSchedule.has("previousContext")) {
                         val previousContext = nextSchedule.optJSONObject("previousContext")
@@ -208,33 +225,29 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                             // Handle "null" string case
                             if (summary == "null" || summary == null) summary = ""
                             Log.d(TAG, "Previous context summary: '$summary' (length: ${summary?.length ?: 0})")
-                            if (summary != null && summary.isNotEmpty()) {
-                                views.setViewVisibility(R.id.previous_context_container, android.view.View.VISIBLE)
-                                views.setTextViewText(R.id.previous_context_text, summary)
-                                views.setInt(R.id.previous_context_title, "setTextColor", colors.onBackground)
-                                views.setInt(R.id.previous_context_text, "setTextColor", colors.onBackground)
-                                views.setInt(R.id.previous_context_icon, "setColorFilter", colors.onBackground)
-                                // Set background color to surface with 0.5 alpha (same as Flutter app)
-                                // Use drawable resources for light/dark mode to preserve borderRadius
-                                val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-                                val drawableRes = if (isDarkMode) {
-                                    R.drawable.previous_context_background_dark
-                                } else {
-                                    R.drawable.previous_context_background_light
-                                }
-                                views.setInt(R.id.previous_context_container, "setBackgroundResource", drawableRes)
-                                Log.d(TAG, "Previous context set successfully with summary length: ${summary.length}")
+                            // summary가 있으면 항상 표시 (비어있어도 "Cannot find any previous context" 메시지가 있을 수 있음)
+                            views.setViewVisibility(R.id.previous_context_container, android.view.View.VISIBLE)
+                            views.setTextViewText(R.id.previous_context_text, summary)
+                            views.setInt(R.id.previous_context_title, "setTextColor", colors.onBackground)
+                            views.setInt(R.id.previous_context_text, "setTextColor", colors.onBackground)
+                            views.setInt(R.id.previous_context_icon, "setColorFilter", colors.onBackground)
+                            // Set background color to surface with 0.5 alpha (same as Flutter app)
+                            // Use drawable resources for light/dark mode to preserve borderRadius
+                            val isDarkMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+                            val drawableRes = if (isDarkMode) {
+                                R.drawable.previous_context_background_dark
                             } else {
-                                views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
-                                Log.d(TAG, "Previous context hidden: summary is empty or null")
+                                R.drawable.previous_context_background_light
                             }
+                            views.setInt(R.id.previous_context_container, "setBackgroundResource", drawableRes)
+                            Log.d(TAG, "Previous context set successfully with summary length: ${summary.length}")
                         } else {
                             views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
                             Log.d(TAG, "Previous context hidden: previousContext JSON is null")
                         }
                     } else {
-                        Log.d(TAG, "Previous context not in JSON - preserving existing state")
-                        // previousContext가 JSON에 없으면 visibility를 변경하지 않음 (이전 값 유지)
+                        views.setViewVisibility(R.id.previous_context_container, android.view.View.GONE)
+                        Log.d(TAG, "Previous context not in JSON - hiding container")
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error setting previous context", e)
