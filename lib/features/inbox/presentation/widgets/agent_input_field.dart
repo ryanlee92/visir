@@ -58,6 +58,7 @@ class AgentInputField extends ConsumerStatefulWidget {
   final TaskEntity? upNextTask;
   final EventEntity? upNextEvent;
   final Function(String mcpFunctionName, {InboxEntity? inbox, TaskEntity? task, EventEntity? event})? onActionTap;
+  final Function(String title, String prompt)? onCustomPrompt;
   final GlobalKey<AgentInputFieldState>? fieldKey;
 
   const AgentInputField({
@@ -76,6 +77,7 @@ class AgentInputField extends ConsumerStatefulWidget {
     this.upNextTask,
     this.upNextEvent,
     this.onActionTap,
+    this.onCustomPrompt,
     this.fieldKey,
   });
 
@@ -864,7 +866,13 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null))
-                    AgentActionSuggestionsWidget(inboxes: widget.inboxes ?? [], upNextTask: widget.upNextTask, upNextEvent: widget.upNextEvent, onActionTap: widget.onActionTap),
+                    AgentActionSuggestionsWidget(
+                      inboxes: widget.inboxes ?? [],
+                      upNextTask: widget.upNextTask,
+                      upNextEvent: widget.upNextEvent,
+                      onActionTap: widget.onActionTap,
+                      onCustomPrompt: widget.onCustomPrompt,
+                    ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Container(

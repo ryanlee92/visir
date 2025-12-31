@@ -633,6 +633,13 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                 ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
                               }
                             },
+                            onCustomPrompt: (title, prompt) {
+                              final controller = ref.read(agentActionControllerProvider.notifier);
+                              final message = prompt.isNotEmpty ? prompt : title;
+                              if (message.isNotEmpty) {
+                                controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
+                              }
+                            },
                           ),
                         ),
                       ),
@@ -836,6 +843,13 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                         final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
                                         if (actionType != null) {
                                           ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
+                                        }
+                                      },
+                                      onCustomPrompt: (title, prompt) {
+                                        final controller = ref.read(agentActionControllerProvider.notifier);
+                                        final message = prompt.isNotEmpty ? prompt : title;
+                                        if (message.isNotEmpty) {
+                                          controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
                                         }
                                       },
                                     ),

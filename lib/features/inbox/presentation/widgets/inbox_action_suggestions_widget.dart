@@ -1,9 +1,12 @@
+import 'package:Visir/dependency/contextmenu/src/ContextMenuArea.dart' show ContextMenuActionType;
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
+import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
+import 'package:Visir/features/inbox/presentation/widgets/custom_action_prompt_add_widget.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -352,8 +355,9 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
   final TaskEntity? upNextTask;
   final EventEntity? upNextEvent;
   final Function(String mcpFunctionName, {InboxEntity? inbox, TaskEntity? task, EventEntity? event})? onActionTap;
+  final Function(String title, String prompt)? onCustomPrompt;
 
-  const AgentActionSuggestionsWidget({super.key, required this.inboxes, this.upNextTask, this.upNextEvent, this.onActionTap});
+  const AgentActionSuggestionsWidget({super.key, required this.inboxes, this.upNextTask, this.upNextEvent, this.onActionTap, this.onCustomPrompt});
 
   List<McpActionSuggestion> _generateSuggestions(BuildContext context, WidgetRef ref) {
     final suggestions = <McpActionSuggestion>[];
@@ -469,24 +473,33 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
       constraints: null,
       child: Row(
         children: [
-          VisirButton(
-            type: VisirButtonAnimationType.scaleAndOpacity,
-            style: VisirButtonStyle(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              backgroundColor: context.surface.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(16),
-              margin: EdgeInsets.symmetric(horizontal: 12),
-              border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-            ),
-            onTap: () {},
-            child: VisirIcon(type: VisirIconType.add, size: 12, color: context.onSurface, isSelected: true),
-          ),
-          Container(
-            width: 2,
-            height: 24,
-            decoration: BoxDecoration(color: context.outline, borderRadius: BorderRadius.circular(12)),
-          ),
-
+          // PopupMenu(
+          //   type: ContextMenuActionType.tap,
+          //   location: PopupMenuLocation.right,
+          //   backgroundColor: Colors.transparent,
+          //   forceShiftOffset: forceShiftOffsetForMenu,
+          //   style: VisirButtonStyle(
+          //     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          //     backgroundColor: context.surface.withValues(alpha: 0.7),
+          //     borderRadius: BorderRadius.circular(16),
+          //     margin: EdgeInsets.symmetric(horizontal: 12),
+          //     border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+          //   ),
+          //   popup: CustomActionPromptAddWidget(
+          //     onSave: (title, prompt) {
+          //       if (title.isNotEmpty || prompt.isNotEmpty) {
+          //         onCustomPrompt?.call(title, prompt);
+          //       }
+          //     },
+          //   ),
+          //   hideShadow: true,
+          //   child: VisirIcon(type: VisirIconType.add, size: 12, color: context.onSurface, isSelected: true),
+          // ),
+          // Container(
+          //   width: 2,
+          //   height: 24,
+          //   decoration: BoxDecoration(color: context.outline, borderRadius: BorderRadius.circular(12)),
+          // ),
           Expanded(
             child: ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
