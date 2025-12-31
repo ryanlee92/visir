@@ -80,9 +80,8 @@ class InboxConfigControllerInternal extends _$InboxConfigControllerInternal {
 
     ref.listen(provider.select((e) => e.value?.sequence ?? 0), (previous, next) {
       final sequence = next;
-      if (sequence <= (state.value?.sequence ?? -1)) return;
       final inboxes = ref.read(provider).value?.inboxes ?? [];
-      _prevInboxes = [..._prevInboxes, ...inboxes].unique((e) => e.id).toList();
+      _prevInboxes = [...inboxes, ..._prevInboxes].unique((e) => e.id).toList();
       setInboxConfig(_prevInboxes, sequence, DateTime(year, month, day));
     });
 
@@ -104,7 +103,7 @@ class InboxConfigControllerInternal extends _$InboxConfigControllerInternal {
       if (!ref.mounted) return;
       final r = state.value;
       final _configs = r?.configs ?? <InboxConfigEntity>[];
-      final restInboxes = inboxes.where((e) => !_configs.any((s) => s.id == e.id)).toList();
+      final restInboxes = inboxes;
 
       if (ref.read(shouldUseMockDataProvider)) return;
 
@@ -117,7 +116,7 @@ class InboxConfigControllerInternal extends _$InboxConfigControllerInternal {
             ref.read(loadingStatusProvider.notifier).update(InboxConfigListController.stringKey, LoadingState.success);
 
             return restConfigs.fold((l) {}, (r2) {
-              final finalConfigs = [..._configs, ...r2];
+              final finalConfigs = [...r2, ..._configs].unique((e) => e.id).toList();
               state = AsyncData(InboxConfigFetchListEntity(configs: finalConfigs, sequence: sequence));
             });
           })
@@ -141,6 +140,7 @@ class InboxConfigControllerInternal extends _$InboxConfigControllerInternal {
     if (ref.read(shouldUseMockDataProvider)) return;
 
     final result = await _inboxRepository.saveInboxConfig(configs: configs);
+
     result.fold((l) {
       state = prevState;
     }, (r) {});

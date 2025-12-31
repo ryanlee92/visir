@@ -252,9 +252,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     }
 
     // Create InboxSuggestionFetchListEntity with combined suggestions
-    final firstController = _suggestionControllers.isNotEmpty ? _suggestionControllers.first : null;
-    suggestions = InboxSuggestionFetchListEntity(suggestions: allSuggestions, sequence: firstController != null ? ref.read(firstController)?.sequence ?? 0 : 0);
-
+    suggestions = InboxSuggestionFetchListEntity(suggestions: allSuggestions, sequence: 0);
     updateData();
   }
 
@@ -267,9 +265,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     }
 
     // Create InboxLinkedTaskFetchListEntity with combined linked tasks
-    final firstController = _linkedTaskControllers.isNotEmpty ? _linkedTaskControllers.first : null;
-    linkedTasks = InboxLinkedTaskFetchListEntity(linkedTasks: allLinkedTasks, sequence: firstController != null ? ref.read(firstController)?.sequence ?? 0 : 0);
-
+    linkedTasks = InboxLinkedTaskFetchListEntity(linkedTasks: allLinkedTasks, sequence: 0);
     updateData();
   }
 
@@ -282,9 +278,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     }
 
     // Create InboxConfigFetchListEntity with combined configs
-    final firstController = _configControllers.isNotEmpty ? _configControllers.first : null;
-    configs = InboxConfigFetchListEntity(configs: allConfigs, sequence: firstController != null ? ref.read(firstController)?.sequence ?? 0 : 0);
-
+    configs = InboxConfigFetchListEntity(configs: allConfigs, sequence: 0);
     updateData();
   }
 
@@ -362,7 +356,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     final processedInboxes = filteredInboxes.map((e) {
       final suggestion = suggestions?.suggestions.firstWhereOrNull((s) => s.id == e.id || (s.id.contains(',') && s.id.split(',').contains(e.id)));
       final linkedTask = linkedTasks?.linkedTasks.firstWhereOrNull((s) => s.inboxId == e.id);
-      final config = configs?.configs.firstWhereOrNull((s) => s.id == e.uniqueId);
+      final config = configs?.configs.firstWhereOrNull((s) => s.inboxUniqueId == e.uniqueId);
 
       // Extract merged inbox IDs from suggestion if it exists
       // AI suggestion controller stores merged IDs as comma-separated string in suggestion.id
@@ -548,6 +542,12 @@ class InboxAgentListController extends _$InboxAgentListController {
   void updateIsSearchDone(bool isSearchDone) {
     for (final controller in _dateControllers) {
       ref.read(controller.notifier).updateIsSearchDone(isSearchDone);
+    }
+  }
+
+  void updateInboxConfig(InboxConfigEntity config) {
+    for (final controller in _configControllers) {
+      ref.read(controller.notifier).updateInboxConfig(configs: [config]);
     }
   }
 }

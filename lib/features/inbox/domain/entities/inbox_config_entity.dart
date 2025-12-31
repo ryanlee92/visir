@@ -8,16 +8,8 @@ class InboxConfigEntity {
   final bool? isTask;
   final String? inboxUniqueId;
 
-  InboxConfigEntity({
-    required this.id,
-    required this.userId,
-    required this.dateTime,
-    this.isRead,
-    this.isDeleted,
-    this.isTask,
-    this.updatedAt,
-    this.inboxUniqueId,
-  });
+  InboxConfigEntity({required this.userId, required this.dateTime, this.isRead, this.isDeleted, this.isTask, this.updatedAt, required this.inboxUniqueId})
+    : id = '${userId}-${inboxUniqueId}';
 
   Map<String, dynamic> toJson() {
     return {
@@ -28,13 +20,14 @@ class InboxConfigEntity {
       'is_deleted': isDeleted,
       'is_task': isTask,
       'updated_at': updatedAt?.toUtc().toIso8601String(),
+      'inbox_unique_id': inboxUniqueId,
     };
   }
 
   factory InboxConfigEntity.fromJson(Map<String, dynamic> json) {
     return InboxConfigEntity(
-      id: json['id'],
       userId: json['user_id'],
+      inboxUniqueId: json['inbox_unique_id'],
       dateTime: DateTime.parse(json['date_time']).toLocal(),
       isRead: json['is_read'],
       isDeleted: json['is_deleted'],
@@ -45,7 +38,6 @@ class InboxConfigEntity {
 
   InboxConfigEntity copyWith({DateTime? dateTime, bool? isRead, bool? isPinned, bool? isDeleted, bool? isTask, DateTime? updatedAt, String? inboxUniqueId}) {
     return InboxConfigEntity(
-      id: id,
       userId: userId,
       dateTime: dateTime ?? this.dateTime,
       isRead: isRead ?? this.isRead,

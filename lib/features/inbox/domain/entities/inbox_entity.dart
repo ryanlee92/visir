@@ -214,7 +214,7 @@ class InboxEntity {
       title: e.subject?.isNotEmpty == true ? e.subject! : Utils.mainContext.tr.mail_empty_subject,
       description: e.snippetWithLineBreaks ?? e.snippet, // Use snippetWithLineBreaks for AI actions (longer, preserves line breaks)
       isPinned: e.isPinned,
-      config: config ?? InboxConfigEntity(id: InboxEntity.getInboxIdFromMail(e), userId: userId, dateTime: e.date ?? DateTime.now()),
+      config: config ?? InboxConfigEntity(inboxUniqueId: InboxEntity.getInboxIdFromMail(e), userId: userId, dateTime: e.date ?? DateTime.now()),
       linkedMail: LinkedMailEntity(
         title: e.subject ?? '',
         hostMail: e.hostEmail,
@@ -246,7 +246,7 @@ class InboxEntity {
       id: InboxEntity.getInboxIdFromChat(m),
       title: m.toSnippet(channel: channel, channels: channels, members: members, groups: groups),
       isPinned: m.isPinned,
-      config: config ?? InboxConfigEntity(id: InboxEntity.getInboxIdFromChat(m), userId: userId, dateTime: m.createdAt ?? DateTime.now()),
+      config: config ?? InboxConfigEntity(inboxUniqueId: InboxEntity.getInboxIdFromChat(m), userId: userId, dateTime: m.createdAt ?? DateTime.now()),
       linkedMessage: LinkedMessageEntity(
         teamId: m.teamId!,
         channelId: channel.id,
