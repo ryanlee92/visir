@@ -838,230 +838,227 @@ class DailySummaryWidget extends ConsumerWidget {
   Widget _buildColumnList({required BuildContext context, required WidgetRef ref, required List<_DashboardItem> items, required String emptyMessage}) {
     final isMobileView = PlatformX.isMobileView;
 
+    final columnChild = items.map((item) {
+      final project = item.projectId != null ? ref.read(projectListControllerProvider).firstWhereOrNull((p) => p.uniqueId == item.projectId) : null;
+      final itemIconColor = project?.color ?? context.onSurfaceVariant;
+      final isUnread = item.inbox == null ? false : item.inbox?.isRead != true;
+
+      return _buildDraggable(
+        ref: ref,
+        context: context,
+        inbox: item.inbox,
+        child: PopupMenu(
+          style: VisirButtonStyle(
+            width: double.maxFinite,
+            padding: const EdgeInsets.all(8),
+            backgroundColor: context.surface.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(8),
+            margin: const EdgeInsets.only(bottom: 8),
+          ),
+          backgroundColor: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? null : Colors.transparent,
+          hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
+          forceShiftOffset: Offset(0, -36),
+          beforePopup: () {
+            if (item.inbox != null && item.inbox?.isRead != true) {
+              final userId = Utils.ref.read(authControllerProvider).value?.id;
+              if (userId == null) return;
+              ref
+                  .read(inboxAgentListControllerProvider.notifier)
+                  .updateInboxConfig(
+                    item.inbox?.config?.copyWith(isRead: true) ??
+                        InboxConfigEntity(inboxUniqueId: item.inbox!.uniqueId, userId: userId, dateTime: DateTime.now(), updatedAt: DateTime.now(), isRead: true),
+                  );
+            }
+
+            if (item.inbox != null && item.inbox!.linkedMessage != null) {
+              final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
+              final channel = channels.firstWhereOrNull((e) => e.id == item.inbox!.linkedMessage!.channelId);
+              if (channel == null) return;
+              ref
+                  .read(chatConditionProvider(TabType.home).notifier)
+                  .setThreadAndChannel(item.inbox!.linkedMessage!.threadId, channel, targetMessageId: item.inbox!.linkedMessage!.messageId);
+            }
+
+            if (item.inbox != null && item.inbox!.linkedMail != null) {
+              final inboxMail = item.inbox!.linkedMail!;
+              ref
+                  .read(mailConditionProvider(TabType.home).notifier)
+                  .openThread(label: CommonMailLabels.inbox.id, email: null, threadId: inboxMail.threadId, threadEmail: inboxMail.hostMail, type: inboxMail.type);
+            }
+
+            mailViewportSyncVisibleNotifier[TabType.home]!.value = false;
+          },
+          // doNotResizePopup: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null,
+          width: item.inbox != null ? 480 : 320,
+          // height: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? context.height * 2 / 3 : null,
+          popup: item.inbox != null
+              ? item.inbox!.linkedMail != null
+                    ? Container(
+                        // width: 720,
+                        height: context.height * 4 / 5,
+                        child: MailDetailScreen(
+                          tabType: TabType.home,
+                          taskMail: item.inbox!.linkedMail!,
+                          anchorMailId: item.inbox!.linkedMail!.messageId,
+                          // onKeyDown: (event) => _onKeyDown(event, justReturnResult: true),
+                          // onKeyRepeat: (event) => _onKeyRepeat(event, justReturnResult: true),
+                          // deleteTask: () => toggleDeleteInbox(),
+                          inboxConfig: item.inbox!.config,
+                          close: () => Navigator.of(Utils.mainContext).maybePop(),
+                        ),
+                      )
+                    : item.inbox!.linkedMessage != null
+                    ? Container(
+                        height: context.height * 2 / 3,
+                        child: ChatListScreen(
+                          tabType: TabType.home,
+                          taskMessage: item.inbox!.linkedMessage!,
+                          // taskMessageGroupIds: item.inbox!.linkedMessage!.groupIds,
+                          // onKeyDown: (event) => _onKeyDown(event, justReturnResult: true),
+                          // onKeyRepeat: (event) => _onKeyRepeat(event, justReturnResult: true),
+                          // deleteTask: () => toggleDeleteInbox(),
+                          inboxConfig: item.inbox!.config,
+                          close: () => Navigator.of(Utils.mainContext).maybePop(),
+                        ),
+                      )
+                    : null
+              : item.task != null
+              ? PlatformX.isMobileView
+                    ? MobileTaskEditWidget(
+                        task: item.task!,
+                        selectedDate: item.task!.startDate,
+                        tabType: TabType.home,
+                        calendarTaskEditSourceType: CalendarTaskEditSourceType.editOriginal,
+                      )
+                    : TaskSimpleCreateWidget(
+                        tabType: TabType.home,
+                        task: item.task!,
+                        selectedDate: item.task!.startDate,
+                        calendarTaskEditSourceType: CalendarTaskEditSourceType.editOriginal,
+                      )
+              : null,
+          type: ContextMenuActionType.tap,
+          location: PopupMenuLocation.right,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      VisirIcon(type: project?.icon ?? VisirIconType.project, size: 14, color: itemIconColor, isSelected: true),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          '${project?.name ?? context.tr.no_project_suggested}${item.inbox != null ? ' · ${item.inbox?.linkedMail?.fromName ?? item.inbox?.linkedMessage?.userName ?? item.inbox?.suggestion?.sender_name}' : ''}',
+                          style: context.bodyMedium?.textColor(context.onSurfaceVariant),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (item.urgency != InboxSuggestionUrgency.none) ...[
+                        Builder(
+                          builder: (context) {
+                            // urgency 문자열을 미리 저장 (context를 사용하여 로컬라이제이션 가져오기)
+                            final urgencyTitle = item.urgency.title.isNotEmpty
+                                ? item.urgency.title
+                                : (item.urgency == InboxSuggestionUrgency.urgent
+                                      ? context.tr.ai_suggestion_urgency_urgent
+                                      : item.urgency == InboxSuggestionUrgency.important
+                                      ? context.tr.ai_suggestion_urgency_important
+                                      : item.urgency == InboxSuggestionUrgency.action_required
+                                      ? context.tr.ai_suggestion_urgency_action_required
+                                      : item.urgency == InboxSuggestionUrgency.need_review
+                                      ? context.tr.ai_suggestion_urgency_need_review
+                                      : '');
+
+                            // urgencyTitle이 비어있으면 태그를 표시하지 않음
+                            if (urgencyTitle.isEmpty) return const SizedBox.shrink();
+
+                            return Container(
+                              margin: EdgeInsets.only(left: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(color: item.urgency.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
+                              child: Text(urgencyTitle, style: context.bodySmall?.textColor(item.urgency.color), maxLines: 1),
+                            );
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          if (isUnread)
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Container(
+                                margin: EdgeInsets.only(right: 6),
+                                decoration: BoxDecoration(color: context.primary, borderRadius: BorderRadius.circular(3)),
+                                width: 6,
+                                height: 6,
+                              ),
+                            ),
+                          TextSpan(text: item.title, style: context.bodyLarge?.textColor(context.onBackground)),
+                        ],
+                      ),
+                      maxLines: 5,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (item.inbox?.linkedTask?.tasks.isNotEmpty == true)
+                    IntrinsicWidth(
+                      child: PopupMenu(
+                        type: ContextMenuActionType.tap,
+                        location: PopupMenuLocation.right,
+                        backgroundColor: item.inbox?.linkedTask?.tasks.length == 1 ? Colors.transparent : null,
+                        hideShadow: item.inbox?.linkedTask?.tasks.length == 1 ? true : null,
+                        width: 300,
+                        forceShiftOffset: item.inbox?.linkedTask?.tasks.length == 1 ? Offset(0, -28) : null,
+                        borderRadius: 12,
+                        mobileUseBottomSheet: true,
+                        mobiileBottomSheetTitle: context.tr.linked_task_evnet,
+                        popup: LinkedTasksPopup(tasks: item.inbox?.linkedTask?.tasks ?? [], tabType: TabType.home),
+                        popupBuilderOnMobileView: (scr) => LinkedTasksPopup(tasks: item.inbox?.linkedTask?.tasks ?? [], tabType: TabType.home, scrollController: scr),
+                        style: VisirButtonStyle(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          backgroundColor: context.surfaceVariant.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(6),
+                          margin: EdgeInsets.only(left: 6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            VisirIcon(type: VisirIconType.linkedTask, size: 12, color: context.onSurface, isSelected: true),
+                            SizedBox(width: 4),
+                            Text(item.inbox?.linkedTask?.tasks.length.toString() ?? '0', style: context.bodySmall?.textColor(context.onSurface)),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }).toList();
+
     if (isMobileView) {
       return Padding(
         padding: EdgeInsets.symmetric(vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: [
-            if (items.isEmpty)
-              Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant))
-            else
-              ...items.map((item) {
-                final project = item.projectId != null ? ref.read(projectListControllerProvider).firstWhereOrNull((p) => p.uniqueId == item.projectId) : null;
-                final itemIconColor = project?.color ?? context.onSurfaceVariant;
-                final isUnread = item.inbox?.isRead != true;
-
-                return _buildDraggable(
-                  ref: ref,
-                  context: context,
-                  inbox: item.inbox,
-                  child: PopupMenu(
-                    style: VisirButtonStyle(
-                      width: double.maxFinite,
-                      padding: const EdgeInsets.all(8),
-                      backgroundColor: context.surface.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(8),
-                      margin: const EdgeInsets.only(bottom: 8),
-                    ),
-                    backgroundColor: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? null : Colors.transparent,
-                    hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
-                    forceShiftOffset: Offset(0, -36),
-                    beforePopup: () {
-                      if (item.inbox?.isRead != true) {
-                        final userId = Utils.ref.read(authControllerProvider).value?.id;
-                        if (userId == null) return;
-                        ref
-                            .read(inboxAgentListControllerProvider.notifier)
-                            .updateInboxConfig(
-                              item.inbox?.config?.copyWith(isRead: true) ??
-                                  InboxConfigEntity(inboxUniqueId: item.inbox!.uniqueId, userId: userId, dateTime: DateTime.now(), updatedAt: DateTime.now(), isRead: true),
-                            );
-                      }
-
-                      if (item.inbox!.linkedMessage != null) {
-                        final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
-                        final channel = channels.firstWhereOrNull((e) => e.id == item.inbox!.linkedMessage!.channelId);
-                        if (channel == null) return;
-                        ref
-                            .read(chatConditionProvider(TabType.home).notifier)
-                            .setThreadAndChannel(item.inbox!.linkedMessage!.threadId, channel, targetMessageId: item.inbox!.linkedMessage!.messageId);
-                      }
-
-                      if (item.inbox!.linkedMail != null) {
-                        final inboxMail = item.inbox!.linkedMail!;
-                        ref
-                            .read(mailConditionProvider(TabType.home).notifier)
-                            .openThread(label: CommonMailLabels.inbox.id, email: null, threadId: inboxMail.threadId, threadEmail: inboxMail.hostMail, type: inboxMail.type);
-                      }
-
-                      mailViewportSyncVisibleNotifier[TabType.home]!.value = false;
-                    },
-                    // doNotResizePopup: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null,
-                    width: 480,
-                    // height: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? context.height * 2 / 3 : null,
-                    popup: item.inbox != null
-                        ? item.inbox!.linkedMail != null
-                              ? Container(
-                                  // width: 720,
-                                  height: context.height * 4 / 5,
-                                  child: MailDetailScreen(
-                                    tabType: TabType.home,
-                                    taskMail: item.inbox!.linkedMail!,
-                                    anchorMailId: item.inbox!.linkedMail!.messageId,
-                                    // onKeyDown: (event) => _onKeyDown(event, justReturnResult: true),
-                                    // onKeyRepeat: (event) => _onKeyRepeat(event, justReturnResult: true),
-                                    // deleteTask: () => toggleDeleteInbox(),
-                                    inboxConfig: item.inbox!.config,
-                                    close: () => Navigator.of(Utils.mainContext).maybePop(),
-                                  ),
-                                )
-                              : item.inbox!.linkedMessage != null
-                              ? Container(
-                                  height: context.height * 2 / 3,
-                                  child: ChatListScreen(
-                                    tabType: TabType.home,
-                                    taskMessage: item.inbox!.linkedMessage!,
-                                    // taskMessageGroupIds: item.inbox!.linkedMessage!.groupIds,
-                                    // onKeyDown: (event) => _onKeyDown(event, justReturnResult: true),
-                                    // onKeyRepeat: (event) => _onKeyRepeat(event, justReturnResult: true),
-                                    // deleteTask: () => toggleDeleteInbox(),
-                                    inboxConfig: item.inbox!.config,
-                                    close: () => Navigator.of(Utils.mainContext).maybePop(),
-                                  ),
-                                )
-                              : null
-                        : item.task != null
-                        ? PlatformX.isMobileView
-                              ? MobileTaskEditWidget(
-                                  task: item.task!,
-                                  selectedDate: item.task!.startDate,
-                                  tabType: TabType.home,
-                                  calendarTaskEditSourceType: CalendarTaskEditSourceType.editOriginal,
-                                )
-                              : TaskSimpleCreateWidget(
-                                  tabType: TabType.home,
-                                  task: item.task!,
-                                  selectedDate: item.task!.startDate,
-                                  calendarTaskEditSourceType: CalendarTaskEditSourceType.editOriginal,
-                                )
-                        : null,
-                    type: ContextMenuActionType.tap,
-                    location: PopupMenuLocation.right,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                VisirIcon(type: project?.icon ?? VisirIconType.project, size: 14, color: itemIconColor, isSelected: true),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    '${project?.name ?? context.tr.no_project_suggested}${item.inbox != null ? ' · ${item.inbox?.linkedMail?.fromName ?? item.inbox?.linkedMessage?.userName ?? item.inbox?.suggestion?.sender_name}' : ''}',
-                                    style: context.bodyMedium?.textColor(context.onSurfaceVariant),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (item.urgency != InboxSuggestionUrgency.none) ...[
-                                  Builder(
-                                    builder: (context) {
-                                      // urgency 문자열을 미리 저장 (context를 사용하여 로컬라이제이션 가져오기)
-                                      final urgencyTitle = item.urgency.title.isNotEmpty
-                                          ? item.urgency.title
-                                          : (item.urgency == InboxSuggestionUrgency.urgent
-                                                ? context.tr.ai_suggestion_urgency_urgent
-                                                : item.urgency == InboxSuggestionUrgency.important
-                                                ? context.tr.ai_suggestion_urgency_important
-                                                : item.urgency == InboxSuggestionUrgency.action_required
-                                                ? context.tr.ai_suggestion_urgency_action_required
-                                                : item.urgency == InboxSuggestionUrgency.need_review
-                                                ? context.tr.ai_suggestion_urgency_need_review
-                                                : '');
-
-                                      // urgencyTitle이 비어있으면 태그를 표시하지 않음
-                                      if (urgencyTitle.isEmpty) return const SizedBox.shrink();
-
-                                      return Container(
-                                        margin: EdgeInsets.only(left: 6),
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(color: item.urgency.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
-                                        child: Text(urgencyTitle, style: context.bodySmall?.textColor(item.urgency.color), maxLines: 1),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                          ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text.rich(
-                                TextSpan(
-                                  children: [
-                                    if (isUnread)
-                                      WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: 6),
-                                          decoration: BoxDecoration(color: context.primary, borderRadius: BorderRadius.circular(3)),
-                                          width: 6,
-                                          height: 6,
-                                        ),
-                                      ),
-                                    TextSpan(text: item.title, style: context.bodyLarge?.textColor(context.onBackground)),
-                                  ],
-                                ),
-                                maxLines: 5,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (item.inbox?.linkedTask?.tasks.isNotEmpty == true)
-                              IntrinsicWidth(
-                                child: PopupMenu(
-                                  type: ContextMenuActionType.tap,
-                                  location: PopupMenuLocation.right,
-                                  backgroundColor: item.inbox?.linkedTask?.tasks.length == 1 ? Colors.transparent : null,
-                                  hideShadow: item.inbox?.linkedTask?.tasks.length == 1 ? true : null,
-                                  width: 300,
-                                  forceShiftOffset: item.inbox?.linkedTask?.tasks.length == 1 ? Offset(0, -28) : null,
-                                  borderRadius: 12,
-                                  mobileUseBottomSheet: true,
-                                  mobiileBottomSheetTitle: context.tr.linked_task_evnet,
-                                  popup: LinkedTasksPopup(tasks: item.inbox?.linkedTask?.tasks ?? [], tabType: TabType.home),
-                                  popupBuilderOnMobileView: (scr) => LinkedTasksPopup(tasks: item.inbox?.linkedTask?.tasks ?? [], tabType: TabType.home, scrollController: scr),
-                                  style: VisirButtonStyle(
-                                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                    backgroundColor: context.surfaceVariant.withValues(alpha: 0.5),
-                                    borderRadius: BorderRadius.circular(6),
-                                    margin: EdgeInsets.only(left: 6),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      VisirIcon(type: VisirIconType.linkedTask, size: 12, color: context.onSurface, isSelected: true),
-                                      SizedBox(width: 4),
-                                      Text(item.inbox?.linkedTask?.tasks.length.toString() ?? '0', style: context.bodySmall?.textColor(context.onSurface)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-          ],
+          children: [if (items.isEmpty) Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant)) else ...columnChild],
         ),
       );
     }
@@ -1081,237 +1078,7 @@ class DailySummaryWidget extends ConsumerWidget {
                     Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant))
                   else
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: items.map((item) {
-                          final project = item.projectId != null ? ref.read(projectListControllerProvider).firstWhereOrNull((p) => p.uniqueId == item.projectId) : null;
-                          final itemIconColor = project?.color ?? context.onSurfaceVariant;
-                          final isUnread = item.inbox?.isRead != true;
-
-                          return _buildDraggable(
-                            ref: ref,
-                            context: context,
-                            inbox: item.inbox,
-                            child: PopupMenu(
-                              style: VisirButtonStyle(
-                                width: double.maxFinite,
-                                padding: const EdgeInsets.all(8),
-                                backgroundColor: context.surface.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(8),
-                                margin: const EdgeInsets.only(bottom: 8),
-                              ),
-                              backgroundColor: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? null : Colors.transparent,
-                              hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
-                              forceShiftOffset: Offset(0, -36),
-                              beforePopup: () {
-                                if (item.task != null && item.inbox == null) return;
-
-                                if (item.inbox?.isRead != true) {
-                                  final userId = Utils.ref.read(authControllerProvider).value?.id;
-                                  if (userId == null) return;
-                                  ref
-                                      .read(inboxAgentListControllerProvider.notifier)
-                                      .updateInboxConfig(
-                                        item.inbox?.config?.copyWith(isRead: true) ??
-                                            InboxConfigEntity(
-                                              inboxUniqueId: item.inbox!.uniqueId,
-                                              userId: userId,
-                                              dateTime: DateTime.now(),
-                                              updatedAt: DateTime.now(),
-                                              isRead: true,
-                                            ),
-                                      );
-                                }
-
-                                if (item.inbox!.linkedMessage != null) {
-                                  final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
-                                  final channel = channels.firstWhereOrNull((e) => e.id == item.inbox!.linkedMessage!.channelId);
-                                  if (channel == null) return;
-                                  ref
-                                      .read(chatConditionProvider(TabType.home).notifier)
-                                      .setThreadAndChannel(item.inbox!.linkedMessage!.threadId, channel, targetMessageId: item.inbox!.linkedMessage!.messageId);
-                                }
-
-                                if (item.inbox!.linkedMail != null) {
-                                  final inboxMail = item.inbox!.linkedMail!;
-                                  ref
-                                      .read(mailConditionProvider(TabType.home).notifier)
-                                      .openThread(
-                                        label: CommonMailLabels.inbox.id,
-                                        email: null,
-                                        threadId: inboxMail.threadId,
-                                        threadEmail: inboxMail.hostMail,
-                                        type: inboxMail.type,
-                                      );
-                                }
-
-                                mailViewportSyncVisibleNotifier[TabType.home]!.value = false;
-                              },
-                              // doNotResizePopup: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null,
-                              width: item.task != null && item.inbox == null ? 320 : 480,
-                              // height: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? context.height * 2 / 3 : null,
-                              popup: item.inbox != null
-                                  ? item.inbox!.linkedMail != null
-                                        ? Container(
-                                            // width: 720,
-                                            height: context.height * 4 / 5,
-                                            child: MailDetailScreen(
-                                              tabType: TabType.home,
-                                              taskMail: item.inbox!.linkedMail!,
-                                              anchorMailId: item.inbox!.linkedMail!.messageId,
-                                              // onKeyDown: (event) => _onKeyDown(event, justReturnResult: true),
-                                              // onKeyRepeat: (event) => _onKeyRepeat(event, justReturnResult: true),
-                                              // deleteTask: () => toggleDeleteInbox(),
-                                              inboxConfig: item.inbox!.config,
-                                              close: () => Navigator.of(context).pop(),
-                                            ),
-                                          )
-                                        : item.inbox!.linkedMessage != null
-                                        ? Container(
-                                            height: context.height * 2 / 3,
-                                            child: ChatListScreen(
-                                              tabType: TabType.home,
-                                              taskMessage: item.inbox!.linkedMessage!,
-                                              // taskMessageGroupIds: item.inbox!.linkedMessage!.groupIds,
-                                              // onKeyDown: (event) => _onKeyDown(event, justReturnResult: true),
-                                              // onKeyRepeat: (event) => _onKeyRepeat(event, justReturnResult: true),
-                                              // deleteTask: () => toggleDeleteInbox(),
-                                              inboxConfig: item.inbox!.config,
-                                              close: () => Navigator.of(context).pop(),
-                                            ),
-                                          )
-                                        : null
-                                  : item.task != null
-                                  ? PlatformX.isMobileView
-                                        ? MobileTaskEditWidget(
-                                            task: item.task!,
-                                            selectedDate: item.task!.startDate,
-                                            tabType: TabType.home,
-                                            calendarTaskEditSourceType: CalendarTaskEditSourceType.editOriginal,
-                                          )
-                                        : TaskSimpleCreateWidget(
-                                            tabType: TabType.home,
-                                            task: item.task!,
-                                            selectedDate: item.task!.startDate,
-                                            calendarTaskEditSourceType: CalendarTaskEditSourceType.editOriginal,
-                                          )
-                                  : null,
-                              type: ContextMenuActionType.tap,
-                              location: PopupMenuLocation.right,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          VisirIcon(type: project?.icon ?? VisirIconType.project, size: 14, color: itemIconColor, isSelected: true),
-                                          const SizedBox(width: 6),
-                                          Expanded(
-                                            child: Text(
-                                              '${project?.name ?? context.tr.no_project_suggested}${item.inbox != null ? ' · ${item.inbox?.linkedMail?.fromName ?? item.inbox?.linkedMessage?.userName ?? item.inbox?.suggestion?.sender_name}' : ''}',
-                                              style: context.bodyMedium?.textColor(context.onSurfaceVariant),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          if (item.urgency != InboxSuggestionUrgency.none) ...[
-                                            Builder(
-                                              builder: (context) {
-                                                // urgency 문자열을 미리 저장 (context를 사용하여 로컬라이제이션 가져오기)
-                                                final urgencyTitle = item.urgency.title.isNotEmpty
-                                                    ? item.urgency.title
-                                                    : (item.urgency == InboxSuggestionUrgency.urgent
-                                                          ? context.tr.ai_suggestion_urgency_urgent
-                                                          : item.urgency == InboxSuggestionUrgency.important
-                                                          ? context.tr.ai_suggestion_urgency_important
-                                                          : item.urgency == InboxSuggestionUrgency.action_required
-                                                          ? context.tr.ai_suggestion_urgency_action_required
-                                                          : item.urgency == InboxSuggestionUrgency.need_review
-                                                          ? context.tr.ai_suggestion_urgency_need_review
-                                                          : '');
-
-                                                // urgencyTitle이 비어있으면 태그를 표시하지 않음
-                                                if (urgencyTitle.isEmpty) return const SizedBox.shrink();
-
-                                                return Container(
-                                                  margin: EdgeInsets.only(left: 6),
-                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                  decoration: BoxDecoration(color: item.urgency.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
-                                                  child: Text(urgencyTitle, style: context.bodySmall?.textColor(item.urgency.color), maxLines: 1),
-                                                );
-                                              },
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
-                                    ],
-                                  ),
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Text.rich(
-                                          TextSpan(
-                                            children: [
-                                              if (isUnread)
-                                                WidgetSpan(
-                                                  alignment: PlaceholderAlignment.middle,
-                                                  child: Container(
-                                                    margin: EdgeInsets.only(right: 6),
-                                                    decoration: BoxDecoration(color: context.primary, borderRadius: BorderRadius.circular(3)),
-                                                    width: 6,
-                                                    height: 6,
-                                                  ),
-                                                ),
-                                              TextSpan(text: item.title, style: context.bodyLarge?.textColor(context.onBackground)),
-                                            ],
-                                          ),
-                                          maxLines: 5,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      if (item.inbox?.linkedTask?.tasks.isNotEmpty == true)
-                                        IntrinsicWidth(
-                                          child: PopupMenu(
-                                            type: ContextMenuActionType.tap,
-                                            location: PopupMenuLocation.right,
-                                            backgroundColor: item.inbox?.linkedTask?.tasks.length == 1 ? Colors.transparent : null,
-                                            hideShadow: item.inbox?.linkedTask?.tasks.length == 1 ? true : null,
-                                            width: 300,
-                                            forceShiftOffset: item.inbox?.linkedTask?.tasks.length == 1 ? Offset(0, -28) : null,
-                                            borderRadius: 12,
-                                            mobileUseBottomSheet: true,
-                                            mobiileBottomSheetTitle: context.tr.linked_task_evnet,
-                                            popup: LinkedTasksPopup(tasks: item.inbox?.linkedTask?.tasks ?? [], tabType: TabType.home),
-                                            popupBuilderOnMobileView: (scr) =>
-                                                LinkedTasksPopup(tasks: item.inbox?.linkedTask?.tasks ?? [], tabType: TabType.home, scrollController: scr),
-                                            style: VisirButtonStyle(
-                                              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                              backgroundColor: context.surfaceVariant.withValues(alpha: 0.5),
-                                              borderRadius: BorderRadius.circular(6),
-                                              margin: EdgeInsets.only(left: 6),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                VisirIcon(type: VisirIconType.linkedTask, size: 12, color: context.onSurface, isSelected: true),
-                                                SizedBox(width: 4),
-                                                Text(item.inbox?.linkedTask?.tasks.length.toString() ?? '0', style: context.bodySmall?.textColor(context.onSurface)),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: columnChild),
                     ),
                 ],
               ),
