@@ -640,6 +640,9 @@ class InboxRepository {
       final datasource = _getDatasourceForModel(model);
       if (datasource == null) return right(null);
 
+      // Filter to only editable calendars
+      final editableCalendars = calendars.where((c) => c['modifiable'] == true).toList();
+
       Map<String, dynamic>? result;
       final usedUserApiKey = apiKey != null && apiKey.isNotEmpty;
 
@@ -659,11 +662,11 @@ class InboxRepository {
       }
 
       if (datasource is OpenAiInboxDatasource) {
-        result = await datasource.generateSuggestedEvent(inbox: inbox, calendars: calendars, model: model, apiKey: apiKey);
+        result = await datasource.generateSuggestedEvent(inbox: inbox, calendars: editableCalendars, model: model, apiKey: apiKey);
       } else if (datasource is GoogleAiInboxDatasource) {
-        result = await datasource.generateSuggestedEvent(inbox: inbox, calendars: calendars, model: model, apiKey: apiKey);
+        result = await datasource.generateSuggestedEvent(inbox: inbox, calendars: editableCalendars, model: model, apiKey: apiKey);
       } else if (datasource is AnthropicAiInboxDatasource) {
-        result = await datasource.generateSuggestedEvent(inbox: inbox, calendars: calendars, model: model, apiKey: apiKey);
+        result = await datasource.generateSuggestedEvent(inbox: inbox, calendars: editableCalendars, model: model, apiKey: apiKey);
       }
 
       // 크레딧 체크 및 차감
@@ -689,6 +692,9 @@ class InboxRepository {
     try {
       final datasource = _getDatasourceForModel(model);
       if (datasource == null) return right(null);
+
+      // Filter to only editable calendars
+      final editableCalendars = calendars.where((c) => c['modifiable'] == true).toList();
 
       Map<String, dynamic>? result;
       final usedUserApiKey = apiKey != null && apiKey.isNotEmpty;
@@ -718,7 +724,7 @@ class InboxRepository {
           inbox: inbox,
           userRequest: userRequest,
           conversationHistory: conversationHistory,
-          calendars: calendars,
+          calendars: editableCalendars,
           model: model,
           previousEventEntity: previousEventEntity,
           previousTaskEntity: previousTaskEntity,
@@ -729,7 +735,7 @@ class InboxRepository {
           inbox: inbox,
           userRequest: userRequest,
           conversationHistory: conversationHistory,
-          calendars: calendars,
+          calendars: editableCalendars,
           model: model,
           previousEventEntity: previousEventEntity,
           previousTaskEntity: previousTaskEntity,
@@ -740,7 +746,7 @@ class InboxRepository {
           inbox: inbox,
           userRequest: userRequest,
           conversationHistory: conversationHistory,
-          calendars: calendars,
+          calendars: editableCalendars,
           model: model,
           previousEventEntity: previousEventEntity,
           previousTaskEntity: previousTaskEntity,

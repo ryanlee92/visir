@@ -643,6 +643,9 @@ Return only the HTML-formatted email body. Do not include any additional explana
       
       systemMessage += '''You are a helpful AI assistant integrated with Visir, a productivity app.
 
+## Response Format
+**CRITICAL**: Always respond in HTML format, NOT Markdown. Use HTML tags like <p>, <br>, <strong>, <em>, <ul>, <li>, etc. for formatting. Do NOT use Markdown syntax (e.g., #, *, **, -). The system expects HTML-formatted responses.
+
 ## Current Date Information
 - TODAY's date: $todayStr
 - TOMORROW's date: $tomorrowStr

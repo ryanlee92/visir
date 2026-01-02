@@ -1544,7 +1544,6 @@ IMPORTANT: If the user requests to create the task "as is", "as suggested", or s
     final todayStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
     final tomorrowStr = '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
 
-
     final prompt =
         '''
 Please create a task based on the following inbox item and user request.
@@ -1738,10 +1737,7 @@ Return only the JSON object, no additional text or explanations.
               "description": {
                 "type": ["string", "null"],
               },
-              "project_id": {
-                "type": "string",
-                "description": "REQUIRED - must always be included, cannot be null",
-              },
+              "project_id": {"type": "string", "description": "REQUIRED - must always be included, cannot be null"},
               "start_at": {
                 "type": ["string", "null"],
               },
@@ -1888,10 +1884,7 @@ Return only the JSON object, no additional text or explanations.
               "description": {
                 "type": ["string", "null"],
               },
-              "project_id": {
-                "type": "string",
-                "description": "REQUIRED - must always be included, cannot be null",
-              },
+              "project_id": {"type": "string", "description": "REQUIRED - must always be included, cannot be null"},
             },
             "required": ["title", "project_id"],
             "additionalProperties": false,
@@ -2648,9 +2641,11 @@ Return only the JSON object, no additional text or explanations.
       final tomorrow = now.add(const Duration(days: 1));
       final tomorrowStr = '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
 
-
       systemMessage +=
           '''You are a helpful AI assistant integrated with Visir, a productivity app.
+
+## Response Format
+**CRITICAL**: Always respond in HTML format, NOT Markdown. Use HTML tags like <p>, <br>, <strong>, <em>, <ul>, <li>, etc. for formatting. Do NOT use Markdown syntax (e.g., #, *, **, -). The system expects HTML-formatted responses.
 
 ## Current Date Information
 - TODAY's date: $todayStr
@@ -3074,10 +3069,13 @@ Response:
       // Add Available Projects section if projects are provided
       if (projects != null && projects.isNotEmpty) {
         systemMessage += '\n\n## Available Projects';
-        systemMessage += '\nYou MUST select a project_id from this list when creating tasks. Match the user\'s request to one of these projects by name (case-insensitive, partial matching is OK).';
-        systemMessage += '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
+        systemMessage +=
+            '\nYou MUST select a project_id from this list when creating tasks. Match the user\'s request to one of these projects by name (case-insensitive, partial matching is OK).';
+        systemMessage +=
+            '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
         systemMessage += '\n\nCRITICAL PROJECT SELECTION RULES:';
-        systemMessage += '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
+        systemMessage +=
+            '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
         systemMessage += '\n2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:';
         systemMessage += '\n   - Search through the Available Projects list above';
         systemMessage += '\n   - Find the project whose name best matches the user\'s request (case-insensitive, partial match is OK)';
@@ -3113,7 +3111,7 @@ Response:
         systemMessage += '\n\n## Inbox Context\n$inboxContext';
         systemMessage +=
             '\n\nWhen the user asks about inbox items, emails, or messages (e.g., "인박스 중에 우리카드에서 온거 있어?", "Is there anything from Woori Card in the inbox?", "인박스에서 우리카드 메일 찾아줘"), use the inbox items listed above. Search through the inbox items and provide specific information about matching items. Do NOT say "I cannot access" or "I don\'t have information". You have access to the inbox items in the Inbox Context section above.';
-        
+
         // 전체 내용이 이미 포함된 경우와 메타데이터만 있는 경우 구분
         final hasFullContent = inboxContext.contains('Full Content:');
         if (hasFullContent) {
