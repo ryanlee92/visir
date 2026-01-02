@@ -90,10 +90,6 @@ class ProjectSummaryCardsWidget extends StatelessWidget {
                         ]);
                       }
 
-                      if (suggestions.map((e) => (e['inboxes'] as List<InboxEntity>).length).reduce((a, b) => a + b) == 0) {
-                        return null;
-                      }
-
                       _globalKeys[project?.uniqueId ?? ''] ??= GlobalKey();
 
                       return VisirButton(
@@ -162,24 +158,22 @@ class ProjectSummaryCardsWidget extends StatelessWidget {
                                                 children: suggestions.mapIndexed((index, t) {
                                                   final reason = t['reason'] as InboxSuggestionUrgency;
                                                   final targetInboxes = t['inboxes']! as List<InboxEntity>;
-                                                  
+
                                                   // urgency 문자열을 미리 저장 (context를 사용하여 로컬라이제이션 가져오기)
-                                                  final urgencyTitle = reason.title.isNotEmpty 
-                                                      ? reason.title 
-                                                      : (reason == InboxSuggestionUrgency.urgent 
-                                                          ? context.tr.ai_suggestion_urgency_urgent
-                                                          : reason == InboxSuggestionUrgency.important
-                                                              ? context.tr.ai_suggestion_urgency_important
-                                                              : reason == InboxSuggestionUrgency.action_required
-                                                                  ? context.tr.ai_suggestion_urgency_action_required
-                                                                  : reason == InboxSuggestionUrgency.need_review
-                                                                      ? context.tr.ai_suggestion_urgency_need_review
-                                                                      : '');
-                                                  
+                                                  final urgencyTitle = reason.title.isNotEmpty
+                                                      ? reason.title
+                                                      : (reason == InboxSuggestionUrgency.urgent
+                                                            ? context.tr.ai_suggestion_urgency_urgent
+                                                            : reason == InboxSuggestionUrgency.important
+                                                            ? context.tr.ai_suggestion_urgency_important
+                                                            : reason == InboxSuggestionUrgency.action_required
+                                                            ? context.tr.ai_suggestion_urgency_action_required
+                                                            : reason == InboxSuggestionUrgency.need_review
+                                                            ? context.tr.ai_suggestion_urgency_need_review
+                                                            : '');
+
                                                   // urgencyTitle이 비어있으면 기본값으로 name 사용
-                                                  final urgencyName = urgencyTitle.isNotEmpty 
-                                                      ? urgencyTitle 
-                                                      : reason.name.toSentenceCase();
+                                                  final urgencyName = urgencyTitle.isNotEmpty ? urgencyTitle : reason.name.toSentenceCase();
 
                                                   final inboxBuilder = (InboxEntity inbox) {
                                                     final isAsap = inbox.suggestion?.isASAP ?? false;
