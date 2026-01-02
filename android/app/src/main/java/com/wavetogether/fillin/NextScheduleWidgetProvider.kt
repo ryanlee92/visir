@@ -134,35 +134,62 @@ class NextScheduleWidgetProvider : AppWidgetProvider() {
                     Log.e(TAG, "Error setting event title", e)
                 }
                 
-                // Color bar
+                // Color bar or border (for tasks)
                 try {
                     val colorInt = nextSchedule.optInt("colorInt", 0)
+                    val isEvent = nextSchedule.optBoolean("isEvent", true)
                     val colorBar = android.graphics.Color.argb(
                         (colorInt shr 24) and 0xFF,
                         (colorInt shr 16) and 0xFF,
                         (colorInt shr 8) and 0xFF,
                         colorInt and 0xFF
                     )
-                    // Create a rounded rectangle drawable with borderRadius
-                    val drawable = GradientDrawable().apply {
-                        setColor(colorBar)
-                        // borderRadius: 2dp (half of width 4dp)
-                        cornerRadius = 2f * context.resources.displayMetrics.density
+                    
+                    val density = context.resources.displayMetrics.density
+                    
+                    if (isEvent) {
+                        // Event: filled rounded rectangle bar (4dp x 20dp)
+                        val barWidth = (4 * density).toInt()
+                        val barHeight = (20 * density).toInt()
+                        
+                        val drawable = GradientDrawable().apply {
+                            setColor(colorBar)
+                            cornerRadius = 2f * density
+                        }
+                        val bitmap = Bitmap.createBitmap(barWidth, barHeight, Bitmap.Config.ARGB_8888)
+                        val canvas = Canvas(bitmap)
+                        drawable.setBounds(0, 0, canvas.width, canvas.height)
+                        drawable.draw(canvas)
+                        
+                        // Event ImageView 표시, Task ImageView 숨김
+                        views.setViewVisibility(R.id.color_bar_event, android.view.View.VISIBLE)
+                        views.setViewVisibility(R.id.color_bar_task, android.view.View.GONE)
+                        views.setImageViewBitmap(R.id.color_bar_event, bitmap)
+                    } else {
+                        // Task: rounded square with border only (20dp x 20dp)
+                        val size = (20 * density).toInt()
+                        val borderWidth = (2 * density).toInt()
+                        val borderRadius = 4f * density
+                        
+                        val drawable = GradientDrawable().apply {
+                            setColor(android.graphics.Color.TRANSPARENT)
+                            setStroke(borderWidth, colorBar)
+                            cornerRadius = borderRadius
+                        }
+                        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+                        val canvas = Canvas(bitmap)
+                        drawable.setBounds(0, 0, canvas.width, canvas.height)
+                        drawable.draw(canvas)
+                        
+                        // Task ImageView 표시, Event ImageView 숨김
+                        views.setViewVisibility(R.id.color_bar_event, android.view.View.GONE)
+                        views.setViewVisibility(R.id.color_bar_task, android.view.View.VISIBLE)
+                        views.setImageViewBitmap(R.id.color_bar_task, bitmap)
                     }
-                    // Convert drawable to bitmap
-                    val bitmap = Bitmap.createBitmap(
-                        (4 * context.resources.displayMetrics.density).toInt(),
-                        (20 * context.resources.displayMetrics.density).toInt(),
-                        Bitmap.Config.ARGB_8888
-                    )
-                    val canvas = Canvas(bitmap)
-                    drawable.setBounds(0, 0, canvas.width, canvas.height)
-                    drawable.draw(canvas)
-                    // Set bitmap to ImageView
-                    views.setImageViewBitmap(R.id.color_bar, bitmap)
-                    Log.d(TAG, "Color bar set successfully with borderRadius")
+                    
+                    Log.d(TAG, "Color indicator set successfully (isEvent: $isEvent)")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error setting color bar", e)
+                    Log.e(TAG, "Error setting color indicator", e)
                 }
                 
                 // Event details
