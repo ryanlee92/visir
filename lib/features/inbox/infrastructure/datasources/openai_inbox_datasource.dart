@@ -2291,32 +2291,34 @@ ${calendars.map((c) => 'Calendar Name: "${c['name']}" | Calendar ID: "${c['id']}
 CRITICAL CALENDAR SELECTION RULES:
 1. ABSOLUTE PRIORITY: You MUST ONLY select calendars where "Modifiable: YES". NEVER select a calendar marked "Modifiable: NO" as it will cause an error.
 
-2. If a previous event entity exists, you MUST use the previous event's calendar_id UNLESS the user explicitly requests to change the calendar.
+2. **CRITICAL: Check Conversation History for Suggested Event**: Before selecting a calendar, check the Conversation History above. If you see a suggested event in the conversation history (look for `<inapp_event>` tags or event information that was previously suggested), you MUST use the calendar_id from that suggested event UNLESS the user explicitly requests to change the calendar. This ensures consistency between the suggested event and the actual event being created.
+
+3. If a previous event entity exists, you MUST use the previous event's calendar_id UNLESS the user explicitly requests to change the calendar.
    - If the user does NOT mention calendar at all, keep the previous calendar_id unchanged.
    - DO NOT intelligently select a calendar when modifying an existing event unless explicitly requested.
    - However, if the previous calendar is marked "Modifiable: NO", you MUST select a different modifiable calendar.
 
-3. When the user explicitly mentions a calendar name (e.g., "work calendar", "personal", "change calendar to X"), you MUST:
+4. When the user explicitly mentions a calendar name (e.g., "work calendar", "personal", "change calendar to X"), you MUST:
    - Search through the Available Calendars list above
    - Find the calendar whose name best matches the user's request (case-insensitive, partial match is OK)
    - CRITICAL: Verify that the matching calendar has "Modifiable: YES" before selecting it
    - If the matching calendar is "Modifiable: NO", find the next best match that is modifiable
    - Return the EXACT calendar_id from a modifiable calendar
 
-4. When the user does NOT mention a calendar name AND there is NO previous event entity, you MUST intelligently select the most appropriate calendar:
+5. When the user does NOT mention a calendar name AND there is NO previous event entity AND there is NO suggested event in conversation history, you MUST intelligently select the most appropriate calendar:
    - FIRST: Filter to only calendars marked "Modifiable: YES"
    - If source host email is available, try to match it with calendar emails or infer from the email domain
    - Consider the context: work-related emails → work calendar, personal emails → personal calendar
    - Look at calendar names and emails to find the best match among modifiable calendars
    - As a last resort, select the first modifiable calendar from the list
 
-4. Examples of intelligent matching (ONLY when creating a NEW event, not modifying):
+6. Examples of intelligent matching (ONLY when creating a NEW event, not modifying, and no suggested event in history):
    - Work email (e.g., company.com domain) → Look for work-related calendar names or matching email domains
    - Personal email → Look for personal calendar names
    - Source host email matches a calendar email → Use that calendar
    - User says "work calendar" → Find calendar with name containing "work" → Return its calendar_id
 
-5. The calendar_id MUST be one of the IDs listed in the Available Calendars section above.
+7. The calendar_id MUST be one of the IDs listed in the Available Calendars section above.
 
 ## Conversation History
 $conversationText
@@ -2331,6 +2333,7 @@ $userRequest
 
 ## Requirements
 ${previousEventEntity != null ? '''- IMPORTANT: A previous event entity is provided above. Use it as the base and ONLY modify the fields that the user explicitly requests to change.
+- CRITICAL: Before selecting a calendar, check the Conversation History above. If a suggested event was shown earlier (look for `<inapp_event>` tags), use the calendar_id from that suggested event to maintain consistency.
 - If the user doesn't mention a field (title, description, date/time, calendar, location, etc.), keep it exactly as it is in the previous event entity.
 - Only extract and apply the specific changes requested by the user.
 - CRITICAL: If the user requests a date/time change (e.g., "tomorrow", "내일", "change date to X", "make it tomorrow"), you MUST extract the new date and include it in start_at (LOCAL timezone format: YYYY-MM-DDTHH:mm:ss without Z suffix). Do NOT leave start_at as null or empty. Do NOT use the previous event's date.
@@ -2361,7 +2364,12 @@ ${previousEventEntity != null ? '''- IMPORTANT: A previous event entity is provi
     * Set start_at to "${tomorrowStr}T00:00:00" (or the appropriate time if previous event had a specific time)
     * Keep the same time as the previous event, or use 00:00:00 if the previous event was all-day
     * Calculate end_at based on the previous event's duration''' : '''- Generate an event title and description based on the inbox item and user request.
-- CRITICAL CALENDAR SELECTION: Look at the Available Calendars section above. If the user mentions a calendar name, find the matching calendar from the list and return its EXACT calendar_id. Match calendar names case-insensitively with partial matching. If no calendar is mentioned or no match is found, use the first calendar from the list as default.
+- CRITICAL CALENDAR SELECTION: 
+  * FIRST: Check the Conversation History above. If you see a suggested event (look for `<inapp_event>` tags or event information that was previously suggested), you MUST use the calendar_id from that suggested event to maintain consistency between the suggested and actual event.
+  * If no suggested event is found in conversation history, then:
+    - If the user mentions a calendar name, find the matching calendar from the Available Calendars list above and return its EXACT calendar_id. Match calendar names case-insensitively with partial matching.
+    - If no calendar is mentioned or no match is found, intelligently select the most appropriate calendar based on context (work email → work calendar, personal email → personal calendar, etc.)
+    - As a last resort, use the first modifiable calendar from the list.
 - If the user mentions a specific date or time, extract it and include it in start_at (ISO 8601 format).
 - CRITICAL: If the user mentions a specific time (e.g., "9시", "9 o'clock", "9am", "오후 3시", "3pm", "내일 9시"), you MUST include the time in start_at (format: YYYY-MM-DDTHH:mm:ss) and set isAllDay to false. If only a date is mentioned without time, you can set isAllDay to true or include 00:00:00 in start_at.
 - Keep the event title concise and action-oriented.

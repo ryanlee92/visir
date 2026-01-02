@@ -366,8 +366,8 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
     for (final inbox in inboxes) {
       final suggestion = inbox.suggestion;
       if (suggestion == null) continue;
-      if (inbox.isRead == true) continue;
-      if (inbox.linkedTask != null) continue;
+      // if (inbox.isRead == true) continue;
+      // if (inbox.linkedTask != null) continue;
 
       // MCP 함수 추천
       final recommendedFunctions = _getRecommendedMcpFunctions(suggestion, inbox);
