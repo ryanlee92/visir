@@ -17,12 +17,12 @@
 				type="application/octet-stream" />
 		</item>
 		<item>
-			<title>Version 2.0.1</title>
+			<title>Version 2.0.2</title>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Wed, 31 Dec 2025 23:00:00 +0900</pubDate>
+			<pubDate>Fri, 2 Jan 2026 14:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.exe"
-                sparkle:dsaSignature="MDwCHHQpdf3L+RUeaX4+ZwzmUC1vAs96cjSa0P8QmE0CHGT7zT9za9E+FAteDKqL/cW5iakKiSCN+ZkotfQ=" length="0"
-				sparkle:version="2.0.1+1014"
+                sparkle:dsaSignature="MDwCHC2HAtjEFzB6vwNo2BKbl5u0RACULwMkgI1q3gICHCl69m5drrPP+sZcobPBeGAMqQ6F6W4XOcNO7zw=" length="0"
+				sparkle:version="2.0.2+1015"
 				sparkle:os="windows"
 				type="application/octet-stream" />
 		</item>
