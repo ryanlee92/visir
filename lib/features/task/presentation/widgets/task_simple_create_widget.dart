@@ -68,7 +68,7 @@ class TaskSimpleCreateWidget extends ConsumerStatefulWidget {
   final DateTime? savedEndDate;
   final bool? isEdited;
   final bool? isCommandResult;
-  final bool? enableSkipTime;
+
   final bool? forceUnscheduled;
   final TaskStatus? targetStatus;
 
@@ -98,7 +98,7 @@ class TaskSimpleCreateWidget extends ConsumerStatefulWidget {
     this.savedEndDate,
     this.isEdited,
     this.isCommandResult,
-    this.enableSkipTime,
+
     this.forceUnscheduled,
     this.initialProject,
     this.targetStatus,
@@ -201,7 +201,7 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
       endDate = endDate.subtract(Duration(days: 1));
     }
 
-    if (widget.enableSkipTime == true && widget.task != null && widget.task!.startAt == null && widget.task!.endAt == null) {
+    if (widget.task != null && widget.task!.startAt == null && widget.task!.endAt == null) {
       showTimeSection = false;
     }
 
@@ -755,7 +755,21 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
                                                   backgroundColor: context.surfaceVariant,
                                                   borderRadius: BorderRadius.circular(4),
                                                 ),
-                                                child: Text(EventEntity.getDateForEditSimple(startDate), style: context.bodyLarge?.textColor(context.outlineVariant)),
+                                                child: Row(
+                                                  children: [
+                                                    Text(EventEntity.getDateForEditSimple(startDate), style: context.bodyLarge?.textColor(context.outlineVariant)),
+
+                                                    VisirButton(
+                                                      type: VisirButtonAnimationType.scaleAndOpacity,
+                                                      style: VisirButtonStyle(margin: EdgeInsets.only(left: 6)),
+                                                      onTap: () {
+                                                        showTimeSection = !showTimeSection;
+                                                        setState(() {});
+                                                      },
+                                                      child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, isSelected: true),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                             if (!isAllDay)
@@ -957,16 +971,6 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
                                       ],
                                     ),
                                   ),
-                                  if (widget.enableSkipTime == true)
-                                    VisirButton(
-                                      type: VisirButtonAnimationType.scaleAndOpacity,
-                                      style: VisirButtonStyle(margin: EdgeInsets.only(left: 6)),
-                                      onTap: () {
-                                        showTimeSection = !showTimeSection;
-                                        setState(() {});
-                                      },
-                                      child: VisirIcon(type: VisirIconType.closeWithCircle, size: 16, isSelected: true),
-                                    ),
                                 ],
                               ),
                             ),
@@ -1109,21 +1113,20 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
                                   );
                                 },
                               ),
-                              if (widget.enableSkipTime == true)
-                                VisirButton(
-                                  type: VisirButtonAnimationType.scaleAndOpacity,
-                                  style: VisirButtonStyle(
-                                    margin: EdgeInsets.only(left: 6),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: context.outline, width: 0.5),
-                                    padding: EdgeInsets.all(5),
-                                  ),
-                                  onTap: () {
-                                    showTimeSection = !showTimeSection;
-                                    setState(() {});
-                                  },
-                                  child: VisirIcon(type: VisirIconType.clock, size: 16, isSelected: showTimeSection),
+                              VisirButton(
+                                type: VisirButtonAnimationType.scaleAndOpacity,
+                                style: VisirButtonStyle(
+                                  margin: EdgeInsets.only(left: 6),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: context.outline, width: 0.5),
+                                  padding: EdgeInsets.all(5),
                                 ),
+                                onTap: () {
+                                  showTimeSection = !showTimeSection;
+                                  setState(() {});
+                                },
+                                child: VisirIcon(type: VisirIconType.clock, size: 16, isSelected: showTimeSection),
+                              ),
                               if (showTimeSection)
                                 PopupMenu(
                                   forcePopup: true,
