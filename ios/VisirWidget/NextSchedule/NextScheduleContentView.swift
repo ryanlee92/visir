@@ -34,12 +34,20 @@ struct NextScheduleContentView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Event details
             VStack(alignment: .leading, spacing: 8) {
-                // Title with color bar
+                // Title with color bar (event) or border square (task)
                 HStack(spacing: 6) {
-                    Rectangle()
-                        .fill(color)
-                        .frame(width: 4, height: 20)
-                        .cornerRadius(2)
+                    if data.isEvent {
+                        // Event: filled rounded rectangle bar
+                        Rectangle()
+                            .fill(color)
+                            .frame(width: 4, height: 20)
+                            .cornerRadius(2)
+                    } else {
+                        // Task: rounded square with border only
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(color, lineWidth: 2)
+                            .frame(width: 16, height: 16)
+                    }
                     Text(data.title)
                         .font(.custom("SUITE-Medium", size: 16))
                         .foregroundColor(colors.onBackground)
@@ -58,6 +66,7 @@ struct NextScheduleContentView: View {
                 }
             }
             .padding(.top, 14)
+            .padding(.bottom, 4)
             .padding(.horizontal, 14)
             
             Spacer()
@@ -86,6 +95,7 @@ private struct PreviousContextView: View {
                 .foregroundColor(colors.onBackground)
                 .lineLimit(5)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(8)
         .background(colors.surface.opacity(0.5))
         .cornerRadius(8)
