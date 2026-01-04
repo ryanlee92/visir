@@ -757,14 +757,21 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     return writeActions.contains(functionName);
   }
 
-  Widget _buildTaskEntityWithConfirm(BuildContext context, Map<String, dynamic> functionArgs, String actionId, bool isUser, {String? functionName, List<dynamic>? updatedTaggedTasks}) {
+  Widget _buildTaskEntityWithConfirm(
+    BuildContext context,
+    Map<String, dynamic> functionArgs,
+    String actionId,
+    bool isUser, {
+    String? functionName,
+    List<dynamic>? updatedTaggedTasks,
+  }) {
     try {
       final user = ref.read(authControllerProvider).requireValue;
-      
+
       // updateTask인 경우 taskId로 기존 task 찾기
       final taskId = functionArgs['taskId'] as String?;
       TaskEntity? existingTask;
-      
+
       // 먼저 updatedTaggedTasks에서 찾기
       if (updatedTaggedTasks != null && taskId != null && taskId.isNotEmpty) {
         for (final taskData in updatedTaggedTasks) {
@@ -780,7 +787,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
           }
         }
       }
-      
+
       // updatedTaggedTasks에서 찾지 못하면 taskId로 컨트롤러에서 찾기
       if (existingTask == null && taskId != null && taskId.isNotEmpty) {
         // taskListController에서 찾기
@@ -788,7 +795,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
           final taskListState = ref.read(taskListControllerProvider);
           existingTask = taskListState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
         } catch (_) {}
-        
+
         // 찾지 못하면 calendarTaskListController에서 찾기
         if (existingTask == null) {
           try {
@@ -797,7 +804,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
           } catch (_) {}
         }
       }
-      
+
       // functionArgs에서 업데이트할 정보 가져오기
       final title = functionArgs['title'] as String? ?? existingTask?.title ?? '';
       final description = functionArgs['description'] as String? ?? existingTask?.description ?? '';
@@ -808,7 +815,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
       DateTime? startAt = existingTask?.startAt;
       DateTime? endAt = existingTask?.endAt;
-      
+
       if (startAtStr != null) {
         try {
           startAt = DateTime.parse(startAtStr).toLocal();
@@ -829,25 +836,20 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         endAt = endAt ?? startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
       }
 
-      final task = existingTask?.copyWith(
-        title: title,
-        description: description,
-        projectId: projectId,
-        startAt: startAt,
-        endAt: endAt,
-        isAllDay: isAllDay,
-      ) ?? TaskEntity(
-        id: taskId ?? const Uuid().v4(),
-        ownerId: user.id,
-        title: title,
-        description: description,
-        projectId: projectId,
-        startAt: startAt,
-        endAt: endAt,
-        isAllDay: isAllDay,
-        createdAt: existingTask?.createdAt ?? DateTime.now(),
-        status: existingTask?.status ?? TaskStatus.none,
-      );
+      final task =
+          existingTask?.copyWith(title: title, description: description, projectId: projectId, startAt: startAt, endAt: endAt, isAllDay: isAllDay) ??
+          TaskEntity(
+            id: taskId ?? const Uuid().v4(),
+            ownerId: user.id,
+            title: title,
+            description: description,
+            projectId: projectId,
+            startAt: startAt,
+            endAt: endAt,
+            isAllDay: isAllDay,
+            createdAt: existingTask?.createdAt ?? DateTime.now(),
+            status: existingTask?.status ?? TaskStatus.none,
+          );
 
       return _buildTaskWidget(context, task, isUser);
     } catch (e) {
@@ -1190,7 +1192,11 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         // First, restore escaped tag pairs: &lt;inapp_xxx&gt;...&lt;/inapp_xxx&gt; -> <inapp_xxx>...</inapp_xxx>
         // Also restore conversation_title tags
         // Match the entire tag pair including escaped content (non-greedy, dotall mode)
-        final escapedTagPairRegex = RegExp(r'&lt;(inapp_|tagged_|conversation_)([a-z_]+)&gt;([\s\S]*?)&lt;/(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false, dotAll: true);
+        final escapedTagPairRegex = RegExp(
+          r'&lt;(inapp_|tagged_|conversation_)([a-z_]+)&gt;([\s\S]*?)&lt;/(inapp_|tagged_|conversation_)([a-z_]+)&gt;',
+          caseSensitive: false,
+          dotAll: true,
+        );
 
         restoredHtml = restoredHtml.replaceAllMapped(escapedTagPairRegex, (match) {
           final openingPrefix = match.group(1)!;
@@ -1217,10 +1223,16 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
         // Also handle cases where tags might be on separate lines or have different escaping
         // Restore any remaining escaped opening tags (standalone, not part of a pair)
-        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false), (match) => '<${match.group(1)}${match.group(2)}>');
+        restoredHtml = restoredHtml.replaceAllMapped(
+          RegExp(r'&lt;(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false),
+          (match) => '<${match.group(1)}${match.group(2)}>',
+        );
 
         // Restore any remaining escaped closing tags (standalone, not part of a pair)
-        restoredHtml = restoredHtml.replaceAllMapped(RegExp(r'&lt;/(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false), (match) => '</${match.group(1)}${match.group(2)}>');
+        restoredHtml = restoredHtml.replaceAllMapped(
+          RegExp(r'&lt;/(inapp_|tagged_|conversation_)([a-z_]+)&gt;', caseSensitive: false),
+          (match) => '</${match.group(1)}${match.group(2)}>',
+        );
 
         // Also restore JSON quotes that might still be escaped in restored tags
         // Find all restored tag pairs and unescape their content
@@ -2278,15 +2290,9 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                                               child: Container(
                                                                 width: 200,
                                                                 height: 200,
-                                                                decoration: BoxDecoration(
-                                                                  color: context.surfaceVariant,
-                                                                  borderRadius: BorderRadius.circular(8),
-                                                                ),
+                                                                decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(8)),
                                                                 child: file.bytes != null
-                                                                    ? Image.memory(
-                                                                        file.bytes!,
-                                                                        fit: BoxFit.cover,
-                                                                      )
+                                                                    ? Image.memory(file.bytes!, fit: BoxFit.cover)
                                                                     : Center(
                                                                         child: VisirIcon(type: VisirIconType.caution, size: 24, color: context.surfaceTint),
                                                                       ),
@@ -2294,24 +2300,13 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                                             )
                                                           : Container(
                                                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                              decoration: BoxDecoration(
-                                                                color: context.surfaceVariant,
-                                                                borderRadius: BorderRadius.circular(8),
-                                                              ),
+                                                              decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(8)),
                                                               child: Row(
                                                                 mainAxisSize: MainAxisSize.min,
                                                                 children: [
-                                                                  VisirIcon(
-                                                                    type: isVideo ? VisirIconType.videoCall : VisirIconType.file,
-                                                                    size: 16,
-                                                                    color: context.outlineVariant,
-                                                                  ),
+                                                                  VisirIcon(type: isVideo ? VisirIconType.videoCall : VisirIconType.file, size: 16, color: context.outlineVariant),
                                                                   const SizedBox(width: 8),
-                                                                  Text(
-                                                                    file.name,
-                                                                    style: context.titleSmall?.textColor(context.outlineVariant),
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                  ),
+                                                                  Text(file.name, style: context.titleSmall?.textColor(context.outlineVariant), overflow: TextOverflow.ellipsis),
                                                                 ],
                                                               ),
                                                             );
@@ -2338,7 +2333,14 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                           if (functionName == 'createTask' || functionName == 'updateTask') {
                                             return Padding(
                                               padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                              child: _buildTaskEntityWithConfirm(context, functionArgs, actionId, isUser, functionName: functionName, updatedTaggedTasks: updatedTaggedTasks),
+                                              child: _buildTaskEntityWithConfirm(
+                                                context,
+                                                functionArgs,
+                                                actionId,
+                                                isUser,
+                                                functionName: functionName,
+                                                updatedTaggedTasks: updatedTaggedTasks,
+                                              ),
                                             );
                                           } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
                                             return Padding(
