@@ -1152,7 +1152,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         child: Container(
                                                           constraints: const BoxConstraints(maxWidth: 200),
                                                           margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 2, bottom: 2),
+                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 4, bottom: 4),
                                                           decoration: BoxDecoration(
                                                             color: context.surface,
                                                             borderRadius: BorderRadius.circular(6),
@@ -1199,7 +1199,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         child: Container(
                                                           constraints: const BoxConstraints(maxWidth: 200),
                                                           margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 2, bottom: 2),
+                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 4, bottom: 4),
                                                           decoration: BoxDecoration(
                                                             color: targetProject.color != null ? targetProject.color!.withValues(alpha: 0.15) : context.surface,
                                                             borderRadius: BorderRadius.circular(6),
