@@ -353,7 +353,7 @@ class AgentActionController extends _$AgentActionController {
   }) async {
     // 파일 정보를 메시지에 추가 (인박스 첨부 파일 포함)
     String enhancedUserMessage = userMessage;
-    
+
     // 사용자가 직접 첨부한 파일만 사용 (인박스 첨부 파일은 AI가 요청할 때만 다운로드)
     final allFiles = files ?? [];
 
@@ -1155,7 +1155,7 @@ class AgentActionController extends _$AgentActionController {
           // AI 응답에서 <need_attachment> 태그 파싱하여 첨부 파일 다운로드
           if (!isRecursiveCall && inboxes != null && inboxes.isNotEmpty) {
             final inboxAttachmentFiles = await _fetchInboxAttachmentsFromAiResponse(aiMessage, inboxes);
-            
+
             if (inboxAttachmentFiles.isNotEmpty) {
               // 첨부 파일이 다운로드되었으면 파일과 함께 재요청
               await _generateGeneralChat(
@@ -1918,7 +1918,13 @@ class AgentActionController extends _$AgentActionController {
   /// [requestedInboxNumbers]: 전체 내용을 보낼 inbox 번호 목록 (1부터 시작)
   /// [maxItems]: 최대 보낼 인박스 개수 (기본값: summaryOnly일 때 300, 아닐 때 50)
   /// [includeAttachmentInfo]: 첨부 파일 정보를 포함할지 여부 (기본값: false, 사용자 요청이 있을 때만 true)
-  Future<String> _buildInboxContext(List<InboxEntity> inboxes, {bool summaryOnly = true, Set<int> requestedInboxNumbers = const {}, int? maxItems, bool includeAttachmentInfo = false}) async {
+  Future<String> _buildInboxContext(
+    List<InboxEntity> inboxes, {
+    bool summaryOnly = true,
+    Set<int> requestedInboxNumbers = const {},
+    int? maxItems,
+    bool includeAttachmentInfo = false,
+  }) async {
     // summaryOnly일 때는 메타데이터만 보내므로 더 많이 보낼 수 있음
     final defaultMaxItems = summaryOnly ? 300 : 50;
     final effectiveMaxItems = maxItems ?? defaultMaxItems;
@@ -2171,7 +2177,7 @@ class AgentActionController extends _$AgentActionController {
 
       final mailRepository = ref.read(mailRepositoryProvider);
       final mailType = MailEntityTypeX.fromOAuthType(oauth.type);
-      
+
       // 메일을 가져오기 위해 threadId를 사용
       final threadResult = await mailRepository.fetchThreads(
         oauth: oauth,
@@ -2181,10 +2187,7 @@ class AgentActionController extends _$AgentActionController {
         labelId: mail.labelIds?.firstOrNull ?? CommonMailLabels.inbox.id,
       );
 
-      return threadResult.fold(
-        (failure) => null,
-        (mails) => mails.firstWhereOrNull((m) => m.id == mail.messageId),
-      );
+      return threadResult.fold((failure) => null, (mails) => mails.firstWhereOrNull((m) => m.id == mail.messageId));
     } catch (e) {
       return null;
     }
@@ -2201,34 +2204,24 @@ class AgentActionController extends _$AgentActionController {
       if (oauth == null) return null;
 
       final chatRepository = ref.read(chatRepositoryProvider);
-      
+
       // user 정보 가져오기 (_buildChannelContext와 동일한 방식)
       final me = ref.read(authControllerProvider).value;
       if (me == null) return null;
-      
+
       // MessageChannelEntity 생성에 필요한 정보 가져오기
       // inbox_list_controller.dart와 동일한 방식 사용
       final channelMap = ref.read(chatChannelListControllerProvider);
       final channelList = channelMap[message.teamId]?.channels ?? [];
       final channelData = channelList.firstWhereOrNull((c) => c.id == message.channelId);
-      
+
       MessageChannelEntity channel;
       if (channelData != null) {
         channel = channelData;
       } else {
         // 채널 정보가 없으면 기본값으로 생성
-        final slackChannel = SlackMessageChannelEntity(
-          teamId: message.teamId,
-          id: message.channelId,
-          name: message.channelName,
-          isIm: message.isDm ?? false,
-        );
-        channel = MessageChannelEntity(
-          type: MessageChannelEntityType.slack,
-          teamId: message.teamId,
-          meId: me.id,
-          slackChannel: slackChannel,
-        );
+        final slackChannel = SlackMessageChannelEntity(teamId: message.teamId, id: message.channelId, name: message.channelName, isIm: message.isDm ?? false);
+        channel = MessageChannelEntity(type: MessageChannelEntityType.slack, teamId: message.teamId, meId: me.id, slackChannel: slackChannel);
       }
 
       final result = await chatRepository.fetchMessageForInbox(
@@ -2240,10 +2233,7 @@ class AgentActionController extends _$AgentActionController {
         endDate: message.date.add(const Duration(days: 1)),
       );
 
-      return result.fold(
-        (failure) => null,
-        (fetchResult) => fetchResult.messages.firstWhereOrNull((m) => m.id == message.messageId),
-      );
+      return result.fold((failure) => null, (fetchResult) => fetchResult.messages.firstWhereOrNull((m) => m.id == message.messageId));
     } catch (e) {
       return null;
     }
@@ -2251,10 +2241,7 @@ class AgentActionController extends _$AgentActionController {
 
   /// AI 응답에서 <need_attachment> 태그를 파싱하여 첨부 파일을 다운로드합니다.
   /// AI가 첨부 파일이 필요하다고 판단하면 이 태그를 사용하여 요청합니다.
-  Future<List<PlatformFile>> _fetchInboxAttachmentsFromAiResponse(
-    String aiResponse,
-    List<InboxEntity>? inboxes,
-  ) async {
+  Future<List<PlatformFile>> _fetchInboxAttachmentsFromAiResponse(String aiResponse, List<InboxEntity>? inboxes) async {
     if (inboxes == null || inboxes.isEmpty) return [];
 
     // <need_attachment> 태그 파싱
@@ -2266,11 +2253,7 @@ class AgentActionController extends _$AgentActionController {
     final numbersStr = match.group(1);
     if (numbersStr == null || numbersStr.isEmpty) return [];
 
-    final requestedNumbers = numbersStr
-        .split(',')
-        .map((s) => int.tryParse(s.trim()))
-        .whereType<int>()
-        .toSet();
+    final requestedNumbers = numbersStr.split(',').map((s) => int.tryParse(s.trim())).whereType<int>().toSet();
 
     if (requestedNumbers.isEmpty) return [];
 
@@ -2299,31 +2282,17 @@ class AgentActionController extends _$AgentActionController {
           final mailRepository = ref.read(mailRepositoryProvider);
           final attachmentIds = attachments.map((a) => a.id).whereType<String>().toList();
 
-          final fetchResult = await mailRepository.fetchAttachments(
-            email: mail.hostMail,
-            messageId: mail.messageId,
-            oauth: oauth,
-            attachmentIds: attachmentIds,
-          );
+          final fetchResult = await mailRepository.fetchAttachments(email: mail.hostMail, messageId: mail.messageId, oauth: oauth, attachmentIds: attachmentIds);
 
-          fetchResult.fold(
-            (failure) => null,
-            (attachmentData) {
-              for (final attachment in attachments) {
-                final data = attachmentData[attachment.id];
-                if (data != null) {
-                  attachmentFiles.add(PlatformFile(
-                    name: attachment.name,
-                    size: data.length,
-                    bytes: data,
-                    path: null,
-                    identifier: attachment.id,
-                  ));
-                }
+          fetchResult.fold((failure) => null, (attachmentData) {
+            for (final attachment in attachments) {
+              final data = attachmentData[attachment.id];
+              if (data != null) {
+                attachmentFiles.add(PlatformFile(name: attachment.name, size: data.length, bytes: data, path: null, identifier: attachment.id));
               }
-              return null;
-            },
-          );
+            }
+            return null;
+          });
         } catch (e) {
           // 첨부 파일 다운로드 실패 시 계속 진행
           continue;
@@ -2350,24 +2319,20 @@ class AgentActionController extends _$AgentActionController {
 
             try {
               // proxyCall을 사용하여 파일 다운로드
-              final fileBytes = await proxyCall(
-                url: downloadUrl,
-                method: 'GET',
-                body: null,
-                oauth: oauth,
-                headers: oauth.authorizationHeaders ?? {},
-                files: null,
-                responseType: ResponseType.bytes,
-              ) as Uint8List?;
+              final fileBytes =
+                  await proxyCall(
+                        url: downloadUrl,
+                        method: 'GET',
+                        body: null,
+                        oauth: oauth,
+                        headers: oauth.authorizationHeaders ?? {},
+                        files: null,
+                        responseType: ResponseType.bytes,
+                      )
+                      as Uint8List?;
 
               if (fileBytes != null) {
-                attachmentFiles.add(PlatformFile(
-                  name: file.name ?? 'unknown',
-                  size: fileBytes.length,
-                  bytes: fileBytes,
-                  path: null,
-                  identifier: file.id,
-                ));
+                attachmentFiles.add(PlatformFile(name: file.name ?? 'unknown', size: fileBytes.length, bytes: fileBytes, path: null, identifier: file.id));
               }
             } catch (e) {
               // 개별 파일 다운로드 실패 시 계속 진행
@@ -2400,7 +2365,6 @@ class AgentActionController extends _$AgentActionController {
       return null;
     }
   }
-
 
   /// 대화 시작 메시지의 summary를 생성합니다.
   /// 사용자 메시지를 추가하고 AI 응답을 받습니다.
