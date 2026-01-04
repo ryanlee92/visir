@@ -28,8 +28,10 @@ import 'package:Visir/features/preference/application/local_pref_controller.dart
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
+import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_entity.dart';
+import 'package:Visir/features/chat/domain/entities/slack/slack_channel_entity.dart';
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
@@ -42,6 +44,7 @@ import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
 import 'package:Visir/features/mail/providers.dart';
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -1951,6 +1954,7 @@ class AgentActionController extends _$AgentActionController {
         // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만, 사용자 요청이 있을 때만)
         if (includeAttachmentInfo) {
           try {
+            // 메일 첨부 파일 정보
             final mailEntity = await _getMailEntityFromInbox(inbox);
             if (mailEntity != null) {
               final attachments = mailEntity.getAttachments();
@@ -1977,6 +1981,45 @@ class AgentActionController extends _$AgentActionController {
             // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
           }
         }
+      } else if (inbox.linkedMessage != null) {
+        final message = inbox.linkedMessage!;
+        buffer.writeln('- Type: Message');
+        buffer.writeln('- From: ${message.userName}');
+        buffer.writeln('- Channel: ${message.channelName}');
+        buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
+
+        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
+        if (includeAttachmentInfo) {
+          try {
+            // 메시지 첨부 파일 정보
+            final messageEntity = await _getMessageEntityFromInbox(inbox);
+            if (messageEntity != null) {
+              final files = messageEntity.files;
+              if (files.isNotEmpty) {
+                buffer.writeln('- Attachments: ${files.length} file(s)');
+                for (final file in files) {
+                  final fileName = file.name ?? 'unknown';
+                  final mimeType = file.slackFile?.mimetype ?? '';
+                  String fileType = '';
+                  if (fileName.toLowerCase().endsWith('.pdf')) {
+                    fileType = ' (PDF)';
+                  } else if (file.isImage) {
+                    fileType = ' (Image)';
+                  } else if (file.isVideo) {
+                    fileType = ' (Video)';
+                  } else if (file.isAudio) {
+                    fileType = ' (Audio)';
+                  } else if (mimeType.startsWith('text/')) {
+                    fileType = ' (Text)';
+                  }
+                  buffer.writeln('  - $fileName$fileType');
+                }
+              }
+            }
+          } catch (e) {
+            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
+          }
+        }
 
         if (shouldIncludeFullContent) {
           // 전체 내용 포함
@@ -1984,6 +2027,7 @@ class AgentActionController extends _$AgentActionController {
             buffer.writeln('- Full Content:');
             buffer.writeln(inbox.description!);
           }
+          final mail = inbox.linkedMail!;
           if (mail.hostMail.isNotEmpty) {
             buffer.writeln('- Email Account: ${mail.hostMail}');
           }
@@ -1997,9 +2041,95 @@ class AgentActionController extends _$AgentActionController {
       } else if (inbox.linkedMessage != null) {
         final message = inbox.linkedMessage!;
         buffer.writeln('- Type: Message');
-        buffer.writeln('- Channel: ${message.channelName}');
         buffer.writeln('- From: ${message.userName}');
+        buffer.writeln('- Channel: ${message.channelName}');
         buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
+
+        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
+        if (includeAttachmentInfo) {
+          try {
+            // 메시지 첨부 파일 정보
+            final messageEntity = await _getMessageEntityFromInbox(inbox);
+            if (messageEntity != null) {
+              final files = messageEntity.files;
+              if (files.isNotEmpty) {
+                buffer.writeln('- Attachments: ${files.length} file(s)');
+                for (final file in files) {
+                  final fileName = file.name ?? 'unknown';
+                  final mimeType = file.slackFile?.mimetype ?? '';
+                  String fileType = '';
+                  if (fileName.toLowerCase().endsWith('.pdf')) {
+                    fileType = ' (PDF)';
+                  } else if (file.isImage) {
+                    fileType = ' (Image)';
+                  } else if (file.isVideo) {
+                    fileType = ' (Video)';
+                  } else if (file.isAudio) {
+                    fileType = ' (Audio)';
+                  } else if (mimeType.startsWith('text/')) {
+                    fileType = ' (Text)';
+                  }
+                  buffer.writeln('  - $fileName$fileType');
+                }
+              }
+            }
+          } catch (e) {
+            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
+          }
+        }
+
+        if (shouldIncludeFullContent) {
+          // 전체 내용 포함
+          if (inbox.description != null && inbox.description!.isNotEmpty) {
+            buffer.writeln('- Full Content:');
+            buffer.writeln(inbox.description!);
+          }
+        } else {
+          // 메타데이터만
+          if (inbox.description != null && inbox.description!.isNotEmpty) {
+            final snippet = inbox.description!.length > 100 ? '${inbox.description!.substring(0, 100)}...' : inbox.description!;
+            buffer.writeln('- Preview: $snippet');
+          }
+        }
+      } else if (inbox.linkedMessage != null) {
+        final message = inbox.linkedMessage!;
+        buffer.writeln('- Type: Message');
+        buffer.writeln('- From: ${message.userName}');
+        buffer.writeln('- Channel: ${message.channelName}');
+        buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
+
+        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
+        if (includeAttachmentInfo) {
+          try {
+            // 메시지 첨부 파일 정보
+            final messageEntity = await _getMessageEntityFromInbox(inbox);
+            if (messageEntity != null) {
+              final files = messageEntity.files;
+              if (files.isNotEmpty) {
+                buffer.writeln('- Attachments: ${files.length} file(s)');
+                for (final file in files) {
+                  final fileName = file.name ?? 'unknown';
+                  final mimeType = file.slackFile?.mimetype ?? '';
+                  String fileType = '';
+                  if (fileName.toLowerCase().endsWith('.pdf')) {
+                    fileType = ' (PDF)';
+                  } else if (file.isImage) {
+                    fileType = ' (Image)';
+                  } else if (file.isVideo) {
+                    fileType = ' (Video)';
+                  } else if (file.isAudio) {
+                    fileType = ' (Audio)';
+                  } else if (mimeType.startsWith('text/')) {
+                    fileType = ' (Text)';
+                  }
+                  buffer.writeln('  - $fileName$fileType');
+                }
+              }
+            }
+          } catch (e) {
+            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
+          }
+        }
 
         if (shouldIncludeFullContent) {
           // 전체 내용 포함
@@ -2060,6 +2190,65 @@ class AgentActionController extends _$AgentActionController {
     }
   }
 
+  /// 인박스에서 메시지 엔티티를 가져옵니다.
+  Future<MessageEntity?> _getMessageEntityFromInbox(InboxEntity inbox) async {
+    if (inbox.linkedMessage == null) return null;
+
+    try {
+      final message = inbox.linkedMessage!;
+      final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+      final oauth = oauths.firstWhereOrNull((o) => o.teamId == message.teamId);
+      if (oauth == null) return null;
+
+      final chatRepository = ref.read(chatRepositoryProvider);
+      
+      // user 정보 가져오기 (_buildChannelContext와 동일한 방식)
+      final me = ref.read(authControllerProvider).value;
+      if (me == null) return null;
+      
+      // MessageChannelEntity 생성에 필요한 정보 가져오기
+      // inbox_list_controller.dart와 동일한 방식 사용
+      final channelMap = ref.read(chatChannelListControllerProvider);
+      final channelList = channelMap[message.teamId]?.channels ?? [];
+      final channelData = channelList.firstWhereOrNull((c) => c.id == message.channelId);
+      
+      MessageChannelEntity channel;
+      if (channelData != null) {
+        channel = channelData;
+      } else {
+        // 채널 정보가 없으면 기본값으로 생성
+        final slackChannel = SlackMessageChannelEntity(
+          teamId: message.teamId,
+          id: message.channelId,
+          name: message.channelName,
+          isIm: message.isDm ?? false,
+        );
+        channel = MessageChannelEntity(
+          type: MessageChannelEntityType.slack,
+          teamId: message.teamId,
+          meId: me.id,
+          slackChannel: slackChannel,
+        );
+      }
+
+      final result = await chatRepository.fetchMessageForInbox(
+        oauth: oauth,
+        user: me,
+        channels: [channel],
+        q: '',
+        startDate: message.date.subtract(const Duration(days: 1)),
+        endDate: message.date.add(const Duration(days: 1)),
+      );
+
+      return result.fold(
+        (failure) => null,
+        (fetchResult) => fetchResult.messages.firstWhereOrNull((m) => m.id == message.messageId),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// AI 응답에서 <need_attachment> 태그를 파싱하여 첨부 파일을 다운로드합니다.
   /// AI가 첨부 파일이 필요하다고 판단하면 이 태그를 사용하여 요청합니다.
   Future<List<PlatformFile>> _fetchInboxAttachmentsFromAiResponse(
@@ -2092,52 +2281,103 @@ class AgentActionController extends _$AgentActionController {
       if (number < 1 || number > inboxes.length) continue;
       final inbox = inboxes[number - 1]; // 1-based index
 
-      if (inbox.linkedMail == null) continue;
+      // 메일 첨부 파일 처리
+      if (inbox.linkedMail != null) {
+        try {
+          final mailEntity = await _getMailEntityFromInbox(inbox);
+          if (mailEntity == null) continue;
 
-      try {
-        final mailEntity = await _getMailEntityFromInbox(inbox);
-        if (mailEntity == null) continue;
+          final attachments = mailEntity.getAttachments();
+          if (attachments.isEmpty) continue;
 
-        final attachments = mailEntity.getAttachments();
-        if (attachments.isEmpty) continue;
+          // 첨부 파일 다운로드
+          final mail = inbox.linkedMail!;
+          final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+          final oauth = oauths.firstWhereOrNull((o) => o.email == mail.hostMail);
+          if (oauth == null) continue;
 
-        // 첨부 파일 다운로드
-        final mail = inbox.linkedMail!;
-        final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
-        final oauth = oauths.firstWhereOrNull((o) => o.email == mail.hostMail);
-        if (oauth == null) continue;
+          final mailRepository = ref.read(mailRepositoryProvider);
+          final attachmentIds = attachments.map((a) => a.id).whereType<String>().toList();
 
-        final mailRepository = ref.read(mailRepositoryProvider);
-        final attachmentIds = attachments.map((a) => a.id).whereType<String>().toList();
+          final fetchResult = await mailRepository.fetchAttachments(
+            email: mail.hostMail,
+            messageId: mail.messageId,
+            oauth: oauth,
+            attachmentIds: attachmentIds,
+          );
 
-        final fetchResult = await mailRepository.fetchAttachments(
-          email: mail.hostMail,
-          messageId: mail.messageId,
-          oauth: oauth,
-          attachmentIds: attachmentIds,
-        );
+          fetchResult.fold(
+            (failure) => null,
+            (attachmentData) {
+              for (final attachment in attachments) {
+                final data = attachmentData[attachment.id];
+                if (data != null) {
+                  attachmentFiles.add(PlatformFile(
+                    name: attachment.name,
+                    size: data.length,
+                    bytes: data,
+                    path: null,
+                    identifier: attachment.id,
+                  ));
+                }
+              }
+              return null;
+            },
+          );
+        } catch (e) {
+          // 첨부 파일 다운로드 실패 시 계속 진행
+          continue;
+        }
+      }
+      // 메시지 첨부 파일 처리
+      else if (inbox.linkedMessage != null) {
+        try {
+          final messageEntity = await _getMessageEntityFromInbox(inbox);
+          if (messageEntity == null) continue;
 
-        fetchResult.fold(
-          (failure) => null,
-          (attachmentData) {
-            for (final attachment in attachments) {
-              final data = attachmentData[attachment.id];
-              if (data != null) {
+          final files = messageEntity.files;
+          if (files.isEmpty) continue;
+
+          // 메시지 파일 다운로드
+          final message = inbox.linkedMessage!;
+          final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+          final oauth = oauths.firstWhereOrNull((o) => o.teamId == message.teamId);
+          if (oauth == null) continue;
+
+          for (final file in files) {
+            final downloadUrl = file.downloadUrl;
+            if (downloadUrl == null || downloadUrl.isEmpty) continue;
+
+            try {
+              // proxyCall을 사용하여 파일 다운로드
+              final fileBytes = await proxyCall(
+                url: downloadUrl,
+                method: 'GET',
+                body: null,
+                oauth: oauth,
+                headers: oauth.authorizationHeaders ?? {},
+                files: null,
+                responseType: ResponseType.bytes,
+              ) as Uint8List?;
+
+              if (fileBytes != null) {
                 attachmentFiles.add(PlatformFile(
-                  name: attachment.name,
-                  size: data.length,
-                  bytes: data,
+                  name: file.name ?? 'unknown',
+                  size: fileBytes.length,
+                  bytes: fileBytes,
                   path: null,
-                  identifier: attachment.id,
+                  identifier: file.id,
                 ));
               }
+            } catch (e) {
+              // 개별 파일 다운로드 실패 시 계속 진행
+              continue;
             }
-            return null;
-          },
-        );
-      } catch (e) {
-        // 첨부 파일 다운로드 실패 시 계속 진행
-        continue;
+          }
+        } catch (e) {
+          // 메시지 첨부 파일 다운로드 실패 시 계속 진행
+          continue;
+        }
       }
     }
 
