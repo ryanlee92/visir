@@ -161,14 +161,16 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   final GlobalKey _inputFieldKey = GlobalKey();
 
   void handleDragStart(InboxEntity? inbox, TaskEntity? task, Offset offset) {
-    print('handleDragStart');
     _isDraggingInbox = inbox != null;
     _isDraggingTask = task != null;
     widget.onDragStart?.call(inbox, task, offset);
   }
 
   void handleDragUpdate(InboxEntity? inbox, TaskEntity? task, Offset offset) {
-    print('handleDragUpdate');
+    // Update dragging state
+    _isDraggingInbox = inbox != null;
+    _isDraggingTask = task != null;
+
     // Check if drag position is over input field
     final RenderBox? renderBox = _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
@@ -177,7 +179,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
       final isOver = localPosition.dx >= 0 && localPosition.dx <= size.width && localPosition.dy >= 0 && localPosition.dy <= size.height;
 
       if (isOver != _isDragOverInputField) {
-        print('isOver: $isOver');
         setState(() {
           _isDragOverInputField = isOver;
         });
@@ -187,15 +188,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   }
 
   void handleDragEnd(InboxEntity? inbox, TaskEntity? task, Offset offset) {
-    print('handleDragEnd');
     final RenderBox? renderBox = _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null && _isDragOverInputField) {
       // Add tag for inbox or task
       if (inbox != null) {
-        print('add inbox tag: ${inbox.uniqueId}');
         _addInboxTag(inbox);
       } else if (task != null) {
-        print('add task tag: ${task.id}');
         _addTaskTag(task);
       }
     }
@@ -1730,6 +1728,47 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                     }
                                                   } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
                                                     if (!hasListBullets && !hasListNumbers && !hasQuote && !hasCodeBlock) {
+                                                      // Check if cursor is at the end of or inside a tag
+                                                      final text = messageController.text;
+                                                      final selection = messageController.selection;
+                                                      final cursorPosition = selection.baseOffset;
+
+                                                      final RegExp tagRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
+                                                      final tagMatches = tagRegex.allMatches(text);
+
+                                                      for (final match in tagMatches) {
+                                                        final tagStart = match.start;
+                                                        final tagEnd = match.end;
+
+                                                        // If cursor is at the end of tag or inside tag, delete entire tag
+                                                        if (cursorPosition > tagStart && cursorPosition <= tagEnd) {
+                                                          final tagContent = match.group(1) ?? '';
+
+                                                          // Remove the entire tag
+                                                          final beforeTag = text.substring(0, tagStart);
+                                                          final afterTag = text.substring(tagEnd);
+                                                          final newText = beforeTag + afterTag;
+
+                                                          // Update text and move cursor to where tag was
+                                                          final newCursorPosition = tagStart.clamp(0, newText.length);
+                                                          messageController.text = newText;
+                                                          messageController.updateSelection(TextSelection.collapsed(offset: newCursorPosition), ChangeSource.local);
+
+                                                          // Remove entity from tagged lists
+                                                          messageController.taggedInboxes.removeWhere((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagContent);
+                                                          messageController.taggedTasks.removeWhere((e) => e.title == tagContent);
+                                                          messageController.taggedEvents.removeWhere((e) => e.title == tagContent);
+                                                          messageController.taggedConnections.removeWhere((e) => e.name == tagContent || e.email == tagContent);
+
+                                                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                            if (!mounted) return;
+                                                            setState(() {});
+                                                          });
+
+                                                          return KeyEventResult.handled;
+                                                        }
+                                                      }
+
                                                       Future.delayed(const Duration(milliseconds: 100), () {
                                                         if (messageController.text.trim().isEmpty) {
                                                           final attributes = <Attribute>{};
