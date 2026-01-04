@@ -2204,17 +2204,17 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                       decoration: BoxDecoration(color: context.primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius)),
                       child: Center(
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: context.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: context.primary.withValues(alpha: 0.3), width: 1),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               VisirIcon(type: _isDraggingInbox ? VisirIconType.inbox : VisirIconType.task, size: 16, color: context.primary, isSelected: true),
-                              SizedBox(width: 8),
+                              SizedBox(width: 6),
                               Text(_isDraggingInbox ? 'Drop inbox' : (_isDraggingTask ? 'Drop task' : 'Drop here'), style: context.bodyMedium?.textColor(context.primary).textBold),
                             ],
                           ),
