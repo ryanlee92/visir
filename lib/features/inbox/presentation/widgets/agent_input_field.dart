@@ -24,6 +24,7 @@ import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/presentation/widgets/bottom_dialog_option.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
+import 'package:Visir/features/common/presentation/widgets/proxy_network_image.dart';
 import 'package:Visir/features/common/presentation/widgets/selection_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
@@ -410,6 +411,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     final RegExp tagRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
     final currentTagMatches = tagRegex.allMatches(value);
     final Set<String> existingTagNames = currentTagMatches.map((m) => m.group(1) ?? '').toSet();
+
+    // Remove inboxes that are no longer in text
+    messageController.taggedInboxes.removeWhere((inbox) {
+      final displayName = inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle;
+      return !existingTagNames.contains(displayName);
+    });
 
     // Remove tasks that are no longer in text
     messageController.taggedTasks.removeWhere((task) {
@@ -1098,6 +1105,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                 // Get tagged entities from controller
                                                 final taggedTasks = messageController.taggedTasks;
                                                 final taggedEvents = messageController.taggedEvents;
+                                                final taggedInboxes = messageController.taggedInboxes;
                                                 final taggedConnections = messageController.taggedConnections;
                                                 final taggedChannels = messageController.taggedChannels;
                                                 final taggedProjects = messageController.taggedProjects;
@@ -1111,6 +1119,10 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                   String tagName = piece.replaceAll('@', '').replaceAll('\u200b', '').trim();
 
                                                   // Find matching entity from tagged entities
+                                                  InboxEntity? targetInbox = taggedInboxes
+                                                      .where((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagName)
+                                                      .firstOrNull;
+
                                                   TaskEntity? targetTask = taggedTasks.where((e) => e.title != null && tagName == e.title).firstOrNull;
 
                                                   EventEntity? targetEvent = taggedEvents.where((e) => e.title != null && tagName == e.title).firstOrNull;
@@ -1123,7 +1135,61 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
                                                   ProjectEntity? targetProject = taggedProjects.where((e) => tagName == e.name).firstOrNull;
 
-                                                  if (targetProject != null) {
+                                                  if (targetInbox != null) {
+                                                    final displayName = targetInbox.suggestion?.decryptedSummary ?? targetInbox.decryptedTitle;
+                                                    final name = '@$displayName';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+
+                                                    // Get inbox provider for avatarUrl and icon
+                                                    final inboxProviders = targetInbox.providers;
+                                                    final firstProvider = inboxProviders.isNotEmpty ? inboxProviders.first : null;
+                                                    final avatarUrl = firstProvider?.avatarUrl;
+                                                    final providerIcon = firstProvider?.icon;
+
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 2, bottom: 2),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              avatarUrl != null || providerIcon != null
+                                                                  ? ClipRRect(
+                                                                      borderRadius: BorderRadius.circular(6),
+                                                                      child: avatarUrl != null
+                                                                          ? ProxyNetworkImage(imageUrl: avatarUrl, width: 12, height: 12, fit: BoxFit.cover)
+                                                                          : Image.asset(providerIcon!, width: 12, height: 12, fit: BoxFit.cover),
+                                                                    )
+                                                                  : Container(
+                                                                      width: 12,
+                                                                      height: 12,
+                                                                      alignment: Alignment.center,
+                                                                      child: VisirIcon(type: VisirIconType.inbox, size: 12, color: context.onBackground, isSelected: true),
+                                                                    ),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetProject != null) {
                                                     final displayName = targetProject.name;
                                                     final name = '@${targetProject.name}';
                                                     final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
@@ -1152,14 +1218,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                                 width: 12,
                                                                 height: 12,
                                                                 alignment: Alignment.center,
-                                                                child: targetProject.icon == null
-                                                                    ? null
-                                                                    : VisirIcon(
-                                                                        type: targetProject.icon!,
-                                                                        size: 12,
-                                                                        color: targetProject.color ?? context.onBackground,
-                                                                        isSelected: true,
-                                                                      ),
+                                                                child: VisirIcon(
+                                                                  type: targetProject.icon ?? VisirIconType.inbox,
+                                                                  size: 12,
+                                                                  color: targetProject.color ?? context.onBackground,
+                                                                  isSelected: true,
+                                                                ),
                                                               ),
                                                               const SizedBox(width: 4),
                                                               Flexible(
