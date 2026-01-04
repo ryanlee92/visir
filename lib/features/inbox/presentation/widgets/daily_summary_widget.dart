@@ -42,7 +42,6 @@ import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 class DailySummaryWidget extends ConsumerWidget {
   final List<EventEntity> events;
@@ -52,9 +51,9 @@ class DailySummaryWidget extends ConsumerWidget {
   final List<ProjectEntityWithDepth> projects;
   final String? userName;
 
-  final void Function(InboxEntity inbox)? onDragStart;
-  final void Function(InboxEntity inbox, Offset offset)? onDragUpdate;
-  final void Function(InboxEntity inbox, Offset offset)? onDragEnd;
+  final void Function(InboxEntity? inbox, TaskEntity? task)? onDragStart;
+  final void Function(InboxEntity? inbox, TaskEntity? task, Offset offset)? onDragUpdate;
+  final void Function(InboxEntity? inbox, TaskEntity? task, Offset offset)? onDragEnd;
 
   DailySummaryWidget({
     super.key,
@@ -847,6 +846,7 @@ class DailySummaryWidget extends ConsumerWidget {
         ref: ref,
         context: context,
         inbox: item.inbox,
+        task: item.task,
         child: PopupMenu(
           style: VisirButtonStyle(
             width: double.maxFinite,
@@ -1089,10 +1089,11 @@ class DailySummaryWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildDraggable({required Widget child, required WidgetRef ref, required BuildContext context, required InboxEntity? inbox}) {
-    if (inbox == null) return child;
+  Widget _buildDraggable({required Widget child, required WidgetRef ref, required BuildContext context, required InboxEntity? inbox, TaskEntity? task}) {
+    if (inbox == null && task == null) return child;
     final ratio = ref.watch(zoomRatioProvider);
     Offset lastPosition = Offset.zero; // 메서드 내부 변수로 이동 (immutable 위젯 호환)
+    final displayText = inbox != null ? (inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle) : (task?.title ?? 'Untitled');
     final feedbackWidget = Material(
       color: Colors.transparent,
       child: Opacity(
@@ -1101,7 +1102,7 @@ class DailySummaryWidget extends ConsumerWidget {
           constraints: BoxConstraints(maxWidth: 180),
           decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(6)),
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Text(inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle, style: context.bodyLarge?.textColor(context.onBackground)),
+          child: Text(displayText, style: context.bodyLarge?.textColor(context.onBackground)),
         ),
       ),
     );
@@ -1113,14 +1114,14 @@ class DailySummaryWidget extends ConsumerWidget {
           return Offset(d.feedbackOffset.dx, d.feedbackOffset.dy);
         },
         onDragStarted: () {
-          onDragStart?.call(inbox);
+          onDragStart?.call(inbox, task);
         },
         onDragUpdate: (details) {
-          onDragUpdate?.call(inbox, details.globalPosition / ratio);
+          onDragUpdate?.call(inbox, task, details.globalPosition / ratio);
           lastPosition = details.globalPosition;
         },
         onDragEnd: (details) {
-          onDragEnd?.call(inbox, lastPosition / ratio);
+          onDragEnd?.call(inbox, task, lastPosition / ratio);
         },
         hitTestBehavior: HitTestBehavior.opaque,
         feedback: feedbackWidget,
@@ -1133,11 +1134,11 @@ class DailySummaryWidget extends ConsumerWidget {
         return Offset(d.feedbackOffset.dx, d.feedbackOffset.dy);
       },
       onDragUpdate: (details) {
-        onDragUpdate?.call(inbox, details.globalPosition / ratio);
+        onDragUpdate?.call(inbox, task, details.globalPosition / ratio);
         lastPosition = details.globalPosition;
       },
       onDragEnd: (details) {
-        onDragEnd?.call(inbox, lastPosition / ratio);
+        onDragEnd?.call(inbox, task, lastPosition / ratio);
       },
       hitTestBehavior: HitTestBehavior.opaque,
       feedback: feedbackWidget,

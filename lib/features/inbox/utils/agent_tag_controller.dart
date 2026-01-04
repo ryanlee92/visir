@@ -2,6 +2,7 @@ import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/common/domain/entities/connection_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
+import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class AgentTagController extends QuillController {
 
   List<TaskEntity> taggedTasks = [];
   List<EventEntity> taggedEvents = [];
+  List<InboxEntity> taggedInboxes = [];
   List<ConnectionEntity> taggedConnections = [];
   List<MessageChannelEntity> taggedChannels = [];
   List<ProjectEntity> taggedProjects = [];
@@ -75,9 +77,10 @@ class AgentTagController extends QuillController {
 
   bool get isMobileView => PlatformX.isMobileView;
 
-  void addTaggedData({TaskEntity? task, EventEntity? event, ConnectionEntity? connection, MessageChannelEntity? channel, ProjectEntity? project}) {
+  void addTaggedData({TaskEntity? task, EventEntity? event, InboxEntity? inbox, ConnectionEntity? connection, MessageChannelEntity? channel, ProjectEntity? project}) {
     if (task != null) taggedTasks.add(task);
     if (event != null) taggedEvents.add(event);
+    if (inbox != null) taggedInboxes.add(inbox);
     if (connection != null) taggedConnections.add(connection);
     if (channel != null) taggedChannels.add(channel);
     if (project != null) taggedProjects.add(project);
@@ -88,6 +91,7 @@ class AgentTagController extends QuillController {
     editingMessageId = null;
     taggedTasks.clear();
     taggedEvents.clear();
+    taggedInboxes.clear();
     taggedConnections.clear();
     taggedChannels.clear();
     taggedProjects.clear();

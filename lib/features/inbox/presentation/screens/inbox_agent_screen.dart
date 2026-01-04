@@ -72,6 +72,7 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
 
   double _agentInputFieldHeight = 0;
   final GlobalKey _agentInputFieldKey = GlobalKey();
+  final GlobalKey<AgentInputFieldState> _agentInputFieldStateKey = GlobalKey<AgentInputFieldState>();
   RefreshController _refreshController = RefreshController();
 
   String getDateString({required DateTime date, bool? forceDate}) {
@@ -546,13 +547,19 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                             selectedProject: _selectedProject,
                             projects: projects,
                             userName: userName,
-                            onDragStart: (inbox) {
+                            onDragStart: (inbox, task) {
+                              _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                              if (inbox == null) return;
                               widget.onDragStart?.call(inbox);
                             },
-                            onDragUpdate: (inbox, offset) {
+                            onDragUpdate: (inbox, task, offset) {
+                              _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                              if (inbox == null) return;
                               widget.onDragUpdate?.call(inbox, offset);
                             },
-                            onDragEnd: (inbox, offset) {
+                            onDragEnd: (inbox, task, offset) {
+                              _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                              if (inbox == null) return;
                               widget.onDragEnd?.call(inbox, offset);
                             },
                           ),
@@ -614,6 +621,8 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                           key: _agentInputFieldKey,
                           padding: EdgeInsets.only(bottom: max(MediaQuery.of(context).viewInsets.bottom / ref.read(zoomRatioProvider) + 8, tabMargin + 8)),
                           child: AgentInputField(
+                            key: _agentInputFieldStateKey,
+                            fieldKey: _agentInputFieldStateKey,
                             messageController: _messageController,
                             focusNode: _focusNode,
                             onPressEscape: () => true,
@@ -797,23 +806,34 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                                   selectedProject: _selectedProject,
                                                   projects: projects,
                                                   userName: userName,
-                                                  onDragStart: (inbox) {
+                                                  onDragStart: (inbox, task) {
                                                     if (PlatformX.isDesktopView) {
+                                                      _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
                                                     } else {
+                                                      _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                      if (inbox == null) return;
                                                       widget.onDragStart?.call(inbox);
                                                     }
                                                   },
-                                                  onDragUpdate: (inbox, offset) {
+                                                  onDragUpdate: (inbox, task, offset) {
                                                     if (PlatformX.isDesktopView) {
+                                                      if (inbox == null) return;
+                                                      _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
                                                       timeblockDropWidgetKey.currentState?.onInboxDragUpdate(inbox, offset);
                                                     } else {
+                                                      _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                      if (inbox == null) return;
                                                       widget.onDragUpdate?.call(inbox, offset);
                                                     }
                                                   },
-                                                  onDragEnd: (inbox, offset) {
+                                                  onDragEnd: (inbox, task, offset) {
                                                     if (PlatformX.isDesktopView) {
+                                                      _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                      if (inbox == null) return;
                                                       timeblockDropWidgetKey.currentState?.onInboxDragEnd(inbox, offset);
                                                     } else {
+                                                      _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                      if (inbox == null) return;
                                                       widget.onDragEnd?.call(inbox, offset);
                                                     }
                                                   },
@@ -826,6 +846,8 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                       ),
                                     ),
                                     AgentInputField(
+                                      key: _agentInputFieldStateKey,
+                                      fieldKey: _agentInputFieldStateKey,
                                       messageController: _messageController,
                                       focusNode: _focusNode,
                                       onPressEscape: () => true,

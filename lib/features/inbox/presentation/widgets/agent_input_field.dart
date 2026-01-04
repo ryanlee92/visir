@@ -65,6 +65,9 @@ class AgentInputField extends ConsumerStatefulWidget {
   final Function(String mcpFunctionName, {InboxEntity? inbox, TaskEntity? task, EventEntity? event})? onActionTap;
   final Function(String title, String prompt)? onCustomPrompt;
   final GlobalKey<AgentInputFieldState>? fieldKey;
+  final void Function(InboxEntity? inbox, TaskEntity? task, Offset offset)? onDragStart;
+  final void Function(InboxEntity? inbox, TaskEntity? task, Offset offset)? onDragUpdate;
+  final void Function(InboxEntity? inbox, TaskEntity? task, Offset offset)? onDragEnd;
 
   const AgentInputField({
     super.key,
@@ -84,6 +87,9 @@ class AgentInputField extends ConsumerStatefulWidget {
     this.onActionTap,
     this.onCustomPrompt,
     this.fieldKey,
+    this.onDragStart,
+    this.onDragUpdate,
+    this.onDragEnd,
   });
 
   @override
@@ -146,6 +152,99 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   bool get isDummy => widget.messageController == null || widget.focusNode == null;
 
   OverlayEntry? tagListOverlayEntry;
+
+  // Drag state
+  bool _isDragOverInputField = false;
+  bool _isDraggingInbox = false;
+  bool _isDraggingTask = false;
+  final GlobalKey _inputFieldKey = GlobalKey();
+
+  void handleDragStart(InboxEntity? inbox, TaskEntity? task, Offset offset) {
+    print('handleDragStart');
+    _isDraggingInbox = inbox != null;
+    _isDraggingTask = task != null;
+    widget.onDragStart?.call(inbox, task, offset);
+  }
+
+  void handleDragUpdate(InboxEntity? inbox, TaskEntity? task, Offset offset) {
+    print('handleDragUpdate');
+    // Check if drag position is over input field
+    final RenderBox? renderBox = _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      final localPosition = renderBox.globalToLocal(offset);
+      final size = renderBox.size;
+      final isOver = localPosition.dx >= 0 && localPosition.dx <= size.width && localPosition.dy >= 0 && localPosition.dy <= size.height;
+
+      if (isOver != _isDragOverInputField) {
+        print('isOver: $isOver');
+        setState(() {
+          _isDragOverInputField = isOver;
+        });
+      }
+    }
+    widget.onDragUpdate?.call(inbox, task, offset);
+  }
+
+  void handleDragEnd(InboxEntity? inbox, TaskEntity? task, Offset offset) {
+    print('handleDragEnd');
+    final RenderBox? renderBox = _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && _isDragOverInputField) {
+      // Add tag for inbox or task
+      if (inbox != null) {
+        print('add inbox tag: ${inbox.uniqueId}');
+        _addInboxTag(inbox);
+      } else if (task != null) {
+        print('add task tag: ${task.id}');
+        _addTaskTag(task);
+      }
+    }
+
+    setState(() {
+      _isDragOverInputField = false;
+      _isDraggingInbox = false;
+      _isDraggingTask = false;
+    });
+
+    widget.onDragEnd?.call(inbox, task, offset);
+  }
+
+  void _addInboxTag(InboxEntity inbox) {
+    // Add to tagged list
+    if (!messageController.taggedInboxes.any((i) => i.uniqueId == inbox.uniqueId)) {
+      messageController.addTaggedData(inbox: inbox);
+    }
+
+    // Add @tag to text
+    final displayName = inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle;
+    final tagString = '\u200b@${displayName}\u200b ';
+    final currentText = messageController.text;
+    final selection = messageController.selection;
+    final insertPosition = selection.end;
+
+    messageController.text = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
+    messageController.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+
+    setState(() {});
+  }
+
+  void _addTaskTag(TaskEntity task) {
+    // Add to tagged list
+    if (!messageController.taggedTasks.any((t) => t.id == task.id)) {
+      messageController.addTaggedData(task: task);
+    }
+
+    // Add @tag to text
+    final displayName = task.title ?? 'Untitled';
+    final tagString = '\u200b@${displayName}\u200b ';
+    final currentText = messageController.text;
+    final selection = messageController.selection;
+    final insertPosition = selection.end;
+
+    messageController.text = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
+    messageController.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+
+    setState(() {});
+  }
 
   void requestFocus() {
     if (isDummy) return;
@@ -686,6 +785,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     // Get tagged entities from controller (copy lists before clearing)
     final taggedTasks = List<TaskEntity>.from(messageController.taggedTasks);
     final taggedEvents = List<EventEntity>.from(messageController.taggedEvents);
+    final taggedInboxes = List<InboxEntity>.from(messageController.taggedInboxes);
     final taggedConnections = List<ConnectionEntity>.from(messageController.taggedConnections);
     final taggedChannels = List<MessageChannelEntity>.from(messageController.taggedChannels);
     final taggedProjects = List<ProjectEntity>.from(messageController.taggedProjects);
@@ -737,6 +837,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
           inboxes: widget.inboxes,
           taggedTasks: taggedTasks,
           taggedEvents: taggedEvents,
+          taggedInboxes: taggedInboxes,
           taggedConnections: taggedConnections,
           taggedChannels: taggedChannels,
           taggedProjects: taggedProjects,
@@ -885,9 +986,14 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
         }
       },
       child: Container(
+        key: _inputFieldKey,
         decoration: BoxDecoration(
-          border: Border.all(color: context.tertiary.withValues(alpha: 0.7), strokeAlign: BorderSide.strokeAlignOutside),
-          color: context.background,
+          border: Border.all(
+            color: _isDragOverInputField ? context.primary.withValues(alpha: 0.7) : context.tertiary.withValues(alpha: 0.7),
+            strokeAlign: BorderSide.strokeAlignOutside,
+            width: _isDragOverInputField ? 2 : 1,
+          ),
+          color: _isDragOverInputField ? context.primary.withValues(alpha: 0.1) : context.background,
           borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius),
           boxShadow: PopupMenu.popupShadow,
         ),
@@ -2027,6 +2133,31 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                     ),
                   ],
                 ),
+
+                if (_isDragOverInputField)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(color: context.primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius)),
+                      child: Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: context.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: context.primary.withValues(alpha: 0.3), width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              VisirIcon(type: _isDraggingInbox ? VisirIconType.inbox : VisirIconType.task, size: 16, color: context.primary, isSelected: true),
+                              SizedBox(width: 8),
+                              Text(_isDraggingInbox ? 'Drop inbox' : (_isDraggingTask ? 'Drop task' : 'Drop here'), style: context.bodyMedium?.textColor(context.primary).textBold),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             );
           },

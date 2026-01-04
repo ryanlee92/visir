@@ -274,12 +274,24 @@ class AgentActionController extends _$AgentActionController {
     List<InboxEntity>? inboxes,
     List<TaskEntity>? taggedTasks,
     List<EventEntity>? taggedEvents,
+    List<InboxEntity>? taggedInboxes,
     List<ConnectionEntity>? taggedConnections,
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
     List<PlatformFile>? files,
   }) async {
     if (userMessage.trim().isEmpty && (files == null || files.isEmpty)) return;
+
+    // 태그된 inboxes를 inboxes에 병합 (중복 제거)
+    final combinedInboxes = <InboxEntity>[];
+    if (inboxes != null) combinedInboxes.addAll(inboxes);
+    if (taggedInboxes != null) {
+      for (final inbox in taggedInboxes) {
+        if (!combinedInboxes.any((i) => i.uniqueId == inbox.uniqueId)) {
+          combinedInboxes.add(inbox);
+        }
+      }
+    }
 
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
     final messageWithTags = _buildMessageWithTaggedItems(
@@ -306,7 +318,7 @@ class AgentActionController extends _$AgentActionController {
         taggedConnections: taggedConnections,
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
-        inboxes: inboxes,
+        inboxes: combinedInboxes.isNotEmpty ? combinedInboxes : null,
         files: files,
       );
     } catch (e) {
