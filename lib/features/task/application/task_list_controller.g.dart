@@ -42,7 +42,7 @@ final class TaskListControllerProvider
 }
 
 String _$taskListControllerHash() =>
-    r'1711bd05a9d3466e74b7eaf5aec118cb2b1a01bb';
+    r'a69d269cef9fd07f6250c6ec026a932c1999a07c';
 
 abstract class _$TaskListController extends $Notifier<TaskListResultEntity> {
   TaskListResultEntity build();

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:Visir/config/providers.dart';
@@ -33,6 +35,7 @@ import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/common/domain/entities/connection_entity.dart';
 import 'package:Visir/features/common/domain/failures/failure.dart';
+import 'package:Visir/features/chat/domain/entities/message_file_entity.dart';
 import 'package:Visir/features/common/utils/ai_pricing_calculator.dart';
 import 'package:Visir/features/auth/presentation/screens/ai_credits_screen.dart';
 import 'package:collection/collection.dart';
@@ -47,8 +50,9 @@ class AgentActionMessage {
   final String role; // 'user' or 'assistant'
   final String content;
   final bool excludeFromHistory; // conversation history에서 제외할지 여부 (함수 실행 결과 메시지용)
+  final List<PlatformFile>? files; // 첨부된 파일 목록
 
-  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false});
+  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false, this.files});
 
   Map<String, dynamic> toJson({bool? local}) {
     return {
@@ -59,6 +63,7 @@ class AgentActionMessage {
                 : Utils.encryptAESCryptoJS(content, aesKey)
           : '',
       'exclude_from_history': excludeFromHistory,
+      'files': files?.map((f) => {'name': f.name, 'size': f.size, 'path': f.path, 'bytes': f.bytes != null ? base64Encode(f.bytes!) : null}).toList(),
     };
   }
 
@@ -67,7 +72,21 @@ class AgentActionMessage {
     // local이 true면 평문, false면 isEncrypted 플래그에 따라 복호화
     final decryptedContent = contentStr.isNotEmpty && local != true && (isEncrypted == true) ? Utils.decryptAESCryptoJS(contentStr, aesKey) : contentStr;
 
-    return AgentActionMessage(role: json['role'] as String, content: decryptedContent, excludeFromHistory: json['exclude_from_history'] as bool? ?? false);
+    // 파일 정보 복원
+    List<PlatformFile>? files;
+    if (json['files'] != null) {
+      final filesList = json['files'] as List<dynamic>?;
+      files = filesList?.map((f) {
+        final fileMap = f as Map<String, dynamic>;
+        Uint8List? bytes;
+        if (fileMap['bytes'] != null) {
+          bytes = base64Decode(fileMap['bytes'] as String);
+        }
+        return PlatformFile(name: fileMap['name'] as String? ?? '', size: fileMap['size'] as int? ?? 0, path: fileMap['path'] as String?, bytes: bytes);
+      }).toList();
+    }
+
+    return AgentActionMessage(role: json['role'] as String, content: decryptedContent, excludeFromHistory: json['exclude_from_history'] as bool? ?? false, files: files);
   }
 }
 
@@ -252,8 +271,9 @@ class AgentActionController extends _$AgentActionController {
     List<ConnectionEntity>? taggedConnections,
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
+    List<PlatformFile>? files,
   }) async {
-    if (userMessage.trim().isEmpty) return;
+    if (userMessage.trim().isEmpty && (files == null || files.isEmpty)) return;
 
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
     final messageWithTags = _buildMessageWithTaggedItems(
@@ -266,7 +286,7 @@ class AgentActionController extends _$AgentActionController {
     );
 
     // 사용자 메시지 추가 (기존 대화 흐름 유지)
-    final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: messageWithTags)];
+    final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: messageWithTags, files: files)];
     state = state.copyWith(messages: updatedMessages, isLoading: true);
 
     try {
@@ -281,6 +301,7 @@ class AgentActionController extends _$AgentActionController {
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
         inboxes: inboxes,
+        files: files,
       );
     } catch (e) {
       state = state.copyWith(messages: updatedMessages, isLoading: false);
@@ -321,23 +342,51 @@ class AgentActionController extends _$AgentActionController {
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
     List<InboxEntity>? inboxes,
+    List<PlatformFile>? files,
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
   }) async {
-    // updatedMessages가 제공되지 않으면 새로 생성
-    final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: userMessage)];
+    // 파일 정보를 메시지에 추가
+    String enhancedUserMessage = userMessage;
+    if (files != null && files.isNotEmpty) {
+      // 파일 정보를 상세하게 추가 (AI가 파일을 인식할 수 있도록)
+      final fileInfoList = files
+          .map((f) {
+            final sizeKB = (f.size / 1024).toStringAsFixed(1);
+            final isImage = f.isImage;
+            final isVideo = f.isVideo;
+            String typeInfo = '';
+            if (isImage) {
+              typeInfo = ' (이미지 파일)';
+            } else if (isVideo) {
+              typeInfo = ' (비디오 파일)';
+            } else if (f.name.toLowerCase().endsWith('.pdf')) {
+              typeInfo = ' (PDF 문서)';
+            } else if (f.name.toLowerCase().endsWith('.txt') || f.name.toLowerCase().endsWith('.md')) {
+              typeInfo = ' (텍스트 파일)';
+            }
+            return '파일명: ${f.name}${typeInfo}, 크기: ${sizeKB} KB';
+          })
+          .join('\n');
+      enhancedUserMessage =
+          '$userMessage\n\n[CRITICAL: 첨부된 파일이 있습니다 - 반드시 이 파일을 우선 처리하세요]\n$fileInfoList\n\n⚠️ 중요: 사용자가 "이거 요약해줘", "이거 분석해줘", "요약해줘" 등으로 요청할 때는:\n1. 반드시 위에 첨부된 파일($fileInfoList)을 참고하여 답변해야 합니다.\n2. 인박스 메일이나 다른 컨텍스트를 참고하지 마세요.\n3. 첨부된 파일의 내용만 처리하세요.\n4. 파일이 첨부되어 있으면 인박스 관련 함수를 호출하지 마세요.';
+    }
+
+    // updatedMessages가 제공되지 않으면 새로 생성 (파일 정보 포함)
+    final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: enhancedUserMessage, files: files)];
 
     // 디버깅: _generateGeneralChat 시작 시 state 확인
 
     // 재귀 호출인 경우, conversation history의 마지막 user 메시지를 사용
     // (이미 updatedMessages에 첫 번째 응답이 포함되어 있으므로, 같은 userMessage를 다시 추가하지 않음)
-    final actualUserMessage = isRecursiveCall && updatedMessages != null && messages.isNotEmpty
-        ? (messages
-              .lastWhere(
-                (m) => m.role == 'user',
-                orElse: () => AgentActionMessage(role: 'user', content: userMessage),
-              )
-              .content)
-        : userMessage;
+    // 파일 정보가 포함된 enhancedUserMessage를 유지
+    if (isRecursiveCall && updatedMessages != null && messages.isNotEmpty) {
+      final lastUserMessage = messages.lastWhere(
+        (m) => m.role == 'user',
+        orElse: () => AgentActionMessage(role: 'user', content: enhancedUserMessage, files: files),
+      );
+      // 재귀 호출인 경우에도 파일 정보가 포함된 메시지 사용
+      enhancedUserMessage = lastUserMessage.content;
+    }
 
     // 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 자동으로 로드할 inbox 찾기
     Set<int> autoDetectedFromUserQuery = {};
@@ -524,7 +573,7 @@ class AgentActionController extends _$AgentActionController {
 
       // 최근 생성된 taskId/eventId를 user message에 추가하여 AI가 직접 참조할 수 있도록 함
       // IMPORTANT: state.recentTaskIds/recentEventIds를 직접 참조하여 최신 상태 사용
-      String enhancedUserMessage = actualUserMessage;
+      // 파일 정보가 포함된 enhancedUserMessage를 유지하면서 contextSuffix만 추가
       final latestState = state; // 최신 state 참조
       if (latestState.recentTaskIds.isNotEmpty || latestState.recentEventIds.isNotEmpty) {
         String contextSuffix = '';
@@ -546,7 +595,7 @@ class AgentActionController extends _$AgentActionController {
             contextSuffix += '\n[All recent event IDs: ${latestState.recentEventIds.join(', ')}. The last one ($mostRecentEventId) is the most recent.]';
           }
         }
-        enhancedUserMessage = actualUserMessage + contextSuffix;
+        enhancedUserMessage = enhancedUserMessage + contextSuffix;
       }
 
       final response = await _repository.generateGeneralChat(
@@ -2017,6 +2066,7 @@ class AgentActionController extends _$AgentActionController {
     List<ConnectionEntity>? taggedConnections,
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
+    List<PlatformFile>? files,
   }) async {
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
     final messageWithTags = _buildMessageWithTaggedItems(
@@ -2031,7 +2081,7 @@ class AgentActionController extends _$AgentActionController {
     // 사용자 메시지 추가
     // IMPORTANT: 최신 state를 다시 읽어서 recentTaskIds/recentEventIds가 반영되었는지 확인
     final currentState = state;
-    final updatedMessages = [...currentState.messages, AgentActionMessage(role: 'user', content: messageWithTags)];
+    final updatedMessages = [...currentState.messages, AgentActionMessage(role: 'user', content: messageWithTags, files: files)];
     state = state.copyWith(messages: updatedMessages, isLoading: true);
 
     // 사용자 메시지 추가 후 히스토리 저장
@@ -2051,6 +2101,7 @@ class AgentActionController extends _$AgentActionController {
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
         inboxes: inboxes,
+        files: files,
       );
     } catch (e) {
       state = state.copyWith(

@@ -7,6 +7,10 @@ import 'package:Visir/features/chat/domain/entities/message_group_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_member_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_tag_entity.dart';
 import 'package:Visir/features/chat/providers.dart';
+import 'package:Visir/features/inbox/application/agent_file_list_controller.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_temporary_file_list.dart';
+import 'package:Visir/features/common/presentation/widgets/custom_circualr_loading_indicator.dart';
+import 'package:Visir/dependency/toasty_box/model/toast_model.dart';
 import 'package:Visir/features/inbox/utils/agent_tag_controller.dart';
 import 'package:Visir/features/calendar/application/calendar_event_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
@@ -656,12 +660,25 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   Future<bool> postMessage({required bool uploadable, required String html}) async {
     if (onPickingFiles) return true;
-    // if (!uploadable) return true;
+
+    // 파일 업로드 중인지 확인
+    if (ref.read(agentFileListControllerProvider(tabType: widget.tabType).notifier).isUploading == true) {
+      Utils.showToast(
+        ToastModel(
+          message: TextSpan(text: context.tr.file_uploading_message_error),
+          buttons: [],
+        ),
+      );
+      return true;
+    }
 
     // Check if agentAction is active
     final plainText = _htmlToPlainText(html);
 
-    if (plainText.trim().isEmpty) {
+    // 파일이 있으면 업로드 가능한 것으로 간주
+    final agentFileList = ref.read(agentFileListControllerProvider(tabType: widget.tabType).select((v) => v));
+    final hasFiles = agentFileList.where((e) => (e.ok ?? false)).toList().isNotEmpty;
+    if (plainText.trim().isEmpty && !hasFiles) {
       return false;
     }
 
@@ -702,8 +719,15 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     // 태그된 프로젝트가 있으면 그것을 selectedProject로 사용 (우선순위)
     final effectiveSelectedProject = taggedProjects.isNotEmpty ? taggedProjects.first : contextProject;
 
+    // 파일 목록 가져오기
+    final files = agentFileList.where((e) => (e.ok ?? false)).map((e) => e.file).toList();
+
     // MCP 함수 호출을 통한 통합 처리
     clearMessage();
+
+    // 파일 목록 초기화
+    ref.read(agentFileListControllerProvider(tabType: widget.tabType).notifier).clear();
+
     await ref
         .read(agentActionControllerProvider.notifier)
         .handleMessageWithoutAction(
@@ -715,6 +739,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
           taggedConnections: taggedConnections,
           taggedChannels: taggedChannels,
           taggedProjects: taggedProjects,
+          files: files,
         );
     return true;
 
@@ -781,14 +806,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   }
 
   Future<void> uploadFiles({required List<PlatformFile> files}) async {
-    // if (files.isNotEmpty) {
-    //   files.forEach((f) async {
-    //     final compressedFile = await Utils.compressOnlyVideoFileInMobile(originalFile: f);
-    //     ref
-    //         .read(chatFileListControllerProvider(tabType: widget.tabType, isThread: false).notifier)
-    //         .getFileUploadUrl(type: widget.channel.type, file: compressedFile);
-    //   });
-    // }
+    if (files.isNotEmpty) {
+      for (final f in files) {
+        final compressedFile = await Utils.compressOnlyVideoFileInMobile(originalFile: f);
+        ref.read(agentFileListControllerProvider(tabType: widget.tabType).notifier).addFile(file: compressedFile);
+      }
+    }
   }
 
   bool onPickingFiles = false;
@@ -847,6 +870,10 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
       editor = null;
     }
 
+    // 파일 목록 확인하여 uploadable 상태 업데이트
+    final messageFileList = ref.watch(agentFileListControllerProvider(tabType: widget.tabType).select((v) => v));
+    uploadable = messageController.text.trim().isNotEmpty || messageFileList.where((e) => (e.ok ?? false)).toList().isNotEmpty;
+
     final selectedModel = ref.watch(selectedAgentModelProvider).value;
     return Container(
       decoration: BoxDecoration(
@@ -876,8 +903,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Container(
+                      constraints: BoxConstraints(minWidth: constraints.maxWidth),
                       padding: EdgeInsets.symmetric(horizontal: 12),
-                      // child: MessageTemporaryFileList(isReply: widget.isThread, tabType: widget.tabType),
+                      child: AgentTemporaryFileList(tabType: widget.tabType),
                     ),
                   ),
                   SizedBox(height: 6),
@@ -1719,27 +1747,27 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                   child: VisirIcon(type: VisirIconType.clock, size: 14, isSelected: true),
                                 ),
                               ),
-                              // IntrinsicWidth(
-                              //   child: VisirButton(
-                              //     enabled: messageController.editingMessageId == null,
-                              //     type: VisirButtonAnimationType.scaleAndOpacity,
-                              //     style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
-                              //     options: VisirButtonOptions(
-                              //       message: context.tr.attach,
-                              //       customShortcutTooltip: context.tr.drag_and_drop,
-                              //       tooltipLocation: VisirButtonTooltipLocation.top,
-                              //       doNotConvertCase: true,
-                              //     ),
-                              //     onTap: isDummy ? null : onPressUpload,
-                              //     child: onPickingFiles
-                              //         ? CustomCircularLoadingIndicator(size: 14, color: focusNode.hasFocus ? context.onInverseSurface : context.surface)
-                              //         : SizedBox(
-                              //             width: 14,
-                              //             height: 14,
-                              //             child: VisirIcon(type: VisirIconType.file, size: 14, isSelected: focusNode.hasFocus),
-                              //           ),
-                              //   ),
-                              // ),
+                              IntrinsicWidth(
+                                child: VisirButton(
+                                  enabled: true,
+                                  type: VisirButtonAnimationType.scaleAndOpacity,
+                                  style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
+                                  options: VisirButtonOptions(
+                                    message: context.tr.attach,
+                                    customShortcutTooltip: context.tr.drag_and_drop,
+                                    tooltipLocation: VisirButtonTooltipLocation.top,
+                                    doNotConvertCase: true,
+                                  ),
+                                  onTap: isDummy ? null : onPressUpload,
+                                  child: onPickingFiles
+                                      ? CustomCircularLoadingIndicator(size: 14, color: focusNode.hasFocus ? context.onInverseSurface : context.surface)
+                                      : SizedBox(
+                                          width: 14,
+                                          height: 14,
+                                          child: VisirIcon(type: VisirIconType.file, size: 14, isSelected: focusNode.hasFocus),
+                                        ),
+                                ),
+                              ),
                               IntrinsicWidth(
                                 child: PopupMenu(
                                   beforePopup: () => FocusScope.of(context).unfocus(),

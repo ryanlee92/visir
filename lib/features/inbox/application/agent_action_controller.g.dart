@@ -42,7 +42,7 @@ final class AgentActionControllerProvider
 }
 
 String _$agentActionControllerHash() =>
-    r'e24c5fdbc7d143b272ffd842a015cb9ecac0ebe3';
+    r'd0516a3ec208e6c5a008b683ad8aa8bd2c67a424';
 
 abstract class _$AgentActionController extends $Notifier<AgentActionState> {
   AgentActionState build();

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:Visir/config/providers.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
@@ -3132,9 +3133,109 @@ Response:
       }
 
       // Build messages
+      // 파일이 첨부된 경우 OpenAI API 형식에 맞게 content를 배열로 변환
       final messages = <Map<String, dynamic>>[
         {'role': 'system', 'content': systemMessage},
-        ...conversationHistory.map((m) => {'role': m['role'], 'content': m['content']}),
+        ...await Future.wait(
+          conversationHistory.map((m) async {
+            final role = m['role'] as String;
+            final content = m['content'] as String? ?? '';
+            final files = m['files'] as List<dynamic>?;
+
+            // 파일이 첨부된 경우 content를 배열로 변환
+            if (files != null && files.isNotEmpty && role == 'user') {
+              final contentArray = <Map<String, dynamic>>[
+                {'type': 'text', 'text': content},
+              ];
+
+              // 각 파일을 처리
+              for (final file in files) {
+                final fileMap = file as Map<String, dynamic>;
+                final fileName = fileMap['name'] as String? ?? '';
+                final fileBytes = fileMap['bytes'] as String?; // base64 encoded
+
+                if (fileBytes != null && fileName.isNotEmpty) {
+                  final lowerName = fileName.toLowerCase();
+
+                  // 이미지 파일인 경우
+                  if (lowerName.endsWith('.png') || lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
+                    final mimeType = lowerName.endsWith('.png')
+                        ? 'image/png'
+                        : lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg')
+                        ? 'image/jpeg'
+                        : lowerName.endsWith('.gif')
+                        ? 'image/gif'
+                        : 'image/webp';
+                    contentArray.add({
+                      'type': 'image_url',
+                      'image_url': {'url': 'data:$mimeType;base64,$fileBytes'},
+                    });
+                  }
+                  // PDF 파일인 경우 - 각 페이지를 이미지로 변환하여 전달
+                  else if (lowerName.endsWith('.pdf')) {
+                    try {
+                      // Base64 디코딩
+                      final pdfBytes = base64Decode(fileBytes);
+
+                      // PDF 문서 로드
+                      final pdfDocument = await PdfDocument.openData(pdfBytes);
+                      final pageCount = pdfDocument.pagesCount;
+
+                      // 각 페이지를 이미지로 변환 (최대 10페이지까지만 처리)
+                      final maxPages = pageCount > 10 ? 10 : pageCount;
+                      for (int i = 1; i <= maxPages; i++) {
+                        // PDF 페이지 가져오기 (페이지 번호는 1부터 시작)
+                        final page = await pdfDocument.getPage(i);
+
+                        // PDF 페이지를 이미지로 렌더링
+                        // 높은 해상도로 렌더링 (OpenAI Vision API 권장 해상도)
+                        final pageImage = await page.render(
+                          width: page.width * 2, // 2배 해상도
+                          height: page.height * 2,
+                          format: PdfPageImageFormat.png, // PNG 형식
+                        );
+
+                        // 렌더링된 이미지의 bytes를 Base64로 인코딩
+                        final bytes = pageImage?.bytes;
+                        if (bytes != null && bytes.isNotEmpty) {
+                          final imageBase64 = base64Encode(bytes);
+
+                          contentArray.add({
+                            'type': 'image_url',
+                            'image_url': {'url': 'data:image/png;base64,$imageBase64'},
+                          });
+                        }
+
+                        // 페이지 닫기 (메모리 관리)
+                        page.close();
+                      }
+
+                      // 페이지가 10개를 넘으면 알림 추가
+                      if (pageCount > 10) {
+                        contentArray.add({'type': 'text', 'text': '\n[참고: PDF 파일이 $pageCount 페이지입니다. 처음 10페이지만 표시했습니다.]'});
+                      }
+
+                      // PDF 문서 닫기
+                      pdfDocument.close();
+                    } catch (e) {
+                      // PDF 변환 실패 시 파일 정보만 전달
+                      final fileSizeKB = ((fileMap['size'] as int? ?? 0) / 1024).toStringAsFixed(1);
+                      contentArray.add({'type': 'text', 'text': '\n[PDF 파일 첨부됨: $fileName (${fileSizeKB} KB) - 파일을 이미지로 변환하는 중 오류가 발생했습니다: $e]'});
+                    }
+                  }
+                  // 기타 파일인 경우
+                  else {
+                    contentArray.add({'type': 'text', 'text': '\n[파일 첨부됨: $fileName]'});
+                  }
+                }
+              }
+
+              return {'role': role, 'content': contentArray};
+            } else {
+              return {'role': role, 'content': content};
+            }
+          }),
+        ),
       ];
 
       // Call OpenAI API

@@ -14,6 +14,7 @@ import 'package:Visir/features/calendar/application/calendar_list_controller.dar
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/inbox/application/agent_action_controller.dart';
+import 'package:Visir/features/chat/domain/entities/message_file_entity.dart';
 import 'package:collection/collection.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/presentation/widgets/inbox_action_suggestions_widget.dart';
@@ -2255,7 +2256,71 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true), const SizedBox(width: 8)],
-                                          Expanded(child: _buildMessageContent(context, message.content, isUser)),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                _buildMessageContent(context, message.content, isUser),
+                                                // 파일 첨부 표시
+                                                if (message.files != null && message.files!.isNotEmpty) ...[
+                                                  const SizedBox(height: 12),
+                                                  Wrap(
+                                                    alignment: WrapAlignment.start,
+                                                    crossAxisAlignment: WrapCrossAlignment.start,
+                                                    spacing: 8,
+                                                    runSpacing: 8,
+                                                    children: message.files!.map((file) {
+                                                      final isImage = file.isImage;
+                                                      final isVideo = file.isVideo;
+                                                      return isImage
+                                                          ? ClipRRect(
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              child: Container(
+                                                                width: 200,
+                                                                height: 200,
+                                                                decoration: BoxDecoration(
+                                                                  color: context.surfaceVariant,
+                                                                  borderRadius: BorderRadius.circular(8),
+                                                                ),
+                                                                child: file.bytes != null
+                                                                    ? Image.memory(
+                                                                        file.bytes!,
+                                                                        fit: BoxFit.cover,
+                                                                      )
+                                                                    : Center(
+                                                                        child: VisirIcon(type: VisirIconType.caution, size: 24, color: context.surfaceTint),
+                                                                      ),
+                                                              ),
+                                                            )
+                                                          : Container(
+                                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                              decoration: BoxDecoration(
+                                                                color: context.surfaceVariant,
+                                                                borderRadius: BorderRadius.circular(8),
+                                                              ),
+                                                              child: Row(
+                                                                mainAxisSize: MainAxisSize.min,
+                                                                children: [
+                                                                  VisirIcon(
+                                                                    type: isVideo ? VisirIconType.videoCall : VisirIconType.file,
+                                                                    size: 16,
+                                                                    color: context.outlineVariant,
+                                                                  ),
+                                                                  const SizedBox(width: 8),
+                                                                  Text(
+                                                                    file.name,
+                                                                    style: context.titleSmall?.textColor(context.outlineVariant),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                    }).toList(),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       if (writeActionsForMessage.isNotEmpty) ...[
