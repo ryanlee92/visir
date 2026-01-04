@@ -789,7 +789,8 @@ Return only the JSON object, no additional text or explanations.
 ''';
     }
 
-    final systemPrompt = 'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
+    final systemPrompt =
+        'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
 
     try {
       final result = await _callAnthropicApiJson(prompt: prompt, model: model, apiKey: apiKey, systemPrompt: systemPrompt, maxTokens: 4096);
@@ -1101,7 +1102,8 @@ For example: "2024-01-01T10:00:00" (local time) NOT "2024-01-01T10:00:00Z" (UTC)
 CRITICAL: You must respond with valid JSON only. No additional text, explanations, or markdown formatting. Return only the JSON object.
 ''';
 
-    final systemPrompt = 'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
+    final systemPrompt =
+        'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
 
     try {
       final result = await _callAnthropicApiJson(prompt: prompt, model: model, apiKey: apiKey, systemPrompt: systemPrompt, maxTokens: 4096);
@@ -1152,7 +1154,8 @@ CRITICAL: The project_id field is REQUIRED and MUST always be included. It canno
 CRITICAL: You must respond with valid JSON only. No additional text, explanations, or markdown formatting. Return only the JSON object.
 ''';
 
-    final systemPrompt = 'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
+    final systemPrompt =
+        'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
 
     try {
       final result = await _callAnthropicApiJson(prompt: prompt, model: model, apiKey: apiKey, systemPrompt: systemPrompt, maxTokens: 4096);
@@ -1259,7 +1262,8 @@ Return a JSON object with the following structure:
 CRITICAL: You must respond with valid JSON only. No additional text, explanations, or markdown formatting. Return only the JSON object.
 ''';
 
-    final systemPrompt = 'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
+    final systemPrompt =
+        'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
 
     try {
       final result = await _callAnthropicApiJson(prompt: prompt, model: model, apiKey: apiKey, systemPrompt: systemPrompt, maxTokens: 4096);
@@ -1606,7 +1610,8 @@ For example: "2024-01-01T10:00:00" (local time) NOT "2024-01-01T10:00:00Z" (UTC)
 CRITICAL: You must respond with valid JSON only. No additional text, explanations, or markdown formatting. Return only the JSON object.
 ''';
 
-    final systemPrompt = 'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
+    final systemPrompt =
+        'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
 
     try {
       final result = await _callAnthropicApiJson(prompt: prompt, model: model, apiKey: apiKey, systemPrompt: systemPrompt, maxTokens: 4096);
@@ -1932,10 +1937,13 @@ Use these tags when:
       // Add Available Projects section if projects are provided
       if (projects != null && projects.isNotEmpty) {
         systemMessage += '\n\n## Available Projects';
-        systemMessage += '\nYou MUST select a project_id from this list when creating tasks. Match the user\'s request to one of these projects by name (case-insensitive, partial matching is OK).';
-        systemMessage += '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
+        systemMessage +=
+            '\nYou MUST select a project_id from this list when creating tasks. Match the user\'s request to one of these projects by name (case-insensitive, partial matching is OK).';
+        systemMessage +=
+            '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
         systemMessage += '\n\nCRITICAL PROJECT SELECTION RULES:';
-        systemMessage += '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
+        systemMessage +=
+            '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
         systemMessage += '\n2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:';
         systemMessage += '\n   - Search through the Available Projects list above';
         systemMessage += '\n   - Find the project whose name best matches the user\'s request (case-insensitive, partial match is OK)';
@@ -1964,7 +1972,7 @@ Use these tags when:
         systemMessage += '\n\n## Inbox Context\n$inboxContext';
         systemMessage +=
             '\n\nWhen the user asks about inbox items, emails, or messages (e.g., "인박스 중에 우리카드에서 온거 있어?", "Is there anything from Woori Card in the inbox?", "인박스에서 우리카드 메일 찾아줘"), use the inbox items listed above. Search through the inbox items and provide specific information about matching items. Do NOT say "I cannot access" or "I don\'t have information". You have access to the inbox items in the Inbox Context section above.';
-        
+
         // 전체 내용이 이미 포함된 경우와 메타데이터만 있는 경우 구분
         final hasFullContent = inboxContext.contains('Full Content:');
         if (hasFullContent) {
@@ -1972,7 +1980,7 @@ Use these tags when:
               '\n\n**CRITICAL: DIRECT ACTION REQUIRED**\nThe inbox items above include full content. When the user makes a clear action request (e.g., "요약해줘", "summarize", "읽어줘", "read", "분석해줘", "analyze"), you MUST:\n1. **Immediately provide the requested action** - Do NOT ask "재정리해드릴까요?" or "Would you like me to..." or any follow-up questions.\n2. **Provide the complete answer directly** - If the user asks for a summary, provide the summary immediately. If they ask for analysis, provide the analysis immediately.\n3. **DO NOT ask for confirmation or additional preferences** - The user has already made their request clear. Just execute it.\n\nExample: If user says "링글에서 온 메일 요약해줘", immediately provide the summary. Do NOT say "원하시면 재정리해드릴까요?" or similar questions.';
         } else {
           systemMessage +=
-              '\n\n**CRITICAL INSTRUCTIONS FOR READING INBOX CONTENT**:\n1. When the user asks to summarize, read, or analyze a specific email/message (e.g., "링글에서 온 메일 요약해줘", "summarize the email from X"), you MUST:\n   - Identify the matching inbox item number from the list above\n   - Use the <need_more_action> tag to request full content loading\n   - Format: <need_more_action>{"inbox_numbers": [1, 2, 3]}</need_more_action>\n   - The system will automatically load the full content in the background\n   - You will receive the full content in your next response\n\n2. **When you need to read inbox content**, include the <need_more_action> tag with the inbox numbers you need to read. Example:\n   "인박스 7번과 6번을 읽어서 요약해드릴게요. <need_more_action>{"inbox_numbers": [7, 6]}</need_more_action>"\n\n3. **DO NOT ask for permission** - Just proceed to read and provide the answer. Include the tag and then wait for the full content.\n\n4. **After receiving full content**, immediately provide your answer without asking again. Do NOT ask "재정리해드릴까요?" or similar follow-up questions.\n\n5. **IMPORTANT**: Only use <need_more_action> tag when you actually need to read the full content of specific inbox items. If you already have enough information to answer, do NOT use this tag.';
+              '\n\n**CRITICAL INSTRUCTIONS FOR READING INBOX CONTENT**:\n1. When the user asks to summarize, read, or analyze a specific email/message (e.g., "링글에서 온 메일 요약해줘", "summarize the email from X"), you MUST:\n   - Identify the matching inbox item number from the list above\n   - Use the <need_more_action> tag to request full content loading\n   - Format: <need_more_action>{"inbox_numbers": [1, 2, 3]}</need_more_action>\n   - The system will automatically load the full content in the background\n   - You will receive the full content in your next response\n\n2. **When you need to read inbox content**, include the <need_more_action> tag with the inbox numbers you need to read. Example:\n   "인박스 7번과 6번을 읽어서 요약해드릴게요. <need_more_action>{"inbox_numbers": [7, 6]}</need_more_action>"\n\n3. **DO NOT ask for permission** - Just proceed to read and provide the answer. Include the tag and then wait for the full content.\n\n4. **After receiving full content**, immediately provide your answer without asking again. Do NOT ask "재정리해드릴까요?" or similar follow-up questions.\n\n5. **IMPORTANT**: Only use <need_more_action> tag when you actually need to read the full content of specific inbox items. If you already have enough information to answer, do NOT use this tag.\n\n6. **ATTACHMENT HANDLING**: When the user asks to read, summarize, or analyze attachments/files (e.g., "PDF 읽어서 요약해줘", "첨부파일 분석해줘", "read the attached PDF"), you MUST:\n   - Check if the inbox items listed above have attachments (shown in the "Attachments" section)\n   - If attachments are needed, use the <need_attachment> tag to request attachment download\n   - Format: <need_attachment>{"inbox_numbers": [1, 2, 3]}</need_attachment>\n   - The system will automatically download the attachments and send them to you\n   - You will receive the attachment files in your next response\n   - Example: "인박스 1번의 PDF 파일을 읽어서 요약해드릴게요. <need_attachment>{"inbox_numbers": [1]}</need_attachment>"\n\n7. **IMPORTANT FOR ATTACHMENTS**: Only use <need_attachment> tag when you actually need to process attachment files. If the user\'s request doesn\'t require reading file contents, do NOT use this tag.';
         }
       }
 
@@ -2012,11 +2020,7 @@ Use these tags when:
                       : 'image/webp';
                   contentArray.add({
                     'type': 'image',
-                    'source': {
-                      'type': 'base64',
-                      'media_type': mimeType,
-                      'data': fileBytes,
-                    },
+                    'source': {'type': 'base64', 'media_type': mimeType, 'data': fileBytes},
                   });
                 }
                 // PDF 파일인 경우 - 각 페이지를 이미지로 변환하여 전달
@@ -2049,11 +2053,7 @@ Use these tags when:
 
                         contentArray.add({
                           'type': 'image',
-                          'source': {
-                            'type': 'base64',
-                            'media_type': 'image/png',
-                            'data': imageBase64,
-                          },
+                          'source': {'type': 'base64', 'media_type': 'image/png', 'data': imageBase64},
                         });
                       }
 
@@ -2234,7 +2234,8 @@ Return only valid JSON, no additional text.
 ''';
     }
 
-    final systemPrompt = 'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
+    final systemPrompt =
+        'You are a helpful AI assistant integrated with Visir, a productivity app. You must respond with valid JSON only. No additional text, explanations, or markdown formatting.';
 
     try {
       final result = await _callAnthropicApiJson(prompt: prompt, model: model, apiKey: apiKey, systemPrompt: systemPrompt, maxTokens: 4096);

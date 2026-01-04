@@ -38,6 +38,9 @@ import 'package:Visir/features/common/domain/failures/failure.dart';
 import 'package:Visir/features/chat/domain/entities/message_file_entity.dart';
 import 'package:Visir/features/common/utils/ai_pricing_calculator.dart';
 import 'package:Visir/features/auth/presentation/screens/ai_credits_screen.dart';
+import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
+import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
+import 'package:Visir/features/mail/providers.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -345,11 +348,15 @@ class AgentActionController extends _$AgentActionController {
     List<PlatformFile>? files,
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
   }) async {
-    // 파일 정보를 메시지에 추가
+    // 파일 정보를 메시지에 추가 (인박스 첨부 파일 포함)
     String enhancedUserMessage = userMessage;
-    if (files != null && files.isNotEmpty) {
+    
+    // 사용자가 직접 첨부한 파일만 사용 (인박스 첨부 파일은 AI가 요청할 때만 다운로드)
+    final allFiles = files ?? [];
+
+    if (allFiles.isNotEmpty) {
       // 파일 정보를 상세하게 추가 (AI가 파일을 인식할 수 있도록)
-      final fileInfoList = files
+      final fileInfoList = allFiles
           .map((f) {
             final sizeKB = (f.size / 1024).toStringAsFixed(1);
             final isImage = f.isImage;
@@ -367,12 +374,12 @@ class AgentActionController extends _$AgentActionController {
             return '파일명: ${f.name}${typeInfo}, 크기: ${sizeKB} KB';
           })
           .join('\n');
-      enhancedUserMessage =
-          '$userMessage\n\n[CRITICAL: 첨부된 파일이 있습니다 - 반드시 이 파일을 우선 처리하세요]\n$fileInfoList\n\n⚠️ 중요: 사용자가 "이거 요약해줘", "이거 분석해줘", "요약해줘" 등으로 요청할 때는:\n1. 반드시 위에 첨부된 파일($fileInfoList)을 참고하여 답변해야 합니다.\n2. 인박스 메일이나 다른 컨텍스트를 참고하지 마세요.\n3. 첨부된 파일의 내용만 처리하세요.\n4. 파일이 첨부되어 있으면 인박스 관련 함수를 호출하지 마세요.';
+      // 파일 정보만 제공하고, AI가 판단하도록 함 (룰베이스 제거)
+      enhancedUserMessage = '$userMessage\n\n[첨부된 파일 정보]\n$fileInfoList';
     }
 
     // updatedMessages가 제공되지 않으면 새로 생성 (파일 정보 포함)
-    final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: enhancedUserMessage, files: files)];
+    final messages = updatedMessages ?? [...state.messages, AgentActionMessage(role: 'user', content: enhancedUserMessage, files: allFiles.isNotEmpty ? allFiles : files)];
 
     // 디버깅: _generateGeneralChat 시작 시 state 확인
 
@@ -388,17 +395,8 @@ class AgentActionController extends _$AgentActionController {
       enhancedUserMessage = lastUserMessage.content;
     }
 
-    // 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 자동으로 로드할 inbox 찾기
-    Set<int> autoDetectedFromUserQuery = {};
-    if (inboxes != null && inboxes.isNotEmpty) {
-      autoDetectedFromUserQuery = _detectInboxesFromUserQuery(userMessage, inboxes);
-
-      // 자동 감지된 inbox가 있으면 state에 저장
-      if (autoDetectedFromUserQuery.isNotEmpty) {
-        final updatedLoadedNumbers = {...state.loadedInboxNumbers, ...autoDetectedFromUserQuery};
-        state = state.copyWith(loadedInboxNumbers: updatedLoadedNumbers);
-      }
-    }
+    // 룰베이스 제거: 키워드 기반 자동 감지 제거, AI가 판단하도록 함
+    // 사용자가 명시적으로 요청하거나 AI가 <need_more_action> 태그를 사용할 때만 처리
 
     // state.messages를 항상 업데이트하여 _saveChatHistory가 최신 메시지를 사용하도록 함
     state = state.copyWith(messages: messages, isLoading: true);
@@ -429,7 +427,13 @@ class AgentActionController extends _$AgentActionController {
       if (inboxes != null && inboxes.isNotEmpty) {
         final requestedNumbers = state.loadedInboxNumbers;
         final summaryOnly = requestedNumbers.isEmpty;
-        inboxContext = _buildInboxContext(inboxes, summaryOnly: summaryOnly, requestedInboxNumbers: requestedNumbers);
+        // 첨부 파일 정보는 항상 포함 (AI가 판단할 수 있도록)
+        inboxContext = await _buildInboxContext(
+          inboxes,
+          summaryOnly: summaryOnly,
+          requestedInboxNumbers: requestedNumbers,
+          includeAttachmentInfo: true, // 항상 첨부 파일 정보 포함하여 AI가 판단하도록
+        );
       }
 
       // API 키 선택: useUserApiKey가 true이면 사용자 API 키, false이면 환경 변수 API 키
@@ -1142,23 +1146,41 @@ class AgentActionController extends _$AgentActionController {
           _saveChatHistory(taggedProjects: taggedProjects);
         } else {
           // 일반 응답
-          // 룰베이스 제거: need_more_action 태그 제거하지 않음
           final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
           final updatedMessagesWithResponse = [...messages, assistantMessage];
 
-          // 룰베이스 제거: need_more_action 태그 파싱하지 않음
+          // AI 응답에서 <need_attachment> 태그 파싱하여 첨부 파일 다운로드
+          if (!isRecursiveCall && inboxes != null && inboxes.isNotEmpty) {
+            final inboxAttachmentFiles = await _fetchInboxAttachmentsFromAiResponse(aiMessage, inboxes);
+            
+            if (inboxAttachmentFiles.isNotEmpty) {
+              // 첨부 파일이 다운로드되었으면 파일과 함께 재요청
+              await _generateGeneralChat(
+                userMessage,
+                selectedProject: selectedProject,
+                updatedMessages: updatedMessagesWithResponse,
+                taggedTasks: taggedTasks,
+                taggedEvents: taggedEvents,
+                taggedConnections: taggedConnections,
+                taggedChannels: taggedChannels,
+                taggedProjects: taggedProjects,
+                inboxes: inboxes,
+                files: inboxAttachmentFiles, // 다운로드한 첨부 파일 전달
+                isRecursiveCall: true,
+              );
+              return;
+            }
+          }
+
+          // need_more_action 태그 파싱 (기존 로직 유지)
           if (!isRecursiveCall) {
-            // need_more_action 기능 비활성화 (룰베이스 제거)
-            final needMoreActionData = null;
+            final needMoreActionData = _parseNeedMoreActionTag(aiMessage);
 
             if (needMoreActionData != null && inboxes != null && inboxes.isNotEmpty) {
               // 태그에서 inbox 번호 추출
               Set<int> allRequestedNumbers = needMoreActionData['inbox_numbers'] as Set<int>? ?? {};
 
-              // 번호가 없으면 사용자 메시지에서 자동 감지 시도
-              if (allRequestedNumbers.isEmpty) {
-                allRequestedNumbers = _detectInboxesFromUserQuery(userMessage, inboxes);
-              }
+              // 룰베이스 제거: 키워드 기반 자동 감지 제거, AI가 태그로 명시적으로 요청할 때만 처리
 
               if (allRequestedNumbers.isNotEmpty) {
                 // 요청된 inbox 번호가 유효한지 확인 (1부터 inboxes.length까지)
@@ -1892,7 +1914,8 @@ class AgentActionController extends _$AgentActionController {
   /// [summaryOnly]: true면 제목, sender, 날짜만 보냄 (메타데이터만), false면 전체 내용 포함
   /// [requestedInboxNumbers]: 전체 내용을 보낼 inbox 번호 목록 (1부터 시작)
   /// [maxItems]: 최대 보낼 인박스 개수 (기본값: summaryOnly일 때 300, 아닐 때 50)
-  String _buildInboxContext(List<InboxEntity> inboxes, {bool summaryOnly = true, Set<int> requestedInboxNumbers = const {}, int? maxItems}) {
+  /// [includeAttachmentInfo]: 첨부 파일 정보를 포함할지 여부 (기본값: false, 사용자 요청이 있을 때만 true)
+  Future<String> _buildInboxContext(List<InboxEntity> inboxes, {bool summaryOnly = true, Set<int> requestedInboxNumbers = const {}, int? maxItems, bool includeAttachmentInfo = false}) async {
     // summaryOnly일 때는 메타데이터만 보내므로 더 많이 보낼 수 있음
     final defaultMaxItems = summaryOnly ? 300 : 50;
     final effectiveMaxItems = maxItems ?? defaultMaxItems;
@@ -1924,6 +1947,36 @@ class AgentActionController extends _$AgentActionController {
         buffer.writeln('- From: ${mail.fromName}');
         buffer.writeln('- Subject: ${inbox.title}');
         buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
+
+        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만, 사용자 요청이 있을 때만)
+        if (includeAttachmentInfo) {
+          try {
+            final mailEntity = await _getMailEntityFromInbox(inbox);
+            if (mailEntity != null) {
+              final attachments = mailEntity.getAttachments();
+              if (attachments.isNotEmpty) {
+                buffer.writeln('- Attachments: ${attachments.length} file(s)');
+                for (final attachment in attachments) {
+                  final fileName = attachment.name;
+                  final mimeType = attachment.mimeType;
+                  String fileType = '';
+                  if (fileName.toLowerCase().endsWith('.pdf')) {
+                    fileType = ' (PDF)';
+                  } else if (mimeType.startsWith('image/')) {
+                    fileType = ' (Image)';
+                  } else if (mimeType.startsWith('video/')) {
+                    fileType = ' (Video)';
+                  } else if (mimeType.startsWith('text/')) {
+                    fileType = ' (Text)';
+                  }
+                  buffer.writeln('  - $fileName$fileType');
+                }
+              }
+            }
+          } catch (e) {
+            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
+          }
+        }
 
         if (shouldIncludeFullContent) {
           // 전체 내용 포함
@@ -1976,85 +2029,138 @@ class AgentActionController extends _$AgentActionController {
     return buffer.toString();
   }
 
-  /// 사용자 질문에서 특정 sender나 키워드를 언급했는지 확인하여 관련 inbox를 자동으로 감지합니다.
-  Set<int> _detectInboxesFromUserQuery(String userQuery, List<InboxEntity> inboxes) {
-    final detectedNumbers = <int>{};
-    final lowerQuery = userQuery.toLowerCase();
+  /// InboxEntity에서 MailEntity를 가져옵니다.
+  Future<MailEntity?> _getMailEntityFromInbox(InboxEntity inbox) async {
+    if (inbox.linkedMail == null) return null;
 
-    // 요약, 읽기, 분석 등의 액션 키워드 확인
-    final actionKeywords = ['요약', 'summarize', 'summary', '읽어', 'read', '분석', 'analyze', 'analysis', '보여', 'show', '보고', '알려', 'tell'];
-    final hasActionRequest = actionKeywords.any((keyword) => lowerQuery.contains(keyword));
+    try {
+      final mail = inbox.linkedMail!;
+      final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+      final oauth = oauths.firstWhereOrNull((o) => o.email == mail.hostMail);
+      if (oauth == null) return null;
 
-    // 사용자가 특정 sender나 키워드를 언급했는지 확인
-    for (int i = 0; i < inboxes.length; i++) {
-      final inbox = inboxes[i];
-      final itemNumber = i + 1;
+      final mailRepository = ref.read(mailRepositoryProvider);
+      final mailType = MailEntityTypeX.fromOAuthType(oauth.type);
+      
+      // 메일을 가져오기 위해 threadId를 사용
+      final threadResult = await mailRepository.fetchThreads(
+        oauth: oauth,
+        type: mailType,
+        threadId: mail.threadId,
+        email: mail.hostMail,
+        labelId: mail.labelIds?.firstOrNull ?? CommonMailLabels.inbox.id,
+      );
 
-      // 이미 전체 내용을 보낸 inbox는 제외
-      if (state.loadedInboxNumbers.contains(itemNumber)) {
-        continue;
-      }
+      return threadResult.fold(
+        (failure) => null,
+        (mails) => mails.firstWhereOrNull((m) => m.id == mail.messageId),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 
-      // Email인 경우 sender 이름 확인
-      if (inbox.linkedMail != null) {
+  /// AI 응답에서 <need_attachment> 태그를 파싱하여 첨부 파일을 다운로드합니다.
+  /// AI가 첨부 파일이 필요하다고 판단하면 이 태그를 사용하여 요청합니다.
+  Future<List<PlatformFile>> _fetchInboxAttachmentsFromAiResponse(
+    String aiResponse,
+    List<InboxEntity>? inboxes,
+  ) async {
+    if (inboxes == null || inboxes.isEmpty) return [];
+
+    // <need_attachment> 태그 파싱
+    final RegExp attachmentTagRegex = RegExp(r'<need_attachment>\s*\{[^}]*"inbox_numbers"\s*:\s*\[([^\]]+)\][^}]*\}\s*</need_attachment>', caseSensitive: false);
+    final match = attachmentTagRegex.firstMatch(aiResponse);
+    if (match == null) return [];
+
+    // inbox_numbers 추출
+    final numbersStr = match.group(1);
+    if (numbersStr == null || numbersStr.isEmpty) return [];
+
+    final requestedNumbers = numbersStr
+        .split(',')
+        .map((s) => int.tryParse(s.trim()))
+        .whereType<int>()
+        .toSet();
+
+    if (requestedNumbers.isEmpty) return [];
+
+    // 인박스에서 첨부 파일이 있는 메일 찾기
+    final attachmentFiles = <PlatformFile>[];
+
+    for (final number in requestedNumbers) {
+      if (number < 1 || number > inboxes.length) continue;
+      final inbox = inboxes[number - 1]; // 1-based index
+
+      if (inbox.linkedMail == null) continue;
+
+      try {
+        final mailEntity = await _getMailEntityFromInbox(inbox);
+        if (mailEntity == null) continue;
+
+        final attachments = mailEntity.getAttachments();
+        if (attachments.isEmpty) continue;
+
+        // 첨부 파일 다운로드
         final mail = inbox.linkedMail!;
-        final senderName = mail.fromName.toLowerCase();
+        final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+        final oauth = oauths.firstWhereOrNull((o) => o.email == mail.hostMail);
+        if (oauth == null) continue;
 
-        // sender 이름에서 주요 단어 추출 (예: "링글 공동창업자 이승훈" -> "링글", "이승훈")
-        final senderWords = senderName.split(' ').where((w) => w.length >= 2).toList();
+        final mailRepository = ref.read(mailRepositoryProvider);
+        final attachmentIds = attachments.map((a) => a.id).whereType<String>().toList();
 
-        // 사용자 질문에 sender 이름이나 주요 단어가 포함되어 있는지 확인
-        bool senderMatches = false;
-        if (senderName.length >= 2 && lowerQuery.contains(senderName)) {
-          senderMatches = true;
-        } else {
-          // sender의 주요 단어 중 하나라도 매칭되면
-          for (final word in senderWords) {
-            if (word.length >= 2 && lowerQuery.contains(word)) {
-              senderMatches = true;
-              break;
+        final fetchResult = await mailRepository.fetchAttachments(
+          email: mail.hostMail,
+          messageId: mail.messageId,
+          oauth: oauth,
+          attachmentIds: attachmentIds,
+        );
+
+        fetchResult.fold(
+          (failure) => null,
+          (attachmentData) {
+            for (final attachment in attachments) {
+              final data = attachmentData[attachment.id];
+              if (data != null) {
+                attachmentFiles.add(PlatformFile(
+                  name: attachment.name,
+                  size: data.length,
+                  bytes: data,
+                  path: null,
+                  identifier: attachment.id,
+                ));
+              }
             }
-          }
-        }
-
-        if (senderMatches && hasActionRequest) {
-          // 액션 요청이 있고 sender가 매칭되면 자동으로 로드
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
-
-        // 제목에 키워드가 있는지 확인
-        final title = inbox.title.toLowerCase();
-        final titleWords = title.split(' ').where((w) => w.length >= 2).toList();
-        for (final word in titleWords.take(5)) {
-          // 최대 5개 단어만 확인
-          if (lowerQuery.contains(word) && hasActionRequest) {
-            detectedNumbers.add(itemNumber);
-            break;
-          }
-        }
-      }
-
-      // Message인 경우 sender 이름 확인
-      if (inbox.linkedMessage != null) {
-        final message = inbox.linkedMessage!;
-        final userName = message.userName.toLowerCase();
-
-        if (userName.length >= 2 && lowerQuery.contains(userName) && hasActionRequest) {
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
-
-        final channelName = message.channelName.toLowerCase();
-        if (channelName.length >= 2 && lowerQuery.contains(channelName) && hasActionRequest) {
-          detectedNumbers.add(itemNumber);
-          continue;
-        }
+            return null;
+          },
+        );
+      } catch (e) {
+        // 첨부 파일 다운로드 실패 시 계속 진행
+        continue;
       }
     }
 
-    return detectedNumbers;
+    return attachmentFiles;
   }
+
+  /// AI 응답에서 <need_more_action> 태그를 파싱합니다.
+  Map<String, dynamic>? _parseNeedMoreActionTag(String aiResponse) {
+    try {
+      final RegExp tagRegex = RegExp(r'<need_more_action>\s*(\{[^}]+\})\s*</need_more_action>', caseSensitive: false);
+      final match = tagRegex.firstMatch(aiResponse);
+      if (match == null) return null;
+
+      final jsonStr = match.group(1);
+      if (jsonStr == null) return null;
+
+      final jsonData = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return jsonData;
+    } catch (e) {
+      return null;
+    }
+  }
+
 
   /// 대화 시작 메시지의 summary를 생성합니다.
   /// 사용자 메시지를 추가하고 AI 응답을 받습니다.
