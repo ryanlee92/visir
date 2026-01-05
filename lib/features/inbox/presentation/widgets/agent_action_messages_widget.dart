@@ -2787,34 +2787,6 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             ] else if (widget.functionName == 'createEvent' || widget.functionName == 'updateEvent') ...[
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ],
-            const SizedBox(height: 6),
-            if (!_isProcessing)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IntrinsicWidth(
-                    child: VisirButton(
-                      type: VisirButtonAnimationType.scaleAndOpacity,
-                      style: VisirButtonStyle(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        backgroundColor: context.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      options: VisirButtonOptions(
-                        bypassTextField: true,
-                        shortcuts: [
-                          VisirButtonKeyboardShortcut(
-                            keys: [if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control, LogicalKeyboardKey.enter],
-                            message: context.tr.confirm,
-                          ),
-                        ],
-                      ),
-                      onTap: _handleConfirm,
-                      child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                    ),
-                  ),
-                ],
-              ),
           ],
         ),
       ),
