@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Buffer } from 'node:buffer';
+import * as crypto from 'node:crypto';
 
 import { PubSub } from '@google-cloud/pubsub';
 import { ApnsClient, Notification, NotificationOptions } from 'apns2';
@@ -61,6 +62,81 @@ const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
 		results.push(chunk);
 	}
 	return results;
+};
+
+// Decrypt AES CryptoJS format (compatible with Dart implementation)
+const decryptAESCryptoJS = (encrypted: string, passphrase: string): string => {
+	try {
+		console.log(`############## decryptAESCryptoJS: encrypted length=${encrypted.length}, passphrase length=${passphrase.length}`);
+		
+		// Base64 decode
+		const encryptedBytesWithSalt = Buffer.from(encrypted, 'base64');
+		console.log(`############## decryptAESCryptoJS: decoded length=${encryptedBytesWithSalt.length}`);
+		
+		// Check for "Salted__" header (8 bytes)
+		const header = encryptedBytesWithSalt.subarray(0, 8);
+		const headerStr = header.toString('ascii');
+		console.log(`############## decryptAESCryptoJS: header=${headerStr}`);
+		
+		if (headerStr !== 'Salted__') {
+			throw new Error(`Invalid encrypted data format: header is "${headerStr}" instead of "Salted__"`);
+		}
+		
+		// Extract salt (8-16 bytes)
+		const salt = encryptedBytesWithSalt.subarray(8, 16);
+		console.log(`############## decryptAESCryptoJS: salt length=${salt.length}`);
+		
+		// Extract encrypted data (16 bytes onwards)
+		const encryptedBytes = encryptedBytesWithSalt.subarray(16);
+		console.log(`############## decryptAESCryptoJS: encrypted data length=${encryptedBytes.length}`);
+		
+		// Derive key and IV using MD5 (same as Dart implementation)
+		const { key, iv } = deriveKeyAndIV(passphrase, salt);
+		console.log(`############## decryptAESCryptoJS: key length=${key.length}, iv length=${iv.length}`);
+		
+		// Decrypt using AES CBC mode
+		const decipher = crypto.createDecipheriv('aes-256-cbc', key as any, iv as any);
+		decipher.setAutoPadding(true); // PKCS7 padding
+		
+		let decrypted = decipher.update(encryptedBytes as any);
+		decrypted = Buffer.concat([decrypted, decipher.final() as any]);
+		
+		const result = decrypted.toString('utf8');
+		console.log(`############## decryptAESCryptoJS: decrypted result length=${result.length}`);
+		return result;
+	} catch (error) {
+		console.log(`############## decryptAESCryptoJS error: ${error}, error message: ${error instanceof Error ? error.message : String(error)}`);
+		throw error;
+	}
+};
+
+// Derive key and IV from passphrase and salt (same as Dart implementation)
+const deriveKeyAndIV = (passphrase: string, salt: Buffer): { key: Buffer; iv: Buffer } => {
+	const password = Buffer.from(passphrase, 'utf8');
+	let concatenatedHashes = Buffer.alloc(0);
+	let currentHash = Buffer.alloc(0);
+	let enoughBytesForKey = false;
+	
+	while (!enoughBytesForKey) {
+		let preHash: Buffer;
+		if (currentHash.length > 0) {
+			preHash = Buffer.concat([currentHash, password, salt] as any);
+		} else {
+			preHash = Buffer.concat([password, salt] as any);
+		}
+		
+		currentHash = crypto.createHash('md5').update(preHash as any).digest() as Buffer;
+		concatenatedHashes = Buffer.concat([concatenatedHashes, currentHash] as any);
+		
+		if (concatenatedHashes.length >= 48) {
+			enoughBytesForKey = true;
+		}
+	}
+	
+	const keyBytes = concatenatedHashes.subarray(0, 32);
+	const ivBytes = concatenatedHashes.subarray(32, 48);
+	
+	return { key: keyBytes, iv: ivBytes };
 };
 
 const isDesktopData = (data: sendFcmData) => {
@@ -443,8 +519,49 @@ export const scheduledfcmcalendargoogle = v2.scheduler.onSchedule(
 				sentReminders.map((r) => {
 					var title: string = r.title;
 					if (r.is_encrypted) {
-						var bytes = CryptoJS.AES.decrypt(title, aesKey);
-						title = bytes.toString(CryptoJS.enc.Utf8);
+						try {
+							console.log(`############## Decrypt attempt: encrypted=${r.title.substring(0, 50)}..., aesKey=${aesKey}, aesKeyLength=${aesKey.length}`);
+							
+							// Try CryptoJS first (original method)
+							var cryptoJSTitle = '';
+							try {
+								var cryptoJSBytes = CryptoJS.AES.decrypt(r.title, aesKey);
+								cryptoJSTitle = cryptoJSBytes.toString(CryptoJS.enc.Utf8);
+								console.log(`############## CryptoJS result: ${cryptoJSTitle}, length=${cryptoJSTitle.length}`);
+							} catch (cryptoJSError) {
+								console.log(`############## CryptoJS error: ${cryptoJSError}`);
+							}
+							
+							// Try custom decryptAESCryptoJS (Dart-compatible)
+							var customTitle = '';
+							try {
+								customTitle = decryptAESCryptoJS(r.title, aesKey);
+								console.log(`############## Custom decrypt result: ${customTitle}, length=${customTitle.length}`);
+							} catch (customError) {
+								console.log(`############## Custom decrypt error: ${customError}, error message: ${customError instanceof Error ? customError.message : String(customError)}`);
+							}
+							
+							// Use whichever worked
+							if (cryptoJSTitle && cryptoJSTitle.trim() !== '' && cryptoJSTitle !== '[object Object]') {
+								title = cryptoJSTitle;
+								console.log(`############## Using CryptoJS result`);
+							} else if (customTitle && customTitle.trim() !== '') {
+								title = customTitle;
+								console.log(`############## Using custom decrypt result`);
+							} else {
+								console.log(`############## Both methods failed, using calendar name: ${r.calendar_name}`);
+								title = r.calendar_name || 'Event';
+							}
+						} catch (e) {
+							console.log(`############## Outer decryption error: ${e}, error message: ${e instanceof Error ? e.message : String(e)}`);
+							// Decryption error, use calendar name as fallback
+							title = r.calendar_name || 'Event';
+						}
+					} else {
+						// Not encrypted, but check if empty
+						if (!title || title.trim() === '') {
+							title = r.calendar_name || 'Event';
+						}
 					}
 
 					const startDate = dayjs(r.start_date);
@@ -534,6 +651,8 @@ export const scheduledfcmcalendargoogle = v2.scheduler.onSchedule(
 					}
 
 					const token = r.n.fcm_token || r.n.device_id;
+					// Use the notification image for this specific calendar_id, not just the token
+					const notificationImageUrl = r.n.gcal_notification_image?.[r.calendar_id];
 					let data: sendFcmData = {
 						apnsToken: r.n.apns_token,
 						fcmToken: token,
@@ -554,7 +673,7 @@ export const scheduledfcmcalendargoogle = v2.scheduler.onSchedule(
 						notification: {
 							title: title,
 							body: body,
-							imageUrl: notificationImage[token],
+							imageUrl: notificationImageUrl,
 						},
 						subtitle: undefined,
 						subtitleSeparator: undefined,
