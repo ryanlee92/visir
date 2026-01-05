@@ -5,7 +5,6 @@ import 'package:pdfx/pdfx.dart';
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
-import 'package:Visir/features/common/infrastructure/entities/environment.dart';
 import 'package:Visir/features/inbox/domain/datasources/inbox_datasource.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
@@ -14,9 +13,7 @@ import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dar
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
-import 'package:Visir/flavors.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -27,13 +24,8 @@ class OpenAiInboxDatasource extends InboxDatasource {
     // API 키가 제공되지 않으면 전역 변수에서 가져오기
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
+      // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨), 없으면 null
       finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
-      // 전역 변수에도 없으면 config.json에서 가져오기 (fallback)
-      if (finalApiKey == null || finalApiKey.isEmpty) {
-        final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-        final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-        finalApiKey = env.openAiApiKey;
-      }
     }
     if (finalApiKey == null || finalApiKey.isEmpty) {
       return [];
@@ -500,12 +492,10 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     String? apiKey,
   }) async {
     final modelName = model ?? 'gpt-5-mini';
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     // Build conversation snippet
@@ -710,12 +700,10 @@ Return only the summary text, no additional formatting or explanations.
   /// Extracts search keywords from task information using OpenAI
   /// Returns a list of keywords that can be used to search in integrated datasources
   Future<List<String>?> extractSearchKeywords({required String taskTitle, String? taskDescription, String? taskProjectName, String? calendarName, String? apiKey}) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final taskInfo = [
@@ -846,12 +834,10 @@ Return only the JSON array, no additional text or explanations.
     required List<Map<String, dynamic>> conversationHistory,
     String? apiKey,
   }) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final originalSnippet = originalMail.snippetWithLineBreaks ?? originalMail.snippet ?? '';
@@ -951,12 +937,10 @@ HTML 형식의 메일 본문만 반환해주세요. 추가 설명이나 주석�
     required List<Map<String, dynamic>> conversationHistory,
     required String model,
   }) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final originalSubject = linkedMail.title;
@@ -1063,12 +1047,10 @@ Return only the HTML-formatted email body. Do not include any additional explana
     String? actionType, // 'reply', 'send', etc. - used to adjust prompt
     String? apiKey,
   }) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final originalSubject = linkedMail.title;
@@ -1451,12 +1433,10 @@ Return only the JSON object, no additional text or explanations.
     EventEntity? previousEventEntity,
     String? apiKey,
   }) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final inboxTitle = inbox.title ?? '';
@@ -1822,12 +1802,10 @@ Return only the JSON object, no additional text or explanations.
 
   /// AI를 사용하여 task 제안을 생성합니다.
   Future<Map<String, dynamic>?> generateSuggestedTask({required InboxEntity inbox, required List<Map<String, dynamic>> projects, required String model, String? apiKey}) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final inboxTitle = inbox.title ?? '';
@@ -1951,12 +1929,10 @@ Return only the JSON object, no additional text or explanations.
 
   /// AI를 사용하여 suggested event를 생성합니다.
   Future<Map<String, dynamic>?> generateSuggestedEvent({required InboxEntity inbox, required List<Map<String, dynamic>> calendars, required String model, String? apiKey}) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final inboxTitle = inbox.title ?? '';
@@ -2157,12 +2133,10 @@ Return only the JSON object, no additional text or explanations.
     TaskEntity? previousTaskEntity,
     String? apiKey,
   }) async {
-    // API 키가 제공되지 않으면 환경 변수에서 가져오기
+    // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     String? finalApiKey = apiKey;
     if (finalApiKey == null || finalApiKey.isEmpty) {
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+      finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
     final inboxTitle = inbox.title ?? '';
@@ -2629,12 +2603,10 @@ Return only the JSON object, no additional text or explanations.
     String? systemPrompt,
   }) async {
     try {
-      // API 키가 제공되지 않으면 환경 변수에서 가져오기
+      // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
       String? finalApiKey = apiKey;
       if (finalApiKey == null || finalApiKey.isEmpty) {
-        final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-        final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-        finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+        finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
       }
 
       // Build system message with project context and tagged context if available
@@ -3284,12 +3256,10 @@ Response:
     String? apiKey,
   }) async {
     try {
-      // API 키가 제공되지 않으면 환경 변수에서 가져오기
+      // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
       String? finalApiKey = apiKey;
       if (finalApiKey == null || finalApiKey.isEmpty) {
-        final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-        final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-        finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : (env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null);
+        finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
       }
 
       // Build recipients info

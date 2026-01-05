@@ -43,18 +43,19 @@ class GoogleApiHandler {
         : PlatformX.isWeb
         ? env.googleClientIdWeb
         : PlatformX.isWindows
-        ? env.googleClientIdWeb // Windows는 Desktop Client ID 사용
+        ? env.googleClientIdWeb
         : env.googleClientIdWeb;
 
+    // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
     final clientSecret = PlatformX.isAppAuthSupported
         ? PlatformX.isAndroid
               ? ''
               : ''
         : PlatformX.isWeb
-        ? (googleCliendSecretWeb.isNotEmpty ? googleCliendSecretWeb : env.googleCliendSecretWeb)
+        ? googleCliendSecretWeb
         : PlatformX.isWindows
-        ? (googleCliendSecretWeb.isNotEmpty ? googleCliendSecretWeb : env.googleCliendSecretDesktop) // Windows는 Desktop Secret 사용 (function에서 받아옴)
-        : (googleCliendSecretWeb.isNotEmpty ? googleCliendSecretWeb : env.googleCliendSecretWeb);
+        ? googleCliendSecretWeb // Windows는 Desktop Secret 사용
+        : googleCliendSecretWeb;
 
     return ClientId(clientId, clientSecret);
   }
@@ -103,12 +104,12 @@ class GoogleApiHandler {
       'scope': scope.join(' '),
       'redirect_uri': PlatformX.isWindows || PlatformX.isWeb ? redirectUrl : '${callbackUrl}:/',
     };
-    
+
     // audience 파라미터는 Windows/Web에서만 사용 (일부 경우에만 필요)
     if (PlatformX.isWindows || PlatformX.isWeb) {
       oauthParams['audience'] = PlatformX.isWindows ? env.googleClientIdDesktop : env.googleClientIdWeb;
     }
-    
+
     final url = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', oauthParams);
 
     debugPrint('[GoogleApiHandler.getCode] OAuth URL: ${url.toString()}');
@@ -170,7 +171,9 @@ class GoogleApiHandler {
     debugPrint('[GoogleApiHandler.integrate] ClientSecret: ${secret != null && secret.isNotEmpty ? 'present (${secret.length} chars)' : 'EMPTY or NULL'}');
     debugPrint('[GoogleApiHandler.integrate] Platform: Windows=${PlatformX.isWindows}, Web=${PlatformX.isWeb}');
     debugPrint('[GoogleApiHandler.integrate] Using Desktop Client ID: ${PlatformX.isWindows}');
-    debugPrint('[GoogleApiHandler.integrate] Desktop Secret from function: ${googleCliendSecretDesktop.isNotEmpty ? 'present (${googleCliendSecretDesktop.length} chars)' : 'EMPTY'}');
+    debugPrint(
+      '[GoogleApiHandler.integrate] Desktop Secret from function: ${googleCliendSecretDesktop.isNotEmpty ? 'present (${googleCliendSecretDesktop.length} chars)' : 'EMPTY'}',
+    );
 
     final configFile = await rootBundle.loadString('assets/config/config.json');
     final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
@@ -186,7 +189,7 @@ class GoogleApiHandler {
     final code = result['code'];
     final redirect = result['redirect'];
     debugPrint('[GoogleApiHandler.integrate] Code: $code, Redirect: $redirect');
-    
+
     if (code == null) {
       debugPrint('[GoogleApiHandler.integrate] ERROR: Code is null!');
       return null;
@@ -204,46 +207,35 @@ class GoogleApiHandler {
     debugPrint('  - redirect_uri: $redirect');
     debugPrint('  - grant_type: authorization_code');
     debugPrint('  - code length: ${code.length}');
-    
-    final tokenRequestBody = {
-      'client_id': clientId.identifier,
-      'client_secret': clientId.secret ?? '',
-      'redirect_uri': redirect,
-      'grant_type': 'authorization_code',
-      'code': code,
-    };
+
+    final tokenRequestBody = {'client_id': clientId.identifier, 'client_secret': clientId.secret ?? '', 'redirect_uri': redirect, 'grant_type': 'authorization_code', 'code': code};
     debugPrint('[GoogleApiHandler.integrate] Token request body: ${tokenRequestBody.map((k, v) => MapEntry(k, k == 'client_secret' ? (v.isNotEmpty ? '***' : 'EMPTY') : v))}');
-    
-    final response = await http.post(
-      tokenUrl,
-      body: tokenRequestBody,
-    );
+
+    final response = await http.post(tokenUrl, body: tokenRequestBody);
 
     debugPrint('[GoogleApiHandler.integrate] Token response status: ${response.statusCode}');
     debugPrint('[GoogleApiHandler.integrate] Token response body: ${response.body}');
-    
+
     final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
     debugPrint('[GoogleApiHandler.integrate] Parsed response body: $responseBody');
-    
+
     final tokenType = responseBody['token_type'] as String?;
     final accessTokenStr = responseBody['access_token'] as String?;
     final expiresIn = responseBody['expires_in'] as int?;
     final refreshTokenStr = responseBody['refresh_token'] as String?;
-    
-    debugPrint('[GoogleApiHandler.integrate] token_type: $tokenType, access_token: ${accessTokenStr != null ? 'present' : 'null'}, expires_in: $expiresIn, refresh_token: ${refreshTokenStr != null ? 'present' : 'null'}');
-    
+
+    debugPrint(
+      '[GoogleApiHandler.integrate] token_type: $tokenType, access_token: ${accessTokenStr != null ? 'present' : 'null'}, expires_in: $expiresIn, refresh_token: ${refreshTokenStr != null ? 'present' : 'null'}',
+    );
+
     if (tokenType == null || accessTokenStr == null || expiresIn == null) {
       debugPrint('[GoogleApiHandler.integrate] ERROR: Missing required token fields');
       return null;
     }
-    
-    accessToken = AccessToken(
-      tokenType,
-      accessTokenStr,
-      callDatetime.add(Duration(seconds: expiresIn)).toUtc(),
-    );
+
+    accessToken = AccessToken(tokenType, accessTokenStr, callDatetime.add(Duration(seconds: expiresIn)).toUtc());
     refreshToken = refreshTokenStr;
-    
+
     if (refreshToken == null) {
       debugPrint('[GoogleApiHandler.integrate] WARNING: refresh_token is null');
     }

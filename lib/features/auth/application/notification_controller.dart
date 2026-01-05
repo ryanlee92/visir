@@ -13,7 +13,6 @@ import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/providers.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/chat/providers.dart';
-import 'package:Visir/features/common/infrastructure/entities/environment.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
@@ -22,12 +21,10 @@ import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
-import 'package:Visir/flavors.dart';
 import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:emoji_extension/emoji_extension.dart' hide Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/experimental/persist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -190,9 +187,8 @@ class NotificationControllerInternal extends _$NotificationControllerInternal {
         apns = await FirebaseMessaging.instance.getAPNSToken();
       }
 
-      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-      FirebaseMessaging.instance.getToken(vapidKey: PlatformX.isWeb ? env.fcmWebVapidKey : null).then((token) => _updateNotification(fcmToken: token));
+      // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
+      FirebaseMessaging.instance.getToken(vapidKey: PlatformX.isWeb ? fcmWebVapidKey : null).then((token) => _updateNotification(fcmToken: token));
       FirebaseMessaging.instance.onTokenRefresh.listen((token) => _updateNotification(fcmToken: token));
       FirebaseMessaging.onBackgroundMessage(onNotificationBackground);
       await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);

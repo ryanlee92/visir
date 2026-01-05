@@ -3,11 +3,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:Visir/config/providers.dart';
-import 'package:Visir/features/common/infrastructure/entities/environment.dart';
-import 'package:Visir/flavors.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/calendar/application/calendar_event_list_controller.dart';
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
@@ -492,14 +489,8 @@ class AgentActionController extends _$AgentActionController {
         final apiKeys = ref.read(aiApiKeysProvider);
         apiKey = apiKeys[selectedModel.provider.name];
       } else {
-        // 환경 변수에서 가져오기 (datasource와 동일한 방식)
-        try {
-          final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-          final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-          apiKey = env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null;
-        } catch (e) {
-          // 환경 변수 읽기 실패
-        }
+        // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
+        apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
       }
 
       // 사용자 ID 가져오기 (크레딧 체크용)
@@ -1119,13 +1110,8 @@ class AgentActionController extends _$AgentActionController {
                     final apiKeys = ref.read(aiApiKeysProvider);
                     apiKey = apiKeys[selectedModel.provider.name];
                   } else {
-                    try {
-                      final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-                      final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-                      apiKey = env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null;
-                    } catch (e) {
-                      // 환경 변수 읽기 실패
-                    }
+                    // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
+                    apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
                   }
 
                   final projects = ref.read(projectListControllerProvider);
@@ -2967,13 +2953,8 @@ class AgentActionController extends _$AgentActionController {
         apiKey = apiKeys[selectedModel.provider.name];
       } else {
         // 환경 변수에서 가져오기 (datasource와 동일한 방식)
-        try {
-          final configFile = await rootBundle.loadString('assets/config/${F.envFileName}');
-          final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
-          apiKey = env.openAiApiKey.isNotEmpty ? env.openAiApiKey : null;
-        } catch (e) {
-          // 환경 변수 읽기 실패
-        }
+        // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
+        apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
       }
 
       // Projects 리스트 가져오기 (Available Projects 리스트 제공용)

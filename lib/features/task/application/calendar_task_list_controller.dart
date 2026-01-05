@@ -964,7 +964,6 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
 
     // Use global aesKey variable (updated from Edge Function) instead of env.encryptAESKey
     final encryptionKey = aesKey.isNotEmpty ? aesKey : env.encryptAESKey;
-    print('############## Dart task encryptAESKey: global aesKey=$aesKey, length=${aesKey.length}, env.encryptAESKey=$encryptionKey, length=${encryptionKey.length}');
 
     /// 📌 EventEntity 리스트에서 CalendarReminderEntity 추출
     final doneTasks = list.where((e) => e.isDone).toList();
@@ -976,9 +975,7 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
             if (r.minutes == null) return [];
             if (e.isDone || e.isCancelled) return [];
 
-            final originalTitle = e.title ?? '(No title)';
-            final title = Utils.encryptAESCryptoJS(originalTitle, encryptionKey);
-            print('############## Dart task encrypt: originalTitle=$originalTitle, encrypted=${title.substring(0, title.length > 50 ? 50 : title.length)}..., aesKey=$encryptionKey');
+            final title = Utils.encryptAESCryptoJS(e.title ?? '(No title)', encryptionKey);
 
             if (e.rrule != null) {
               if (e.startDate.isAfter(DateTime.now().add(Duration(days: 28)))) return [];
