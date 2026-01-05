@@ -28,6 +28,7 @@ import 'package:Visir/features/preference/application/local_pref_controller.dart
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
+import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_entity.dart';
@@ -57,8 +58,9 @@ class AgentActionMessage {
   final String content;
   final bool excludeFromHistory; // conversation history에서 제외할지 여부 (함수 실행 결과 메시지용)
   final List<PlatformFile>? files; // 첨부된 파일 목록
+  final List<TaskEntity>? deletedTasks; // 삭제된 task 정보 (confirm 후에도 preview 유지용)
 
-  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false, this.files});
+  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false, this.files, this.deletedTasks});
 
   Map<String, dynamic> toJson({bool? local}) {
     return {
@@ -181,6 +183,12 @@ class AgentActionState {
 class AgentActionController extends _$AgentActionController {
   late InboxRepository _repository;
   late AgentChatHistoryRepository _historyRepository;
+
+  // deleteTask의 경우 함수 실행 전에 추출한 task 정보를 저장 (confirm 후에도 preview 유지용)
+  final Map<String, List<TaskEntity>> _deletedTasksCache = {};
+
+  // 캐시에 접근하기 위한 getter
+  Map<String, List<TaskEntity>> get deletedTasksCache => _deletedTasksCache;
 
   bool get useUserApiKey => ref.watch(selectedAgentModelProvider).value?.useUserApiKey ?? false;
   AgentModel get selectedModel => ref.watch(selectedAgentModelProvider).value?.model ?? AgentModel.gpt51;
@@ -2591,6 +2599,9 @@ class AgentActionController extends _$AgentActionController {
     final callsToExecute = <Map<String, dynamic>>[];
     final seenActionIds = <String>{};
     final seenFunctionSignatures = <String>{};
+    // deleteTask의 경우 함수 실행 전에 task 정보를 추출하여 저장 (실행 후에는 삭제되어 찾을 수 없음)
+    final deletedTasksBeforeExecution = <TaskEntity>[];
+    final messageId = const Uuid().v4(); // 이번 confirm에 대한 고유 ID 생성
 
     for (final call in filteredCalls) {
       final functionName = call['function_name'] as String? ?? '';
@@ -2611,6 +2622,90 @@ class AgentActionController extends _$AgentActionController {
         seenActionIds.add(actionId);
         seenFunctionSignatures.add(signature);
         callsToExecute.add(call);
+
+        // deleteTask의 경우 함수 실행 전에 task 정보 추출
+        if (functionName == 'deleteTask') {
+          final taskId = functionArgs['taskId'] as String?;
+          if (taskId != null && taskId.isNotEmpty) {
+            TaskEntity? taskToDelete;
+
+            // 1. updated_tagged_tasks에서 task 찾기 (가장 확실한 방법)
+            final updatedTaggedTasks = call['updated_tagged_tasks'] as List<dynamic>?;
+            if (updatedTaggedTasks != null) {
+              for (final taskData in updatedTaggedTasks) {
+                if (taskData is TaskEntity && taskData.id == taskId) {
+                  taskToDelete = taskData;
+                  break;
+                } else if (taskData is Map<String, dynamic> && taskData['id'] == taskId) {
+                  try {
+                    taskToDelete = TaskEntity.fromJson(taskData);
+                    break;
+                  } catch (_) {}
+                }
+              }
+            }
+
+            // 2. 찾지 못하면 컨트롤러에서 찾기 (삭제 전이므로 아직 있을 수 있음)
+            if (taskToDelete == null) {
+              try {
+                final taskListState = ref.read(taskListControllerProvider);
+                taskToDelete = taskListState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
+              } catch (_) {}
+
+              if (taskToDelete == null) {
+                try {
+                  final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+                  taskToDelete = calendarState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
+                } catch (_) {}
+              }
+            }
+
+            // 3. task를 찾았으면 deletedTasksBeforeExecution에 추가하고 캐시에도 저장
+            // 중요: task가 삭제되기 전에 완전한 복사본을 만들어서 저장 (삭제 후 정보 손실 방지)
+            if (taskToDelete != null && !deletedTasksBeforeExecution.any((t) => t.id == taskId)) {
+              // task의 완전한 복사본 생성 (모든 필드 보존)
+              // copyWith를 사용하되, 모든 필드를 명시적으로 전달하여 완전한 복사본 생성
+              final taskCopy = taskToDelete.copyWith(
+                id: taskToDelete.id,
+                ownerId: taskToDelete.ownerId,
+                title: taskToDelete.title,
+                description: taskToDelete.description,
+                projectId: taskToDelete.projectId,
+                startAt: taskToDelete.startAt,
+                endAt: taskToDelete.endAt,
+                isAllDay: taskToDelete.isAllDay,
+                status: taskToDelete.status,
+                createdAt: taskToDelete.createdAt,
+                updatedAt: taskToDelete.updatedAt,
+                linkedEvent: taskToDelete.linkedEvent,
+                editedStartTime: taskToDelete.editedStartTime,
+                editedEndTime: taskToDelete.editedEndTime,
+                rrule: taskToDelete.rrule,
+                recurrenceEndAt: taskToDelete.recurrenceEndAt,
+                recurringTaskId: taskToDelete.recurringTaskId,
+                excludedRecurrenceDate: taskToDelete.excludedRecurrenceDate,
+                editedRecurrenceTaskIds: taskToDelete.editedRecurrenceTaskIds,
+                reminders: taskToDelete.reminders,
+                linkedMails: taskToDelete.linkedMails,
+                linkedMessages: taskToDelete.linkedMessages,
+              );
+
+              // color는 copyWith 후에 별도로 설정
+              if (taskToDelete.color != null) {
+                taskCopy.setColor(taskToDelete.color!);
+              }
+
+              deletedTasksBeforeExecution.add(taskCopy);
+              // 전역 캐시에 저장 (메시지 ID를 키로 사용)
+              if (!_deletedTasksCache.containsKey(messageId)) {
+                _deletedTasksCache[messageId] = [];
+              }
+              if (!_deletedTasksCache[messageId]!.any((t) => t.id == taskId)) {
+                _deletedTasksCache[messageId]!.add(taskCopy);
+              }
+            }
+          }
+        }
       }
     }
 
@@ -2942,7 +3037,15 @@ class AgentActionController extends _$AgentActionController {
 
     // 함수 실행 결과 메시지는 conversation history에서 제외하도록 플래그 설정
     // 룰베이스로 텍스트를 변경하지 않음 - excludeFromHistory 플래그로 처리
-    final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage, excludeFromHistory: true);
+    // deleteTask의 경우 함수 실행 전에 추출한 task 정보 사용 (deletedTasksBeforeExecution 또는 캐시에서)
+    final cachedDeletedTasks = _deletedTasksCache[messageId] ?? deletedTasksBeforeExecution;
+
+    final assistantMessage = AgentActionMessage(
+      role: 'assistant',
+      content: resultMessage,
+      excludeFromHistory: true,
+      deletedTasks: cachedDeletedTasks.isNotEmpty ? cachedDeletedTasks : null, // 삭제된 task 정보 포함
+    );
     final updatedMessages = [...state.messages, assistantMessage];
 
     // pendingFunctionCalls에서 실행된 항목 제거 (entity block은 유지)

@@ -836,20 +836,14 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         endAt = endAt ?? startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
       }
 
+      final controller = ref.read(agentActionControllerProvider.notifier);
+      final cachedTasks = controller.deletedTasksCache.values.expand((tasks) => tasks).toList();
+
       final task =
           existingTask?.copyWith(title: title, description: description, projectId: projectId, startAt: startAt, endAt: endAt, isAllDay: isAllDay) ??
-          TaskEntity(
-            id: taskId ?? const Uuid().v4(),
-            ownerId: user.id,
-            title: title,
-            description: description,
-            projectId: projectId,
-            startAt: startAt,
-            endAt: endAt,
-            isAllDay: isAllDay,
-            createdAt: existingTask?.createdAt ?? DateTime.now(),
-            status: existingTask?.status ?? TaskStatus.none,
-          );
+          cachedTasks.firstWhereOrNull((t) => t.id == taskId);
+
+      if (task == null) return const SizedBox.shrink();
 
       return _buildTaskWidget(context, task, isUser);
     } catch (e) {
@@ -2330,7 +2324,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                           // updateTask인 경우 updated_tagged_tasks에서 task 정보 가져오기
                                           final updatedTaggedTasks = call['updated_tagged_tasks'] as List<dynamic>?;
 
-                                          if (functionName == 'createTask' || functionName == 'updateTask') {
+                                          if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'deleteTask') {
                                             return Padding(
                                               padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
                                               child: _buildTaskEntityWithConfirm(
@@ -2782,7 +2776,7 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
             Text(widget.confirmationMessage, style: context.bodyMedium?.copyWith(color: widget.isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5)),
             if (widget.functionName == 'sendMail' || widget.functionName == 'replyMail' || widget.functionName == 'forwardMail') ...[
               _buildMailActionDetailsForConfirm(context, widget.functionName, widget.functionArgs, widget.isUser),
-            ] else if (widget.functionName == 'createTask' || widget.functionName == 'updateTask') ...[
+            ] else if (widget.functionName == 'createTask' || widget.functionName == 'updateTask' || widget.functionName == 'deleteTask') ...[
               _buildTaskActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
             ] else if (widget.functionName == 'createEvent' || widget.functionName == 'updateEvent') ...[
               _buildEventActionDetailsForConfirm(context, widget.functionArgs, widget.isUser),
@@ -2840,8 +2834,35 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
   }
 
   Widget _buildTaskActionDetailsForConfirm(BuildContext context, Map<String, dynamic> args, bool isUser) {
-    final title = args['title'] as String? ?? '';
-    final description = args['description'] as String? ?? '';
+    // deleteTask의 경우 taskId로 실제 task 찾기
+    final taskId = args['taskId'] as String?;
+    TaskEntity? existingTask;
+
+    if (taskId != null && taskId.isNotEmpty) {
+      // taskListController에서 찾기
+      try {
+        final taskListState = ref.read(taskListControllerProvider);
+        existingTask = taskListState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
+      } catch (_) {}
+
+      // 찾지 못하면 calendarTaskListController에서 찾기
+      if (existingTask == null) {
+        try {
+          final calendarState = ref.read(calendarTaskListControllerProvider(tabType: TabType.home));
+          existingTask = calendarState.tasks.firstWhereOrNull((t) => t.id == taskId && !t.isEventDummyTask);
+        } catch (_) {}
+      }
+    }
+
+    // task를 찾았으면 그 정보 사용, 없으면 args에서 가져오기
+    final title = existingTask?.title ?? args['title'] as String? ?? '';
+    final description = existingTask?.description ?? args['description'] as String? ?? '';
+    final startAt = existingTask?.startAt ?? existingTask?.startDate;
+    final endAt = existingTask?.endAt ?? existingTask?.endDate;
+    final startAtStr = startAt?.toIso8601String();
+    final endAtStr = endAt?.toIso8601String();
+
+    if (existingTask == null) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2859,6 +2880,15 @@ class _ActionConfirmWidgetState extends ConsumerState<_ActionConfirmWidget> {
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(description, style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant)),
+          ),
+        ],
+        if (startAtStr != null || endAtStr != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              Utils.mainContext.tr.agent_action_confirm_time(startAtStr ?? '', endAtStr != null ? ' - $endAtStr' : ''),
+              style: context.bodyMedium?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant),
+            ),
           ),
         ],
       ],
