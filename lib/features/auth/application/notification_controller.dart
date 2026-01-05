@@ -25,6 +25,7 @@ import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:emoji_extension/emoji_extension.dart' hide Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/experimental/persist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -420,14 +421,14 @@ class NotificationControllerInternal extends _$NotificationControllerInternal {
           }).whereType<MapEntry<String, String>>() ??
           [],
     );
-    final calNotificationImage = Map<String, String>.fromEntries(
-      linkedCalendars?.map((o) {
-            final calOauth = calOauths.where((e) => e.email == o.email).firstOrNull;
-            if (calOauth?.notificationUrl == null) return null;
-            return MapEntry(o.id, calOauth?.notificationUrl!);
-          }).whereType<MapEntry<String, String>>() ??
-          [],
-    );
+    final calNotificationImageEntries = <MapEntry<String, String>>[];
+    linkedCalendars?.forEach((o) {
+      final calOauth = calOauths.where((e) => e.email == o.email).firstOrNull;
+      if (calOauth?.notificationUrl != null) {
+        calNotificationImageEntries.add(MapEntry(o.id, calOauth!.notificationUrl!));
+      }
+    });
+    final calNotificationImage = Map<String, String>.fromEntries(calNotificationImageEntries);
     final linkedCalendarIds = (linkedCalendars ?? []).map((e) => e.id).toList()..sort((a, b) => a.compareTo(b));
     final showCalendarNotification = {};
     localCalendarResult?.keys.forEach((key) {
@@ -584,13 +585,16 @@ class NotificationControllerInternal extends _$NotificationControllerInternal {
         return MapEntry(o.id, calOauth?.serverCode!);
       }).whereType<MapEntry<String, String>>(),
     );
-    final calNotificationImage = Map<String, String>.fromEntries(
-      linkedCalendars.map((o) {
-        final calOauth = oauths.where((e) => e.email == o.email).firstOrNull;
-        if (calOauth?.notificationUrl == null) return null;
-        return MapEntry(o.id, calOauth?.notificationUrl!);
-      }).whereType<MapEntry<String, String>>(),
-    );
+    final calNotificationImageEntries = <MapEntry<String, String>>[];
+    linkedCalendars.forEach((o) {
+      final calOauth = oauths.where((e) => e.email == o.email).firstOrNull;
+      debugPrint('############## updateLinkedCalendar calNotificationImage: calendar_id=${o.id}, email=${o.email}, notificationUrl=${calOauth?.notificationUrl}');
+      if (calOauth?.notificationUrl != null) {
+        calNotificationImageEntries.add(MapEntry(o.id, calOauth!.notificationUrl!));
+      }
+    });
+    final calNotificationImage = Map<String, String>.fromEntries(calNotificationImageEntries);
+    debugPrint('############## updateLinkedCalendar calNotificationImage final: $calNotificationImage');
     final linkedCalendarIds = linkedCalendars.map((e) => e.id).toList()..sort((a, b) => a.compareTo(b));
 
     await repository.updateLinkedCalendar(
