@@ -9,10 +9,10 @@ import 'package:Visir/features/common/presentation/utils/extensions/ui_extension
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
-import 'package:Visir/dependency/rrule/src/recurrence_rule.dart';
 import 'package:Visir/features/calendar/application/calendar_list_controller.dart';
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
+import 'package:Visir/features/calendar/domain/entities/event_attendee_entity.dart';
 import 'package:Visir/features/inbox/application/agent_action_controller.dart';
 import 'package:Visir/features/chat/domain/entities/message_file_entity.dart';
 import 'package:collection/collection.dart';
@@ -26,11 +26,11 @@ import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
+import 'package:Visir/features/calendar/application/calendar_event_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_entity.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
 import 'package:Visir/features/chat/application/chat_member_list_controller.dart';
-import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -262,219 +262,92 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     );
   }
 
-  // Event data structure for display
-  Map<String, dynamic> _parseEventFromJson(Map<String, dynamic> jsonData) {
-    return {
-      'id': jsonData['id'],
-      'title': jsonData['title'],
-      'description': jsonData['description'],
-      'calendar_id': jsonData['calendar_id'] ?? jsonData['calendarId'], // calendarId도 지원
-      'start_at': jsonData['start_at'] ?? jsonData['startAt'],
-      'end_at': jsonData['end_at'] ?? jsonData['endAt'],
-      'location': jsonData['location'],
-      'rrule': jsonData['rrule'],
-      'attendees': jsonData['attendees'] as List<dynamic>? ?? [],
-      'conference_link': jsonData['conference_link'],
-      'isAllDay': jsonData['isAllDay'] ?? false,
-    };
-  }
+  // Map 데이터를 EventEntity로 변환하는 헬퍼 함수
+  EventEntity? _convertMapToEventEntity(Map<String, dynamic> eventData) {
+    try {
+      final calendarMap = ref.read(calendarListControllerProvider);
+      final calendarList = calendarMap.values.expand((e) => e).toList();
 
-  Widget _buildEventWidget(BuildContext context, Map<String, dynamic> eventData, bool isUser) {
-    final calendarMap = ref.read(calendarListControllerProvider);
-    final calendarList = calendarMap.values.expand((e) => e).toList();
-    // calendar_id 또는 calendarId 모두 지원
-    final calendarId = eventData['calendar_id'] as String? ?? eventData['calendarId'] as String?;
-    CalendarEntity? calendar;
-    if (calendarId != null && calendarId.isNotEmpty) {
-      calendar = calendarList.firstWhereOrNull((c) => c.uniqueId == calendarId);
-    }
-    // calendarId가 없거나 찾지 못한 경우 첫 번째 캘린더 사용
-    if (calendar == null && calendarList.isNotEmpty) {
-      calendar = calendarList.first;
-    }
-
-    final startAtStr = eventData['start_at'] as String?;
-    final endAtStr = eventData['end_at'] as String?;
-    final isAllDay = eventData['isAllDay'] as bool? ?? false;
-
-    DateTime? startAt;
-    DateTime? endAt;
-    if (startAtStr != null) {
-      try {
-        startAt = DateTime.parse(startAtStr).toLocal();
-      } catch (e) {
-        // Error parsing date
+      // calendar_id 또는 calendarId 모두 지원
+      final calendarId = eventData['calendar_id'] as String? ?? eventData['calendarId'] as String?;
+      CalendarEntity? calendar;
+      if (calendarId != null && calendarId.isNotEmpty) {
+        calendar = calendarList.firstWhereOrNull((c) => c.uniqueId == calendarId);
       }
-    }
-    if (endAtStr != null) {
-      try {
-        endAt = DateTime.parse(endAtStr).toLocal();
-      } catch (e) {
-        // Error parsing date
+      // calendarId가 없거나 찾지 못한 경우 첫 번째 캘린더 사용
+      if (calendar == null && calendarList.isNotEmpty) {
+        calendar = calendarList.first;
       }
+      if (calendar == null) {
+        return null;
+      }
+
+      final title = eventData['title'] as String? ?? '';
+      final description = eventData['description'] as String? ?? '';
+      final location = eventData['location'] as String?;
+      final isAllDay = eventData['isAllDay'] as bool? ?? false;
+
+      final startAtStr = eventData['start_at'] as String?;
+      final endAtStr = eventData['end_at'] as String?;
+
+      DateTime? startAt;
+      DateTime? endAt;
+      if (startAtStr != null) {
+        try {
+          startAt = DateTime.parse(startAtStr).toLocal();
+        } catch (e) {
+          startAt = DateTime.now();
+        }
+      } else {
+        startAt = DateTime.now();
+      }
+
+      if (endAtStr != null) {
+        try {
+          endAt = DateTime.parse(endAtStr).toLocal();
+        } catch (e) {
+          endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+        }
+      } else {
+        endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+      }
+
+      // attendees 변환
+      final attendeesList = eventData['attendees'] as List<dynamic>? ?? [];
+      final attendees = attendeesList
+          .map((a) {
+            if (a is Map<String, dynamic>) {
+              return EventAttendeeEntity(email: a['email'] as String?, displayName: a['displayName'] as String? ?? a['name'] as String?);
+            } else if (a is String) {
+              return EventAttendeeEntity(email: a, displayName: null);
+            }
+            return EventAttendeeEntity(email: null, displayName: null);
+          })
+          .where((a) => a.email != null || a.displayName != null)
+          .toList();
+
+      // EventEntity 생성 (Google Calendar 기본 사용)
+      return EventEntity(
+        calendarType: CalendarEntityType.google,
+        eventId: eventData['id'] as String?,
+        title: title,
+        description: description,
+        rrule: null,
+        location: location,
+        isAllDay: isAllDay,
+        startDate: startAt,
+        endDate: endAt,
+        attendees: attendees,
+        reminders: [],
+        attachments: [],
+        conferenceLink: eventData['conference_link'] as String?,
+        timezone: 'UTC',
+        sequence: 0,
+        calendar: calendar,
+      );
+    } catch (e) {
+      return null;
     }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: context.surface,
-        border: Border.all(color: context.outline.withValues(alpha: 0.3), width: 1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (eventData['title'] != null && (eventData['title'] as String).isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      eventData['title'] as String,
-                      style: context.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: (context.bodyLarge?.fontSize ?? 14) * 1.1,
-                        color: isUser ? context.onPrimaryContainer : context.onSurface,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          if (eventData['description'] != null && (eventData['description'] as String).isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                eventData['description'] as String,
-                style: context.bodyLarge?.copyWith(color: isUser ? context.onPrimaryContainer : context.onSurfaceVariant, height: 1.5),
-              ),
-            ),
-
-          Wrap(
-            runSpacing: 6,
-            spacing: 6,
-            children: [
-              if (calendar != null)
-                IntrinsicWidth(
-                  child: Container(
-                    decoration: BoxDecoration(color: ColorX.fromHex(calendar.backgroundColor), borderRadius: BorderRadius.circular(6)),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    child: Row(
-                      children: [
-                        VisirIcon(type: VisirIconType.calendar, size: context.bodySmall!.height! * context.bodySmall!.fontSize! - 2, color: Colors.white, isSelected: true),
-                        const SizedBox(width: 4),
-                        Text(calendar.name, style: context.bodySmall?.copyWith(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              if (startAt != null)
-                Builder(
-                  builder: (context) {
-                    final duration = (startAt != null && endAt != null) ? endAt.difference(startAt).inMinutes : 60;
-
-                    String timeText;
-                    if (startAt == null) {
-                      timeText = context.tr.all_day;
-                    } else if (isAllDay) {
-                      timeText = startAt.forceDateString + ' • ' + context.tr.all_day;
-                    } else {
-                      timeText = startAt.forceDateTimeString;
-                    }
-
-                    if (!isAllDay && endAt != null) {
-                      timeText += ', ${context.tr.ai_suggestion_duration(duration)}';
-                    }
-                    return IntrinsicWidth(
-                      child: Container(
-                        decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(6)),
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                        child: Row(
-                          children: [
-                            VisirIcon(type: VisirIconType.clock, size: context.bodySmall!.height! * context.bodySmall!.fontSize! - 2, color: Colors.white, isSelected: true),
-                            const SizedBox(width: 4),
-                            Text(timeText, style: context.bodySmall?.copyWith(color: Colors.white)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              if (eventData['location'] != null && (eventData['location'] as String).isNotEmpty)
-                IntrinsicWidth(
-                  child: Container(
-                    decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(6)),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    child: Row(
-                      children: [
-                        VisirIcon(type: VisirIconType.location, size: context.bodySmall!.height! * context.bodySmall!.fontSize! - 2, color: Colors.white, isSelected: true),
-                        const SizedBox(width: 4),
-                        Text(eventData['location'] as String, style: context.bodySmall?.copyWith(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              if (eventData['rrule'] != null && (eventData['rrule'] as String).isNotEmpty)
-                Builder(
-                  builder: (context) {
-                    try {
-                      final rruleStr = eventData['rrule'] as String;
-                      final rrule = RecurrenceRule.fromString(rruleStr);
-                      return IntrinsicWidth(
-                        child: Container(
-                          decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(6)),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                          child: Row(
-                            children: [
-                              VisirIcon(type: VisirIconType.repeat, size: context.bodySmall!.height! * context.bodySmall!.fontSize! - 2, color: Colors.white, isSelected: true),
-                              const SizedBox(width: 4),
-                              Text(
-                                rrule.toText(l10n: ref.read(rruleL10nEnProvider).asData!.value),
-                                style: context.bodySmall?.copyWith(color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    } catch (e) {
-                      return const SizedBox.shrink();
-                    }
-                  },
-                ),
-              if (eventData['attendees'] != null && (eventData['attendees'] as List).isNotEmpty)
-                IntrinsicWidth(
-                  child: Container(
-                    decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(6)),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    child: Row(
-                      children: [
-                        VisirIcon(type: VisirIconType.attendee, size: context.bodySmall!.height! * context.bodySmall!.fontSize! - 2, color: Colors.white, isSelected: true),
-                        const SizedBox(width: 4),
-                        Text('${(eventData['attendees'] as List).join(', ')}', style: context.bodySmall?.copyWith(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              if (eventData['conference_link'] != null && (eventData['conference_link'] as String).isNotEmpty)
-                IntrinsicWidth(
-                  child: Container(
-                    decoration: BoxDecoration(color: context.primary, borderRadius: BorderRadius.circular(6)),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                    child: Row(
-                      children: [
-                        VisirIcon(type: VisirIconType.videoCall, size: context.bodySmall!.height! * context.bodySmall!.fontSize! - 2, color: context.onPrimary, isSelected: true),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildMailSummaryWidget(BuildContext context, String summary, bool isUser) {
@@ -766,8 +639,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     List<dynamic>? updatedTaggedTasks,
   }) {
     try {
-      final user = ref.read(authControllerProvider).requireValue;
-
       // updateTask인 경우 taskId로 기존 task 찾기
       final taskId = functionArgs['taskId'] as String?;
       TaskEntity? existingTask;
@@ -851,54 +722,90 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     }
   }
 
-  Widget _buildEventEntityWithConfirm(BuildContext context, Map<String, dynamic> functionArgs, String actionId, bool isUser) {
+  Widget _buildEventEntityWithConfirm(
+    BuildContext context,
+    Map<String, dynamic> functionArgs,
+    String actionId,
+    bool isUser, {
+    String? functionName,
+    List<dynamic>? updatedTaggedEvents,
+  }) {
     try {
-      final title = functionArgs['title'] as String? ?? '';
-      final description = functionArgs['description'] as String? ?? '';
-      final calendarId = functionArgs['calendarId'] as String?;
+      // updateEvent인 경우 eventId로 기존 event 찾기
+      final eventId = functionArgs['eventId'] as String?;
+      EventEntity? existingEvent;
+
+      // 먼저 updatedTaggedEvents에서 찾기
+      if (updatedTaggedEvents != null && eventId != null && eventId.isNotEmpty) {
+        for (final eventData in updatedTaggedEvents) {
+          if (eventData is EventEntity && (eventData.eventId == eventId || eventData.uniqueId == eventId)) {
+            existingEvent = eventData;
+            break;
+          }
+        }
+      }
+
+      // updatedTaggedEvents에서 찾지 못하면 eventId로 컨트롤러에서 찾기
+      if (existingEvent == null && eventId != null && eventId.isNotEmpty) {
+        try {
+          final calendarState = ref.read(calendarEventListControllerProvider(tabType: TabType.home));
+          existingEvent = calendarState.eventsOnView.firstWhereOrNull((e) => e.eventId == eventId || e.uniqueId == eventId);
+        } catch (_) {}
+      }
+
+      // functionArgs에서 업데이트할 정보 가져오기
+      final title = functionArgs['title'] as String? ?? existingEvent?.title ?? '';
+      final description = functionArgs['description'] as String? ?? existingEvent?.description ?? '';
+      final calendarId = functionArgs['calendarId'] as String? ?? existingEvent?.calendar.uniqueId;
       final startAtStr = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String?;
       final endAtStr = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String?;
-      final isAllDay = functionArgs['isAllDay'] as bool? ?? false;
-      final location = functionArgs['location'] as String?;
+      final isAllDay = functionArgs['isAllDay'] as bool? ?? existingEvent?.isAllDay ?? false;
+      final location = functionArgs['location'] as String? ?? existingEvent?.location;
       final attendeesList = functionArgs['attendees'] as List<dynamic>?;
 
-      DateTime? startAt;
-      DateTime? endAt;
+      DateTime? startAt = existingEvent?.startDate;
+      DateTime? endAt = existingEvent?.endDate;
+
       if (startAtStr != null) {
         try {
           startAt = DateTime.parse(startAtStr).toLocal();
         } catch (e) {
-          startAt = DateTime.now();
+          startAt = startAt ?? DateTime.now();
         }
       } else {
-        startAt = DateTime.now();
+        startAt = startAt ?? DateTime.now();
       }
 
       if (endAtStr != null) {
         try {
           endAt = DateTime.parse(endAtStr).toLocal();
         } catch (e) {
-          endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+          endAt = endAt ?? startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
         }
       } else {
-        endAt = startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
+        endAt = endAt ?? startAt.add(isAllDay ? const Duration(days: 1) : const Duration(hours: 1));
       }
 
-      final eventData = {
-        'id': const Uuid().v4(),
-        'title': title,
-        'description': description,
-        'calendar_id': calendarId,
-        'start_at': startAt.toIso8601String(),
-        'end_at': endAt.toIso8601String(),
-        'location': location,
-        'attendees': attendeesList ?? [],
-        'isAllDay': isAllDay,
-      };
+      final controller = ref.read(agentActionControllerProvider.notifier);
+      final cachedEvents = controller.deletedEventsCache.values.expand((events) => events).toList();
 
-      return _buildEventWidget(context, eventData, isUser);
+      final event =
+          existingEvent?.copyWith(
+            title: title,
+            description: description,
+            calendar: existingEvent.calendar,
+            editedStartTime: startAt,
+            editedEndTime: endAt,
+            isAllDay: isAllDay,
+            location: location,
+          ) ??
+          cachedEvents.firstWhereOrNull((e) => e.eventId == eventId || e.uniqueId == eventId);
+
+      if (event == null) return const SizedBox.shrink();
+
+      return _buildEventEntityWidget(context, event, isUser);
     } catch (e) {
-      return Padding(padding: const EdgeInsets.only(top: 6), child: _buildActionConfirmWidget(context, 'createEvent', functionArgs, actionId, isUser));
+      return Padding(padding: const EdgeInsets.only(top: 6), child: _buildActionConfirmWidget(context, functionName ?? 'createEvent', functionArgs, actionId, isUser));
     }
   }
 
@@ -1525,8 +1432,24 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                   }
                 }
 
-                final eventData = _parseEventFromJson(jsonData);
-                return _buildEventWidget(context, eventData, isUser);
+                // Map 데이터를 EventEntity로 변환
+                final eventData = {
+                  'id': jsonData['id'],
+                  'title': jsonData['title'],
+                  'description': jsonData['description'],
+                  'calendar_id': jsonData['calendar_id'] ?? jsonData['calendarId'],
+                  'start_at': jsonData['start_at'] ?? jsonData['startAt'],
+                  'end_at': jsonData['end_at'] ?? jsonData['endAt'],
+                  'location': jsonData['location'],
+                  'attendees': jsonData['attendees'] as List<dynamic>? ?? [],
+                  'conference_link': jsonData['conference_link'],
+                  'isAllDay': jsonData['isAllDay'] ?? false,
+                };
+                final event = _convertMapToEventEntity(eventData);
+                if (event != null) {
+                  return _buildEventEntityWidget(context, event, isUser);
+                }
+                return Text(context.tr.agent_action_task_generation_failed.replaceAll('task', 'event'), style: baseStyle?.copyWith(color: context.error));
               } catch (e) {
                 // 디버깅을 위해 에러 메시지 표시
                 return Text(context.tr.agent_action_task_generation_failed.replaceAll('task', 'event'), style: baseStyle?.copyWith(color: context.error));
@@ -2337,9 +2260,18 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                               ),
                                             );
                                           } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
+                                            // updateEvent인 경우 updated_tagged_events에서 event 정보 가져오기
+                                            final updatedTaggedEvents = call['updated_tagged_events'] as List<dynamic>?;
                                             return Padding(
                                               padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                              child: _buildEventEntityWithConfirm(context, functionArgs, actionId, isUser),
+                                              child: _buildEventEntityWithConfirm(
+                                                context,
+                                                functionArgs,
+                                                actionId,
+                                                isUser,
+                                                functionName: functionName,
+                                                updatedTaggedEvents: updatedTaggedEvents,
+                                              ),
                                             );
                                           } else {
                                             return Padding(

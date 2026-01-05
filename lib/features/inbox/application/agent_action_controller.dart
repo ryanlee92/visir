@@ -59,8 +59,9 @@ class AgentActionMessage {
   final bool excludeFromHistory; // conversation history에서 제외할지 여부 (함수 실행 결과 메시지용)
   final List<PlatformFile>? files; // 첨부된 파일 목록
   final List<TaskEntity>? deletedTasks; // 삭제된 task 정보 (confirm 후에도 preview 유지용)
+  final List<EventEntity>? deletedEvents; // 삭제된 event 정보 (confirm 후에도 preview 유지용)
 
-  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false, this.files, this.deletedTasks});
+  AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false, this.files, this.deletedTasks, this.deletedEvents});
 
   Map<String, dynamic> toJson({bool? local}) {
     return {
@@ -72,6 +73,8 @@ class AgentActionMessage {
           : '',
       'exclude_from_history': excludeFromHistory,
       'files': files?.map((f) => {'name': f.name, 'size': f.size, 'path': f.path, 'bytes': f.bytes != null ? base64Encode(f.bytes!) : null}).toList(),
+      'deleted_tasks': deletedTasks?.map((t) => t.toJson(local: true)).toList(), // deletedTasks 직렬화
+      'deleted_events': deletedEvents?.map((e) => e.toJson()).toList(), // deletedEvents 직렬화 (EventEntity.toJson은 local 파라미터 없음)
     };
   }
 
@@ -94,7 +97,28 @@ class AgentActionMessage {
       }).toList();
     }
 
-    return AgentActionMessage(role: json['role'] as String, content: decryptedContent, excludeFromHistory: json['exclude_from_history'] as bool? ?? false, files: files);
+    // deletedTasks 복원
+    List<TaskEntity>? deletedTasks;
+    if (json['deleted_tasks'] != null) {
+      final deletedTasksList = json['deleted_tasks'] as List<dynamic>?;
+      deletedTasks = deletedTasksList?.map((t) => TaskEntity.fromJson(t as Map<String, dynamic>)).toList();
+    }
+
+    // deletedEvents 복원
+    List<EventEntity>? deletedEvents;
+    if (json['deleted_events'] != null) {
+      final deletedEventsList = json['deleted_events'] as List<dynamic>?;
+      deletedEvents = deletedEventsList?.map((e) => EventEntity.fromJson(e as Map<String, dynamic>)).toList();
+    }
+
+    return AgentActionMessage(
+      role: json['role'] as String,
+      content: decryptedContent,
+      excludeFromHistory: json['exclude_from_history'] as bool? ?? false,
+      files: files,
+      deletedTasks: deletedTasks,
+      deletedEvents: deletedEvents,
+    );
   }
 }
 
@@ -186,9 +210,12 @@ class AgentActionController extends _$AgentActionController {
 
   // deleteTask의 경우 함수 실행 전에 추출한 task 정보를 저장 (confirm 후에도 preview 유지용)
   final Map<String, List<TaskEntity>> _deletedTasksCache = {};
+  // deleteEvent의 경우 함수 실행 전에 추출한 event 정보를 저장 (confirm 후에도 preview 유지용)
+  final Map<String, List<EventEntity>> _deletedEventsCache = {};
 
   // 캐시에 접근하기 위한 getter
   Map<String, List<TaskEntity>> get deletedTasksCache => _deletedTasksCache;
+  Map<String, List<EventEntity>> get deletedEventsCache => _deletedEventsCache;
 
   bool get useUserApiKey => ref.watch(selectedAgentModelProvider).value?.useUserApiKey ?? false;
   AgentModel get selectedModel => ref.watch(selectedAgentModelProvider).value?.model ?? AgentModel.gpt51;
@@ -2601,6 +2628,8 @@ class AgentActionController extends _$AgentActionController {
     final seenFunctionSignatures = <String>{};
     // deleteTask의 경우 함수 실행 전에 task 정보를 추출하여 저장 (실행 후에는 삭제되어 찾을 수 없음)
     final deletedTasksBeforeExecution = <TaskEntity>[];
+    // deleteEvent의 경우 함수 실행 전에 event 정보를 추출하여 저장 (실행 후에는 삭제되어 찾을 수 없음)
+    final deletedEventsBeforeExecution = <EventEntity>[];
     final messageId = const Uuid().v4(); // 이번 confirm에 대한 고유 ID 생성
 
     for (final call in filteredCalls) {
@@ -2702,6 +2731,51 @@ class AgentActionController extends _$AgentActionController {
               }
               if (!_deletedTasksCache[messageId]!.any((t) => t.id == taskId)) {
                 _deletedTasksCache[messageId]!.add(taskCopy);
+              }
+            }
+          } else if (functionName == 'deleteEvent') {
+            // deleteEvent의 경우 함수 실행 전에 event 정보 추출
+            final eventId = functionArgs['eventId'] as String?;
+            if (eventId != null && eventId.isNotEmpty) {
+              EventEntity? eventToDelete;
+
+              // 1. updated_tagged_events에서 event 찾기 (가장 확실한 방법)
+              final updatedTaggedEvents = call['updated_tagged_events'] as List<dynamic>?;
+              if (updatedTaggedEvents != null) {
+                for (final eventData in updatedTaggedEvents) {
+                  if (eventData is EventEntity && (eventData.eventId == eventId || eventData.uniqueId == eventId)) {
+                    eventToDelete = eventData;
+                    break;
+                  }
+                }
+              }
+
+              // 2. 찾지 못하면 컨트롤러에서 찾기 (삭제 전이므로 아직 있을 수 있음)
+              if (eventToDelete == null) {
+                try {
+                  final calendarState = ref.read(calendarEventListControllerProvider(tabType: TabType.home));
+                  eventToDelete = calendarState.eventsOnView.firstWhereOrNull((e) => e.eventId == eventId || e.uniqueId == eventId);
+                } catch (_) {}
+              }
+
+              // 3. event를 찾았으면 deletedEventsBeforeExecution에 추가하고 캐시에도 저장
+              // 중요: event가 삭제되기 전에 완전한 복사본을 만들어서 저장 (삭제 후 정보 손실 방지)
+              if (eventToDelete != null && !deletedEventsBeforeExecution.any((e) => e.eventId == eventId || e.uniqueId == eventId)) {
+                // event의 완전한 복사본 생성 (copyWith 사용)
+                final eventCopy = eventToDelete.copyWith(
+                  calendar: eventToDelete.calendar,
+                  editedStartTime: eventToDelete.editedStartTime,
+                  editedEndTime: eventToDelete.editedEndTime,
+                );
+
+                deletedEventsBeforeExecution.add(eventCopy);
+                // 전역 캐시에 저장 (메시지 ID를 키로 사용)
+                if (!_deletedEventsCache.containsKey(messageId)) {
+                  _deletedEventsCache[messageId] = [];
+                }
+                if (!_deletedEventsCache[messageId]!.any((e) => e.eventId == eventId || e.uniqueId == eventId)) {
+                  _deletedEventsCache[messageId]!.add(eventCopy);
+                }
               }
             }
           }
@@ -3039,12 +3113,15 @@ class AgentActionController extends _$AgentActionController {
     // 룰베이스로 텍스트를 변경하지 않음 - excludeFromHistory 플래그로 처리
     // deleteTask의 경우 함수 실행 전에 추출한 task 정보 사용 (deletedTasksBeforeExecution 또는 캐시에서)
     final cachedDeletedTasks = _deletedTasksCache[messageId] ?? deletedTasksBeforeExecution;
+    // deleteEvent의 경우 함수 실행 전에 추출한 event 정보 사용 (deletedEventsBeforeExecution 또는 캐시에서)
+    final cachedDeletedEvents = _deletedEventsCache[messageId] ?? deletedEventsBeforeExecution;
 
     final assistantMessage = AgentActionMessage(
       role: 'assistant',
       content: resultMessage,
       excludeFromHistory: true,
       deletedTasks: cachedDeletedTasks.isNotEmpty ? cachedDeletedTasks : null, // 삭제된 task 정보 포함
+      deletedEvents: cachedDeletedEvents.isNotEmpty ? cachedDeletedEvents : null, // 삭제된 event 정보 포함
     );
     final updatedMessages = [...state.messages, assistantMessage];
 
