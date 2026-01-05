@@ -67,7 +67,7 @@ class _SelectionWidgetState<T> extends State<SelectionWidget<T>> {
                     PopupMenu(
                       type: ContextMenuActionType.tap,
                       location: PopupMenuLocation.bottom,
-                      width: 240,
+                      width: 280,
                       forcePopup: true,
                       style: VisirButtonStyle(
                         width: double.maxFinite,
@@ -85,9 +85,7 @@ class _SelectionWidgetState<T> extends State<SelectionWidget<T>> {
                                 child: widget.getTitle != null
                                     ? Text(
                                         widget.getTitle?.call(item) ?? '',
-                                        style: (widget.cellTitleTextStyle ?? context.bodyLarge)!.textColor(
-                                          widget.getTitleColor?.call(item) ?? context.outlineVariant,
-                                        ),
+                                        style: (widget.cellTitleTextStyle ?? context.bodyLarge)!.textColor(widget.getTitleColor?.call(item) ?? context.outlineVariant),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       )
@@ -131,9 +129,7 @@ class _SelectionWidgetState<T> extends State<SelectionWidget<T>> {
                                 child: widget.getTitle != null
                                     ? Text(
                                         widget.getTitle?.call(item) ?? '',
-                                        style: (widget.cellTitleTextStyle ?? context.bodyLarge)!.textColor(
-                                          widget.getTitleColor?.call(item) ?? context.outlineVariant,
-                                        ),
+                                        style: (widget.cellTitleTextStyle ?? context.bodyLarge)!.textColor(widget.getTitleColor?.call(item) ?? context.outlineVariant),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       )

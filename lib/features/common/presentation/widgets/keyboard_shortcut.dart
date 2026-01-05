@@ -34,6 +34,7 @@ class KeyboardShortcut extends StatefulWidget {
 
 class _KeyboardShortcutState extends State<KeyboardShortcut> with RouteAware {
   bool _enableKeyboard = true;
+  bool _isCurrentRoute = true;
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _KeyboardShortcutState extends State<KeyboardShortcut> with RouteAware {
   bool onKey(KeyEvent event) {
     final key = event.logicalKey;
     if (!_enableKeyboard) return false;
+    if (!_isCurrentRoute) return false;
 
     final logicalKeysPressed = ServicesBinding.instance.keyboard.logicalKeysPressed;
 
@@ -109,28 +111,33 @@ class _KeyboardShortcutState extends State<KeyboardShortcut> with RouteAware {
     super.didChangeDependencies();
     if (ModalRoute.of(context) == null) return;
     routeObserver.subscribe(this, ModalRoute.of(context) as ModalRoute<void>);
+    _isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
   }
 
   @override
   void didPopNext() {
     _enableKeyboard = true;
+    _isCurrentRoute = true;
     widget.onPushOrPopNext?.call();
   }
 
   @override
   void didPush() {
     _enableKeyboard = true;
+    _isCurrentRoute = true;
     widget.onPushOrPopNext?.call();
   }
 
   @override
   void didPop() {
     _enableKeyboard = false;
+    _isCurrentRoute = false;
   }
 
   @override
   void didPushNext() {
     _enableKeyboard = false;
+    _isCurrentRoute = false;
   }
 
   @override
