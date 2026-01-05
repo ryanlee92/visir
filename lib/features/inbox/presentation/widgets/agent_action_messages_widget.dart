@@ -813,14 +813,41 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       EventEntity? event;
       if (existingEvent != null) {
         // updateEvent인 경우 기존 event를 copyWith로 업데이트
+        // calendarId가 있으면 해당 CalendarEntity 찾기
+        CalendarEntity? calendarToUse = existingEvent.calendar;
+        if (calendarId != null && calendarId.isNotEmpty && calendarId != existingEvent.calendar.uniqueId) {
+          try {
+            final calendarMap = ref.read(calendarListControllerProvider);
+            final calendarList = calendarMap.values.expand((e) => e).toList();
+            calendarToUse = calendarList.firstWhereOrNull((c) => c.uniqueId == calendarId) ?? existingEvent.calendar;
+          } catch (_) {}
+        }
+
+        // attendeesList를 EventAttendeeEntity 리스트로 변환
+        List<EventAttendeeEntity>? attendeesToUse;
+        if (attendeesList != null) {
+          attendeesToUse = attendeesList
+              .map((a) {
+                if (a is Map<String, dynamic>) {
+                  return EventAttendeeEntity(email: a['email'] as String?, displayName: a['displayName'] as String? ?? a['name'] as String?);
+                } else if (a is String) {
+                  return EventAttendeeEntity(email: a, displayName: null);
+                }
+                return EventAttendeeEntity(email: null, displayName: null);
+              })
+              .where((a) => a.email != null || a.displayName != null)
+              .toList();
+        }
+
         event = existingEvent.copyWith(
           title: title,
           description: description,
-          calendar: existingEvent.calendar,
+          calendar: calendarToUse,
           editedStartTime: startAt,
           editedEndTime: endAt,
           isAllDay: isAllDay,
           location: location,
+          attendees: attendeesToUse,
         );
       } else if (functionName == 'createEvent') {
         // createEvent인 경우 새로운 EventEntity 생성
