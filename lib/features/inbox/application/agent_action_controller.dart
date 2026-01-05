@@ -1691,6 +1691,7 @@ class AgentActionController extends _$AgentActionController {
           .map((task) {
             final taskProject = allProject.where((p) => p.isPointedProjectId(task.projectId)).firstOrNull;
             return {
+              'id': task.id,
               'title': task.title ?? 'Untitled',
               'status': task.status.name,
               'isDone': task.status == TaskStatus.done,
@@ -1791,6 +1792,7 @@ class AgentActionController extends _$AgentActionController {
       final tasksJson = limitedTasks.map((task) {
         final taskProject = task.projectId != null ? projects.firstWhereOrNull((p) => p.isPointedProjectId(task.projectId)) : null;
         return {
+          'id': task.id,
           'title': task.title ?? 'Untitled',
           'status': task.status.name,
           'isDone': task.status == TaskStatus.done,
