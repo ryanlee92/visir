@@ -710,9 +710,30 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       final controller = ref.read(agentActionControllerProvider.notifier);
       final cachedTasks = controller.deletedTasksCache.values.expand((tasks) => tasks).toList();
 
-      final task =
-          existingTask?.copyWith(title: title, description: description, projectId: projectId, startAt: startAt, endAt: endAt, isAllDay: isAllDay) ??
-          cachedTasks.firstWhereOrNull((t) => t.id == taskId);
+      TaskEntity? task;
+      if (existingTask != null) {
+        // updateTask인 경우 기존 task를 copyWith로 업데이트
+        task = existingTask.copyWith(title: title, description: description, projectId: projectId, startAt: startAt, endAt: endAt, isAllDay: isAllDay);
+      } else if (functionName == 'createTask') {
+        // createTask인 경우 새로운 TaskEntity 생성
+        final projects = ref.read(projectListControllerProvider);
+        final defaultProject = projects.firstWhere((p) => p.isDefault);
+        final project = projectId != null ? projects.firstWhereOrNull((p) => p.uniqueId == projectId) : defaultProject;
+
+        task = TaskEntity(
+          id: taskId,
+          title: title,
+          description: description,
+          projectId: project?.uniqueId,
+          startAt: startAt,
+          endAt: endAt,
+          isAllDay: isAllDay,
+          status: TaskStatus.none,
+        );
+      } else {
+        // updateTask인데 existingTask가 없는 경우 캐시에서 찾기
+        task = cachedTasks.firstWhereOrNull((t) => t.id == taskId);
+      }
 
       if (task == null) return const SizedBox.shrink();
 
@@ -789,17 +810,36 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       final controller = ref.read(agentActionControllerProvider.notifier);
       final cachedEvents = controller.deletedEventsCache.values.expand((events) => events).toList();
 
-      final event =
-          existingEvent?.copyWith(
-            title: title,
-            description: description,
-            calendar: existingEvent.calendar,
-            editedStartTime: startAt,
-            editedEndTime: endAt,
-            isAllDay: isAllDay,
-            location: location,
-          ) ??
-          cachedEvents.firstWhereOrNull((e) => e.eventId == eventId || e.uniqueId == eventId);
+      EventEntity? event;
+      if (existingEvent != null) {
+        // updateEvent인 경우 기존 event를 copyWith로 업데이트
+        event = existingEvent.copyWith(
+          title: title,
+          description: description,
+          calendar: existingEvent.calendar,
+          editedStartTime: startAt,
+          editedEndTime: endAt,
+          isAllDay: isAllDay,
+          location: location,
+        );
+      } else if (functionName == 'createEvent') {
+        // createEvent인 경우 새로운 EventEntity 생성
+        final eventData = {
+          'id': eventId ?? const Uuid().v4(),
+          'title': title,
+          'description': description,
+          'calendar_id': calendarId,
+          'start_at': startAt.toIso8601String(),
+          'end_at': endAt.toIso8601String(),
+          'location': location,
+          'attendees': attendeesList ?? [],
+          'isAllDay': isAllDay,
+        };
+        event = _convertMapToEventEntity(eventData);
+      } else {
+        // updateEvent인데 existingEvent가 없는 경우 캐시에서 찾기
+        event = cachedEvents.firstWhereOrNull((e) => e.eventId == eventId || e.uniqueId == eventId);
+      }
 
       if (event == null) return const SizedBox.shrink();
 
