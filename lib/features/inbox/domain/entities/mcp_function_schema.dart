@@ -98,7 +98,7 @@ class McpFunctionRegistry {
             name: 'inboxId',
             type: 'string',
             description:
-                'Inbox ID to link the task to a specific inbox item (email or message). Use the inboxId from Inbox Context when creating a task from an inbox item. (optional)',
+                '**MANDATORY when creating tasks from inbox items**: Inbox ID to link the task to a specific inbox item (email or message). You MUST use the exact inboxId shown in the Inbox Context (format: "Inbox ID (USE THIS EXACT ID): `mail_...`" or "Inbox ID: `mail_...`"). Copy the inboxId EXACTLY as shown - do NOT use item numbers or titles. Example: If Inbox Context shows "Inbox ID (USE THIS EXACT ID): `mail_google_example@gmail.com_12345`", use "mail_google_example@gmail.com_12345". (required when creating from inbox items)',
             required: false,
           ),
         ],

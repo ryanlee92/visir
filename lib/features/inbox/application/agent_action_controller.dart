@@ -975,6 +975,16 @@ class AgentActionController extends _$AgentActionController {
               }
             }
 
+            // 검색 결과가 있으면 state 업데이트 (재귀 호출 전에!)
+            if (updatedLoadedInboxNumbers != state.loadedInboxNumbers ||
+                updatedTaggedTasks != taggedTasks ||
+                updatedTaggedEvents != taggedEvents ||
+                updatedAvailableInboxes != state.availableInboxes) {
+              print('[AgentChat] 검색 함수 처리 후 state 업데이트: updatedAvailableInboxes 개수: ${updatedAvailableInboxes?.length ?? 0}');
+              state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
+              print('[AgentChat] 검색 함수 처리 후 state 업데이트 완료: state.availableInboxes 개수: ${state.availableInboxes?.length ?? 0}');
+            }
+
             // 검색 결과를 context로 추가하여 AI 재호출
             print('[AgentChat] 검색 context 최종 확인: ${searchContext?.length ?? 0}자');
             if (searchContext != null && searchContext.isNotEmpty) {
@@ -1757,7 +1767,7 @@ class AgentActionController extends _$AgentActionController {
         }
       }
 
-      // 3. inboxId가 없으면 threadId나 messageId로 inboxId 생성
+      // 3. inboxId가 없으면 threadId나 messageId로 inboxId 생성 (fallback만)
       if (!enrichedArgs.containsKey('inboxId') || enrichedArgs['inboxId'] == null || (enrichedArgs['inboxId'] as String).isEmpty) {
         final threadId = enrichedArgs['threadId'] as String?;
         final messageId = enrichedArgs['messageId'] as String?;
