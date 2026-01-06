@@ -5,7 +5,7 @@
   import iconOutlook from '../assets/providers/icon_outlook_transition.webp';
   import iconSlack from '../assets/providers/icon_slack_transition.webp';
   import iconGcal from '../assets/providers/icon_gcal_transition.webp';
-  import visirForeground from '../assets/visir/visir_foreground.webp';
+  import visirForeground from '../assets/visir/visir_foreground-32.webp';
   import { createScrollAnimation, createStaggerAnimation } from '../lib/animations';
 
   let sectionElement: HTMLElement;
@@ -105,7 +105,7 @@
         </p>
         <div class="flex -space-x-2 mt-auto">
           <div class="w-8 h-8 rounded-lg bg-white border border-visir-bg overflow-hidden flex items-center justify-center">
-            <img src={visirForeground} alt="Visir" class="w-full h-full object-contain scale-[0.8]" width="32" height="32" sizes="32px" />
+            <img src={visirForeground} alt="Visir" class="w-full h-full object-contain scale-[0.8]" sizes="32px" />
           </div>
         </div>
         <div class="mt-2 text-xs text-visir-text-muted/60 italic">

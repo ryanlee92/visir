@@ -33,11 +33,9 @@
       <div class="flex-shrink-0 pr-8">
         <div class="flex items-center gap-2 mb-6">
           <img 
-            src="/assets/visir/visir_foreground.webp" 
+            src="/assets/visir/visir_foreground-32.webp" 
             alt="Visir Logo" 
             class="h-8 w-8 object-contain"
-            width="32"
-            height="32"
             sizes="32px"
             loading="lazy"
             decoding="async"

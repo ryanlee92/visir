@@ -81,6 +81,15 @@ if (ga4Id) {
   console.warn('   You can set it in .env file or as an environment variable.');
 }
 
+// Resize images before build
+console.log('\n🖼️  Resizing images...');
+try {
+  execSync('npm run resize:images', { stdio: 'inherit', cwd: rootDir });
+} catch (error) {
+  console.warn('⚠️  이미지 리사이징 실패:', error.message);
+  console.warn('   계속 진행합니다...');
+}
+
 // Copy og-image from assets to public before build
 console.log('\n📸 Copying og-image...');
 const ogImageSource = join(rootDir, 'assets', 'ogimage.png');

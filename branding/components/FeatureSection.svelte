@@ -202,8 +202,6 @@
                       className="w-full h-full"
                       imgClass="object-contain"
                       sizes="(max-width: 480px) 240px, 392px"
-                      width="392"
-                      height="852"
                       eager={true}
                       transition={false}
                     />
@@ -299,8 +297,6 @@
                   className="w-full h-full"
                   imgClass="object-cover object-left-top"
                   sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 616px"
-                  width="616"
-                  height="504"
                   eager={index < 2}
                   priority={index < 2 ? 'high' : 'auto'}
                 />
@@ -314,8 +310,6 @@
                   className="w-full h-full"
                   imgClass="object-cover object-left-top"
                   sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 616px"
-                  width="616"
-                  height="461"
                   eager={index < 2}
                   priority={index < 2 ? 'high' : 'auto'}
                 />
