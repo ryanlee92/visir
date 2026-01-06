@@ -1,0 +1,183 @@
+{
+  "timestamp": "2026-01-06T16:27:03.971Z",
+  "score": 100,
+  "results": {
+    "contentStructure": {
+      "name": "콘텐츠 구조",
+      "score": 100,
+      "checks": [
+        {
+          "name": "H1 태그",
+          "result": {
+            "pass": true,
+            "message": "H1 태그: 1개"
+          }
+        },
+        {
+          "name": "H2-H6 태그 구조",
+          "result": {
+            "pass": true,
+            "message": "H2: 1개, H3: 1개"
+          }
+        },
+        {
+          "name": "키워드 밀도 (Title)",
+          "result": {
+            "pass": true,
+            "message": "주요 키워드: visir"
+          }
+        },
+        {
+          "name": "키워드 밀도 (Description)",
+          "result": {
+            "pass": true,
+            "message": "주요 키워드: visir, productivity, slack, calendar"
+          }
+        }
+      ]
+    },
+    "linkOptimization": {
+      "name": "링크 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "내부 링크 구조",
+          "result": {
+            "pass": true,
+            "message": "내부 링크: 7개"
+          }
+        },
+        {
+          "name": "외부 링크 보안",
+          "result": {
+            "pass": true,
+            "message": "외부 링크 없음"
+          }
+        },
+        {
+          "name": "앵커 텍스트 품질",
+          "result": {
+            "pass": true,
+            "message": "앵커 링크 없음 (SPA이므로 정상일 수 있음)"
+          }
+        }
+      ]
+    },
+    "imageOptimization": {
+      "name": "이미지 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "이미지 Alt 속성",
+          "result": {
+            "pass": true,
+            "message": "이미지 없음"
+          }
+        },
+        {
+          "name": "이미지 Lazy Loading",
+          "result": {
+            "pass": true,
+            "message": "이미지 없음"
+          }
+        },
+        {
+          "name": "이미지 포맷 최적화",
+          "result": {
+            "pass": true,
+            "message": "이미지 없음"
+          }
+        }
+      ]
+    },
+    "mobileOptimization": {
+      "name": "모바일 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "Viewport 설정",
+          "result": {
+            "pass": true,
+            "message": "Viewport 설정 완료"
+          }
+        },
+        {
+          "name": "터치 아이콘",
+          "result": {
+            "pass": true,
+            "message": "Apple Touch Icon 있음"
+          }
+        },
+        {
+          "name": "모바일 웹앱 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "모바일 웹앱 메타 태그 있음"
+          }
+        }
+      ]
+    },
+    "technicalSEO": {
+      "name": "기술적 SEO",
+      "score": 100,
+      "checks": [
+        {
+          "name": "XML Sitemap",
+          "result": {
+            "pass": true,
+            "message": "sitemap.xml 파일 있음"
+          }
+        },
+        {
+          "name": "Robots.txt",
+          "result": {
+            "pass": true,
+            "message": "robots.txt 파일 있음"
+          }
+        },
+        {
+          "name": "Favicon 설정",
+          "result": {
+            "pass": true,
+            "message": "Favicon 설정 완료"
+          }
+        },
+        {
+          "name": "언어 설정",
+          "result": {
+            "pass": true,
+            "message": "Lang: en"
+          }
+        }
+      ]
+    },
+    "socialMedia": {
+      "name": "소셜 미디어 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "Open Graph 완전성",
+          "result": {
+            "pass": true,
+            "message": "Open Graph 태그 완료 (5/5)"
+          }
+        },
+        {
+          "name": "Twitter Card 완전성",
+          "result": {
+            "pass": true,
+            "message": "Twitter Card 태그 완료 (4/4)"
+          }
+        },
+        {
+          "name": "OG 이미지 크기",
+          "result": {
+            "pass": true,
+            "message": "OG 이미지 크기: 1200x630"
+          }
+        }
+      ]
+    }
+  },
+  "improvements": []
+}
