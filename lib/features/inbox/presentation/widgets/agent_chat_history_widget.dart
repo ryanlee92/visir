@@ -296,15 +296,12 @@ class _AgentChatHistoryPopupMenuState extends ConsumerState<AgentChatHistoryPopu
           ),
           Divider(height: 1, color: context.outline),
           // 히스토리 목록
-          Flexible(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 400),
-              child: AgentChatHistoryWidget(
+          Expanded(
+            child: AgentChatHistoryWidget(
                 onHistorySelected: (sessionId) {
                   ref.read(agentActionControllerProvider.notifier).resumeChatFromHistory(sessionId);
                 },
               ),
-            ),
           ),
         ],
       ),
