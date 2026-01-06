@@ -153,13 +153,19 @@ async function runSEOAudit(url = 'http://localhost:4173') {
       });
     }
 
-    // 구조화된 데이터
-    if (audits['structured-data'] && audits['structured-data'].score < 1) {
-      criticalIssues.push({
-        type: 'structured-data',
-        issue: '구조화된 데이터가 없거나 잘못됨',
-        fix: 'index.html의 JSON-LD 스키마 확인',
-      });
+    // 구조화된 데이터 (수동 감사 항목이므로 score가 null일 수 있음)
+    const structuredDataAudit = audits['structured-data'];
+    if (structuredDataAudit) {
+      // 구조화된 데이터가 있는지 확인
+      const hasStructuredData = structuredDataAudit.details?.items?.length > 0 || 
+                                 structuredDataAudit.details?.type === 'table';
+      
+      if (!hasStructuredData && structuredDataAudit.score === null) {
+        // 수동 감사 항목이므로 경고만 표시
+        log(`\n  ⚠️  구조화된 데이터는 수동으로 확인해야 합니다`, 'yellow');
+        log(`     Google Structured Data Testing Tool 사용: https://search.google.com/test/rich-results`, 'yellow');
+        log(`     Schema.org Validator 사용: https://validator.schema.org/`, 'yellow');
+      }
     }
 
     // 언어 설정

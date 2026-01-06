@@ -101,7 +101,11 @@
           "@type": "EntryPoint",
           "urlTemplate": "https://visir.pro/search?q={search_term_string}"
         },
-        "query-input": "required name=search_term_string"
+        "query-input": {
+          "@type": "PropertyValueSpecification",
+          "valueRequired": true,
+          "valueName": "search_term_string"
+        }
       },
       "mainEntity": {
         "@type": "FAQPage",
@@ -164,8 +168,22 @@
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Visir",
+      "url": "https://visir.pro",
       "applicationCategory": "ProductivityApplication",
+      "applicationSubCategory": "Productivity Software",
       "operatingSystem": ["macOS", "Windows", "iOS", "Android"],
+      "softwareVersion": "2.0",
+      "description": "Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.",
+      "screenshot": "https://visir.pro/og-image.png?v=3",
+      "featureList": [
+        "Unified inbox for Gmail, Slack, and Outlook",
+        "AI-powered email triage and categorization",
+        "Calendar integration with time blocking",
+        "Task management with drag-and-drop",
+        "Cross-platform sync",
+        "Offline support",
+        "Privacy-first architecture"
+      ],
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -179,17 +197,17 @@
         "bestRating": "5",
         "worstRating": "1"
       },
-      "description": "Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.",
-      "screenshot": "https://visir.pro/og-image.png?v=3",
-      "featureList": [
-        "Unified inbox for Gmail, Slack, and Outlook",
-        "AI-powered email triage and categorization",
-        "Calendar integration with time blocking",
-        "Task management with drag-and-drop",
-        "Cross-platform sync",
-        "Offline support",
-        "Privacy-first architecture"
-      ]
+      "downloadUrl": "https://visir.pro/download",
+      "installUrl": "https://visir.pro/download",
+      "softwareHelp": "https://visir.pro/help",
+      "supportUrl": "https://visir.pro/help",
+      "termsOfService": "https://visir.pro/terms",
+      "privacyPolicy": "https://visir.pro/privacy",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Visir",
+        "url": "https://visir.pro"
+      }
     }
     </script>
     

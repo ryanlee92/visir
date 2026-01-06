@@ -1,0 +1,36 @@
+[debug] [2026-01-06T14:04:49.509Z] ----------------------------------------------------------------------
+[debug] [2026-01-06T14:04:49.511Z] Command:       /Users/ryan/.nvm/versions/node/v20.14.0/bin/node /Users/ryan/.nvm/versions/node/v20.14.0/bin/firebase deploy --only hosting:visir-app
+[debug] [2026-01-06T14:04:49.511Z] CLI Version:   15.1.0
+[debug] [2026-01-06T14:04:49.512Z] Platform:      darwin
+[debug] [2026-01-06T14:04:49.512Z] Node Version:  v20.14.0
+[debug] [2026-01-06T14:04:49.512Z] Time:          Tue Jan 06 2026 23:04:49 GMT+0900 (Korean Standard Time)
+[debug] [2026-01-06T14:04:49.512Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-01-06T14:04:50.502Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-01-06T14:04:50.502Z] > authorizing via signed-in user (ryan@wavetogether.com)
+[debug] [2026-01-06T14:04:50.503Z] [iam] checking project fillin-cd65f for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-01-06T14:04:50.503Z] Checked if tokens are valid: true, expires at: 1767709375245
+[debug] [2026-01-06T14:04:50.503Z] Checked if tokens are valid: true, expires at: 1767709375245
+[debug] [2026-01-06T14:04:50.504Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/fillin-cd65f:testIamPermissions [none]
+[debug] [2026-01-06T14:04:50.504Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/fillin-cd65f:testIamPermissions x-goog-quota-user=projects/fillin-cd65f
+[debug] [2026-01-06T14:04:50.504Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fillin-cd65f:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-01-06T14:04:50.774Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/fillin-cd65f:testIamPermissions 200
+[debug] [2026-01-06T14:04:50.774Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fillin-cd65f:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-01-06T14:04:50.775Z] Checked if tokens are valid: true, expires at: 1767709375245
+[debug] [2026-01-06T14:04:50.775Z] Checked if tokens are valid: true, expires at: 1767709375245
+[debug] [2026-01-06T14:04:50.775Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fillin-cd65f [none]
+[debug] [2026-01-06T14:04:51.276Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fillin-cd65f 200
+[debug] [2026-01-06T14:04:51.276Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fillin-cd65f {"projectId":"fillin-cd65f","projectNumber":"939046847033","displayName":"Visir","name":"projects/fillin-cd65f","resources":{"hostingSite":"fillin-cd65f","locationId":"us-central"},"state":"ACTIVE","etag":"1_1daf1eb5-1d23-43ee-afab-b8cdd69c44fc"}
+[info] 
+[info] === Deploying to 'fillin-cd65f'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2026-01-06T14:04:51.281Z] Checked if tokens are valid: true, expires at: 1767709375245
+[debug] [2026-01-06T14:04:51.281Z] Checked if tokens are valid: true, expires at: 1767709375245
+[debug] [2026-01-06T14:04:51.281Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/visir-app/versions [none]
+[debug] [2026-01-06T14:04:51.281Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/visir-app/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-01-06T14:04:52.754Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/visir-app/versions 200
+[debug] [2026-01-06T14:04:52.754Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/visir-app/versions {"name":"projects/939046847033/sites/visir-app/versions/dace24b73d9fd23c","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[visir-app]: beginning deploy... 
+[info] i  hosting[visir-app]: found 66 files in branding/dist 
+[debug] [2026-01-06T14:04:52.768Z] [hosting] uploading with 200 concurrency
