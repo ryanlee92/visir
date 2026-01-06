@@ -1,7 +1,16 @@
+# robots.txt for visir.pro
+# Allow all search engines and AI crawlers by default
+
+# Default rules for all crawlers
 User-agent: *
 Allow: /
+Disallow: /login
+Disallow: /signup
 
-# AI Crawlers - Allow access for training and indexing
+# Sitemap location
+Sitemap: https://visir.pro/sitemap.xml
+
+# AI Crawlers - Explicit allow with crawl delay
 User-agent: GPTBot
 Allow: /
 Crawl-delay: 1
@@ -33,31 +42,3 @@ Crawl-delay: 1
 User-agent: Applebot-Extended
 Allow: /
 Crawl-delay: 1
-
-# Disallow login and signup pages from search engines
-Disallow: /login
-Disallow: /signup
-
-# Allow all other pages
-Allow: /blog
-Allow: /pricing
-Allow: /download
-Allow: /integrations
-Allow: /founders
-Allow: /developers
-Allow: /managers
-Allow: /personal
-Allow: /community
-Allow: /help
-Allow: /changelog
-Allow: /roadmap
-Allow: /feature-requests
-Allow: /privacy
-Allow: /terms
-
-# Sitemap location
-Sitemap: https://visir.pro/sitemap.xml
-
-# Crawl delay (optional, adjust as needed)
-Crawl-delay: 1
-
