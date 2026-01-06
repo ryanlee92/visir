@@ -347,11 +347,7 @@ Return only the JSON object, no additional text or explanations.
   }
 
   /// Builds the base system message for chat
-  static String buildBaseSystemMessage({
-    required String todayStr,
-    required String tomorrowStr,
-    required String currentTime,
-  }) {
+  static String buildBaseSystemMessage({required String todayStr, required String tomorrowStr, required String currentTime}) {
     return '''You are a helpful AI assistant integrated with Visir, a productivity app.
 
 ## Response Format
@@ -807,10 +803,7 @@ Response:
   }
 
   /// Adds available projects section to system message
-  static String addAvailableProjectsSection({
-    required String systemMessage,
-    required List<Map<String, dynamic>> projects,
-  }) {
+  static String addAvailableProjectsSection({required String systemMessage, required List<Map<String, dynamic>> projects}) {
     var result = systemMessage;
     result += '\n\n## Available Projects';
     result +=
@@ -818,8 +811,7 @@ Response:
     result +=
         '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
     result += '\n\nCRITICAL PROJECT SELECTION RULES:';
-    result +=
-        '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
+    result += '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
     result += '\n2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:';
     result += '\n   - Search through the Available Projects list above';
     result += '\n   - Find the project whose name best matches the user\'s request (case-insensitive, partial match is OK)';
@@ -834,10 +826,7 @@ Response:
   }
 
   /// Adds project context section to system message
-  static String addProjectContextSection({
-    required String systemMessage,
-    required String projectContext,
-  }) {
+  static String addProjectContextSection({required String systemMessage, required String projectContext}) {
     var result = systemMessage;
     result +=
         '\n\n## CRITICAL: Project Context Available\nYou have access to detailed project information including raw task data in JSON format in the Project Context section below.';
@@ -848,10 +837,7 @@ Response:
   }
 
   /// Adds tagged context section to system message
-  static String addTaggedContextSection({
-    required String systemMessage,
-    required String taggedContext,
-  }) {
+  static String addTaggedContextSection({required String systemMessage, required String taggedContext}) {
     var result = systemMessage;
     result += '\n\n## Tagged Items (Available for Function Calls)\n$taggedContext';
     result += '\n\nWhen calling functions that require taskId or eventId, use the IDs from the tagged items above if the user doesn\'t specify one.';
@@ -859,10 +845,7 @@ Response:
   }
 
   /// Adds channel context section to system message
-  static String addChannelContextSection({
-    required String systemMessage,
-    required String channelContext,
-  }) {
+  static String addChannelContextSection({required String systemMessage, required String channelContext}) {
     var result = systemMessage;
     result += '\n\n## Channel Messages Context\n$channelContext';
     result +=
@@ -871,10 +854,7 @@ Response:
   }
 
   /// Adds inbox context section to system message
-  static String addInboxContextSection({
-    required String systemMessage,
-    required String inboxContext,
-  }) {
+  static String addInboxContextSection({required String systemMessage, required String inboxContext}) {
     var result = systemMessage;
     result += '\n\n## Inbox Context\n$inboxContext';
     result +=
@@ -951,9 +931,7 @@ Return only the summary text, no additional formatting or explanations.
   }
 
   /// Builds description prompt for conversation snippet
-  static String buildDescriptionPrompt({
-    required String? currentTaskEventDescription,
-  }) {
+  static String buildDescriptionPrompt({required String? currentTaskEventDescription}) {
     return currentTaskEventDescription != null
         ? '''
 IMPORTANT: The current task/event has a description below. You MUST incorporate the key information from this description into your summary. Focus on:
@@ -966,9 +944,7 @@ IMPORTANT: The current task/event has a description below. You MUST incorporate 
   }
 
   /// Builds prompt for extracting search keywords from task information
-  static String buildExtractSearchKeywordsPrompt({
-    required String taskInfo,
-  }) {
+  static String buildExtractSearchKeywordsPrompt({required String taskInfo}) {
     return '''
 You are an expert productivity assistant. Extract search keywords from the following task information.
 
@@ -1338,12 +1314,7 @@ IMPORTANT: If the user requests to create the task "as is", "as suggested", or s
   }
 
   /// Builds prompt for suggesting task from inbox
-  static String buildSuggestTaskFromInboxPrompt({
-    required String inboxTitle,
-    required String snippet,
-    required List<Map<String, dynamic>> projects,
-    String? inboxId,
-  }) {
+  static String buildSuggestTaskFromInboxPrompt({required String inboxTitle, required String snippet, required List<Map<String, dynamic>> projects, String? inboxId}) {
     return '''
 Please suggest a task based on the following inbox item.
 
@@ -1858,4 +1829,3 @@ Return only valid JSON, no additional text.
 ''';
   }
 }
-
