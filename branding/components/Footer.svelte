@@ -1,5 +1,6 @@
 <script lang="ts">
   import { link, location } from '../lib/router';
+  import visirLogo32 from '../assets/visir/visir_foreground-32.webp';
 
   $: currentLocation = $location;
 
@@ -36,7 +37,7 @@
       <div class="flex-shrink-0 pr-8">
         <div class="flex items-center gap-2 mb-6">
           <img 
-            src="/assets/visir/visir_foreground-32.webp" 
+            src={visirLogo32} 
             alt="Visir Logo" 
             class="h-8 w-8 object-contain"
             sizes="32px"

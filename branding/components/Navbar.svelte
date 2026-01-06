@@ -4,6 +4,7 @@
   import Icon from './Icon.svelte';
   import Button from './Button.svelte';
   import type { NavItem } from '../types';
+  import visirLogo32 from '../assets/visir/visir_foreground-32.webp';
 
   const navItems: NavItem[] = [
     { label: 'Features', href: '/#features' },
@@ -111,7 +112,7 @@
         on:click={handleLogoClick}
       >
         <img 
-          src="/assets/visir/visir_foreground-32.webp" 
+          src={visirLogo32} 
           alt="Visir Logo" 
           class="h-8 w-8 object-contain"
           sizes="32px"

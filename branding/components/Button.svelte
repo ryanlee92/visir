@@ -28,18 +28,20 @@
 
 <style>
   :global(.button-primary) {
-    background: rgba(124, 93, 255, 0.7) !important;
+    /* Light mode: use darker primary color for better contrast */
+    background: rgba(90, 63, 215, 0.7) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    box-shadow: 0 0 20px rgba(124, 93, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 20px rgba(90, 63, 215, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   }
   
   :global(.button-primary:hover) {
-    background: rgba(124, 93, 255, 0.85) !important;
-    box-shadow: 0 0 25px rgba(124, 93, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    background: rgba(90, 63, 215, 0.85) !important;
+    box-shadow: 0 0 25px rgba(90, 63, 215, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   }
   
   :global(.dark .button-primary) {
+    /* Dark mode: use original brighter color */
     background: rgba(124, 93, 255, 0.8) !important;
     box-shadow: 0 0 20px rgba(124, 93, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
   }
