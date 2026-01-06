@@ -33,7 +33,7 @@
       ]
     },
     {
-      title: "Full-Power Vertical Apps",
+      title: "Native Power without the Noise.",
       description: "Don't settle for shallow integrations. Visir provides full-featured dedicated tabs for Mail, Chat, Calendar, and Tasks. Switch between a high-level AI overview and deep-focus work in specific tools with a single click.",
       icon: "Monitor",
       imagePosition: 'right',

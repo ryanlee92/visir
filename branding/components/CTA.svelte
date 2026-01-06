@@ -32,11 +32,9 @@
 
   <div class="max-w-4xl mx-auto px-4 relative z-10 text-center animate-ready" bind:this={contentElement}>
     <h2 class="text-4xl md:text-5xl font-semibold font-display text-visir-text mb-6 tracking-tight">
-      Ready to upgrade?<br/>
-      Experience a <span class="text-visir-primary">new dimension</span> of productivity.
+      Reclaim your <span class="text-visir-primary">2 hours today</span>.
     </h2>
     <p class="text-xl text-visir-text-muted mb-10 font-sans font-light">
-      Reclaim 2 hours of your week with Visir.
       Start now without any complex setup.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -48,7 +46,7 @@
       </a>
     </div>
     <p class="mt-6 text-sm text-visir-text-muted font-sans font-light">
-      No credit card required · 7-day free trial · Cancel anytime
+      No credit card required · Set up in 2 mins · Cancel anytime
     </p>
   </div>
 </section>

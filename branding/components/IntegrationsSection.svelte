@@ -46,6 +46,7 @@
         Connect your tools.<br />
         <span class="text-visir-text-muted">Work seamlessly.</span>
       </h2>
+      <h3 class="sr-only">Connect your tools: Slack, Gmail, Calendar Integrations</h3>
       <p class="text-lg text-visir-text-muted font-light max-w-2xl mx-auto">
         Integrate with your favorite services and bring everything together in one place. No more switching between apps.
       </p>

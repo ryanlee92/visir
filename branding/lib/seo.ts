@@ -14,9 +14,9 @@ const baseUrl = 'https://visir.pro';
 
 // Default SEO data
 const defaultSEO: SEOData = {
-  title: 'Visir - Your AI Executive Assistant | Unified Productivity Platform',
-  description: 'Visir unifies your email, calendar, and chats into one intelligent timeline. AI automatically sorts your inbox, prepares you for meetings, and optimizes your schedule.',
-  keywords: 'productivity, email management, calendar, task management, AI assistant, unified inbox, time blocking, workflow automation',
+  title: 'Visir - Your AI Executive Assistant | Stop juggling Slack, Gmail, Outlook & Calendar',
+  description: 'Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.',
+  keywords: 'productivity, email management, calendar, task management, AI assistant, unified inbox, time blocking, workflow automation, Slack, Gmail, Outlook, Notion',
   ogImage: `${baseUrl}/og-image.webp`, // SEO용 전용 이미지 (생성 필요)
   ogType: 'website',
 };
@@ -24,9 +24,9 @@ const defaultSEO: SEOData = {
 // Page-specific SEO data
 export const pageSEO: Record<string, SEOData> = {
   '/': {
-    title: 'Visir - Your AI Executive Assistant | Unified Productivity Platform',
-    description: 'Stop juggling apps. Reclaim your focus. Visir unifies your email, calendar, and chats into one intelligent timeline. AI automatically sorts your inbox, prepares you for meetings, and optimizes your schedule.',
-    keywords: 'productivity, email management, calendar, task management, AI assistant, unified inbox, time blocking, workflow automation, Gmail, Slack, Outlook',
+    title: 'Visir - Your AI Executive Assistant | Stop juggling Slack, Gmail, Outlook & Calendar',
+    description: 'Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.',
+    keywords: 'productivity, email management, calendar, task management, AI assistant, unified inbox, time blocking, workflow automation, Gmail, Slack, Outlook, Notion',
     ogType: 'website',
   },
   '/pricing': {

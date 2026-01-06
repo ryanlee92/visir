@@ -136,7 +136,7 @@
 
   $: unifiedImage = feature.title.includes("Never Alt-Tab") ? (isDark ? unifiedInboxDark : unifiedInboxLight) : null;
   $: aiImage = feature.title.includes("Your Brain") ? (isDark ? aiAssistantDark : aiAssistantLight) : null;
-  $: isVerticalApps = feature.title.includes("Vertical Apps");
+  $: isVerticalApps = feature.title.includes("Native Power");
   $: mailImage = isVerticalApps ? (isDark ? mailDark : mailLight) : null;
   $: chatImage = isVerticalApps ? (isDark ? chatDark : chatLight) : null;
   $: taskImage = isVerticalApps ? (isDark ? taskDark : taskLight) : null;

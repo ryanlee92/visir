@@ -122,6 +122,7 @@
     </div>
 
     <h1 class="text-4xl sm:text-5xl lg:text-7xl font-medium font-display tracking-tight text-visir-text mb-6 leading-tight drop-shadow-lg">
+      <span class="sr-only">Visir: Your AI Executive Assistant - </span>
       Your browser tabs are<br />
       <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 {isDark ? 'drop-shadow-sm' : 'drop-shadow-lg'} {!isDark ? 'brightness-90 contrast-110' : ''}">
         killing your productivity.
