@@ -4,32 +4,18 @@
   import type { Feature } from '../types';
   import Image from './Image.svelte';
   import { createScrollAnimation } from '../lib/animations';
-  import unifiedInboxDark from '../assets/unified-inbox-dark.webp';
-  import unifiedInboxDark2x from '../assets/unified-inbox-dark@2x.webp';
-  import unifiedInboxLight from '../assets/unified-inbox-light.webp';
-  import unifiedInboxLight2x from '../assets/unified-inbox-light@2x.webp';
-  import aiAssistantDark from '../assets/ai-assistant-dark.webp';
-  import aiAssistantDark2x from '../assets/ai-assistant-dark@2x.webp';
-  import aiAssistantLight from '../assets/ai-assistant-light.webp';
-  import aiAssistantLight2x from '../assets/ai-assistant-light@2x.webp';
-  import mailDark from '../assets/mail_dark.webp';
-  import mailLight from '../assets/mail_light.webp';
-  import chatDark from '../assets/chat_dark.webp';
-  import chatLight from '../assets/chat_light.webp';
-  import taskDark from '../assets/task_dark.webp';
-  import taskLight from '../assets/task_light.webp';
-  import calendarDark from '../assets/calendar_dark.webp';
-  import calendarLight from '../assets/calendar_light.webp';
-  
-  // @2x 이미지 import (스크립트 실행 후 생성됨)
-  import mailDark2x from '../assets/mail_dark@2x.webp';
-  import mailLight2x from '../assets/mail_light@2x.webp';
-  import chatDark2x from '../assets/chat_dark@2x.webp';
-  import chatLight2x from '../assets/chat_light@2x.webp';
-  import taskDark2x from '../assets/task_dark@2x.webp';
-  import taskLight2x from '../assets/task_light@2x.webp';
-  import calendarDark2x from '../assets/calendar_dark@2x.webp';
-  import calendarLight2x from '../assets/calendar_light@2x.webp';
+  import unifiedInboxDark from '../assets/unified-inbox-dark@2x.webp';
+  import unifiedInboxLight from '../assets/unified-inbox-light@2x.webp';
+  import aiAssistantDark from '../assets/ai-assistant-dark@2x.webp';
+  import aiAssistantLight from '../assets/ai-assistant-light@2x.webp';
+  import mailDark from '../assets/mail_dark@2x.webp';
+  import mailLight from '../assets/mail_light@2x.webp';
+  import chatDark from '../assets/chat_dark@2x.webp';
+  import chatLight from '../assets/chat_light@2x.webp';
+  import taskDark from '../assets/task_dark@2x.webp';
+  import taskLight from '../assets/task_light@2x.webp';
+  import calendarDark from '../assets/calendar_dark@2x.webp';
+  import calendarLight from '../assets/calendar_light@2x.webp';
   import mobileHomeDark from '../assets/mobile/mobile_home_dark.webp';
   import mobileHomeLight from '../assets/mobile/mobile_home_light.webp';
   import mobileMailDark from '../assets/mobile/mobile_mail_dark.webp';
@@ -148,33 +134,13 @@
     currentMobileIndex = index;
   }
 
-  // srcset 생성 헬퍼 함수
-  function createSrcset(base1x: string, base2x: string | null = null): string {
-    if (base2x) {
-      return `${base1x} 1x, ${base2x} 2x`;
-    }
-    return '';
-  }
-  
   $: unifiedImage = feature.title.includes("Never Alt-Tab") ? (isDark ? unifiedInboxDark : unifiedInboxLight) : null;
-  $: unifiedImage2x = feature.title.includes("Never Alt-Tab") ? (isDark ? unifiedInboxDark2x : unifiedInboxLight2x) : null;
-  $: unifiedImageSrcset = unifiedImage && unifiedImage2x ? createSrcset(unifiedImage, unifiedImage2x) : '';
   $: aiImage = feature.title.includes("Your Brain") ? (isDark ? aiAssistantDark : aiAssistantLight) : null;
-  $: aiImage2x = feature.title.includes("Your Brain") ? (isDark ? aiAssistantDark2x : aiAssistantLight2x) : null;
-  $: aiImageSrcset = aiImage && aiImage2x ? createSrcset(aiImage, aiImage2x) : '';
   $: isVerticalApps = feature.title.includes("Native Power");
   $: mailImage = isVerticalApps ? (isDark ? mailDark : mailLight) : null;
-  $: mailImage2x = isVerticalApps ? (isDark ? mailDark2x : mailLight2x) : null;
-  $: mailImageSrcset = mailImage && mailImage2x ? createSrcset(mailImage, mailImage2x) : '';
   $: chatImage = isVerticalApps ? (isDark ? chatDark : chatLight) : null;
-  $: chatImage2x = isVerticalApps ? (isDark ? chatDark2x : chatLight2x) : null;
-  $: chatImageSrcset = chatImage && chatImage2x ? createSrcset(chatImage, chatImage2x) : '';
   $: taskImage = isVerticalApps ? (isDark ? taskDark : taskLight) : null;
-  $: taskImage2x = isVerticalApps ? (isDark ? taskDark2x : taskLight2x) : null;
-  $: taskImageSrcset = taskImage && taskImage2x ? createSrcset(taskImage, taskImage2x) : '';
   $: calendarImage = isVerticalApps ? (isDark ? calendarDark : calendarLight) : null;
-  $: calendarImage2x = isVerticalApps ? (isDark ? calendarDark2x : calendarLight2x) : null;
-  $: calendarImageSrcset = calendarImage && calendarImage2x ? createSrcset(calendarImage, calendarImage2x) : '';
 </script>
 
 <section class="py-24 lg:py-32 relative overflow-hidden animate-ready" bind:this={sectionElement} style="contain: layout style paint;">
@@ -235,7 +201,6 @@
                       alt="{mobileScreenshots[currentMobileIndex].name} Interface"
                       className="w-full h-full"
                       imgClass="object-contain"
-                      sizes="(max-width: 480px) 240px, 392px"
                       eager={true}
                       transition={false}
                     />
@@ -330,8 +295,6 @@
                   alt="Unified Inbox Interface" 
                   className="w-full h-full"
                   imgClass="object-cover object-left-top"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 616px"
-                  srcset={unifiedImageSrcset}
                   eager={index < 2}
                   priority={index < 2 ? 'high' : 'auto'}
                 />
@@ -344,8 +307,6 @@
                   alt="AI Executive Assistant Interface" 
                   className="w-full h-full"
                   imgClass="object-cover object-left-top"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 616px"
-                  srcset={aiImageSrcset}
                   eager={index < 2}
                   priority={index < 2 ? 'high' : 'auto'}
                 />
@@ -360,8 +321,6 @@
                       alt="Mail Interface" 
                       className="block rounded-xl"
                       imgClass="max-w-full h-auto"
-                      sizes="100vw"
-                      srcset={mailImageSrcset}
                       eager={index < 2}
                       priority={index < 2 ? 'high' : 'auto'}
                     />
@@ -376,8 +335,6 @@
                       alt="Chat Interface" 
                       className="block rounded-xl"
                       imgClass="max-w-full h-auto"
-                      sizes="100vw"
-                      srcset={chatImageSrcset}
                       eager={index < 2}
                       priority={index < 2 ? 'high' : 'auto'}
                     />
@@ -392,8 +349,6 @@
                       alt="Task Interface" 
                       className="block rounded-xl"
                       imgClass="max-w-full h-auto"
-                      sizes="100vw"
-                      srcset={taskImageSrcset}
                       eager={index < 2}
                       priority={index < 2 ? 'high' : 'auto'}
                     />
@@ -408,8 +363,6 @@
                       alt="Calendar Interface" 
                       className="block rounded-xl"
                       imgClass="max-w-full h-auto"
-                      sizes="100vw"
-                      srcset={calendarImageSrcset}
                       eager={index < 2}
                       priority={index < 2 ? 'high' : 'auto'}
                     />
