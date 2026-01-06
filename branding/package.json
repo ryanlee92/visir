@@ -51,6 +51,10 @@
     "perf:build": "npm run build && npm run perf -- --skip-lighthouse",
     "perf:lighthouse": "npm run perf -- --skip-build",
     "generate:og-image": "node scripts/generate-og-image.js",
-    "check:seo": "node scripts/check-seo.js"
+    "check:seo": "node scripts/check-seo.js",
+    "check:seo:full": "node scripts/check-seo-comprehensive.js",
+    "check:seo:all": "node scripts/check-seo-comprehensive.js --lighthouse",
+    "check:seo:multi": "node scripts/check-seo-multi.js",
+    "check:seo:multi:all": "node scripts/check-seo-multi.js --lighthouse"
   }
 }

@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-01-06T16:23:56.270Z",
+  "score": 100,
+  "results": {
+    "metaTags": {
+      "name": "메타 태그",
+      "score": 100,
+      "checks": [
+        {
+          "name": "Title 태그",
+          "result": {
+            "pass": true,
+            "message": "Title: Visir - Your AI Executive Assistant | Never Alt-Tab Again (57자)"
+          }
+        },
+        {
+          "name": "Meta Description",
+          "result": {
+            "pass": true,
+            "message": "Meta description: 150자"
+          }
+        },
+        {
+          "name": "Meta Keywords",
+          "result": {
+            "pass": true,
+            "message": "Meta keywords 있음"
+          }
+        },
+        {
+          "name": "Open Graph 태그",
+          "result": {
+            "pass": true,
+            "message": "Open Graph 태그 완료"
+          }
+        },
+        {
+          "name": "Twitter Card 태그",
+          "result": {
+            "pass": true,
+            "message": "Twitter Card 태그 완료"
+          }
+        },
+        {
+          "name": "Canonical URL",
+          "result": {
+            "pass": true,
+            "message": "Canonical URL 있음"
+          }
+        },
+        {
+          "name": "Robots 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "Robots 메타 태그 있음"
+          }
+        }
+      ]
+    },
+    "structuredData": {
+      "name": "구조화된 데이터",
+      "score": 100,
+      "checks": [
+        {
+          "name": "JSON-LD 스키마",
+          "result": {
+            "pass": true,
+            "message": "구조화된 데이터: 2개"
+          }
+        },
+        {
+          "name": "WebSite 스키마",
+          "result": {
+            "pass": true,
+            "message": "WebSite 스키마 있음"
+          }
+        },
+        {
+          "name": "SoftwareApplication 스키마",
+          "result": {
+            "pass": true,
+            "message": "SoftwareApplication 스키마 있음"
+          }
+        },
+        {
+          "name": "Organization 스키마",
+          "result": {
+            "pass": true,
+            "message": "Organization 스키마 있음"
+          }
+        }
+      ]
+    },
+    "performance": {
+      "name": "성능 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "DNS Prefetch",
+          "result": {
+            "pass": true,
+            "message": "DNS prefetch: 3개"
+          }
+        },
+        {
+          "name": "Preconnect",
+          "result": {
+            "pass": true,
+            "message": "Preconnect: 3개"
+          }
+        },
+        {
+          "name": "폰트 최적화",
+          "result": {
+            "pass": true,
+            "message": "폰트 최적화 완료 (display=swap, subset=latin)"
+          }
+        }
+      ]
+    },
+    "accessibility": {
+      "name": "접근성",
+      "score": 100,
+      "checks": [
+        {
+          "name": "HTML Lang 속성",
+          "result": {
+            "pass": true,
+            "message": "Lang 속성: en"
+          }
+        },
+        {
+          "name": "Viewport 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "Viewport 메타 태그 있음"
+          }
+        },
+        {
+          "name": "Charset 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "Charset 메타 태그 있음"
+          }
+        }
+      ]
+    },
+    "security": {
+      "name": "보안",
+      "score": 100,
+      "checks": [
+        {
+          "name": "HTTPS (Canonical URL)",
+          "result": {
+            "pass": true,
+            "message": "Canonical URL이 HTTPS를 사용합니다."
+          }
+        },
+        {
+          "name": "Open Graph Secure URL",
+          "result": {
+            "pass": true,
+            "message": "og:image:secure_url 있음"
+          }
+        }
+      ]
+    }
+  },
+  "improvements": []
+}
