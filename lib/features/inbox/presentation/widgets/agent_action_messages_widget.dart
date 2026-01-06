@@ -1263,8 +1263,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       // baseStyle에서 fontFamily를 제거하여 기본 폰트 사용
       final htmlTextStyle = baseStyle?.copyWith(fontFamily: null);
 
-      print('############# html: ${processedHtml}');
-
       return Container(
         decoration: isUser ? BoxDecoration(color: context.primary.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(6)) : null,
         padding: isUser ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6) : null,
