@@ -161,16 +161,73 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     String? previousTaskInfo,
     String? suggestedTaskInfo,
     required List<Map<String, dynamic>> projects,
-    required String conversationText,
-    required String todayStr,
-    required String tomorrowStr,
-    required String currentTime,
-    required String userRequest,
-    required bool hasPreviousTask,
+    String? conversationText,
+    String? todayStr,
+    String? tomorrowStr,
+    String? currentTime,
+    String? userRequest,
+    bool hasPreviousTask = false,
     String? suggestionSummary,
     String? taskId,
     String? inboxId,
+    bool isSuggestionMode = false,
   }) {
+    if (isSuggestionMode) {
+      return '''
+Please suggest a task based on the following inbox item.
+
+## Inbox Item Information
+${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
+Description:
+$snippet
+${taskId != null && previousTaskInfo != null ? '\n## Previous Task ID\nTask ID: $taskId\n' : ''}
+
+${previousTaskInfo ?? ''}
+${suggestedTaskInfo ?? ''}
+## Available Projects
+You MUST select a project_id from this list. Match the user's request to one of these projects by name (case-insensitive, partial matching is OK).
+
+${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}
+
+CRITICAL PROJECT SELECTION RULES:
+1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response. project_id cannot be null.
+
+2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:
+   - Search through the Available Projects list above
+   - Find the project whose name best matches the user's request (case-insensitive, partial match is OK)
+   - Return the EXACT project_id from the matching project
+
+3. If the user doesn't mention a project name or no match is found:
+   - If there is a previous task entity, use its project_id
+   - If there is a suggested task with a project_id, use that project_id
+   - Otherwise, select the first project from the Available Projects list (or the default project if one is marked as default)
+   - **NEVER return null for project_id**
+
+4. Examples of matching:
+   - User says "networking project" → Find project with name containing "networking" → Return its project_id
+   - User says "marketing" → Find project with name containing "marketing" → Return its project_id
+   - User says "change project to [project name]" → Find matching project → Return its project_id
+   - User doesn't mention a project → Use previous task's project_id, or suggested task's project_id, or first available project_id
+
+5. The project_id MUST be one of the IDs listed in the Available Projects section above. It MUST NOT be null.
+
+Return only the JSON object, no additional text or explanations.
+''';
+    }
+
+    // In normal mode, these are required
+    assert(conversationText != null, 'conversationText is required in normal mode');
+    assert(todayStr != null, 'todayStr is required in normal mode');
+    assert(tomorrowStr != null, 'tomorrowStr is required in normal mode');
+    assert(currentTime != null, 'currentTime is required in normal mode');
+    assert(userRequest != null, 'userRequest is required in normal mode');
+
+    final finalConversationText = conversationText!;
+    final finalTodayStr = todayStr!;
+    final finalTomorrowStr = tomorrowStr!;
+    final finalCurrentTime = currentTime!;
+    final finalUserRequest = userRequest!;
+
     return '''
 Please create a task based on the following inbox item and user request.
 
@@ -210,15 +267,15 @@ CRITICAL PROJECT SELECTION RULES:
 5. The project_id MUST be one of the IDs listed in the Available Projects section above. It MUST NOT be null.
 
 ## Conversation History
-$conversationText
+$finalConversationText
 
 ## Current Date Information
-- TODAY's date: $todayStr
-- TOMORROW's date: $tomorrowStr
-- Current time: $currentTime
+- TODAY's date: $finalTodayStr
+- TOMORROW's date: $finalTomorrowStr
+- Current time: $finalCurrentTime
 
 ## User Request
-$userRequest
+$finalUserRequest
 
 ## Requirements
 ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Use it as the base and ONLY modify the fields that the user explicitly requests to change.
@@ -243,10 +300,10 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
   4. If the user doesn't mention a project and you're modifying an existing task, keep the previous task's project_id unchanged
   5. If no matching project is found, use the previous task's project_id, or the suggested task's project_id, or the first available project_id. NEVER return null for project_id
 - CRITICAL DATE CALCULATION: 
-  * TODAY's date is $todayStr (see Current Date Information above)
-  * TOMORROW's date is $tomorrowStr (see Current Date Information above)
-  * When the user says "tomorrow" or "내일", you MUST use TOMORROW's date ($tomorrowStr), NOT today's date ($todayStr), and NOT the previous task's date.
-  * Example: If user says "tomorrow" or "I want to create task at tomorrow", set start_at to "${tomorrowStr}T00:00:00" (or the appropriate time based on previous task)
+  * TODAY's date is $finalTodayStr (see Current Date Information above)
+  * TOMORROW's date is $finalTomorrowStr (see Current Date Information above)
+  * When the user says "tomorrow" or "내일", you MUST use TOMORROW's date ($finalTomorrowStr), NOT today's date ($finalTodayStr), and NOT the previous task's date.
+  * Example: If user says "tomorrow" or "I want to create task at tomorrow", set start_at to "${finalTomorrowStr}T00:00:00" (or the appropriate time based on previous task)
 - For example:
   - If user says "change title to X", only change the title, keep everything else the same.
   - If user says "change project to networking project" or "I want to change project to X" or "set project to Y" or mentions any project name:
@@ -257,8 +314,8 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
     * Keep all other fields the same as the previous task
     * Example: If user says "networking project" and Available Projects shows "Project Name: 'Networking Project' | Project ID: 'abc-123'", then set project_id to "abc-123"
   - If user says "change date to tomorrow" or "I want to create task at tomorrow" or "make it tomorrow" or "내일로 바꿔줘":
-    * Use TOMORROW's date: $tomorrowStr (NOT today: $todayStr, NOT previous task date)
-    * Set start_at to "${tomorrowStr}T00:00:00" (or the appropriate time if previous task had a specific time)
+    * Use TOMORROW's date: $finalTomorrowStr (NOT today: $finalTodayStr, NOT previous task date)
+    * Set start_at to "${finalTomorrowStr}T00:00:00" (or the appropriate time if previous task had a specific time)
     * Keep the same time as the previous task, or use 00:00:00 if the previous task was all-day
     * Calculate end_at based on the previous task's duration
   - If user says "as is" or "create as is", use the previous task entity exactly as is (all fields unchanged) - in this case, you can omit start_at from the response or set it to the previous task's start_at.''' : '''- Generate a task title and description based on the inbox item and user request.
@@ -1313,133 +1370,6 @@ IMPORTANT: If the user requests to create the task "as is", "as suggested", or s
 ''';
   }
 
-  /// Builds prompt for suggesting task from inbox
-  static String buildSuggestTaskFromInboxPrompt({required String inboxTitle, required String snippet, required List<Map<String, dynamic>> projects, String? inboxId}) {
-    return '''
-Please suggest a task based on the following inbox item.
-
-## Inbox Item Information
-${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
-Description:
-$snippet
-
-## Available Projects
-${projects.map((p) => '- ${p['name']} (id: ${p['id']})${p['description'] != null ? ': ${p['description']}' : ''}${p['parent_id'] != null ? ' | parent_id: ${p['parent_id']}' : ''}').join('\n')}
-
-## Requirements
-- Generate a task title and description based on the inbox item.
-- **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response. project_id cannot be null.
-- Select the most appropriate project ID from the available projects list. If no project clearly matches, select the first project from the list.
-- Keep the task title concise and action-oriented.
-- The description should include relevant details from the inbox item.
-
-## Output Format
-Return a JSON object with the following structure:
-{
-  "title": "Task title",
-  "description": "Task description (can be null)",
-  "project_id": "project-id (REQUIRED - must always be included, cannot be null)"
-}
-
-CRITICAL: The project_id field is REQUIRED and MUST always be included. It cannot be null. If you cannot determine which project to use, select the first project from the Available Projects list.
-
-Return only the JSON object, no additional text or explanations.
-''';
-  }
-
-  /// Builds prompt for suggesting event from inbox
-  static String buildSuggestEventFromInboxPrompt({
-    required String inboxTitle,
-    required String snippet,
-    required String? sourceHostEmail,
-    required String? sourceFromName,
-    required List<Map<String, dynamic>> calendars,
-    String? inboxId,
-  }) {
-    return '''
-Please suggest a calendar event based on the following inbox item.
-
-## Inbox Item Information
-${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
-Description:
-$snippet
-${sourceHostEmail != null ? '\nSource Host Email: $sourceHostEmail' : ''}
-${sourceFromName != null ? 'Source From Name: $sourceFromName' : ''}
-
-## Available Calendars
-You MUST select a calendar_id from this list. Use the following information to make an intelligent choice:
-- Consider the source host email and context to infer the most appropriate calendar
-- Prefer calendars that match the domain or context of the inbox item
-
-${calendars.map((c) => 'Calendar Name: "${c['name']}" | Calendar ID: "${c['id']}"${c['email'] != null ? ' | Email: "${c['email']}"' : ''} | Modifiable: ${c['modifiable'] == true ? 'YES (can create events)' : 'NO (read-only, DO NOT SELECT)'}').join('\n')}
-
-CRITICAL CALENDAR SELECTION RULES:
-1. ABSOLUTE PRIORITY: You MUST ONLY select calendars where "Modifiable: YES". NEVER select a calendar marked "Modifiable: NO" as it will cause an error.
-
-2. Intelligently select the most appropriate calendar based on:
-   - FIRST: Filter to only calendars marked "Modifiable: YES"
-   - Source host email matching calendar emails or domains
-   - Context: work-related emails → work calendar, personal emails → personal calendar
-   - Calendar names and their relevance to the source
-3. The calendar_id MUST be one of the IDs listed in the Available Calendars section above AND must be modifiable.
-
-## Conference Call Decision
-You MUST decide whether to add a conference call link to this event. Consider the following:
-- Add conference_link automatically if:
-  * The event involves multiple attendees (2+ people mentioned in the inbox item)
-  * The inbox item mentions "meeting", "call", "video", "zoom", "teams", "google meet", "conference", "화상", "회의", "통화"
-  * The event title or description suggests a remote meeting or online interaction
-- Set conference_link to "added" (a special value that indicates a conference link should be generated) if a conference call is appropriate
-- Set conference_link to null if:
-  * The event is clearly in-person (mentions physical location without remote option)
-  * It's a personal reminder or task without attendees
-  * There's no indication of a meeting or call
-
-## Location Extraction
-- Extract location information from the inbox item if mentioned (e.g., "at office", "in conference room", "서울시 강남구", "123 Main St", "Google Office")
-- Look for location keywords: "at", "in", "location", "venue", "address", "장소", "위치", "주소"
-- If a physical location is mentioned, extract it and include in the location field
-- If no location is mentioned, set location to null
-
-## Attendees Extraction
-- Extract email addresses of people mentioned in the inbox item
-- Look for email patterns (e.g., "john@example.com", "jane@company.com")
-- Extract names and try to infer email addresses if the inbox item mentions people but not emails (use common patterns like "firstname.lastname@domain.com" or "firstname@domain.com" based on the source host email domain)
-- If the inbox item mentions people to invite or attendees, include them in the attendees array
-- Return attendees as an array of email address strings: ["john@example.com", "jane@example.com"]
-- If no attendees are mentioned, return an empty array []
-
-## Description Summarization
-- Summarize the inbox item description into a concise event description
-- Include only the most relevant and important information
-- Remove unnecessary details, links, or promotional content
-- Keep it clear and actionable
-- If the inbox item description is very long, summarize it to 2-3 sentences maximum
-- If the inbox item description is already concise, you can use it as-is or slightly refine it
-
-## Requirements
-- Generate an event title and description based on the inbox item (summarize description if needed).
-- Select the most appropriate calendar ID from the available calendars list.
-- Extract location from the inbox item if mentioned.
-- Extract attendees (email addresses) from the inbox item if mentioned.
-- Decide whether to add a conference call link based on the context above.
-- Keep the event title concise and action-oriented.
-
-## Output Format
-Return a JSON object with the following structure:
-{
-  "title": "Event title",
-  "description": "Summarized event description (can be null)",
-  "calendar_id": "calendar-id",
-  "location": "Location string or null",
-  "attendees": ["email1@example.com", "email2@example.com"] or [],
-  "conference_link": "added" or null
-}
-
-Return only the JSON object, no additional text or explanations.
-''';
-  }
-
   /// Builds previous event info prompt for event generation (from previous event)
   static String buildPreviousEventInfoPrompt({
     required String eventTitle,
@@ -1521,16 +1451,107 @@ CRITICAL: Convert the task information to event format. Use the title, descripti
     required String snippet,
     required String? sourceHostEmail,
     required String? sourceFromName,
-    required String? previousEventInfo,
+    String? previousEventInfo,
     required List<Map<String, dynamic>> calendars,
-    required String conversationText,
-    required String todayStr,
-    required String tomorrowStr,
-    required String currentTime,
-    required String userRequest,
-    required bool hasPreviousEventEntity,
+    String? conversationText,
+    String? todayStr,
+    String? tomorrowStr,
+    String? currentTime,
+    String? userRequest,
+    bool hasPreviousEventEntity = false,
     String? inboxId,
+    bool isSuggestionMode = false,
   }) {
+    if (isSuggestionMode) {
+      return '''
+Please suggest a calendar event based on the following inbox item.
+
+## Inbox Item Information
+${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
+Description:
+$snippet
+${sourceHostEmail != null ? '\nSource Host Email: $sourceHostEmail' : ''}
+${sourceFromName != null ? 'Source From Name: $sourceFromName' : ''}
+
+## Available Calendars
+You MUST select a calendar_id from this list. Use the following information to make an intelligent choice:
+- Consider the source host email and context to infer the most appropriate calendar
+- Prefer calendars that match the domain or context of the inbox item
+
+${calendars.map((c) => 'Calendar Name: "${c['name']}" | Calendar ID: "${c['id']}"${c['email'] != null ? ' | Email: "${c['email']}"' : ''} | Modifiable: ${c['modifiable'] == true ? 'YES (can create events)' : 'NO (read-only, DO NOT SELECT)'}').join('\n')}
+
+CRITICAL CALENDAR SELECTION RULES:
+1. ABSOLUTE PRIORITY: You MUST ONLY select calendars where "Modifiable: YES". NEVER select a calendar marked "Modifiable: NO" as it will cause an error.
+
+2. Intelligently select the most appropriate calendar based on:
+   - FIRST: Filter to only calendars marked "Modifiable: YES"
+   - Source host email matching calendar emails or domains
+   - Context: work-related emails → work calendar, personal emails → personal calendar
+   - Calendar names and their relevance to the source
+3. The calendar_id MUST be one of the IDs listed in the Available Calendars section above AND must be modifiable.
+
+## Conference Call Decision
+You MUST decide whether to add a conference call link to this event. Consider the following:
+- Add conference_link automatically if:
+  * The event involves multiple attendees (2+ people mentioned in the inbox item)
+  * The inbox item mentions "meeting", "call", "video", "zoom", "teams", "google meet", "conference", "화상", "회의", "통화"
+  * The event title or description suggests a remote meeting or online interaction
+- Set conference_link to "added" (a special value that indicates a conference link should be generated) if a conference call is appropriate
+- Set conference_link to null if:
+  * The event is clearly in-person (mentions physical location without remote option)
+  * It's a personal reminder or task without attendees
+  * There's no indication of a meeting or call
+
+## Location Extraction
+- Extract location information from the inbox item if mentioned (e.g., "at office", "in conference room", "서울시 강남구", "123 Main St", "Google Office")
+- Look for location keywords: "at", "in", "location", "venue", "address", "장소", "위치", "주소"
+- If a physical location is mentioned, extract it and include in the location field
+- If no location is mentioned, set location to null
+
+## Attendees Extraction
+- Extract email addresses of people mentioned in the inbox item
+- Look for email patterns (e.g., "john@example.com", "jane@company.com")
+- Extract names and try to infer email addresses if the inbox item mentions people but not emails (use common patterns like "firstname.lastname@domain.com" or "firstname@domain.com" based on the source host email domain)
+- If the inbox item mentions people to invite or attendees, include them in the attendees array
+- Return attendees as an array of email address strings: ["john@example.com", "jane@example.com"]
+- If no attendees are mentioned, return an empty array []
+
+## Description Summarization
+- Summarize the inbox item description into a concise event description
+- Include only the most relevant and important information
+- Remove unnecessary details, links, or promotional content
+- Keep it clear and actionable
+- If the inbox item description is very long, summarize it to 2-3 sentences maximum
+- If the inbox item description is already concise, you can use it as-is or slightly refine it
+
+## Output Format
+Return a JSON object with the following structure:
+{
+  "title": "Event title",
+  "description": "Event description (can be null)",
+  "calendar_id": "calendar-id",
+  "location": "Location string or null",
+  "attendees": ["email1@example.com", "email2@example.com"] or [],
+  "conference_link": "added" or null
+}
+
+Return only the JSON object, no additional text or explanations.
+''';
+    }
+
+    // In normal mode, these are required
+    assert(conversationText != null, 'conversationText is required in normal mode');
+    assert(todayStr != null, 'todayStr is required in normal mode');
+    assert(tomorrowStr != null, 'tomorrowStr is required in normal mode');
+    assert(currentTime != null, 'currentTime is required in normal mode');
+    assert(userRequest != null, 'userRequest is required in normal mode');
+
+    final finalConversationText = conversationText!;
+    final finalTodayStr = todayStr!;
+    final finalTomorrowStr = tomorrowStr!;
+    final finalCurrentTime = currentTime!;
+    final finalUserRequest = userRequest!;
+
     return '''
 Please create a calendar event based on the following inbox item and user request.
 
@@ -1583,15 +1604,15 @@ CRITICAL CALENDAR SELECTION RULES:
 7. The calendar_id MUST be one of the IDs listed in the Available Calendars section above.
 
 ## Conversation History
-$conversationText
+$finalConversationText
 
 ## Current Date Information
-- TODAY's date: $todayStr
-- TOMORROW's date: $tomorrowStr
-- Current time: $currentTime
+- TODAY's date: $finalTodayStr
+- TOMORROW's date: $finalTomorrowStr
+- Current time: $finalCurrentTime
 
 ## User Request
-$userRequest
+$finalUserRequest
 
 ## Requirements
 ${hasPreviousEventEntity ? '''- IMPORTANT: A previous event entity is provided above. Use it as the base and ONLY modify the fields that the user explicitly requests to change.
@@ -1609,10 +1630,10 @@ ${hasPreviousEventEntity ? '''- IMPORTANT: A previous event entity is provided a
   * Examples of requests that do NOT change calendar: "add video call", "add conference", "컨퍼런스콜 추가", "change title", "change date" → Keep previous calendar_id.
   * If no matching calendar is found when user explicitly requests a change, use the first calendar from the list as default
 - CRITICAL DATE CALCULATION: 
-  * TODAY's date is ${todayStr} (see Current Date Information above)
-  * TOMORROW's date is ${tomorrowStr} (see Current Date Information above)
-  * When the user says "tomorrow" or "내일", you MUST use TOMORROW's date (${tomorrowStr}), NOT today's date (${todayStr}), and NOT the previous event's date.
-  * Example: If user says "tomorrow" or "I want to create event at tomorrow", set start_at to "${tomorrowStr}T00:00:00" (or the appropriate time based on previous event)
+  * TODAY's date is $finalTodayStr (see Current Date Information above)
+  * TOMORROW's date is $finalTomorrowStr (see Current Date Information above)
+  * When the user says "tomorrow" or "내일", you MUST use TOMORROW's date ($finalTomorrowStr), NOT today's date ($finalTodayStr), and NOT the previous event's date.
+  * Example: If user says "tomorrow" or "I want to create event at tomorrow", set start_at to "${finalTomorrowStr}T00:00:00" (or the appropriate time based on previous event)
 - For example:
   - If user says "change title to X", only change the title, keep everything else the same.
   - If user says "change calendar to work calendar" or mentions any calendar name:
@@ -1622,8 +1643,8 @@ ${hasPreviousEventEntity ? '''- IMPORTANT: A previous event entity is provided a
     * Set calendar_id in your response to that exact ID
     * Keep all other fields the same as the previous event
   - If user says "change date to tomorrow" or "I want to create event at tomorrow" or "make it tomorrow" or "내일로 바꿔줘":
-    * Use TOMORROW's date: ${tomorrowStr} (NOT today: ${todayStr}, NOT previous event date)
-    * Set start_at to "${tomorrowStr}T00:00:00" (or the appropriate time if previous event had a specific time)
+    * Use TOMORROW's date: $finalTomorrowStr (NOT today: $finalTodayStr, NOT previous event date)
+    * Set start_at to "${finalTomorrowStr}T00:00:00" (or the appropriate time if previous event had a specific time)
     * Keep the same time as the previous event, or use 00:00:00 if the previous event was all-day
     * Calculate end_at based on the previous event's duration''' : '''- Generate an event title and description based on the inbox item and user request.
 - CRITICAL CALENDAR SELECTION: 

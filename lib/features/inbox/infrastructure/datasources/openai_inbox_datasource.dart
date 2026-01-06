@@ -1377,7 +1377,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     final inboxDescription = inbox.description ?? '';
     final snippet = inboxDescription;
 
-    final prompt = OpenAiInboxPrompts.buildSuggestTaskFromInboxPrompt(inboxTitle: inboxTitle, snippet: snippet, projects: projects, inboxId: inbox.id);
+    final prompt = OpenAiInboxPrompts.buildGenerateTaskPrompt(inboxTitle: inboxTitle, snippet: snippet, projects: projects, inboxId: inbox.id, isSuggestionMode: true);
 
     const endpoint = 'https://api.openai.com/v1/responses';
 
@@ -1478,13 +1478,14 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     final sourceHostEmail = inbox.linkedMail?.hostMail ?? inbox.linkedMessage?.teamId;
     final sourceFromName = inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName;
 
-    final prompt = OpenAiInboxPrompts.buildSuggestEventFromInboxPrompt(
+    final prompt = OpenAiInboxPrompts.buildGenerateEventFromInboxPrompt(
       inboxTitle: inboxTitle,
       snippet: snippet,
       sourceHostEmail: sourceHostEmail,
       sourceFromName: sourceFromName,
       calendars: calendars,
       inboxId: inbox.id,
+      isSuggestionMode: true,
     );
 
     const endpoint = 'https://api.openai.com/v1/responses';
