@@ -17,7 +17,7 @@ const defaultSEO: SEOData = {
   title: 'Visir - Your AI Executive Assistant | Stop juggling Slack, Gmail, Outlook & Calendar',
   description: 'Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.',
   keywords: 'productivity, email management, calendar, task management, AI assistant, unified inbox, time blocking, workflow automation, Slack, Gmail, Outlook, Notion',
-  ogImage: `${baseUrl}/og-image.webp`, // SEO용 전용 이미지 (생성 필요)
+  ogImage: `${baseUrl}/og-image.webp?v=2`, // SEO용 전용 이미지 (캐시 무효화를 위해 버전 파라미터 추가)
   ogType: 'website',
 };
 
@@ -370,7 +370,7 @@ export function generateHowToStructuredData(path: string): object | null {
     '@type': 'HowTo',
     name: article.name,
     description: article.description,
-    image: `${baseUrl}/og-image.webp`,
+    image: `${baseUrl}/og-image.webp?v=2`,
     totalTime: 'PT15M', // 15 minutes estimated
     step: article.steps.map((step, index) => ({
       '@type': 'HowToStep',
@@ -448,7 +448,7 @@ export function generateStructuredData(seoData: SEOData, path: string): object {
       bestRating: '5',
       worstRating: '1',
     },
-    screenshot: `${baseUrl}/og-image.webp`,
+    screenshot: `${baseUrl}/og-image.webp?v=2`,
     featureList: [
       'Unified inbox for Gmail, Slack, and Outlook',
       'AI-powered email triage and categorization',
