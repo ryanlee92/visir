@@ -23,6 +23,7 @@
     "autoprefixer": "^10.4.23",
     "iconsax-svelte": "^0.0.1-alpha.11",
     "lighthouse": "^12.0.0",
+    "chrome-launcher": "^1.1.0",
     "postcss": "^8.5.6",
     "sharp": "^0.33.5",
     "svelte-check": "^4.0.0",
@@ -49,6 +50,7 @@
     "perf": "node scripts/performance-check.js",
     "perf:build": "npm run build && npm run perf -- --skip-lighthouse",
     "perf:lighthouse": "npm run perf -- --skip-build",
-    "generate:og-image": "node scripts/generate-og-image.js"
+    "generate:og-image": "node scripts/generate-og-image.js",
+    "check:seo": "node scripts/check-seo.js"
   }
 }

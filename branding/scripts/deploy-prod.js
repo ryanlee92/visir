@@ -10,7 +10,7 @@
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, copyFileSync, mkdirSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -79,6 +79,29 @@ if (ga4Id) {
 } else {
   console.warn('⚠️  VITE_GA4_ID not set. GA4 tracking will be disabled.');
   console.warn('   You can set it in .env file or as an environment variable.');
+}
+
+// Copy og-image from assets to public before build
+console.log('\n📸 Copying og-image...');
+const ogImageSource = join(rootDir, 'assets', 'ogimage.png');
+const ogImageDest = join(rootDir, 'public', 'og-image.png');
+const publicDir = join(rootDir, 'public');
+
+if (existsSync(ogImageSource)) {
+  try {
+    // Ensure public directory exists
+    if (!existsSync(publicDir)) {
+      mkdirSync(publicDir, { recursive: true });
+    }
+    copyFileSync(ogImageSource, ogImageDest);
+    console.log('✅ og-image.png copied to public folder');
+  } catch (error) {
+    console.warn('⚠️  Failed to copy og-image:', error.message);
+    console.warn('   Continuing with build...');
+  }
+} else {
+  console.warn('⚠️  ogimage.png not found in assets folder');
+  console.warn('   Skipping og-image copy...');
 }
 
 console.log('\n🏗️  Building project...');

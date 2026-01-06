@@ -2,7 +2,8 @@
 <html lang="en" class="dark scroll-smooth" style="scroll-padding-top: 100px;">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="format-detection" content="telephone=no" />
     
     <!-- Primary Meta Tags -->
     <title>Visir - Your AI Executive Assistant | Stop juggling Slack, Gmail, Outlook & Calendar</title>
@@ -28,10 +29,10 @@
     <meta property="og:url" content="https://visir.pro/" />
     <meta property="og:title" content="Visir - Reclaim your 2 hours today." />
     <meta property="og:description" content="Email, Slack, and Tasks lived apart. We married them. Finally meet your new mental home. 100% Local, 100% Yours." />
-    <meta property="og:image" content="https://visir.pro/og-image.webp?v=2" />
-    <meta property="og:image:secure_url" content="https://visir.pro/og-image.webp?v=2" />
+    <meta property="og:image" content="https://visir.pro/og-image.png?v=3" />
+    <meta property="og:image:secure_url" content="https://visir.pro/og-image.png?v=3" />
     <meta property="og:image:alt" content="Visir - Your AI Executive Assistant" />
-    <meta property="og:image:type" content="image/webp" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Visir" />
@@ -42,11 +43,19 @@
     <meta name="twitter:url" content="https://visir.pro/" />
     <meta name="twitter:title" content="Visir - Reclaim your 2 hours today." />
     <meta name="twitter:description" content="Email, Slack, and Tasks lived apart. We married them. Finally meet your new mental home. 100% Local, 100% Yours." />
-    <meta name="twitter:image" content="https://visir.pro/og-image.webp?v=2" />
+    <meta name="twitter:image" content="https://visir.pro/og-image.png?v=3" />
     <meta name="twitter:image:alt" content="Visir Logo" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://visir.pro/" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="geo.region" content="KR" />
+    <meta name="geo.placename" content="Seoul" />
+    <meta name="application-name" content="Visir" />
+    <meta name="apple-mobile-web-app-title" content="Visir" />
+    <meta name="msapplication-TileColor" content="#7C5DFF" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#1C1C1B" media="(prefers-color-scheme: dark)">
@@ -171,7 +180,7 @@
         "worstRating": "1"
       },
       "description": "Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.",
-      "screenshot": "https://visir.pro/og-image.webp?v=2",
+      "screenshot": "https://visir.pro/og-image.png?v=3",
       "featureList": [
         "Unified inbox for Gmail, Slack, and Outlook",
         "AI-powered email triage and categorization",
@@ -235,6 +244,20 @@
         background-color: var(--visir-background);
         color: var(--visir-text);
         transition: background-color 0.3s ease, color 0.3s ease;
+        font-size: 16px; /* SEO: 최소 폰트 크기 12px 이상 */
+        line-height: 1.5; /* SEO: 가독성을 위한 줄 간격 */
+      }
+      
+      /* SEO: 링크 접근성 개선 */
+      a:focus-visible {
+        outline: 2px solid var(--visir-primary);
+        outline-offset: 2px;
+      }
+      
+      /* SEO: 버튼 최소 크기 (모바일 터치 타겟) */
+      button, a[role="button"] {
+        min-height: 44px;
+        min-width: 44px;
       }
     </style>
     
