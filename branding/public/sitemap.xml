@@ -7,7 +7,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://visir.pro/</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -15,7 +15,7 @@
   <!-- Pricing -->
   <url>
     <loc>https://visir.pro/pricing</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -23,7 +23,7 @@
   <!-- Download -->
   <url>
     <loc>https://visir.pro/download</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -31,7 +31,7 @@
   <!-- Blog -->
   <url>
     <loc>https://visir.pro/blog</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -39,7 +39,7 @@
   <!-- Integrations -->
   <url>
     <loc>https://visir.pro/integrations</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -47,28 +47,28 @@
   <!-- Target Audience Pages -->
   <url>
     <loc>https://visir.pro/founders</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/developers</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/managers</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/personal</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -76,35 +76,35 @@
   <!-- Community & Support -->
   <url>
     <loc>https://visir.pro/community</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/help</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/changelog</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/roadmap</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/feature-requests</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -112,14 +112,14 @@
   <!-- Legal Pages -->
   <url>
     <loc>https://visir.pro/privacy</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
     <loc>https://visir.pro/terms</loc>
-    <lastmod>2025-01-17</lastmod>
+    <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

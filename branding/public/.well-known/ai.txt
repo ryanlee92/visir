@@ -1,11 +1,11 @@
-# AI.txt - AI Crawler Instructions for Visir
+# AI.txt file for Visir
+# This file provides information about how AI systems can interact with our website
 
-# About Visir
-Visir is a unified productivity platform that combines email, calendar, and chat into one intelligent timeline. Our AI-powered assistant helps professionals manage their workflow more efficiently.
+# Allow all AI crawlers
+User-agent: *
+Allow: /
 
-# Allowed AI Crawlers
-# We welcome AI crawlers that respect our content and provide value to users.
-
+# Specific AI crawlers
 User-agent: GPTBot
 Allow: /
 Crawl-delay: 1
@@ -38,13 +38,21 @@ User-agent: Applebot-Extended
 Allow: /
 Crawl-delay: 1
 
-# Disallowed Paths
+# Disallow sensitive pages
 Disallow: /login
 Disallow: /signup
 
-# Contact
-# For questions about AI crawling, contact: support@visir.pro
+# Contact information
+Contact: https://visir.pro/help
 
-# Last Updated
-# 2025-01-17
+# About Visir
+Visir is a unified productivity platform that combines email, Slack, calendar, and task management into one intelligent timeline. Our mission is to help professionals reclaim their focus time by eliminating app switching and context loss.
 
+# Key features
+- Unified inbox for Gmail, Outlook, Slack, and Google Calendar
+- AI-powered email triage and categorization
+- Calendar integration with time blocking
+- Task management with drag-and-drop
+- Cross-platform sync (macOS, Windows, iOS, Android)
+- Offline support
+- Privacy-first architecture with local data processing
