@@ -134,8 +134,8 @@
     currentMobileIndex = index;
   }
 
-  $: unifiedImage = feature.title.includes("Unified Context") ? (isDark ? unifiedInboxDark : unifiedInboxLight) : null;
-  $: aiImage = feature.title.includes("AI Executive Assistant") ? (isDark ? aiAssistantDark : aiAssistantLight) : null;
+  $: unifiedImage = feature.title.includes("Never Alt-Tab") ? (isDark ? unifiedInboxDark : unifiedInboxLight) : null;
+  $: aiImage = feature.title.includes("Your Brain") ? (isDark ? aiAssistantDark : aiAssistantLight) : null;
   $: isVerticalApps = feature.title.includes("Vertical Apps");
   $: mailImage = isVerticalApps ? (isDark ? mailDark : mailLight) : null;
   $: chatImage = isVerticalApps ? (isDark ? chatDark : chatLight) : null;
@@ -181,7 +181,7 @@
           <div class="aspect-[4/3] {isDark ? 'bg-black/20' : 'bg-white/60'} backdrop-blur-sm rounded-2xl overflow-visible relative border border-white/5 shadow-inner flex items-center justify-center" style="contain: layout style paint;">
             <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-visir-primary/10 via-transparent to-transparent pointer-events-none"></div>
             
-            {#if isMobile && feature.title.includes("Mobile Experience")}
+            {#if isMobile && feature.title.includes("Command Center")}
               <!-- Mobile Screenshots Carousel -->
               <div class="relative z-10 w-full h-full flex items-center justify-center">
                 <button
@@ -373,7 +373,7 @@
             {:else}
               <!-- Default Fallback -->
               <div class="w-3/4 h-3/4 border border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-visir-text-muted backdrop-blur-sm bg-white/5 shadow-2xl relative z-10">
-                <svelte:component this={IconComponent} size={64} class="opacity-30 mb-4 text-visir-text" />
+                <Icon name={iconName} size={64} className="opacity-30 mb-4 text-visir-text" />
                 <span class="text-xs uppercase tracking-widest font-semibold opacity-50 font-display">Interface Mockup</span>
               </div>
             {/if}

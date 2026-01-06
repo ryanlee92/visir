@@ -117,27 +117,27 @@
     
     <!-- Glassy Tag -->
     <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-visir-surface/30 border border-visir-outline/20 text-visir-primary text-xs font-medium uppercase tracking-wide mb-8 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:bg-visir-surface/50 transition-colors duration-200 cursor-default">
-      <Icon name="Zap" size={14} color="var(--visir-primary)" class="text-visir-primary" />
-      <span class="font-display tracking-wide text-visir-text">Your AI Executive Assistant</span>
+      <Icon name="Zap" size={14} color="var(--visir-primary)" className="text-visir-primary" />
+      <span class="font-display tracking-wide text-visir-text">Your Brain, Just Organized by AI</span>
     </div>
 
     <h1 class="text-4xl sm:text-5xl lg:text-7xl font-medium font-display tracking-tight text-visir-text mb-6 leading-tight drop-shadow-lg">
-      Stop juggling apps.<br />
+      Your browser tabs are<br />
       <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 {isDark ? 'drop-shadow-sm' : 'drop-shadow-lg'} {!isDark ? 'brightness-90 contrast-110' : ''}">
-        Reclaim your focus.
+        killing your productivity.
       </span>
     </h1>
     
     <p class="max-w-4xl text-lg sm:text-xl text-visir-text-muted mb-10 leading-relaxed font-sans font-light drop-shadow-md">
-      Visir unifies your email, calendar, and chats into one intelligent timeline. <br/>
-      AI automatically sorts your inbox, prepares you for meetings, and optimizes your schedule.
+      One Timeline for Everything. Finally. <br/>
+      Email, Slack, and Tasks lived apart. We married them.
     </p>
     
     <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
       <a href="/download" use:link>
         <Button size="lg" className="w-full sm:w-auto gap-2 group font-display font-medium">
           Get Started Free
-          <Icon name="ArrowRight" size={18} class="group-hover:translate-x-1 transition-transform" />
+          <Icon name="ArrowRight" size={18} className="group-hover:translate-x-1 transition-transform" />
         </Button>
       </a>
       <Button variant="secondary" size="lg" className="w-full sm:w-auto gap-2 font-display font-medium">
@@ -145,9 +145,19 @@
       </Button>
     </div>
 
-    <div class="mt-8 flex items-center gap-6 text-sm text-visir-text-muted font-light">
-      <div class="flex items-center gap-1.5"><Icon name="CheckCircle2" size={16} color="#10b981" /> No credit card required</div>
-      <div class="flex items-center gap-1.5"><Icon name="CheckCircle2" size={16} color="#10b981" /> 7-day free trial</div>
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+      <div class="flex items-center gap-2 text-base text-visir-text-muted font-light">
+        <Icon name="CheckCircle2" size={18} color="#10b981" /> 
+        <span class="font-medium">No credit card required</span>
+      </div>
+      <div class="flex items-center gap-2 text-base text-visir-text-muted font-light">
+        <Icon name="CheckCircle2" size={18} color="#10b981" /> 
+        <span class="font-medium">14-day free trial</span>
+      </div>
+      <div class="flex items-center gap-2 text-base text-visir-text-muted font-light">
+        <Icon name="Shield" size={18} color="#10b981" /> 
+        <span class="font-medium">Local-first, encrypted essentials</span>
+      </div>
     </div>
   </div>
 

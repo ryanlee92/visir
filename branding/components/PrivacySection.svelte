@@ -13,10 +13,10 @@
         <span class="font-display tracking-wide">Uncompromising Privacy</span>
       </div>
       <h2 class="text-3xl md:text-5xl font-semibold font-display text-visir-text mb-6 tracking-tight drop-shadow-md">
-        Your data stays <span class="text-emerald-400">yours</span>.
+        We built Visir because we <span class="text-emerald-400">hate snooping</span> too.
       </h2>
       <p class="text-lg text-visir-text-muted font-light leading-relaxed">
-        We designed Visir with extreme security in mind. We don't need your data, so we built an architecture that makes it impossible for us to see it.
+        100% Local, 100% Yours. We don't need your data, so we built an architecture that makes it impossible for us to see it.
       </p>
     </div>
 

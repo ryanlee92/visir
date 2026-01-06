@@ -9,27 +9,27 @@
 
   const features: Feature[] = [
     {
-      title: "Unified Context, Zero Switching",
-      description: "Visir unifies Email, Team chat, and Calendars into one intelligent timeline. Drag any message to your calendar to time-block it, or instantly convert it to a task. Reply to emails or chats directly within Visir—no need to switch apps.",
+      title: "Never Alt-Tab Again.",
+      description: "Email, Slack, and Tasks lived apart. We married them. Drag any message to your calendar to time-block it, or instantly convert it to a task. Reply to emails or chats directly within Visir—no need to switch apps. Empty your inbox in minutes, not hours.",
       icon: "Sms",
       imagePosition: 'right',
       visualType: 'desktop',
       benefits: [
-        "Universal Inbox: Manage Email, Team chat, and Calendars in a single list.",
-        "Time Blocking: Drag tasks directly onto your calendar to secure focus time.",
-        "Instant Capture: Use global shortcuts to capture thoughts without breaking flow."
+        "Protect your focus time: Drag tasks directly onto your calendar to secure focus time.",
+        "Don't lose that thought: Use global shortcuts to capture thoughts without breaking flow.",
+        "Universal Inbox: Manage Email, Team chat, and Calendars in a single list."
       ]
     },
     {
-      title: "The AI Executive Assistant",
-      description: "Your Home tab is an intelligent briefing, not just a list. Visir AI automatically analyzes your inbox to categorize items by project and urgency. It prepares you for meetings by summarizing key context, so you arrive ready.",
+      title: "Your Brain, Just Organized by AI.",
+      description: "It plans your day before you even wake up. Catch up on 100 Slack messages in 10 seconds. Your Home tab is an intelligent briefing that automatically analyzes your inbox to categorize items by project and urgency. Get a 'Who, What, Why' summary before every call, so you arrive ready.",
       icon: "Cpu",
       imagePosition: 'left',
       visualType: 'desktop',
       benefits: [
-        "Smart Triage: AI separates urgent signals from low-priority noise automatically.",
-        "Meeting Prep: Get a 'Who, What, Why' summary before every call.",
-        "Context-Aware Replies: Draft responses instantly with AI that understands the thread."
+        "Catch up on 100 Slack messages in 10 seconds: AI separates urgent signals from low-priority noise automatically.",
+        "Arrive ready: Get a 'Who, What, Why' summary before every call.",
+        "Draft responses instantly: AI that understands the thread and drafts context-aware replies."
       ]
     },
     {
@@ -45,15 +45,15 @@
       ]
     },
     {
-      title: "Uncompromised Mobile Experience",
-      description: "Most mobile apps are just read-only companions. Visir Mobile is a full command center in your pocket. Triage email, manage projects, and block time on your calendar with the same power as the desktop app.",
+      title: "Command Center in Your Pocket.",
+      description: "Desktop power, mobile size. Most mobile apps are just read-only companions. Visir Mobile is a full command center in your pocket. Triage email, manage projects, and block time on your calendar with the same power as the desktop app.",
       icon: "Devices",
       imagePosition: 'left',
       visualType: 'mobile',
       benefits: [
-        "100% Feature Parity: If you can do it on desktop, you can do it on mobile.",
-        "Native Gestures: Swipe to snooze, archive, or schedule tasks in seconds.",
-        "Home Screen Widget: See your 'Up Next' context instantly without opening the app."
+        "Desktop power, mobile size: If you can do it on desktop, you can do it on mobile.",
+        "Swipe to organize: Swipe to snooze, archive, or schedule tasks in seconds.",
+        "See your 'Up Next' instantly: Home Screen Widget shows your context without opening the app."
       ]
     }
   ];
