@@ -780,6 +780,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       fromEmail: fromEmail,
       originalSnippet: originalSnippet,
       conversationText: conversationText,
+      threadId: originalMail.threadId,
     );
 
     const endpoint = 'https://api.openai.com/v1/responses';
@@ -864,6 +865,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       fromName: fromName,
       originalSnippet: snippet,
       conversationText: conversationText,
+      threadId: linkedMail.threadId,
     );
 
     const endpoint = 'https://api.openai.com/v1/responses';
@@ -975,6 +977,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         snippet: snippet,
         userModificationRequest: userModificationRequest,
         originalMailBody: originalMailBody,
+        threadId: linkedMail.threadId,
       );
     } else {
       // Initial reply generation
@@ -1002,6 +1005,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         senderName: senderName,
         currentUserEmail: currentUserEmail,
         originalMailBody: originalMailBody,
+        threadId: linkedMail.threadId,
       );
     }
 
@@ -1203,6 +1207,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         isAllDay: previousTaskEntity.isAllDay ?? false,
         projectId: previousTaskEntity.projectId,
         currentProjectName: currentProjectName,
+        taskId: previousTaskEntity.id,
       );
     }
 
@@ -1223,6 +1228,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         isDateOnly: suggestion.is_date_only ?? false,
         projectId: suggestion.project_id,
         duration: suggestion.duration,
+        inboxId: inbox.id,
       );
     }
 
@@ -1254,6 +1260,8 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       userRequest: userRequest,
       hasPreviousTask: previousTaskEntity != null,
       suggestionSummary: suggestion?.summary,
+      taskId: previousTaskEntity?.id,
+      inboxId: inbox.id,
     );
 
     const endpoint = 'https://api.openai.com/v1/responses';
@@ -1369,7 +1377,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     final inboxDescription = inbox.description ?? '';
     final snippet = inboxDescription;
 
-    final prompt = OpenAiInboxPrompts.buildSuggestTaskFromInboxPrompt(inboxTitle: inboxTitle, snippet: snippet, projects: projects);
+    final prompt = OpenAiInboxPrompts.buildSuggestTaskFromInboxPrompt(inboxTitle: inboxTitle, snippet: snippet, projects: projects, inboxId: inbox.id);
 
     const endpoint = 'https://api.openai.com/v1/responses';
 
@@ -1476,6 +1484,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       sourceHostEmail: sourceHostEmail,
       sourceFromName: sourceFromName,
       calendars: calendars,
+      inboxId: inbox.id,
     );
 
     const endpoint = 'https://api.openai.com/v1/responses';
@@ -1626,6 +1635,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         currentCalendarName: currentCalendarName,
         calendarId: previousEventEntity.calendar.uniqueId,
         conferenceLink: previousEventEntity.conferenceLink,
+        eventId: previousEventEntity.eventId,
       );
     } else if (previousTaskEntity != null) {
       // User switched from task to event - convert task info to event context
@@ -1647,6 +1657,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         endDateTime: formatLocalDateTime(previousTaskEntity.endAt),
         isAllDay: previousTaskEntity.isAllDay ?? false,
         projectId: previousTaskEntity.projectId,
+        taskId: previousTaskEntity.id,
       );
     }
 
@@ -1678,6 +1689,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       currentTime: currentTime,
       userRequest: userRequest,
       hasPreviousEventEntity: previousEventEntity != null,
+      inboxId: inbox.id,
     );
 
     const endpoint = 'https://api.openai.com/v1/responses';

@@ -168,14 +168,17 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     required String userRequest,
     required bool hasPreviousTask,
     String? suggestionSummary,
+    String? taskId,
+    String? inboxId,
   }) {
     return '''
 Please create a task based on the following inbox item and user request.
 
 ## Inbox Item Information
-Title: $inboxTitle
+${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
 Description:
 $snippet
+${taskId != null && previousTaskInfo != null ? '\n## Previous Task ID\nTask ID: $taskId\n' : ''}
 
 ${previousTaskInfo ?? ''}
 ${suggestedTaskInfo ?? ''}
@@ -1010,12 +1013,13 @@ Return only the JSON array, no additional text or explanations.
     required String fromEmail,
     required String originalSnippet,
     required String conversationText,
+    String? threadId,
   }) {
     return '''
 다음 원본 메일에 대한 답장을 작성해주세요.
 
 ## 원본 메일 정보
-제목: $originalSubject
+${threadId != null ? 'Thread ID: $threadId\n' : ''}제목: $originalSubject
 보낸 사람: $fromName <$fromEmail>
 본문:
 $originalSnippet
@@ -1041,12 +1045,13 @@ HTML 형식의 메일 본문만 반환해주세요. 추가 설명이나 주석�
     required String fromName,
     required String originalSnippet,
     required String conversationText,
+    String? threadId,
   }) {
     return '''
 Please write a reply to the following original email.
 
 ## Original Email Information
-Subject: $originalSubject
+${threadId != null ? 'Thread ID: $threadId\n' : ''}Subject: $originalSubject
 From: $fromName
 Body:
 $originalSnippet
@@ -1078,17 +1083,18 @@ Return only the HTML-formatted email body. Do not include any additional explana
     required String? snippet,
     required String userModificationRequest,
     required String? originalMailBody,
+    String? threadId,
   }) {
     return '''
 You are helping to modify a suggested email ${actionLabel} based on user feedback.
 ${isSendAction ? '''
 ## Email to Send
-Subject: $originalSubject
+${threadId != null ? 'Thread ID: $threadId\n' : ''}Subject: $originalSubject
 Body:
 $previousReply
 ''' : '''
 ## Email Thread${threadMessages != null && threadMessages.isNotEmpty ? ' (Full Thread)' : ' (Single Email)'}
-${threadMessages != null && threadMessages.isNotEmpty ? threadContext : '''
+${threadId != null ? 'Thread ID: $threadId\n' : ''}${threadMessages != null && threadMessages.isNotEmpty ? threadContext : '''
 Subject: $originalSubject
 From: $fromName
 Body:
@@ -1178,12 +1184,13 @@ Return only the JSON object, no additional text or explanations.
     required String? senderName,
     required String? currentUserEmail,
     required String? originalMailBody,
+    String? threadId,
   }) {
     return '''
 You are helping to draft a reply email. First, analyze the email thread and summarize it, then suggest an appropriate reply.
 
 ## Email Thread${threadMessages != null && threadMessages.isNotEmpty ? ' (Full Thread)' : ' (Single Email)'}
-${threadMessages != null && threadMessages.isNotEmpty ? threadContext : '''
+${threadId != null ? 'Thread ID: $threadId\n' : ''}${threadMessages != null && threadMessages.isNotEmpty ? threadContext : '''
 Subject: $originalSubject
 From: $fromName${senderEmail != null ? ' <$senderEmail>' : ''}
 Body:
@@ -1280,6 +1287,7 @@ Return only the JSON object, no additional text or explanations.
     required bool isAllDay,
     String? projectId,
     required String currentProjectName,
+    String? taskId,
   }) {
     return '''
 ## Previous Task Entity (Base for Modifications)
@@ -1288,7 +1296,7 @@ The user wants to MODIFY this existing task. This task may have been shown in a 
 IMPORTANT: All dates and times are in LOCAL timezone (not UTC). Return dates in the same format (YYYY-MM-DDTHH:mm:ss without Z suffix).
 
 Current Task Details:
-- Title: $taskTitle
+${taskId != null ? '- Task ID: $taskId\n' : ''}- Title: $taskTitle
 - Description: ${taskDescription ?? 'Not set'}
 - Start Date/Time: $startDateTime
 - End Date/Time: $endDateTime
@@ -1313,11 +1321,12 @@ CRITICAL:
     required bool isDateOnly,
     required String? projectId,
     required int? duration,
+    String? inboxId,
   }) {
     return '''
 ## Suggested Task Information
 The user has a suggested task with the following details:
-- Title: $summary
+${inboxId != null ? '- Inbox ID: $inboxId\n' : ''}- Title: $summary
 - Start Date/Time: ${suggestedStartAt ?? 'Not set'}
 - End Date/Time: ${suggestedEndAt ?? 'Not set'}
 - Is All Day: $isDateOnly
@@ -1333,12 +1342,13 @@ IMPORTANT: If the user requests to create the task "as is", "as suggested", or s
     required String inboxTitle,
     required String snippet,
     required List<Map<String, dynamic>> projects,
+    String? inboxId,
   }) {
     return '''
 Please suggest a task based on the following inbox item.
 
 ## Inbox Item Information
-Title: $inboxTitle
+${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
 Description:
 $snippet
 
@@ -1373,12 +1383,13 @@ Return only the JSON object, no additional text or explanations.
     required String? sourceHostEmail,
     required String? sourceFromName,
     required List<Map<String, dynamic>> calendars,
+    String? inboxId,
   }) {
     return '''
 Please suggest a calendar event based on the following inbox item.
 
 ## Inbox Item Information
-Title: $inboxTitle
+${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
 Description:
 $snippet
 ${sourceHostEmail != null ? '\nSource Host Email: $sourceHostEmail' : ''}
@@ -1469,6 +1480,7 @@ Return only the JSON object, no additional text or explanations.
     required String currentCalendarName,
     required String calendarId,
     String? conferenceLink,
+    String? eventId,
   }) {
     return '''
 ## Previous Event Entity (Base for Modifications)
@@ -1477,6 +1489,7 @@ The user is modifying an event that was shown in the previous message. Use this 
 IMPORTANT: All dates and times are in LOCAL timezone (not UTC). Return dates in the same format (YYYY-MM-DDTHH:mm:ss without Z suffix).
 
 Current Event Details:
+${eventId != null ? '- Event ID: $eventId\n' : ''}
 - Title: $eventTitle
 - Description: ${eventDescription ?? 'Not set'}
 - Start Date/Time: $startDateTime
@@ -1511,6 +1524,7 @@ ABSOLUTE RULE FOR CONFERENCE_LINK WHEN PREVIOUS EVENT EXISTS:
     required String endDateTime,
     required bool isAllDay,
     String? projectId,
+    String? taskId,
   }) {
     return '''
 ## IMPORTANT: Converting Task to Event
@@ -1519,7 +1533,7 @@ The user is converting a previous task to an event. Use the task information bel
 IMPORTANT: All dates and times are in LOCAL timezone (not UTC). Return dates in the same format (YYYY-MM-DDTHH:mm:ss without Z suffix).
 
 Previous Task Details (to be converted to event):
-- Title: $taskTitle
+${taskId != null ? '- Task ID: $taskId\n' : ''}- Title: $taskTitle
 - Description: ${taskDescription ?? 'Not set'}
 - Start Date/Time: $startDateTime
 - End Date/Time: $endDateTime
@@ -1544,12 +1558,13 @@ CRITICAL: Convert the task information to event format. Use the title, descripti
     required String currentTime,
     required String userRequest,
     required bool hasPreviousEventEntity,
+    String? inboxId,
   }) {
     return '''
 Please create a calendar event based on the following inbox item and user request.
 
 ## Inbox Item Information
-Title: $inboxTitle
+${inboxId != null ? 'Inbox ID: $inboxId\n' : ''}Title: $inboxTitle
 Description:
 $snippet
 ${sourceHostEmail != null ? '\nSource Host Email: $sourceHostEmail' : ''}
