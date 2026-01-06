@@ -1177,7 +1177,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
-    final inboxTitle = inbox.title ?? '';
+    final inboxTitle = inbox.title;
     final inboxDescription = inbox.description ?? '';
     final snippet = inboxDescription;
 
@@ -1204,7 +1204,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         taskDescription: previousTaskEntity.description,
         startDateTime: formatLocalDateTime(previousTaskEntity.startAt),
         endDateTime: formatLocalDateTime(previousTaskEntity.endAt),
-        isAllDay: previousTaskEntity.isAllDay ?? false,
+        isAllDay: previousTaskEntity.isAllDay,
         projectId: previousTaskEntity.projectId,
         currentProjectName: currentProjectName,
         taskId: previousTaskEntity.id,
@@ -1373,7 +1373,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
-    final inboxTitle = inbox.title ?? '';
+    final inboxTitle = inbox.title;
     final inboxDescription = inbox.description ?? '';
     final snippet = inboxDescription;
 
@@ -1470,13 +1470,13 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
-    final inboxTitle = inbox.title ?? '';
+    final inboxTitle = inbox.title;
     final inboxDescription = inbox.description ?? '';
     final snippet = inboxDescription;
 
     // Get source host email from inbox
     final sourceHostEmail = inbox.linkedMail?.hostMail ?? inbox.linkedMessage?.teamId;
-    final sourceFromName = inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName;
+    final sourceFromName = inbox.linkedMail != null ? inbox.linkedMail!.fromName : inbox.linkedMessage?.userName;
 
     final prompt = OpenAiInboxPrompts.buildGenerateEventFromInboxPrompt(
       inboxTitle: inboxTitle,
@@ -1600,13 +1600,13 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       finalApiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
     }
 
-    final inboxTitle = inbox.title ?? '';
+    final inboxTitle = inbox.title;
     final inboxDescription = inbox.description ?? '';
     final snippet = inboxDescription;
 
     // Get source host email from inbox
     final sourceHostEmail = inbox.linkedMail?.hostMail ?? inbox.linkedMessage?.teamId;
-    final sourceFromName = inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName;
+    final sourceFromName = inbox.linkedMail != null ? inbox.linkedMail!.fromName : inbox.linkedMessage?.userName;
 
     // Get previous event entity information if available
     String? previousEventInfo;
@@ -1656,7 +1656,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         taskDescription: previousTaskEntity.description,
         startDateTime: formatLocalDateTime(previousTaskEntity.startAt),
         endDateTime: formatLocalDateTime(previousTaskEntity.endAt),
-        isAllDay: previousTaskEntity.isAllDay ?? false,
+        isAllDay: previousTaskEntity.isAllDay,
         projectId: previousTaskEntity.projectId,
         taskId: previousTaskEntity.id,
       );
