@@ -72,23 +72,37 @@
       shouldLoadVideo = true;
     }
 
-    // Initialize UnicornStudio with dynamic script loading
-    if (!(window as any).UnicornStudio) {
-      const script = document.createElement('script');
-      script.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.5.3/dist/unicornStudio.umd.js";
-      script.async = true;
-      script.onload = () => {
-        if ((window as any).UnicornStudio && typeof (window as any).UnicornStudio.init === 'function') {
-           (window as any).UnicornStudio.init();
+    // Initialize UnicornStudio with dynamic script loading (deferred to avoid forced reflow)
+    // Use requestAnimationFrame to batch DOM reads/writes and avoid forced reflow
+    const initUnicornStudio = () => {
+      requestAnimationFrame(() => {
+        if (!(window as any).UnicornStudio) {
+          const script = document.createElement('script');
+          script.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.5.3/dist/unicornStudio.umd.js";
+          script.async = true;
+          script.defer = true; // Add defer to prevent blocking
+          script.onload = () => {
+            // Use requestAnimationFrame to batch initialization
+            requestAnimationFrame(() => {
+              if ((window as any).UnicornStudio && typeof (window as any).UnicornStudio.init === 'function') {
+                (window as any).UnicornStudio.init();
+              }
+            });
+          };
+          document.head.appendChild(script);
+        } else {
+          // If script is already loaded, just init (batched)
+          requestAnimationFrame(() => {
+            if (typeof (window as any).UnicornStudio.init === 'function') {
+              (window as any).UnicornStudio.init();
+            }
+          });
         }
-      };
-      document.head.appendChild(script);
-    } else {
-       // If script is already loaded, just init
-       if (typeof (window as any).UnicornStudio.init === 'function') {
-         (window as any).UnicornStudio.init();
-       }
-    }
+      });
+    };
+    
+    // Delay UnicornStudio initialization to avoid blocking initial render
+    setTimeout(initUnicornStudio, 1000);
 
     return () => {
       observer.disconnect();

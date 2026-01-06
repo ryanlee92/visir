@@ -13,12 +13,15 @@
         e.preventDefault();
         const element = document.getElementById(hash.replace('#', ''));
         if (element) {
-          const offset = 100;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - offset;
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
+          // Use requestAnimationFrame to batch DOM reads and avoid forced reflow
+          requestAnimationFrame(() => {
+            const offset = 100;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
           });
         }
       }

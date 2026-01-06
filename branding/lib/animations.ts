@@ -69,8 +69,8 @@ export function createParallaxEffect(
 
   window.addEventListener('scroll', onScroll, { passive: true });
   
-  // Initial update
-  updateParallax();
+  // Initial update (deferred to avoid forced reflow on mount)
+  requestAnimationFrame(updateParallax);
 
   return () => {
     window.removeEventListener('scroll', onScroll);

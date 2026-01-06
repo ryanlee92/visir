@@ -222,22 +222,26 @@ import { initAnalytics } from './lib/init-analytics';
   // Reactive statement for route changes
   $: handleRouteChange($location);
 
-  // Handle hash scrolling
+  // Handle hash scrolling (optimized to avoid forced reflow)
   function handleHashChange() {
     const hash = window.location.hash;
     if (hash) {
-      setTimeout(() => {
-        const element = document.getElementById(hash.replace('#', ''));
-        if (element) {
-          const offset = 100;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - offset;
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+      // Use requestAnimationFrame to batch DOM reads and avoid forced reflow
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const element = document.getElementById(hash.replace('#', ''));
+          if (element) {
+            // Batch DOM reads together
+            const offset = 100;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+      });
     }
   }
 
