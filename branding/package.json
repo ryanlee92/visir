@@ -56,6 +56,7 @@
     "check:seo:all": "node scripts/check-seo-comprehensive.js --lighthouse",
     "check:seo:multi": "node scripts/check-seo-multi.js",
     "check:seo:multi:all": "node scripts/check-seo-multi.js --lighthouse",
-    "check:seo:advanced": "node scripts/check-seo-advanced.js"
+    "check:seo:advanced": "node scripts/check-seo-advanced.js",
+    "check:seo:ultimate": "node scripts/check-seo-ultimate.js"
   }
 }

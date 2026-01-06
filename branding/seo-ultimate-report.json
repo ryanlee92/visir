@@ -1,0 +1,196 @@
+{
+  "timestamp": "2026-01-06T16:33:17.425Z",
+  "score": 100,
+  "results": {
+    "contentQuality": {
+      "name": "콘텐츠 품질",
+      "score": 100,
+      "checks": [
+        {
+          "name": "콘텐츠 길이",
+          "result": {
+            "pass": true,
+            "message": "콘텐츠 길이: 353단어 (SPA 특성상 런타임 콘텐츠 포함)"
+          }
+        },
+        {
+          "name": "키워드 분산",
+          "result": {
+            "pass": true,
+            "message": "키워드 분산: visir, productivity, email, slack, calendar, task"
+          }
+        },
+        {
+          "name": "중복 콘텐츠 체크",
+          "result": {
+            "pass": true,
+            "message": "중복 콘텐츠 없음"
+          }
+        }
+      ]
+    },
+    "urlStructure": {
+      "name": "URL 구조",
+      "score": 100,
+      "checks": [
+        {
+          "name": "URL 길이",
+          "result": {
+            "pass": true,
+            "message": "URL 길이: 1자"
+          }
+        },
+        {
+          "name": "URL 구조 (슬래시)",
+          "result": {
+            "pass": true,
+            "message": "URL 구조 양호"
+          }
+        },
+        {
+          "name": "URL 파라미터",
+          "result": {
+            "pass": true,
+            "message": "URL 파라미터 양호"
+          }
+        }
+      ]
+    },
+    "pageSpeed": {
+      "name": "페이지 속도 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "인라인 스크립트 최소화",
+          "result": {
+            "pass": true,
+            "message": "인라인 스크립트: 2개 (JSON-LD 2개 제외, 크기 양호)"
+          }
+        },
+        {
+          "name": "인라인 CSS 최소화",
+          "result": {
+            "pass": true,
+            "message": "인라인 CSS: 1KB"
+          }
+        },
+        {
+          "name": "리소스 우선순위",
+          "result": {
+            "pass": true,
+            "message": "리소스 힌트: 8개"
+          }
+        }
+      ]
+    },
+    "structuredDataDetail": {
+      "name": "구조화된 데이터 상세",
+      "score": 100,
+      "checks": [
+        {
+          "name": "JSON-LD 유효성",
+          "result": {
+            "pass": true,
+            "message": "JSON-LD 유효성: 2개 모두 유효"
+          }
+        },
+        {
+          "name": "Schema.org 필수 필드",
+          "result": {
+            "pass": true,
+            "message": "필수 필드 있음"
+          }
+        },
+        {
+          "name": "FAQ 스키마",
+          "result": {
+            "pass": true,
+            "message": "FAQ 스키마 있음"
+          }
+        }
+      ]
+    },
+    "securityTrust": {
+      "name": "보안 및 신뢰성",
+      "score": 100,
+      "checks": [
+        {
+          "name": "HTTPS 사용",
+          "result": {
+            "pass": true,
+            "message": "HTTPS 사용 중"
+          }
+        },
+        {
+          "name": "보안 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "보안 메타 태그 체크 (서버 헤더로도 설정 가능)"
+          }
+        },
+        {
+          "name": "신뢰성 신호",
+          "result": {
+            "pass": true,
+            "message": "신뢰성 신호 있음"
+          }
+        }
+      ]
+    },
+    "internationalization": {
+      "name": "국제화 및 지역화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "언어 설정",
+          "result": {
+            "pass": true,
+            "message": "언어 설정: en"
+          }
+        },
+        {
+          "name": "hreflang 태그",
+          "result": {
+            "pass": true,
+            "message": "hreflang 태그: 0개 (다국어 사이트에만 필요)"
+          }
+        },
+        {
+          "name": "지역 정보",
+          "result": {
+            "pass": true,
+            "message": "지역 정보 있음"
+          }
+        }
+      ]
+    },
+    "fileOptimization": {
+      "name": "파일 크기 및 최적화",
+      "score": 100,
+      "checks": [
+        {
+          "name": "HTML 파일 크기",
+          "result": {
+            "pass": true,
+            "message": "HTML 파일 크기: 17KB"
+          }
+        },
+        {
+          "name": "중복 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "중복 메타 태그 없음"
+          }
+        },
+        {
+          "name": "빈 메타 태그",
+          "result": {
+            "pass": true,
+            "message": "빈 메타 태그 없음"
+          }
+        }
+      ]
+    }
+  },
+  "improvements": []
+}
