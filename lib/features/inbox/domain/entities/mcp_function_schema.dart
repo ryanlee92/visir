@@ -94,6 +94,13 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'from', type: 'string', description: 'Source where the task was created (e.g., GitHub, Email, optional)', required: false),
           McpFunctionParameter(name: 'subject', type: 'string', description: 'Original title or subject (optional)', required: false),
           McpFunctionParameter(name: 'actionNeeded', type: 'string', description: 'Description of action needed (optional)', required: false),
+          McpFunctionParameter(
+            name: 'inboxId',
+            type: 'string',
+            description:
+                'Inbox ID to link the task to a specific inbox item (email or message). Use the inboxId from Inbox Context when creating a task from an inbox item. (optional)',
+            required: false,
+          ),
         ],
       ),
       McpFunctionSchema(
@@ -374,10 +381,16 @@ class McpFunctionRegistry {
       ),
       McpFunctionSchema(
         name: 'linkToProject',
-        description: 'Links an inbox item or task to a project by creating or updating a linked task. Use taskId if you want to move an existing task to a different project, or use inboxId if you want to link an inbox item to a project.',
+        description:
+            'Links an inbox item or task to a project by creating or updating a linked task. Use taskId if you want to move an existing task to a different project, or use inboxId if you want to link an inbox item to a project.',
         parameters: [
           McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID (required if taskId is not provided)', required: false),
-          McpFunctionParameter(name: 'taskId', type: 'string', description: 'Task ID (required if inboxId is not provided). Use this to move an existing task to a different project.', required: false),
+          McpFunctionParameter(
+            name: 'taskId',
+            type: 'string',
+            description: 'Task ID (required if inboxId is not provided). Use this to move an existing task to a different project.',
+            required: false,
+          ),
           McpFunctionParameter(name: 'projectId', type: 'string', description: 'Project ID', required: true),
         ],
       ),
@@ -696,21 +709,75 @@ class McpFunctionRegistry {
       // Search Actions
       McpFunctionSchema(
         name: 'searchInbox',
-        description: 'Searches inbox for emails or messages. Can search by title, sender, content, etc.',
-        parameters: [McpFunctionParameter(name: 'query', type: 'string', description: 'Search query (title, sender, content, etc.)', required: true)],
+        description:
+            'Searches inbox for emails or messages. Can search by title, sender, content, etc. When the user mentions a date range (e.g., "today", "this week", "tomorrow"), urgency (e.g., "urgent", "important", "action required"), or specific ID, include those in the scope parameters.',
+        parameters: [
+          McpFunctionParameter(name: 'query', type: 'string', description: 'Search query (title, sender, content, etc.)', required: true),
+          McpFunctionParameter(
+            name: 'startDate',
+            type: 'string',
+            description: 'Start date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) for filtering results. Use when user mentions "today", "this week", "tomorrow", etc. (optional)',
+            required: false,
+          ),
+          McpFunctionParameter(
+            name: 'endDate',
+            type: 'string',
+            description: 'End date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) for filtering results. Use when user mentions a date range. (optional)',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Filter by specific inbox ID (optional)', required: false),
+          McpFunctionParameter(
+            name: 'urgency',
+            type: 'string',
+            description:
+                'Filter by urgency level. Use when user mentions "urgent", "important", "action required", "꼭 봐야", "중요", "조치 필요". Values: "urgent", "important", "action_required", "need_review" (optional)',
+            enumValues: ['urgent', 'important', 'action_required', 'need_review'],
+            required: false,
+          ),
+        ],
       ),
       McpFunctionSchema(
         name: 'searchTask',
-        description: 'Searches for tasks. Can search by title or description.',
+        description:
+            'Searches for tasks. Can search by title or description. When the user mentions a date range (e.g., "today", "this week"), include those in the scope parameters. At least one of query, startDate, endDate, or taskId must be provided.',
         parameters: [
-          McpFunctionParameter(name: 'query', type: 'string', description: 'Search query (title, description, etc.)', required: true),
-          McpFunctionParameter(name: 'isDone', type: 'boolean', description: 'Search only completed tasks (optional)'),
+          McpFunctionParameter(name: 'query', type: 'string', description: 'Search query (title, description, etc.)', required: false),
+          McpFunctionParameter(name: 'isDone', type: 'boolean', description: 'Search only completed tasks (optional)', required: false),
+          McpFunctionParameter(
+            name: 'startDate',
+            type: 'string',
+            description: 'Start date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) for filtering results. Use when user mentions "today", "this week", "tomorrow", etc. (optional)',
+            required: false,
+          ),
+          McpFunctionParameter(
+            name: 'endDate',
+            type: 'string',
+            description: 'End date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) for filtering results. Use when user mentions a date range. (optional)',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'taskId', type: 'string', description: 'Filter by specific task ID (optional)', required: false),
         ],
       ),
       McpFunctionSchema(
         name: 'searchCalendarEvent',
-        description: 'Searches for calendar events. Can search by title or description.',
-        parameters: [McpFunctionParameter(name: 'query', type: 'string', description: 'Search query (title, description, etc.)', required: true)],
+        description:
+            'Searches for calendar events. Can search by title or description. When the user mentions a date range (e.g., "today", "this week"), include those in the scope parameters. At least one of query, startDate, endDate, or eventId must be provided.',
+        parameters: [
+          McpFunctionParameter(name: 'query', type: 'string', description: 'Search query (title, description, etc.)', required: false),
+          McpFunctionParameter(
+            name: 'startDate',
+            type: 'string',
+            description: 'Start date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) for filtering results. Use when user mentions "today", "this week", "tomorrow", etc. (optional)',
+            required: false,
+          ),
+          McpFunctionParameter(
+            name: 'endDate',
+            type: 'string',
+            description: 'End date in ISO 8601 format (YYYY-MM-DDTHH:mm:ss) for filtering results. Use when user mentions a date range. (optional)',
+            required: false,
+          ),
+          McpFunctionParameter(name: 'eventId', type: 'string', description: 'Filter by specific event ID (optional)', required: false),
+        ],
       ),
     ];
   }

@@ -489,6 +489,9 @@ class McpFunctionExecutor {
 
   // Task execution methods
   Future<Map<String, dynamic>> _executeCreateTask(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
+    print('[CreateTask] 함수 호출 시작. availableInboxes 개수: ${availableInboxes?.length ?? 0}');
+    print('[CreateTask] args: inboxId=${args['inboxId']}, threadId=${args['threadId']}, messageId=${args['messageId']}');
+
     final user = ref.read(authControllerProvider).requireValue;
     final title = args['title'] as String?;
     if (title == null || title.isEmpty) {
@@ -502,11 +505,66 @@ class McpFunctionExecutor {
     var isAllDay = args['isAllDay'] as bool? ?? false;
     final statusStr = args['status'] as String? ?? 'none';
     final inboxId = args['inboxId'] as String?;
+    final threadId = args['threadId'] as String?;
+    final messageId = args['messageId'] as String?;
 
-    // Find matching inbox by id only if inboxId is explicitly provided
+    // Find matching inbox
     InboxEntity? matchingInbox;
-    if (availableInboxes != null && availableInboxes.isNotEmpty && inboxId != null && inboxId.isNotEmpty) {
-      matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
+    if (availableInboxes != null && availableInboxes.isNotEmpty) {
+      print('[CreateTask] availableInboxes가 있음. 개수: ${availableInboxes.length}');
+      // 1. inboxId가 명시적으로 제공되면 그것으로 찾기
+      if (inboxId != null && inboxId.isNotEmpty) {
+        print('[CreateTask] inboxId로 찾기 시도: $inboxId');
+        matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
+        if (matchingInbox != null) {
+          print('[CreateTask] inboxId로 매칭된 inbox 찾음: ${matchingInbox.id}');
+        } else {
+          print('[CreateTask] inboxId로 매칭된 inbox 없음');
+        }
+      }
+
+      // 2. inboxId가 없으면 threadId나 messageId로 inboxId 생성해서 찾기
+      if (matchingInbox == null) {
+        String? generatedInboxId;
+
+        // threadId가 있으면 mail로 간주하고 inboxId 생성
+        if (threadId != null && threadId.isNotEmpty) {
+          print('[CreateTask] threadId로 찾기 시도: $threadId');
+          final mailInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMail != null && inbox.linkedMail!.threadId == threadId);
+          if (mailInbox != null && mailInbox.linkedMail != null) {
+            generatedInboxId = InboxEntity.getInboxIdFromLinkedMail(mailInbox.linkedMail!);
+            print('[CreateTask] threadId로 생성된 inboxId: $generatedInboxId');
+            matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == generatedInboxId);
+            if (matchingInbox != null) {
+              print('[CreateTask] threadId로 매칭된 inbox 찾음: ${matchingInbox.id}');
+            } else {
+              print('[CreateTask] threadId로 생성된 inboxId로 매칭된 inbox 없음');
+            }
+          } else {
+            print('[CreateTask] threadId로 매칭된 mailInbox 없음');
+          }
+        }
+
+        // messageId가 있으면 chat으로 간주하고 inboxId 생성
+        if (matchingInbox == null && messageId != null && messageId.isNotEmpty) {
+          print('[CreateTask] messageId로 찾기 시도: $messageId');
+          final chatInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMessage != null && inbox.linkedMessage!.messageId == messageId);
+          if (chatInbox != null && chatInbox.linkedMessage != null) {
+            generatedInboxId = InboxEntity.getInboxIdFromLinkedChat(chatInbox.linkedMessage!);
+            print('[CreateTask] messageId로 생성된 inboxId: $generatedInboxId');
+            matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == generatedInboxId);
+            if (matchingInbox != null) {
+              print('[CreateTask] messageId로 매칭된 inbox 찾음: ${matchingInbox.id}');
+            } else {
+              print('[CreateTask] messageId로 생성된 inboxId로 매칭된 inbox 없음');
+            }
+          } else {
+            print('[CreateTask] messageId로 매칭된 chatInbox 없음');
+          }
+        }
+      }
+    } else {
+      print('[CreateTask] availableInboxes가 없거나 비어있음');
     }
 
     // If projectId is not provided, try to get it from inbox suggestion, then lastUsedProject, then defaultProject
@@ -607,7 +665,10 @@ class McpFunctionExecutor {
 
     List<LinkedMailEntity> linkedMails = [];
     List<LinkedMessageEntity> linkedMessages = [];
+    print('[CreateTask] matchingInbox 찾기 결과: ${matchingInbox != null ? matchingInbox.id : 'null'}');
     if (matchingInbox != null) {
+      print('[CreateTask] matchingInbox.linkedMail: ${matchingInbox.linkedMail != null ? '있음' : '없음'}');
+      print('[CreateTask] matchingInbox.linkedMessage: ${matchingInbox.linkedMessage != null ? '있음' : '없음'}');
       if (matchingInbox.linkedMail != null) {
         linkedMails = [matchingInbox.linkedMail!];
       }
@@ -3672,30 +3733,182 @@ class McpFunctionExecutor {
     }
   }
 
-  // Search execution methods
-  Future<Map<String, dynamic>> _executeSearchInbox(Map<String, dynamic> args, {required TabType tabType}) async {
-    final query = args['query'] as String?;
-    if (query == null || query.isEmpty) {
-      return {'success': false, 'error': 'query is required'};
+  /// 로컬 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
+  List<InboxEntity> _filterLocalInboxes(List<InboxEntity> localInboxes, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? inboxId) {
+    print('[FilterLocalInboxes] 필터링 시작. 입력 개수: ${localInboxes.length}');
+    print('[FilterLocalInboxes] 필터 조건 - startDate: $startDate, endDate: $endDate, searchKeyword: "$searchKeyword", inboxId: $inboxId');
+    var filtered = localInboxes;
+
+    // ID 필터
+    if (inboxId != null && inboxId.isNotEmpty) {
+      final beforeCount = filtered.length;
+      filtered = filtered.where((inbox) => inbox.id == inboxId || inbox.id.contains(inboxId)).toList();
+      print('[FilterLocalInboxes] ID 필터 적용: $beforeCount -> ${filtered.length}');
+      if (filtered.isEmpty) {
+        print('[FilterLocalInboxes] ID 필터 후 결과 없음');
+        return [];
+      }
+    }
+
+    // 날짜 범위 필터
+    if (startDate != null || endDate != null) {
+      final beforeCount = filtered.length;
+      filtered = filtered.where((inbox) {
+        final inboxDate = inbox.inboxDatetime;
+        if (startDate != null && inboxDate.isBefore(startDate)) return false;
+        if (endDate != null && inboxDate.isAfter(endDate)) return false;
+        return true;
+      }).toList();
+      print('[FilterLocalInboxes] 날짜 범위 필터 적용: $beforeCount -> ${filtered.length}');
+      if (filtered.isEmpty) {
+        print('[FilterLocalInboxes] 날짜 범위 필터 후 결과 없음');
+        return [];
+      }
+    }
+
+    // 검색어 필터 (제목, 설명, 발신자에서 검색)
+    if (searchKeyword != null && searchKeyword.isNotEmpty) {
+      final beforeCount = filtered.length;
+      final keyword = searchKeyword.toLowerCase();
+      filtered = filtered.where((inbox) {
+        final title = inbox.title?.toLowerCase() ?? '';
+        final description = inbox.description?.toLowerCase() ?? '';
+        final sender = (inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName ?? '').toLowerCase();
+        return title.contains(keyword) || description.contains(keyword) || sender.contains(keyword);
+      }).toList();
+      print('[FilterLocalInboxes] 검색어 필터 적용: $beforeCount -> ${filtered.length}');
+    }
+
+    print('[FilterLocalInboxes] 필터링 완료. 최종 결과 개수: ${filtered.length}');
+    return filtered;
+  }
+
+  /// 로컬 데이터에 검색 범위에 해당하는 데이터가 충분히 있는지 확인합니다
+  bool _hasLocalDataForScope(DateTime? startDate, DateTime? endDate) {
+    if (startDate == null && endDate == null) {
+      print('[HasLocalDataForScope] 날짜 범위가 없어 false 반환');
+      return false;
     }
 
     try {
-      // Search inbox using inbox_controller
-      final inboxController = ref.read(inboxControllerProvider.notifier);
-      await inboxController.search(query: query);
-
-      // Wait a bit for search to complete
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Get search results
       final inboxList = ref.read(inboxControllerProvider);
-      final searchResults = inboxList?.inboxes ?? [];
+      final localInboxes = inboxList?.inboxes ?? [];
+      print('[HasLocalDataForScope] 로컬 inbox 개수: ${localInboxes.length}');
+      if (localInboxes.isEmpty) {
+        print('[HasLocalDataForScope] 로컬 inbox가 비어있어 false 반환');
+        return false;
+      }
 
-      // Limit results to 20
-      final limitedResults = searchResults.take(20).toList();
+      // 날짜 범위에 해당하는 데이터가 있는지 확인
+      final matchingCount = localInboxes.where((inbox) {
+        final inboxDate = inbox.inboxDatetime;
+        if (startDate != null && inboxDate.isBefore(startDate)) return false;
+        if (endDate != null && inboxDate.isAfter(endDate)) return false;
+        return true;
+      }).length;
+
+      print('[HasLocalDataForScope] 날짜 범위 매칭 개수: $matchingCount (startDate: $startDate, endDate: $endDate)');
+      // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
+      final result = matchingCount >= 5;
+      print('[HasLocalDataForScope] 결과: $result (${matchingCount >= 5 ? "충분함" : "부족함"})');
+      return result;
+    } catch (e) {
+      print('[HasLocalDataForScope] 에러 발생: $e');
+      return false;
+    }
+  }
+
+  // Search execution methods
+  Future<Map<String, dynamic>> _executeSearchInbox(Map<String, dynamic> args, {required TabType tabType}) async {
+    print('[SearchInbox] 함수 호출 시작. args: $args');
+    final query = args['query'] as String? ?? '';
+    print('[SearchInbox] query: "$query"');
+
+    // query나 scope 파라미터(startDate, endDate, inboxId) 중 하나만 있으면 검색 가능 (urgency는 필터링용이므로 제외)
+    final hasQuery = query.isNotEmpty;
+    final hasScopeParams = args['startDate'] != null || args['endDate'] != null || args['inboxId'] != null;
+    print('[SearchInbox] hasQuery: $hasQuery, hasScopeParams: $hasScopeParams');
+    if (!hasQuery && !hasScopeParams) {
+      print('[SearchInbox] 에러: query 또는 scope 파라미터가 필요함');
+      return {'success': false, 'error': 'query or scope parameters (startDate, endDate, inboxId) are required'};
+    }
+
+    try {
+      // AI에서 전달된 scope 파라미터만 사용 (룰베이스 파싱 없음)
+      DateTime? startDate;
+      DateTime? endDate;
+      String? searchKeyword = query.isNotEmpty ? query : null;
+      String? inboxId;
+
+      // AI에서 전달된 파라미터 확인 (urgency는 제외)
+      if (args['startDate'] != null) {
+        try {
+          startDate = DateTime.parse(args['startDate'] as String).toLocal();
+          print('[SearchInbox] startDate 파싱 성공: $startDate');
+        } catch (e) {
+          print('[SearchInbox] startDate 파싱 실패: ${args['startDate']}, error: $e');
+        }
+      }
+      if (args['endDate'] != null) {
+        try {
+          endDate = DateTime.parse(args['endDate'] as String).toLocal();
+          print('[SearchInbox] endDate 파싱 성공: $endDate');
+        } catch (e) {
+          print('[SearchInbox] endDate 파싱 실패: ${args['endDate']}, error: $e');
+        }
+      }
+      if (args['inboxId'] != null) {
+        inboxId = args['inboxId'] as String?;
+        print('[SearchInbox] inboxId: $inboxId');
+      }
+
+      print('[SearchInbox] 파라미터 요약 - searchKeyword: "$searchKeyword", startDate: $startDate, endDate: $endDate, inboxId: $inboxId');
+
+      // 로컬 데이터 확인
+      final hasLocalData = _hasLocalDataForScope(startDate, endDate);
+      print('[SearchInbox] 로컬 데이터 확인: hasLocalData=$hasLocalData');
+      List<InboxEntity> searchResults;
+
+      if (hasLocalData) {
+        // 로컬 데이터에서 필터링
+        final inboxList = ref.read(inboxControllerProvider);
+        final localInboxes = inboxList?.inboxes ?? [];
+        print('[SearchInbox] 로컬 데이터 사용. 로컬 inbox 개수: ${localInboxes.length}');
+        searchResults = _filterLocalInboxes(localInboxes, startDate, endDate, searchKeyword, inboxId);
+        print('[SearchInbox] 필터링 후 결과 개수: ${searchResults.length}');
+      } else {
+        // Remote search 실행 (검색어가 있을 때만)
+        if (searchKeyword != null && searchKeyword.isNotEmpty) {
+          print('[SearchInbox] Remote search 실행. query: "$searchKeyword"');
+          final inboxController = ref.read(inboxControllerProvider.notifier);
+          await inboxController.search(query: searchKeyword);
+
+          // Wait a bit for search to complete
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          // Get search results
+          final inboxList = ref.read(inboxControllerProvider);
+          final remoteResults = inboxList?.inboxes ?? [];
+          print('[SearchInbox] Remote search 결과 개수: ${remoteResults.length}');
+
+          // 로컬에서 추가 필터링 (날짜 범위 등)
+          searchResults = _filterLocalInboxes(remoteResults, startDate, endDate, searchKeyword, inboxId);
+          print('[SearchInbox] 필터링 후 결과 개수: ${searchResults.length}');
+        } else {
+          // 검색어가 없으면 로컬 데이터에서만 필터링
+          print('[SearchInbox] 검색어 없음. 로컬 데이터에서만 필터링');
+          final inboxList = ref.read(inboxControllerProvider);
+          final localInboxes = inboxList?.inboxes ?? [];
+          print('[SearchInbox] 로컬 inbox 개수: ${localInboxes.length}');
+          searchResults = _filterLocalInboxes(localInboxes, startDate, endDate, searchKeyword, inboxId);
+          print('[SearchInbox] 필터링 후 결과 개수: ${searchResults.length}');
+        }
+      }
+
+      print('[SearchInbox] 최종 결과 개수: ${searchResults.length}');
 
       // Format results
-      final results = limitedResults.map((inbox) {
+      final results = searchResults.map((inbox) {
         final sender = inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName ?? '';
         final sourceType = inbox.linkedMail?.type ?? inbox.linkedMessage?.type;
 
@@ -3709,38 +3922,149 @@ class McpFunctionExecutor {
         };
       }).toList();
 
+      print('[SearchInbox] 함수 호출 완료. 성공: true, 결과 개수: ${results.length}');
       return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 인박스 항목을 찾았습니다.'};
     } catch (e) {
+      print('[SearchInbox] 에러 발생: $e');
       // Provider가 dispose된 경우를 포함한 모든 에러 처리
       if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
+        print('[SearchInbox] Provider가 dispose됨');
         return {'success': false, 'error': 'Provider has been disposed'};
       }
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
   }
 
+  /// 로컬 태스크 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
+  List<TaskEntity> _filterLocalTasks(List<TaskEntity> localTasks, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? taskId, bool? isDone) {
+    var filtered = localTasks;
+
+    // ID 필터
+    if (taskId != null && taskId.isNotEmpty) {
+      filtered = filtered.where((task) => task.id == taskId || task.id?.contains(taskId) == true).toList();
+      if (filtered.isEmpty) return [];
+    }
+
+    // 날짜 범위 필터
+    if (startDate != null || endDate != null) {
+      filtered = filtered.where((task) {
+        final taskDate = task.startAt ?? task.startDate;
+        if (taskDate == null) return false;
+        if (startDate != null && taskDate.isBefore(startDate)) return false;
+        if (endDate != null && taskDate.isAfter(endDate)) return false;
+        return true;
+      }).toList();
+      if (filtered.isEmpty) return [];
+    }
+
+    // 완료 상태 필터
+    if (isDone != null) {
+      filtered = filtered.where((task) => (task.status == TaskStatus.done) == isDone).toList();
+      if (filtered.isEmpty) return [];
+    }
+
+    // 검색어 필터 (제목, 설명에서 검색)
+    if (searchKeyword != null && searchKeyword.isNotEmpty) {
+      final keyword = searchKeyword.toLowerCase();
+      filtered = filtered.where((task) {
+        final title = task.title?.toLowerCase() ?? '';
+        final description = task.description?.toLowerCase() ?? '';
+        return title.contains(keyword) || description.contains(keyword);
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  /// 로컬 태스크 데이터에 검색 범위에 해당하는 데이터가 충분히 있는지 확인합니다
+  bool _hasLocalTaskDataForScope(DateTime? startDate, DateTime? endDate) {
+    if (startDate == null && endDate == null) return false;
+
+    try {
+      final allTasks = ref.read(taskListControllerProvider).tasks;
+      if (allTasks.isEmpty) return false;
+
+      // 날짜 범위에 해당하는 데이터가 있는지 확인
+      final matchingCount = allTasks.where((task) {
+        final taskDate = task.startAt ?? task.startDate;
+        if (taskDate == null) return false;
+        if (startDate != null && taskDate.isBefore(startDate)) return false;
+        if (endDate != null && taskDate.isAfter(endDate)) return false;
+        return true;
+      }).length;
+
+      // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
+      return matchingCount >= 5;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<Map<String, dynamic>> _executeSearchTask(Map<String, dynamic> args) async {
-    final query = args['query'] as String?;
-    if (query == null || query.isEmpty) {
-      return {'success': false, 'error': 'query is required'};
+    final query = args['query'] as String? ?? '';
+
+    // query나 scope 파라미터(startDate, endDate, taskId) 중 하나만 있으면 검색 가능
+    final hasQuery = query.isNotEmpty;
+    final hasScopeParams = args['startDate'] != null || args['endDate'] != null || args['taskId'] != null;
+    if (!hasQuery && !hasScopeParams) {
+      return {'success': false, 'error': 'query or scope parameters (startDate, endDate, taskId) are required'};
     }
 
     final isDone = args['isDone'] as bool?;
 
     try {
-      final user = ref.read(authControllerProvider).requireValue;
-      final pref = ref.read(localPrefControllerProvider).value;
-      if (pref == null) {
-        return {'success': false, 'error': 'Preferences not found'};
+      // AI에서 전달된 scope 파라미터만 사용 (룰베이스 파싱 없음)
+      DateTime? startDate;
+      DateTime? endDate;
+      String? searchKeyword = query.isNotEmpty ? query : null;
+      String? taskId;
+
+      // AI에서 전달된 파라미터 확인
+      if (args['startDate'] != null) {
+        try {
+          startDate = DateTime.parse(args['startDate'] as String).toLocal();
+        } catch (e) {
+          // Invalid date format, ignore
+        }
+      }
+      if (args['endDate'] != null) {
+        try {
+          endDate = DateTime.parse(args['endDate'] as String).toLocal();
+        } catch (e) {
+          // Invalid date format, ignore
+        }
+      }
+      if (args['taskId'] != null) {
+        taskId = args['taskId'] as String?;
       }
 
-      final taskRepository = ref.read(taskRepositoryProvider);
-      final searchResult = await taskRepository.searchTasks(query: query, pref: pref, userId: user.id, isDone: isDone);
+      // 로컬 데이터 확인
+      final hasLocalData = _hasLocalTaskDataForScope(startDate, endDate);
+      List<TaskEntity> searchResults;
 
-      final tasks = searchResult.fold((failure) => <TaskEntity>[], (result) => result.tasks.values.expand((e) => e).toList());
+      if (hasLocalData) {
+        // 로컬 데이터에서 필터링
+        final allTasks = ref.read(taskListControllerProvider).tasks;
+        searchResults = _filterLocalTasks(allTasks, startDate, endDate, searchKeyword, taskId, isDone);
+      } else {
+        // Remote search 실행
+        final user = ref.read(authControllerProvider).requireValue;
+        final pref = ref.read(localPrefControllerProvider).value;
+        if (pref == null) {
+          return {'success': false, 'error': 'Preferences not found'};
+        }
+
+        final taskRepository = ref.read(taskRepositoryProvider);
+        final searchResult = await taskRepository.searchTasks(query: query, pref: pref, userId: user.id, isDone: isDone);
+
+        final tasks = searchResult.fold((failure) => <TaskEntity>[], (result) => result.tasks.values.expand((e) => e).toList());
+
+        // 로컬에서 추가 필터링 (날짜 범위 등)
+        searchResults = _filterLocalTasks(tasks, startDate, endDate, searchKeyword, taskId, isDone);
+      }
 
       // Limit results to 20
-      final limitedTasks = tasks.take(20).toList();
+      final limitedTasks = searchResults.take(20).toList();
 
       // Format results
       final results = limitedTasks.map((task) {
@@ -3762,65 +4086,171 @@ class McpFunctionExecutor {
     }
   }
 
+  /// 로컬 일정 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
+  List<EventEntity> _filterLocalEvents(List<EventEntity> localEvents, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? eventId) {
+    var filtered = localEvents;
+
+    // ID 필터
+    if (eventId != null && eventId.isNotEmpty) {
+      filtered = filtered.where((event) => event.eventId == eventId || event.uniqueId == eventId || event.eventId?.contains(eventId) == true).toList();
+      if (filtered.isEmpty) return [];
+    }
+
+    // 날짜 범위 필터
+    if (startDate != null || endDate != null) {
+      filtered = filtered.where((event) {
+        final eventStart = event.startDate;
+        if (eventStart == null) return false;
+        if (startDate != null && eventStart.isBefore(startDate)) return false;
+        if (endDate != null && eventStart.isAfter(endDate)) return false;
+        return true;
+      }).toList();
+      if (filtered.isEmpty) return [];
+    }
+
+    // 검색어 필터 (제목, 설명, 위치에서 검색)
+    if (searchKeyword != null && searchKeyword.isNotEmpty) {
+      final keyword = searchKeyword.toLowerCase();
+      filtered = filtered.where((event) {
+        final title = event.title?.toLowerCase() ?? '';
+        final description = event.description?.toLowerCase() ?? '';
+        final location = event.location?.toLowerCase() ?? '';
+        return title.contains(keyword) || description.contains(keyword) || location.contains(keyword);
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  /// 로컬 일정 데이터에 검색 범위에 해당하는 데이터가 충분히 있는지 확인합니다
+  bool _hasLocalEventDataForScope(DateTime? startDate, DateTime? endDate) {
+    if (startDate == null && endDate == null) return false;
+
+    try {
+      final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.calendar)).eventsOnView;
+      if (allEvents.isEmpty) return false;
+
+      // 날짜 범위에 해당하는 데이터가 있는지 확인
+      final matchingCount = allEvents.where((event) {
+        final eventStart = event.startDate;
+        if (eventStart == null) return false;
+        if (startDate != null && eventStart.isBefore(startDate)) return false;
+        if (endDate != null && eventStart.isAfter(endDate)) return false;
+        return true;
+      }).length;
+
+      // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
+      return matchingCount >= 5;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<Map<String, dynamic>> _executeSearchCalendarEvent(Map<String, dynamic> args, {required TabType tabType}) async {
-    final query = args['query'] as String?;
-    if (query == null || query.isEmpty) {
-      return {'success': false, 'error': 'query is required'};
+    final query = args['query'] as String? ?? '';
+
+    // query나 scope 파라미터(startDate, endDate, eventId) 중 하나만 있으면 검색 가능
+    final hasQuery = query.isNotEmpty;
+    final hasScopeParams = args['startDate'] != null || args['endDate'] != null || args['eventId'] != null;
+    if (!hasQuery && !hasScopeParams) {
+      return {'success': false, 'error': 'query or scope parameters (startDate, endDate, eventId) are required'};
     }
 
     try {
-      final pref = ref.read(localPrefControllerProvider).value;
-      if (pref == null) {
-        return {'success': false, 'error': 'Preferences not found'};
+      // AI에서 전달된 scope 파라미터만 사용 (룰베이스 파싱 없음)
+      DateTime? startDate;
+      DateTime? endDate;
+      String? searchKeyword = query.isNotEmpty ? query : null;
+      String? eventId;
+
+      // AI에서 전달된 파라미터 확인
+      if (args['startDate'] != null) {
+        try {
+          startDate = DateTime.parse(args['startDate'] as String).toLocal();
+        } catch (e) {
+          // Invalid date format, ignore
+        }
+      }
+      if (args['endDate'] != null) {
+        try {
+          endDate = DateTime.parse(args['endDate'] as String).toLocal();
+        } catch (e) {
+          // Invalid date format, ignore
+        }
+      }
+      if (args['eventId'] != null) {
+        eventId = args['eventId'] as String?;
       }
 
-      final calendarRepository = ref.read(calendarRepositoryProvider);
-      final calendarOAuths = pref.calendarOAuths ?? [];
+      // 로컬 데이터 확인
+      final hasLocalData = _hasLocalEventDataForScope(startDate, endDate);
+      List<EventEntity> searchResults;
 
-      if (calendarOAuths.isEmpty) {
-        return {'success': false, 'error': 'No calendar accounts configured'};
-      }
+      if (hasLocalData) {
+        // 로컬 데이터에서 필터링
+        final allEvents = ref.read(calendarEventListControllerProvider(tabType: tabType)).eventsOnView;
+        searchResults = _filterLocalEvents(allEvents, startDate, endDate, searchKeyword, eventId);
+      } else {
+        // Remote search 실행 (검색어가 있을 때만)
+        if (searchKeyword != null && searchKeyword.isNotEmpty) {
+          final pref = ref.read(localPrefControllerProvider).value;
+          if (pref == null) {
+            return {'success': false, 'error': 'Preferences not found'};
+          }
 
-      final allEvents = <EventEntity>[];
+          final calendarRepository = ref.read(calendarRepositoryProvider);
+          final calendarOAuths = pref.calendarOAuths ?? [];
 
-      // Search in each calendar OAuth account
-      for (final oauth in calendarOAuths) {
-        final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+          if (calendarOAuths.isEmpty) {
+            return {'success': false, 'error': 'No calendar accounts configured'};
+          }
 
-        await calendarListResult.fold(
-          (failure) async {
-            // Calendar list fetch failed, skip this OAuth account
-          },
-          (calendarMap) async {
-            final calendars = calendarMap.values
-                .expand((e) => e)
-                .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
-                .toList();
+          final allEvents = <EventEntity>[];
 
-            if (calendars.isEmpty) return;
+          // Search in each calendar OAuth account
+          for (final oauth in calendarOAuths) {
+            final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
 
-            final eventResult = await calendarRepository.searchEventLists(query: query, oauth: oauth, calendars: calendars, nextPageTokens: null);
-
-            await eventResult.fold(
+            await calendarListResult.fold(
               (failure) async {
-                // Calendar search failed, skip this OAuth account
+                // Calendar list fetch failed, skip this OAuth account
               },
-              (result) async {
-                // Collect all events from the result
-                for (final eventList in result.events.values) {
-                  allEvents.addAll(eventList);
-                }
+              (calendarMap) async {
+                final calendars = calendarMap.values
+                    .expand((e) => e)
+                    .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                    .toList();
+
+                if (calendars.isEmpty) return;
+
+                final eventResult = await calendarRepository.searchEventLists(query: searchKeyword, oauth: oauth, calendars: calendars, nextPageTokens: null);
+
+                await eventResult.fold(
+                  (failure) async {
+                    // Calendar search failed, skip this OAuth account
+                  },
+                  (result) async {
+                    // Collect all events from the result
+                    for (final eventList in result.events.values) {
+                      allEvents.addAll(eventList);
+                    }
+                  },
+                );
               },
             );
-          },
-        );
+          }
+
+          // 로컬에서 추가 필터링 (날짜 범위 등)
+          searchResults = _filterLocalEvents(allEvents, startDate, endDate, searchKeyword, eventId);
+        } else {
+          // 검색어가 없으면 로컬 데이터에서만 필터링
+          final allEvents = ref.read(calendarEventListControllerProvider(tabType: tabType)).eventsOnView;
+          searchResults = _filterLocalEvents(allEvents, startDate, endDate, searchKeyword, eventId);
+        }
       }
 
-      // Limit results to 20
-      final limitedEvents = allEvents.take(20).toList();
-
       // Format results
-      final results = limitedEvents.map((event) {
+      final results = searchResults.map((event) {
         return {
           'id': event.eventId,
           'uniqueId': event.uniqueId,

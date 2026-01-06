@@ -135,6 +135,7 @@ class AgentActionState {
   final Set<String> selectedActionIds; // Action IDs selected for batch confirmation
   final List<String> recentTaskIds; // Recently created/updated task IDs (for AI context)
   final List<String> recentEventIds; // Recently created/updated event IDs (for AI context)
+  final List<InboxEntity>? availableInboxes; // Available inboxes from search results (for linking tasks/events)
 
   AgentActionState({
     this.actionType,
@@ -153,6 +154,7 @@ class AgentActionState {
     Set<String>? selectedActionIds,
     List<String>? recentTaskIds,
     List<String>? recentEventIds,
+    this.availableInboxes,
   }) : messages = messages ?? [],
        loadedInboxNumbers = loadedInboxNumbers ?? {},
        selectedActionIds = selectedActionIds ?? {},
@@ -174,6 +176,7 @@ class AgentActionState {
     Set<String>? selectedActionIds,
     List<String>? recentTaskIds,
     List<String>? recentEventIds,
+    List<InboxEntity>? availableInboxes,
   }) {
     return AgentActionState(
       actionType: actionType ?? this.actionType,
@@ -190,6 +193,7 @@ class AgentActionState {
       selectedActionIds: selectedActionIds ?? this.selectedActionIds,
       recentTaskIds: recentTaskIds ?? this.recentTaskIds,
       recentEventIds: recentEventIds ?? this.recentEventIds,
+      availableInboxes: availableInboxes ?? this.availableInboxes,
     );
   }
 
@@ -765,13 +769,23 @@ class AgentActionController extends _$AgentActionController {
           }
         }
 
-        // 룰베이스 제거: 함수 호출 태그나 JSON 배열 제거하지 않음
+        // 함수 호출 태그 제거 (재귀 호출에서 함수 호출이 무시될 때 메시지에 태그가 포함되지 않도록)
         String aiMessageWithoutFunctionCalls = aiMessage;
+        // <function_call> 태그 제거
+        aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(RegExp(r'<function_call[^>]*>.*?</function_call>', dotAll: true), '');
+        // </function_call> 단독 태그 제거
+        aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(RegExp(r'</function_call>', dotAll: true), '');
+        // 앞뒤 공백 제거
+        aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.trim();
 
         if (functionCalls.isNotEmpty) {
           // 여러 개의 함수 호출이 감지되면 순차적으로 실행
-          // availableInboxes는 state.inbox가 있으면 그것을 사용하고, 없으면 전달받은 inboxes 사용
-          final availableInboxes = state.inbox != null ? [state.inbox!] : inboxes;
+          // availableInboxes는 state.availableInboxes를 우선 사용하고, 없으면 state.inbox, 그래도 없으면 전달받은 inboxes 사용
+          final availableInboxes = state.availableInboxes?.isNotEmpty == true ? state.availableInboxes : (state.inbox != null ? [state.inbox!] : inboxes);
+          print('[AgentChat] 함수 실행 시 availableInboxes 개수: ${availableInboxes?.length ?? 0}');
+          print('[AgentChat] state.availableInboxes 개수: ${state.availableInboxes?.length ?? 0}');
+          print('[AgentChat] state.inbox: ${state.inbox?.id ?? 'null'}');
+          print('[AgentChat] 전달받은 inboxes 개수: ${inboxes?.length ?? 0}');
           final me = ref.read(authControllerProvider).value;
           final remainingCredits = me?.userAiCredits ?? 0.0;
 
@@ -812,6 +826,7 @@ class AgentActionController extends _$AgentActionController {
             for (final searchCall in searchFunctionCalls) {
               final functionName = searchCall['function'] as String;
               var functionArgs = searchCall['arguments'] as Map<String, dynamic>;
+              print('[AgentChat] 검색 함수 호출: $functionName, 초기 args: $functionArgs');
 
               // 태그된 항목들을 자동으로 파라미터에 추가
               functionArgs = _enrichFunctionArgsWithTaggedItems(
@@ -822,12 +837,14 @@ class AgentActionController extends _$AgentActionController {
                 taggedConnections: taggedConnections,
                 availableInboxes: updatedAvailableInboxes,
               );
+              print('[AgentChat] 태그된 항목 추가 후 args: $functionArgs');
 
               // 크레딧 정보를 함수 인자에 추가
               functionArgs['_remaining_credits'] = remainingCredits;
 
               // 검색 함수 실행
               final tabType = _getTabTypeForFunction(functionName);
+              print('[AgentChat] 검색 함수 실행 시작: $functionName, tabType: $tabType');
               final result = await executor.executeFunction(
                 functionName,
                 functionArgs,
@@ -845,6 +862,14 @@ class AgentActionController extends _$AgentActionController {
                 final searchResults = result['results'] as List<dynamic>?;
                 print('[AgentChat] 검색 결과: ${searchResults?.length ?? 0}개');
                 if (searchResults != null && searchResults.isNotEmpty) {
+                  print('[AgentChat] 검색 결과 상세 (최대 3개):');
+                  for (int i = 0; i < searchResults.length && i < 3; i++) {
+                    final item = searchResults[i];
+                    if (item is Map<String, dynamic>) {
+                      print('[AgentChat]   결과 ${i + 1}: id=${item['id']}, title="${item['title']}", sender="${item['sender']}"');
+                    }
+                  }
+                  print('[AgentChat] 검색 결과가 있음. context 생성 시작');
                   // 검색 결과를 silent 메시지로 추가
                   final silentMessage = AgentActionMessage(role: 'assistant', content: '[검색 완료: ${searchResults.length}개의 결과를 찾았습니다]', excludeFromHistory: true);
                   final updatedMessagesWithSearch = [...messages, silentMessage];
@@ -853,7 +878,9 @@ class AgentActionController extends _$AgentActionController {
                   // 검색 결과를 context로 변환
                   String? currentSearchContext;
                   if (functionName == 'searchInbox') {
+                    print('[AgentChat] searchInbox 결과를 context로 변환 중...');
                     currentSearchContext = await _buildInboxContextFromSearchResults(searchResults);
+                    print('[AgentChat] searchInbox context 생성 완료: ${currentSearchContext?.length ?? 0}자');
                     // 검색된 inbox를 availableInboxes에 추가
                     // 검색 결과는 inboxControllerProvider에 반영되어 있으므로, 거기서 찾아서 추가
                     final searchResultInboxes = <InboxEntity>[];
@@ -886,6 +913,9 @@ class AgentActionController extends _$AgentActionController {
                       final newInboxes = searchResultInboxes.where((e) => !existingIds.contains(e.id)).toList();
                       updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
                       updatedLoadedInboxNumbers = {...updatedLoadedInboxNumbers, ...searchResultNumbers};
+                      print(
+                        '[AgentChat] searchInbox 결과를 availableInboxes에 추가. 기존: ${updatedAvailableInboxes?.length ?? 0 - newInboxes.length}개, 추가: ${newInboxes.length}개, 최종: ${updatedAvailableInboxes?.length ?? 0}개',
+                      );
                     }
                   } else if (functionName == 'searchTask') {
                     currentSearchContext = _buildTaskContextFromSearchResults(searchResults);
@@ -941,6 +971,7 @@ class AgentActionController extends _$AgentActionController {
                 }
               } else {
                 print('[AgentChat] 검색 함수 실행 실패: ${result['error']}');
+                print('[AgentChat] 실패한 함수: $functionName, args: $functionArgs');
               }
             }
 
@@ -993,6 +1024,16 @@ class AgentActionController extends _$AgentActionController {
             final groupResults = await Future.wait(
               group.map((functionCall) async {
                 final functionName = functionCall['function'] as String;
+
+                // 재귀 호출에서 검색 함수는 무시 (이미 context에 결과가 있음)
+                if (isRecursiveCall) {
+                  final isSearchFunction = functionName == 'searchInbox' || functionName == 'searchTask' || functionName == 'searchCalendarEvent';
+                  if (isSearchFunction) {
+                    print('[AgentChat] 재귀 호출에서 검색 함수 $functionName 무시 (이미 context에 결과가 있음)');
+                    return null; // 검색 함수는 무시
+                  }
+                }
+
                 var functionArgs = functionCall['arguments'] as Map<String, dynamic>;
 
                 // 태그된 항목들을 자동으로 파라미터에 추가
@@ -1254,12 +1295,27 @@ class AgentActionController extends _$AgentActionController {
           }
 
           // 검색 결과가 있으면 state 업데이트
-          if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
-            state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers);
+          if (updatedLoadedInboxNumbers != state.loadedInboxNumbers ||
+              updatedTaggedTasks != taggedTasks ||
+              updatedTaggedEvents != taggedEvents ||
+              updatedAvailableInboxes != state.availableInboxes) {
+            print('[AgentChat] state 업데이트: updatedAvailableInboxes 개수: ${updatedAvailableInboxes?.length ?? 0}');
+            state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
+            print('[AgentChat] state 업데이트 완료: state.availableInboxes 개수: ${state.availableInboxes?.length ?? 0}');
           }
 
           // AI가 처음 생성한 메시지 사용 (함수 호출 태그 제거된 버전)
           String resultMessage = aiMessageWithoutFunctionCalls;
+
+          // 재귀 호출에서 모든 함수 호출이 무시된 경우, AI의 텍스트 응답 사용
+          if (isRecursiveCall && results.isEmpty) {
+            if (resultMessage.trim().isEmpty) {
+              print('[AgentChat] 재귀 호출에서 모든 함수 호출이 무시됨. AI 텍스트 응답 사용: ${aiMessage.length}자');
+              resultMessage = aiMessage;
+            } else {
+              print('[AgentChat] 재귀 호출에서 모든 함수 호출이 무시됨. 함수 호출 태그 제거된 메시지 사용: ${resultMessage.length}자');
+            }
+          }
 
           // 확인이 필요한 함수가 있는지 확인
           final pendingCallsForMessage = state.pendingFunctionCalls ?? [];
@@ -1353,9 +1409,38 @@ class AgentActionController extends _$AgentActionController {
           final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage);
           final updatedMessagesWithResponse = [...messages, assistantMessage];
 
+          print('[AgentChat] 함수 호출 처리 완료. resultMessage 길이: ${resultMessage.length}자');
+          print('[AgentChat] updatedMessagesWithResponse 개수: ${updatedMessagesWithResponse.length}');
+
           // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
           if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
             state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers);
+          }
+
+          // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
+          if (isRecursiveCall) {
+            print('[AgentChat] 재귀 호출이므로 여기서 종료');
+            print('[AgentChat] 재귀 호출 - updatedMessagesWithResponse 개수: ${updatedMessagesWithResponse.length}');
+            // 재귀 호출 완료 시 로딩 상태 해제
+            // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
+            // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
+            // 최종 메시지: [user, assistant(두 번째)]만 남김
+            final finalMessages =
+                updatedMessagesWithResponse.length >= 3 &&
+                    updatedMessagesWithResponse[0].role == 'user' &&
+                    updatedMessagesWithResponse[1].role == 'assistant' &&
+                    updatedMessagesWithResponse[2].role == 'assistant'
+                ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
+                : updatedMessagesWithResponse;
+            print('[AgentChat] 재귀 호출 - finalMessages 개수: ${finalMessages.length}');
+            if (finalMessages.isNotEmpty) {
+              print(
+                '[AgentChat] 재귀 호출 - 마지막 메시지 내용 (처음 100자): ${finalMessages.last.content.length > 100 ? finalMessages.last.content.substring(0, 100) : finalMessages.last.content}',
+              );
+            }
+            state = state.copyWith(messages: finalMessages, isLoading: false);
+            print('[AgentChat] 재귀 호출 - State 업데이트 완료. messages 개수: ${state.messages.length}, availableInboxes 개수: ${state.availableInboxes?.length ?? 0}');
+            return;
           }
 
           state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
@@ -1400,6 +1485,7 @@ class AgentActionController extends _$AgentActionController {
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
           if (isRecursiveCall) {
             print('[AgentChat] 재귀 호출이므로 여기서 종료');
+            print('[AgentChat] 재귀 호출 - updatedMessagesWithResponse 개수: ${updatedMessagesWithResponse.length}');
             // 재귀 호출 완료 시 로딩 상태 해제
             // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
             // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
@@ -1412,8 +1498,13 @@ class AgentActionController extends _$AgentActionController {
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
             print('[AgentChat] 재귀 호출 - finalMessages 개수: ${finalMessages.length}');
+            if (finalMessages.isNotEmpty) {
+              print(
+                '[AgentChat] 재귀 호출 - 마지막 메시지 내용 (처음 100자): ${finalMessages.last.content.length > 100 ? finalMessages.last.content.substring(0, 100) : finalMessages.last.content}',
+              );
+            }
             state = state.copyWith(messages: finalMessages, isLoading: false);
-            print('[AgentChat] 재귀 호출 - State 업데이트 완료. messages 개수: ${state.messages.length}');
+            print('[AgentChat] 재귀 호출 - State 업데이트 완료. messages 개수: ${state.messages.length}, availableInboxes 개수: ${state.availableInboxes?.length ?? 0}');
             return;
           }
 
@@ -1630,6 +1721,72 @@ class AgentActionController extends _$AgentActionController {
       // AI가 명시적으로 지정한 값이 우선
     }
 
+    // createTask의 경우 inboxId 처리
+    if (functionName == 'createTask' && availableInboxes != null && availableInboxes.isNotEmpty) {
+      final currentInboxId = enrichedArgs['inboxId'] as String?;
+
+      // 1. inboxId가 잘못된 형식인 경우 (예: inbox-item-10) 실제 inboxId로 교체
+      if (currentInboxId != null && currentInboxId.isNotEmpty) {
+        // inbox-item-* 형식인지 확인
+        final itemNumberMatch = RegExp(r'inbox-item-(\d+)').firstMatch(currentInboxId);
+        if (itemNumberMatch != null) {
+          final itemNumber = int.tryParse(itemNumberMatch.group(1) ?? '');
+          if (itemNumber != null && itemNumber > 0 && itemNumber <= availableInboxes.length) {
+            // 항목 번호로 실제 inboxId 찾기 (1-based index)
+            final targetInbox = availableInboxes[itemNumber - 1];
+            enrichedArgs['inboxId'] = targetInbox.id;
+            print('[AgentChat] 잘못된 inboxId 형식 감지: $currentInboxId -> 실제 inboxId: ${targetInbox.id}');
+          }
+        }
+
+        // 2. inboxId가 availableInboxes에 없는 경우, 제목이나 다른 정보로 매칭 시도
+        final foundInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == currentInboxId);
+        if (foundInbox == null) {
+          print('[AgentChat] inboxId가 availableInboxes에 없음: $currentInboxId');
+          // 제목으로 매칭 시도 (AI가 제목을 기반으로 잘못된 inboxId를 생성했을 수 있음)
+          final title = enrichedArgs['title'] as String?;
+          if (title != null && title.isNotEmpty) {
+            final matchedInbox = availableInboxes.firstWhereOrNull(
+              (inbox) => inbox.title.toLowerCase().contains(title.toLowerCase()) || title.toLowerCase().contains(inbox.title.toLowerCase()),
+            );
+            if (matchedInbox != null) {
+              enrichedArgs['inboxId'] = matchedInbox.id;
+              print('[AgentChat] 제목으로 매칭하여 inboxId 교체: $currentInboxId -> ${matchedInbox.id}');
+            }
+          }
+        }
+      }
+
+      // 3. inboxId가 없으면 threadId나 messageId로 inboxId 생성
+      if (!enrichedArgs.containsKey('inboxId') || enrichedArgs['inboxId'] == null || (enrichedArgs['inboxId'] as String).isEmpty) {
+        final threadId = enrichedArgs['threadId'] as String?;
+        final messageId = enrichedArgs['messageId'] as String?;
+
+        String? generatedInboxId;
+
+        // threadId가 있으면 mail로 간주하고 inboxId 생성
+        if (threadId != null && threadId.isNotEmpty) {
+          final mailInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMail != null && inbox.linkedMail!.threadId == threadId);
+          if (mailInbox != null && mailInbox.linkedMail != null) {
+            generatedInboxId = InboxEntity.getInboxIdFromLinkedMail(mailInbox.linkedMail!);
+          }
+        }
+
+        // messageId가 있으면 chat으로 간주하고 inboxId 생성
+        if (generatedInboxId == null && messageId != null && messageId.isNotEmpty) {
+          final chatInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMessage != null && inbox.linkedMessage!.messageId == messageId);
+          if (chatInbox != null && chatInbox.linkedMessage != null) {
+            generatedInboxId = InboxEntity.getInboxIdFromLinkedChat(chatInbox.linkedMessage!);
+          }
+        }
+
+        // 생성된 inboxId를 args에 추가
+        if (generatedInboxId != null) {
+          enrichedArgs['inboxId'] = generatedInboxId;
+        }
+      }
+    }
+
     // updateEvent, deleteEvent, responseCalendarInvitation의 경우 태그된 event 사용
     if ((functionName == 'updateEvent' || functionName == 'deleteEvent' || functionName == 'responseCalendarInvitation') && taggedEvents != null && taggedEvents.isNotEmpty) {
       if (!enrichedArgs.containsKey('eventId') || enrichedArgs['eventId'] == null) {
@@ -1708,7 +1865,11 @@ class AgentActionController extends _$AgentActionController {
   Future<String> _buildInboxContextFromSearchResults(List<dynamic> searchResults) async {
     final buffer = StringBuffer();
     buffer.writeln('## 검색된 인박스 항목');
+    buffer.writeln('');
+    buffer.writeln('**CRITICAL: When creating tasks from these inbox items, you MUST use the exact "Inbox ID" shown below. Do NOT use item numbers or any other identifiers.**');
+    buffer.writeln('');
 
+    int itemIndex = 1;
     for (final result in searchResults.take(10)) {
       if (result is Map<String, dynamic>) {
         final title = result['title'] as String? ?? '';
@@ -1717,17 +1878,23 @@ class AgentActionController extends _$AgentActionController {
         final inboxId = result['id'] as String?;
 
         if (inboxId != null) {
-          buffer.writeln('- Inbox ID: $inboxId');
-          if (title.isNotEmpty) buffer.writeln('  Title: $title');
-          if (sender.isNotEmpty) buffer.writeln('  Sender: $sender');
+          buffer.writeln('### 항목 $itemIndex');
+          buffer.writeln('- **Inbox ID (USE THIS EXACT ID)**: `$inboxId`');
+          if (title.isNotEmpty) buffer.writeln('- Title: $title');
+          if (sender.isNotEmpty) buffer.writeln('- Sender: $sender');
           if (description.isNotEmpty) {
             final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
-            buffer.writeln('  Description: $desc');
+            buffer.writeln('- Description: $desc');
           }
           buffer.writeln('');
+          itemIndex++;
         }
       }
     }
+
+    buffer.writeln(
+      '**REMINDER: When calling createTask, use the exact Inbox ID shown above (e.g., `mail_google_example@gmail.com_12345`). Do NOT use "inbox-item-10" or item numbers.**',
+    );
 
     return buffer.toString();
   }
@@ -2339,10 +2506,16 @@ class AgentActionController extends _$AgentActionController {
     _saveChatHistory(taggedProjects: taggedProjects);
 
     // 디버깅: sendMessage에서 state 확인
+    print('[AgentChat] sendMessage 호출 시 state.availableInboxes 개수: ${state.availableInboxes?.length ?? 0}');
+    print('[AgentChat] sendMessage 호출 시 전달받은 inboxes 개수: ${inboxes?.length ?? 0}');
 
     try {
       // MCP 함수 호출을 통한 일반적인 AI 챗 진행
       // IMPORTANT: state가 최신 상태인지 확인하기 위해 다시 읽기
+      // state.availableInboxes를 우선 사용 (검색 결과로 찾은 inbox 항목들)
+      final currentState = state;
+      final inboxesToUse = currentState.availableInboxes?.isNotEmpty == true ? currentState.availableInboxes : inboxes;
+      print('[AgentChat] sendMessage에서 사용할 inboxes 개수: ${inboxesToUse?.length ?? 0}');
       await _generateGeneralChat(
         userMessage,
         updatedMessages: updatedMessages,
@@ -2351,7 +2524,7 @@ class AgentActionController extends _$AgentActionController {
         taggedConnections: taggedConnections,
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
-        inboxes: inboxes,
+        inboxes: inboxesToUse,
         files: files,
       );
     } catch (e) {

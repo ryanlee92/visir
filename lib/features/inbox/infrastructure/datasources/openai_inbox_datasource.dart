@@ -2681,6 +2681,16 @@ You can call functions using this format:
 - searchTask: Search for tasks by query. Use this when the user asks about specific tasks. Search functions are executed silently and results are automatically added to context.
 - searchCalendarEvent: Search for calendar events by query. Use this when the user asks about specific events. Search functions are executed silently and results are automatically added to context.
 
+**CRITICAL: Search Scope Parameters**
+When calling search functions, you MUST include scope parameters when the user mentions:
+- **Date ranges**: "today", "tomorrow", "this week", "오늘", "내일", "이번 주" → Include `startDate` and `endDate` in ISO 8601 format
+- **Specific IDs**: When user mentions a specific ID → Include `inboxId`, `taskId`, or `eventId` parameter
+
+**Examples**:
+- User says "오늘 인박스중에 꼭 봐야하는거 알려줘" → Call `searchInbox({"query": "", "startDate": "2024-01-15T00:00:00", "endDate": "2024-01-15T23:59:59"})`
+- User says "이번 주 작업들 보여줘" → Call `searchTask({"query": "", "startDate": "2024-01-15T00:00:00", "endDate": "2024-01-21T23:59:59"})`
+- User says "내일 일정 알려줘" → Call `searchCalendarEvent({"query": "", "startDate": "2024-01-16T00:00:00", "endDate": "2024-01-16T23:59:59"})`
+
 **CRITICAL: Context Management**
 - **Initial Context**: No context is provided initially. You start with minimal information.
 - **Dynamic Context Loading**: When the user asks about specific items (emails, tasks, events), you MUST call search functions to find them:
@@ -2690,10 +2700,21 @@ You can call functions using this format:
 - **Getting Full Content**: If you need the full content of a specific inbox item, use `getInboxDetails` function with the inboxId from search results.
 - **Function Chaining**: You can chain multiple functions. Search functions are executed first, then their results are available for subsequent function calls.
 
+**CRITICAL: DO NOT Repeat the Same Search When Results Are Already in Context**
+- **If Inbox Context, Project Context, Tagged Context, or Channel Context is provided**: This means search results have already been executed and added to your context
+- **DO NOT call the same search function again** with the same or similar parameters when the results are already in context
+- **Use the provided context directly** to answer the user's question
+- **ONLY call search functions again** if:
+  1. The user explicitly asks for a NEW search with different criteria (e.g., "그 중에서 우리카드에서 온 것만 찾아줘")
+  2. You need to search for something completely different that is NOT in the current context
+- **Example**: If Inbox Context shows search results for "today's inbox", DO NOT call `searchInbox` again with the same date range. Use the inbox items from the context to answer.
+- **Example**: If Inbox Context shows "today's inbox" but user asks "그 중에서 우리카드에서 온 것만", you can filter from the context OR call `searchInbox` with a new query parameter like `{"query": "우리카드", "startDate": "..."}`
+
 **IMPORTANT**: 
-- Always call search functions when the user asks about specific items that are not explicitly tagged or provided
+- Always call search functions when the user asks about specific items that are not explicitly tagged or provided AND no context is available
 - Search functions are executed silently (results are added to context automatically)
-- After search results are available, use them to answer the user's question or call additional functions as needed
+- After search results are available in context, use them directly to answer the user's question - DO NOT repeat the same search
+- Only call search functions again when the user explicitly requests a NEW search with different criteria
 
 ## Multiple Function Calls and Function Chaining
 
@@ -2878,6 +2899,7 @@ When calling `createTask` or `updateTask`, you MUST use the following field name
 - `title` (string, required): Task title
 - `description` (string, optional): Task description
 - `projectId` (string, optional): Project ID
+- `inboxId` (string, optional): **CRITICAL**: When creating a task from an inbox item, you MUST include the `inboxId` from the Inbox Context. The inboxId is shown as "Inbox ID: ..." in the context. This links the task to the specific inbox item (email or message).
 - `startAt` (string, optional): Start date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T09:00:00"). **CRITICAL**: Extract this from **actionable dates** (deadlines, meeting times, schedules) in the inbox item's content if available, otherwise use user request or default dates. Do NOT use reference dates.
 - `endAt` (string, optional): End date/time in ISO 8601 format: "YYYY-MM-DDTHH:mm:ss" (e.g., "2024-01-01T10:00:00"). **CRITICAL**: Extract this from **actionable dates** in the inbox item's content if available, otherwise calculate based on startAt.
 - `isAllDay` (boolean, optional, default: false): Whether the task is all-day
@@ -3099,6 +3121,8 @@ Response:
         systemMessage += '\n\n## Inbox Context\n$inboxContext';
         systemMessage +=
             '\n\nWhen the user asks about inbox items, emails, or messages (e.g., "인박스 중에 우리카드에서 온거 있어?", "Is there anything from Woori Card in the inbox?", "인박스에서 우리카드 메일 찾아줘"), use the inbox items listed above. Search through the inbox items and provide specific information about matching items. Do NOT say "I cannot access" or "I don\'t have information". You have access to the inbox items in the Inbox Context section above.';
+        systemMessage +=
+            '\n\n**CRITICAL: When creating tasks from inbox items**:\n1. The Inbox Context shows inbox items with "Inbox ID (USE THIS EXACT ID): ..." or "Inbox ID: ..."\n2. You MUST use the EXACT inboxId shown in the context (e.g., `mail_google_example@gmail.com_12345`)\n3. Do NOT use item numbers (like "inbox-item-10") or any other identifiers\n4. Copy the inboxId EXACTLY as shown in the context\n5. Example: If Inbox Context shows "Inbox ID (USE THIS EXACT ID): `mail_google_example@gmail.com_12345`", call `createTask({"title": "...", "inboxId": "mail_google_example@gmail.com_12345", ...})`\n6. The inboxId format is typically: `mail_<type>_<email>_<messageId>` for emails or `message_<type>_<teamId>_<messageId>` for messages';
 
         // 전체 내용이 이미 포함된 경우와 메타데이터만 있는 경우 구분
         final hasFullContent = inboxContext.contains('Full Content:');
