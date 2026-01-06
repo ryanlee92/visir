@@ -1922,7 +1922,8 @@ class AgentActionController extends _$AgentActionController {
 
               // 채널 정보 추가
               buffer.writeln('\n## Channel: ${channel.name ?? channel.id}');
-              buffer.writeln('Team ID: ${channel.teamId}');
+              buffer.writeln('- Channel ID: ${channel.id}');
+              buffer.writeln('- Team ID: ${channel.teamId}');
               buffer.writeln('Messages from last 3 days (${sortedMessages.length} messages):\n');
 
               // 메시지 정보 추가 (최대 100개)
@@ -1930,10 +1931,17 @@ class AgentActionController extends _$AgentActionController {
                 final createdAt = message.createdAt;
                 final text = message.text ?? '';
                 final userId = message.userId ?? 'Unknown';
+                final messageId = message.id ?? 'Unknown';
 
                 if (text.isNotEmpty) {
                   final dateStr = createdAt != null ? createdAt.toIso8601String() : 'Unknown date';
-                  buffer.writeln('- [${dateStr}] User ${userId}: ${text.substring(0, text.length > 200 ? 200 : text.length)}${text.length > 200 ? '...' : ''}');
+                  buffer.writeln(
+                    '- [${dateStr}] Message ID: ${messageId}, User ${userId}: ${text.substring(0, text.length > 200 ? 200 : text.length)}${text.length > 200 ? '...' : ''}',
+                  );
+                  final threadId = message.threadId;
+                  if (threadId != null && threadId.isNotEmpty && threadId != messageId) {
+                    buffer.writeln('  Thread ID: $threadId');
+                  }
                 }
               }
 
@@ -1991,6 +1999,7 @@ class AgentActionController extends _$AgentActionController {
       final shouldIncludeFullContent = requestedInboxNumbers.contains(itemNumber) || !summaryOnly;
 
       buffer.writeln('### Inbox Item $itemNumber');
+      buffer.writeln('- Inbox ID: ${inbox.id}');
 
       if (inbox.linkedMail != null) {
         final mail = inbox.linkedMail!;
@@ -1998,6 +2007,8 @@ class AgentActionController extends _$AgentActionController {
         buffer.writeln('- From: ${mail.fromName}');
         buffer.writeln('- Subject: ${inbox.title}');
         buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
+        buffer.writeln('- Thread ID: ${mail.threadId}');
+        buffer.writeln('- Message ID: ${mail.messageId}');
 
         // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만, 사용자 요청이 있을 때만)
         if (includeAttachmentInfo) {
@@ -2035,63 +2046,10 @@ class AgentActionController extends _$AgentActionController {
         buffer.writeln('- From: ${message.userName}');
         buffer.writeln('- Channel: ${message.channelName}');
         buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
-
-        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
-        if (includeAttachmentInfo) {
-          try {
-            // 메시지 첨부 파일 정보
-            final messageEntity = await _getMessageEntityFromInbox(inbox);
-            if (messageEntity != null) {
-              final files = messageEntity.files;
-              if (files.isNotEmpty) {
-                buffer.writeln('- Attachments: ${files.length} file(s)');
-                for (final file in files) {
-                  final fileName = file.name ?? 'unknown';
-                  final mimeType = file.slackFile?.mimetype ?? '';
-                  String fileType = '';
-                  if (fileName.toLowerCase().endsWith('.pdf')) {
-                    fileType = ' (PDF)';
-                  } else if (file.isImage) {
-                    fileType = ' (Image)';
-                  } else if (file.isVideo) {
-                    fileType = ' (Video)';
-                  } else if (file.isAudio) {
-                    fileType = ' (Audio)';
-                  } else if (mimeType.startsWith('text/')) {
-                    fileType = ' (Text)';
-                  }
-                  buffer.writeln('  - $fileName$fileType');
-                }
-              }
-            }
-          } catch (e) {
-            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
-          }
-        }
-
-        if (shouldIncludeFullContent) {
-          // 전체 내용 포함
-          if (inbox.description != null && inbox.description!.isNotEmpty) {
-            buffer.writeln('- Full Content:');
-            buffer.writeln(inbox.description!);
-          }
-          final mail = inbox.linkedMail!;
-          if (mail.hostMail.isNotEmpty) {
-            buffer.writeln('- Email Account: ${mail.hostMail}');
-          }
-        } else {
-          // 메타데이터만
-          if (inbox.description != null && inbox.description!.isNotEmpty) {
-            final snippet = inbox.description!.length > 100 ? '${inbox.description!.substring(0, 100)}...' : inbox.description!;
-            buffer.writeln('- Preview: $snippet');
-          }
-        }
-      } else if (inbox.linkedMessage != null) {
-        final message = inbox.linkedMessage!;
-        buffer.writeln('- Type: Message');
-        buffer.writeln('- From: ${message.userName}');
-        buffer.writeln('- Channel: ${message.channelName}');
-        buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
+        buffer.writeln('- Message ID: ${message.messageId}');
+        buffer.writeln('- Thread ID: ${message.threadId}');
+        buffer.writeln('- Channel ID: ${message.channelId}');
+        buffer.writeln('- Team ID: ${message.teamId}');
 
         // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
         if (includeAttachmentInfo) {
