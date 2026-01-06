@@ -489,9 +489,6 @@ class McpFunctionExecutor {
 
   // Task execution methods
   Future<Map<String, dynamic>> _executeCreateTask(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
-    print('[CreateTask] 함수 호출 시작. availableInboxes 개수: ${availableInboxes?.length ?? 0}');
-    print('[CreateTask] args: inboxId=${args['inboxId']}, threadId=${args['threadId']}, messageId=${args['messageId']}');
-
     final user = ref.read(authControllerProvider).requireValue;
     final title = args['title'] as String?;
     if (title == null || title.isEmpty) {
@@ -511,16 +508,9 @@ class McpFunctionExecutor {
     // Find matching inbox
     InboxEntity? matchingInbox;
     if (availableInboxes != null && availableInboxes.isNotEmpty) {
-      print('[CreateTask] availableInboxes가 있음. 개수: ${availableInboxes.length}');
       // 1. inboxId가 명시적으로 제공되면 그것으로 찾기
       if (inboxId != null && inboxId.isNotEmpty) {
-        print('[CreateTask] inboxId로 찾기 시도: $inboxId');
         matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
-        if (matchingInbox != null) {
-          print('[CreateTask] inboxId로 매칭된 inbox 찾음: ${matchingInbox.id}');
-        } else {
-          print('[CreateTask] inboxId로 매칭된 inbox 없음');
-        }
       }
 
       // 2. inboxId가 없으면 threadId나 messageId로 inboxId 생성해서 찾기
@@ -529,42 +519,22 @@ class McpFunctionExecutor {
 
         // threadId가 있으면 mail로 간주하고 inboxId 생성
         if (threadId != null && threadId.isNotEmpty) {
-          print('[CreateTask] threadId로 찾기 시도: $threadId');
           final mailInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMail != null && inbox.linkedMail!.threadId == threadId);
           if (mailInbox != null && mailInbox.linkedMail != null) {
             generatedInboxId = InboxEntity.getInboxIdFromLinkedMail(mailInbox.linkedMail!);
-            print('[CreateTask] threadId로 생성된 inboxId: $generatedInboxId');
             matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == generatedInboxId);
-            if (matchingInbox != null) {
-              print('[CreateTask] threadId로 매칭된 inbox 찾음: ${matchingInbox.id}');
-            } else {
-              print('[CreateTask] threadId로 생성된 inboxId로 매칭된 inbox 없음');
-            }
-          } else {
-            print('[CreateTask] threadId로 매칭된 mailInbox 없음');
           }
         }
 
         // messageId가 있으면 chat으로 간주하고 inboxId 생성
         if (matchingInbox == null && messageId != null && messageId.isNotEmpty) {
-          print('[CreateTask] messageId로 찾기 시도: $messageId');
           final chatInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.linkedMessage != null && inbox.linkedMessage!.messageId == messageId);
           if (chatInbox != null && chatInbox.linkedMessage != null) {
             generatedInboxId = InboxEntity.getInboxIdFromLinkedChat(chatInbox.linkedMessage!);
-            print('[CreateTask] messageId로 생성된 inboxId: $generatedInboxId');
             matchingInbox = availableInboxes.firstWhereOrNull((inbox) => inbox.id == generatedInboxId);
-            if (matchingInbox != null) {
-              print('[CreateTask] messageId로 매칭된 inbox 찾음: ${matchingInbox.id}');
-            } else {
-              print('[CreateTask] messageId로 생성된 inboxId로 매칭된 inbox 없음');
-            }
-          } else {
-            print('[CreateTask] messageId로 매칭된 chatInbox 없음');
           }
         }
       }
-    } else {
-      print('[CreateTask] availableInboxes가 없거나 비어있음');
     }
 
     // If projectId is not provided, try to get it from inbox suggestion, then lastUsedProject, then defaultProject
@@ -665,10 +635,7 @@ class McpFunctionExecutor {
 
     List<LinkedMailEntity> linkedMails = [];
     List<LinkedMessageEntity> linkedMessages = [];
-    print('[CreateTask] matchingInbox 찾기 결과: ${matchingInbox != null ? matchingInbox.id : 'null'}');
     if (matchingInbox != null) {
-      print('[CreateTask] matchingInbox.linkedMail: ${matchingInbox.linkedMail != null ? '있음' : '없음'}');
-      print('[CreateTask] matchingInbox.linkedMessage: ${matchingInbox.linkedMessage != null ? '있음' : '없음'}');
       if (matchingInbox.linkedMail != null) {
         linkedMails = [matchingInbox.linkedMail!];
       }
@@ -3735,40 +3702,31 @@ class McpFunctionExecutor {
 
   /// 로컬 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
   List<InboxEntity> _filterLocalInboxes(List<InboxEntity> localInboxes, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? inboxId) {
-    print('[FilterLocalInboxes] 필터링 시작. 입력 개수: ${localInboxes.length}');
-    print('[FilterLocalInboxes] 필터 조건 - startDate: $startDate, endDate: $endDate, searchKeyword: "$searchKeyword", inboxId: $inboxId');
     var filtered = localInboxes;
 
     // ID 필터
     if (inboxId != null && inboxId.isNotEmpty) {
-      final beforeCount = filtered.length;
       filtered = filtered.where((inbox) => inbox.id == inboxId || inbox.id.contains(inboxId)).toList();
-      print('[FilterLocalInboxes] ID 필터 적용: $beforeCount -> ${filtered.length}');
       if (filtered.isEmpty) {
-        print('[FilterLocalInboxes] ID 필터 후 결과 없음');
         return [];
       }
     }
 
     // 날짜 범위 필터
     if (startDate != null || endDate != null) {
-      final beforeCount = filtered.length;
       filtered = filtered.where((inbox) {
         final inboxDate = inbox.inboxDatetime;
         if (startDate != null && inboxDate.isBefore(startDate)) return false;
         if (endDate != null && inboxDate.isAfter(endDate)) return false;
         return true;
       }).toList();
-      print('[FilterLocalInboxes] 날짜 범위 필터 적용: $beforeCount -> ${filtered.length}');
       if (filtered.isEmpty) {
-        print('[FilterLocalInboxes] 날짜 범위 필터 후 결과 없음');
         return [];
       }
     }
 
     // 검색어 필터 (제목, 설명, 발신자에서 검색)
     if (searchKeyword != null && searchKeyword.isNotEmpty) {
-      final beforeCount = filtered.length;
       final keyword = searchKeyword.toLowerCase();
       filtered = filtered.where((inbox) {
         final title = inbox.title?.toLowerCase() ?? '';
@@ -3776,26 +3734,21 @@ class McpFunctionExecutor {
         final sender = (inbox.linkedMail?.fromName ?? inbox.linkedMessage?.userName ?? '').toLowerCase();
         return title.contains(keyword) || description.contains(keyword) || sender.contains(keyword);
       }).toList();
-      print('[FilterLocalInboxes] 검색어 필터 적용: $beforeCount -> ${filtered.length}');
     }
 
-    print('[FilterLocalInboxes] 필터링 완료. 최종 결과 개수: ${filtered.length}');
     return filtered;
   }
 
   /// 로컬 데이터에 검색 범위에 해당하는 데이터가 충분히 있는지 확인합니다
   bool _hasLocalDataForScope(DateTime? startDate, DateTime? endDate) {
     if (startDate == null && endDate == null) {
-      print('[HasLocalDataForScope] 날짜 범위가 없어 false 반환');
       return false;
     }
 
     try {
       final inboxList = ref.read(inboxControllerProvider);
       final localInboxes = inboxList?.inboxes ?? [];
-      print('[HasLocalDataForScope] 로컬 inbox 개수: ${localInboxes.length}');
       if (localInboxes.isEmpty) {
-        print('[HasLocalDataForScope] 로컬 inbox가 비어있어 false 반환');
         return false;
       }
 
@@ -3807,29 +3760,22 @@ class McpFunctionExecutor {
         return true;
       }).length;
 
-      print('[HasLocalDataForScope] 날짜 범위 매칭 개수: $matchingCount (startDate: $startDate, endDate: $endDate)');
       // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
       final result = matchingCount >= 5;
-      print('[HasLocalDataForScope] 결과: $result (${matchingCount >= 5 ? "충분함" : "부족함"})');
       return result;
     } catch (e) {
-      print('[HasLocalDataForScope] 에러 발생: $e');
       return false;
     }
   }
 
   // Search execution methods
   Future<Map<String, dynamic>> _executeSearchInbox(Map<String, dynamic> args, {required TabType tabType}) async {
-    print('[SearchInbox] 함수 호출 시작. args: $args');
     final query = args['query'] as String? ?? '';
-    print('[SearchInbox] query: "$query"');
 
     // query나 scope 파라미터(startDate, endDate, inboxId) 중 하나만 있으면 검색 가능 (urgency는 필터링용이므로 제외)
     final hasQuery = query.isNotEmpty;
     final hasScopeParams = args['startDate'] != null || args['endDate'] != null || args['inboxId'] != null;
-    print('[SearchInbox] hasQuery: $hasQuery, hasScopeParams: $hasScopeParams');
     if (!hasQuery && !hasScopeParams) {
-      print('[SearchInbox] 에러: query 또는 scope 파라미터가 필요함');
       return {'success': false, 'error': 'query or scope parameters (startDate, endDate, inboxId) are required'};
     }
 
@@ -3844,42 +3790,33 @@ class McpFunctionExecutor {
       if (args['startDate'] != null) {
         try {
           startDate = DateTime.parse(args['startDate'] as String).toLocal();
-          print('[SearchInbox] startDate 파싱 성공: $startDate');
         } catch (e) {
-          print('[SearchInbox] startDate 파싱 실패: ${args['startDate']}, error: $e');
+          // 파싱 실패 시 무시
         }
       }
       if (args['endDate'] != null) {
         try {
           endDate = DateTime.parse(args['endDate'] as String).toLocal();
-          print('[SearchInbox] endDate 파싱 성공: $endDate');
         } catch (e) {
-          print('[SearchInbox] endDate 파싱 실패: ${args['endDate']}, error: $e');
+          // 파싱 실패 시 무시
         }
       }
       if (args['inboxId'] != null) {
         inboxId = args['inboxId'] as String?;
-        print('[SearchInbox] inboxId: $inboxId');
       }
-
-      print('[SearchInbox] 파라미터 요약 - searchKeyword: "$searchKeyword", startDate: $startDate, endDate: $endDate, inboxId: $inboxId');
 
       // 로컬 데이터 확인
       final hasLocalData = _hasLocalDataForScope(startDate, endDate);
-      print('[SearchInbox] 로컬 데이터 확인: hasLocalData=$hasLocalData');
       List<InboxEntity> searchResults;
 
       if (hasLocalData) {
         // 로컬 데이터에서 필터링
         final inboxList = ref.read(inboxControllerProvider);
         final localInboxes = inboxList?.inboxes ?? [];
-        print('[SearchInbox] 로컬 데이터 사용. 로컬 inbox 개수: ${localInboxes.length}');
         searchResults = _filterLocalInboxes(localInboxes, startDate, endDate, searchKeyword, inboxId);
-        print('[SearchInbox] 필터링 후 결과 개수: ${searchResults.length}');
       } else {
         // Remote search 실행 (검색어가 있을 때만)
         if (searchKeyword != null && searchKeyword.isNotEmpty) {
-          print('[SearchInbox] Remote search 실행. query: "$searchKeyword"');
           final inboxController = ref.read(inboxControllerProvider.notifier);
           await inboxController.search(query: searchKeyword);
 
@@ -3889,23 +3826,16 @@ class McpFunctionExecutor {
           // Get search results
           final inboxList = ref.read(inboxControllerProvider);
           final remoteResults = inboxList?.inboxes ?? [];
-          print('[SearchInbox] Remote search 결과 개수: ${remoteResults.length}');
 
           // 로컬에서 추가 필터링 (날짜 범위 등)
           searchResults = _filterLocalInboxes(remoteResults, startDate, endDate, searchKeyword, inboxId);
-          print('[SearchInbox] 필터링 후 결과 개수: ${searchResults.length}');
         } else {
           // 검색어가 없으면 로컬 데이터에서만 필터링
-          print('[SearchInbox] 검색어 없음. 로컬 데이터에서만 필터링');
           final inboxList = ref.read(inboxControllerProvider);
           final localInboxes = inboxList?.inboxes ?? [];
-          print('[SearchInbox] 로컬 inbox 개수: ${localInboxes.length}');
           searchResults = _filterLocalInboxes(localInboxes, startDate, endDate, searchKeyword, inboxId);
-          print('[SearchInbox] 필터링 후 결과 개수: ${searchResults.length}');
         }
       }
-
-      print('[SearchInbox] 최종 결과 개수: ${searchResults.length}');
 
       // Format results
       final results = searchResults.map((inbox) {
@@ -3922,13 +3852,10 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      print('[SearchInbox] 함수 호출 완료. 성공: true, 결과 개수: ${results.length}');
       return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 인박스 항목을 찾았습니다.'};
     } catch (e) {
-      print('[SearchInbox] 에러 발생: $e');
       // Provider가 dispose된 경우를 포함한 모든 에러 처리
       if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
-        print('[SearchInbox] Provider가 dispose됨');
         return {'success': false, 'error': 'Provider has been disposed'};
       }
       return {'success': false, 'error': 'Search error: ${e.toString()}'};

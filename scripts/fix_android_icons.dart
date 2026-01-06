@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 
 void main() async {
-  print('🔧 Fixing Android adaptive icons...\n');
-
   final assetsDir = Directory('assets/app_icon');
   final foregroundPath = '${assetsDir.path}/visir_foreground.png';
   final backgroundPath = '${assetsDir.path}/visir_background.png';
@@ -16,15 +14,11 @@ void main() async {
   final background = img.decodeImage(backgroundBytes);
   
   if (foreground == null || background == null) {
-    print('❌ Error: Could not load icon images');
     exit(1);
   }
 
-  print('✅ Loaded images successfully\n');
-
   final androidResDir = Directory('android/app/src/main/res');
   if (!await androidResDir.exists()) {
-    print('❌ Error: Android res directory not found');
     exit(1);
   }
 
@@ -38,8 +32,6 @@ void main() async {
     {'density': 'mipmap-xxxhdpi', 'size': 432}, // 108dp * 4.0
   ];
 
-  print('📦 Generating adaptive icon images for each density...\n');
-
   for (final density in androidDensities) {
     final densityDir = Directory('${androidResDir.path}/${density['density']}');
     if (!await densityDir.exists()) {
@@ -47,7 +39,6 @@ void main() async {
     }
 
     final size = density['size'] as int;
-    print('  Generating ${density['density']} (${size}x${size}px)...');
 
     // Background 이미지 생성 (전체 크기)
     // Background는 108dp 전체 영역을 채워야 함
@@ -59,7 +50,6 @@ void main() async {
     if (await backgroundFile.exists()) {
       final fileSize = await backgroundFile.length();
       if (fileSize == 0) {
-        print('    ⚠️  Warning: Background file is empty, regenerating...');
         // 다시 생성 시도
         await backgroundFile.writeAsBytes(img.encodePng(resizedBackground));
       }
@@ -85,24 +75,6 @@ void main() async {
     final fgExists = await fgFile.exists();
     final bgSize = bgExists ? await bgFile.length() : 0;
     final fgSize = fgExists ? await fgFile.length() : 0;
-    
-    if (bgExists && bgSize > 0 && fgExists && fgSize > 0) {
-      print('    ✅ Generated background (${bgSize} bytes) and foreground (${fgSize} bytes)');
-    } else {
-      print('    ⚠️  Warning: Some files may not be generated correctly');
-      if (!bgExists || bgSize == 0) {
-        print('      ❌ Background file missing or empty');
-      }
-      if (!fgExists || fgSize == 0) {
-        print('      ❌ Foreground file missing or empty');
-      }
-    }
   }
-
-  print('\n🎉 All adaptive icon images generated successfully!');
-  print('\n📝 Next steps:');
-  print('   1. Run: flutter clean');
-  print('   2. Run: flutter build apk --debug');
-  print('   3. Uninstall and reinstall the app');
 }
 

@@ -4,8 +4,6 @@ import 'dart:math' as math;
 import 'package:image/image.dart' as img;
 
 void main() async {
-  print('🎨 Generating app icons with visir_icon_dark_default...\n');
-
   // 경로 설정
   final assetsDir = Directory('assets/app_icon');
   final darkDefaultPath = '${assetsDir.path}/visir_icon_dark_default.png';
@@ -14,27 +12,19 @@ void main() async {
   final darkDefaultBytes = await File(darkDefaultPath).readAsBytes();
   final darkDefault = img.decodeImage(darkDefaultBytes);
   if (darkDefault == null) {
-    print('❌ Error: Could not load visir_icon_dark_default.png');
     exit(1);
   }
-
-  print('✅ Loaded image successfully\n');
 
   // Android 아이콘 생성 (visir_icon_dark_default 사용)
   await generateAndroidIcons(darkDefault);
 
   // Windows 아이콘 생성 (visir_icon_dark_default 사용)
   await generateWindowsIcons(darkDefault);
-
-  print('\n🎉 All app icons generated successfully!');
 }
 
 Future<void> generateAndroidIcons(img.Image darkDefaultIcon) async {
-  print('🤖 Generating Android icons...');
-
   final androidResDir = Directory('android/app/src/main/res');
   if (!await androidResDir.exists()) {
-    print('❌ Error: Android res directory not found');
     return;
   }
 
@@ -69,16 +59,11 @@ Future<void> generateAndroidIcons(img.Image darkDefaultIcon) async {
 
   // Adaptive icon은 XML로 정의되므로, mipmap-anydpi-v26 폴더에는 이미지 파일을 생성하지 않음
   // 실제 이미지 파일들은 각 밀도별 폴더에 있어야 함 (icons_launcher 패키지가 생성)
-
-  print('   ✅ Android icons generated');
 }
 
 Future<void> generateWindowsIcons(img.Image darkDefaultIcon) async {
-  print('🪟 Generating Windows icons...');
-
   final windowsDir = Directory('windows/runner/resources');
   if (!await windowsDir.exists()) {
-    print('❌ Error: Windows resources directory not found');
     return;
   }
 
@@ -92,8 +77,6 @@ Future<void> generateWindowsIcons(img.Image darkDefaultIcon) async {
 
   // Windows 아이콘 (다크 모드만, 하나로 통합)
   await File('${windowsDir.path}/app_icon.png').writeAsBytes(img.encodePng(roundedIcon));
-
-  print('   ✅ Windows icons generated');
 }
 
 /// 배경 이미지와 포그라운드 이미지를 합성하여 아이콘 생성
@@ -291,10 +274,9 @@ Future<void> regenerateMacOSContentsJson(String dirPath, List<Map<String, dynami
     await contentsFile.writeAsString(const JsonEncoder.withIndent('  ').convert(contentsJson));
     final lightCount = allEntries.where((e) => !e.containsKey('appearances')).length;
     final darkCount = allEntries.where((e) => e.containsKey('appearances')).length;
-    print('   ✅ Updated macOS Contents.json with $lightCount light + $darkCount dark mode entries (language-direction preserved)');
-  } catch (e) {
-    print('   ⚠️  Error updating Contents.json: $e');
-  }
+      } catch (e) {
+        // Error updating Contents.json
+      }
 }
 
 /// Mesh background 생성 (라이트/다크 모드)

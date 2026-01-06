@@ -1,17 +1,13 @@
 import 'dart:io';
 
 void main() async {
-  print('🔧 Fixing Android adaptive icon XML files...\n');
-
   final androidResDir = Directory('android/app/src/main/res');
   if (!await androidResDir.exists()) {
-    print('❌ Error: Android res directory not found');
     exit(1);
   }
 
   final adaptiveDir = Directory('${androidResDir.path}/mipmap-anydpi-v26');
   if (!await adaptiveDir.exists()) {
-    print('❌ Error: mipmap-anydpi-v26 directory not found');
     exit(1);
   }
 
@@ -19,7 +15,6 @@ void main() async {
   final foregroundPng = File('${adaptiveDir.path}/ic_launcher_foreground.png');
   if (await foregroundPng.exists()) {
     await foregroundPng.delete();
-    print('✅ Deleted ic_launcher_foreground.png from mipmap-anydpi-v26');
   }
 
   // ic_launcher.xml 수정
@@ -51,9 +46,6 @@ void main() async {
     }
     
     await launcherXml.writeAsString(content);
-    print('✅ Fixed ic_launcher.xml');
-  } else {
-    print('⚠️  ic_launcher.xml not found');
   }
 
   // ic_launcher_round.xml 수정
@@ -85,11 +77,6 @@ void main() async {
     }
     
     await roundXml.writeAsString(content);
-    print('✅ Fixed ic_launcher_round.xml');
-  } else {
-    print('⚠️  ic_launcher_round.xml not found');
   }
-
-  print('\n🎉 Adaptive icon XML files fixed successfully!');
 }
 
