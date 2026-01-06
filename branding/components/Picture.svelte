@@ -29,10 +29,24 @@
     loaded = true;
   }
 
-  $: if (imgElement && imgElement.complete) {
-    if (imgElement.naturalWidth > 0) {
-      loaded = true;
+  // Defer DOM reads to avoid forced reflow
+  onMount(() => {
+    if (imgElement) {
+      requestAnimationFrame(() => {
+        if (imgElement.complete && imgElement.naturalWidth > 0) {
+          loaded = true;
+        }
+      });
     }
+  });
+  
+  $: if (imgElement) {
+    // Defer DOM reads to avoid forced reflow
+    requestAnimationFrame(() => {
+      if (imgElement.complete && imgElement.naturalWidth > 0 && !loaded) {
+        loaded = true;
+      }
+    });
   }
 </script>
 

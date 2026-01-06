@@ -43,6 +43,98 @@ function nonBlockingCSS(): Plugin {
   };
 }
 
+// Plugin to add modulepreload for critical JS chunks
+function addModulePreload(): Plugin {
+  return {
+    name: 'add-modulepreload',
+    apply: 'build',
+    writeBundle(options, bundle) {
+      // Find the HTML file and entry JS files
+      const htmlFiles: string[] = [];
+      const entryJsFiles: string[] = [];
+      
+      for (const [fileName, chunk] of Object.entries(bundle)) {
+        if (fileName.endsWith('.html')) {
+          htmlFiles.push(fileName);
+        } else if (
+          chunk.type === 'chunk' && 
+          chunk.isEntry && 
+          fileName.endsWith('.js')
+        ) {
+          entryJsFiles.push(fileName);
+        }
+      }
+      
+      // Update HTML files with modulepreload links
+      for (const htmlFile of htmlFiles) {
+        const htmlPath = path.join(options.dir || 'dist', htmlFile);
+        if (existsSync(htmlPath)) {
+          let html = readFileSync(htmlPath, 'utf-8');
+          
+          // Extract script tags from HTML to find the actual entry file paths
+          const scriptMatches = html.matchAll(/<script[^>]*src=["']([^"']+)["'][^>]*>/g);
+          const scriptSrcs = Array.from(scriptMatches).map(match => match[1]);
+          
+          // Find entry JS files that are referenced in script tags
+          const entryModules: string[] = [];
+          
+          // First, add all script srcs that look like entry files (index-xxx.js, main-xxx.js)
+          for (const scriptSrc of scriptSrcs) {
+            const fileName = scriptSrc.split('/').pop() || '';
+            // Check if it's an entry file (starts with index, main, or matches entry file pattern)
+            if (fileName.startsWith('index-') || fileName.startsWith('main-') || 
+                entryJsFiles.some(entry => entry.includes(fileName.split('-')[0]))) {
+              entryModules.push(scriptSrc);
+            }
+          }
+          
+          // Also add all entry files from bundle that might not be in script tags yet
+          for (const entryFile of entryJsFiles) {
+            const assetPath = entryFile.startsWith('assets/') ? `/${entryFile}` : `/assets/${entryFile}`;
+            if (!entryModules.includes(assetPath) && !entryModules.some(m => m.endsWith(entryFile))) {
+              entryModules.push(assetPath);
+            }
+          }
+          
+          // Also check for any JS files in script tags that we might have missed
+          for (const scriptSrc of scriptSrcs) {
+            if (scriptSrc.endsWith('.js') && !entryModules.includes(scriptSrc)) {
+              // Check if it matches any entry file name pattern
+              const fileName = scriptSrc.split('/').pop() || '';
+              const baseName = fileName.split('-')[0];
+              if (entryJsFiles.some(entry => entry.startsWith(baseName) || entry.includes(baseName))) {
+                entryModules.push(scriptSrc);
+              }
+            }
+          }
+          
+          // Check if modulepreload already exists for these files
+          const existingPreloads = html.match(/<link[^>]*rel=["']modulepreload["'][^>]*>/g) || [];
+          const existingHrefs = existingPreloads.map(preload => {
+            const match = preload.match(/href=["']([^"']+)["']/);
+            return match ? match[1] : '';
+          });
+          
+          // Generate modulepreload links for files that don't have them yet
+          const newPreloadLinks: string[] = [];
+          for (const modulePath of entryModules) {
+            if (!existingHrefs.includes(modulePath)) {
+              newPreloadLinks.push(`    <link rel="modulepreload" href="${modulePath}" />`);
+            }
+          }
+          
+          // Insert before the closing </head> tag
+          if (newPreloadLinks.length > 0) {
+            html = html.replace('</head>', `${newPreloadLinks.join('\n')}\n  </head>`);
+            writeFileSync(htmlPath, html, 'utf-8');
+            console.log(`✅ Added modulepreload for ${newPreloadLinks.length} entry chunk(s)`);
+          }
+        }
+      }
+    }
+  };
+}
+
 // Plugin to copy release folder and rn.shtml to dist
 function copyReleaseFiles(): Plugin {
   return {
@@ -129,6 +221,7 @@ export default defineConfig(({ mode }) => {
       plugins: [
         svelte(),
         nonBlockingCSS(),
+        addModulePreload(),
         copyReleaseFiles(),
         VitePWA({
           registerType: 'autoUpdate',

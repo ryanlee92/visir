@@ -219,8 +219,13 @@ import { initAnalytics } from './lib/init-analytics';
     }
   }
 
-  // Reactive statement for route changes
-  $: handleRouteChange($location);
+  // Reactive statement for route changes (deferred to avoid forced reflow)
+  $: {
+    // Use requestAnimationFrame to batch DOM operations and avoid forced reflow
+    requestAnimationFrame(() => {
+      handleRouteChange($location);
+    });
+  }
 
   // Handle hash scrolling (optimized to avoid forced reflow)
   function handleHashChange() {
@@ -228,19 +233,30 @@ import { initAnalytics } from './lib/init-analytics';
     if (hash) {
       // Use requestAnimationFrame to batch DOM reads and avoid forced reflow
       requestAnimationFrame(() => {
-        setTimeout(() => {
-          const element = document.getElementById(hash.replace('#', ''));
-          if (element) {
-            // Batch DOM reads together
-            const offset = 100;
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - offset;
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth'
-            });
-          }
-        }, 100);
+        requestAnimationFrame(() => {
+          // Double RAF to ensure layout is complete before reading
+          setTimeout(() => {
+            const element = document.getElementById(hash.replace('#', ''));
+            if (element) {
+              // Batch all DOM reads together in a single frame
+              const offset = 100;
+              // Use scrollY instead of pageYOffset (more modern, same performance)
+              // Read all layout properties at once to minimize reflows
+              const scrollY = window.scrollY;
+              const rect = element.getBoundingClientRect();
+              const elementPosition = rect.top;
+              const offsetPosition = elementPosition + scrollY - offset;
+              
+              // Use requestAnimationFrame for the write to avoid forced reflow
+              requestAnimationFrame(() => {
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth'
+                });
+              });
+            }
+          }, 100);
+        });
       });
     }
   }

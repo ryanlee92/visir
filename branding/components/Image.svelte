@@ -28,11 +28,26 @@
     loaded = true;
   }
 
-  // Force check on mount and update
-  $: if (imgElement && imgElement.complete) {
-    if (imgElement.naturalWidth > 0) {
-        loaded = true;
+  // Force check on mount and update (deferred to avoid forced reflow)
+  onMount(() => {
+    if (imgElement) {
+      // Use requestAnimationFrame to avoid forced reflow
+      requestAnimationFrame(() => {
+        if (imgElement.complete && imgElement.naturalWidth > 0) {
+          loaded = true;
+        }
+      });
     }
+  });
+  
+  // Also check when imgElement changes (but defer the check)
+  $: if (imgElement) {
+    // Defer DOM reads to avoid forced reflow
+    requestAnimationFrame(() => {
+      if (imgElement.complete && imgElement.naturalWidth > 0 && !loaded) {
+        loaded = true;
+      }
+    });
   }
 </script>
 
