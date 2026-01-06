@@ -3,7 +3,7 @@ import { defineConfig, loadEnv, Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 import { partytownVite } from '@qwik.dev/partytown/utils';
-import { readFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { readFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'fs';
 
 // Read version from pubspec.yaml
 function getVersionFromPubspec(): string {
@@ -20,6 +20,27 @@ function getVersionFromPubspec(): string {
     console.warn('⚠️  Could not read version from pubspec.yaml:', error);
   }
   return '2.4.0'; // fallback version
+}
+
+// Plugin to make CSS non-render-blocking
+function nonBlockingCSS(): Plugin {
+  return {
+    name: 'non-blocking-css',
+    transformIndexHtml(html) {
+      // Make CSS links non-render-blocking by using media="print" trick
+      return html.replace(
+        /<link([^>]*rel=["']stylesheet["'][^>]*)>/gi,
+        (match, attrs) => {
+          // Skip if already has onload or media attribute
+          if (attrs.includes('onload') || attrs.includes('media=')) {
+            return match;
+          }
+          // Add media="print" and onload to make it non-blocking
+          return `<link${attrs} media="print" onload="this.media='all'; this.onload=null;"><noscript>${match}</noscript>`;
+        }
+      );
+    },
+  };
 }
 
 // Plugin to copy release folder and rn.shtml to dist
@@ -107,6 +128,7 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [
         svelte(),
+        nonBlockingCSS(),
         copyReleaseFiles(),
         VitePWA({
           registerType: 'autoUpdate',

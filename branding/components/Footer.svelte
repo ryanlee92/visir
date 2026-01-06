@@ -36,6 +36,9 @@
             src="/assets/visir/visir_foreground.webp" 
             alt="Visir Logo" 
             class="h-8 w-8 object-contain"
+            width="32"
+            height="32"
+            sizes="32px"
             loading="lazy"
             decoding="async"
           />

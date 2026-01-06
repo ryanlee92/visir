@@ -27,7 +27,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://visir.pro/" />
-    <meta property="og:title" content="Visir - Reclaim your 2 hours today." />
+    <meta property="og:title" content="Visir: Never Alt-Tab Again | Unified Email, Slack & Calendar" />
     <meta property="og:description" content="Email, Slack, and Tasks lived apart. We married them. Finally meet your new mental home. 100% Local, 100% Yours." />
     <meta property="og:image" content="https://visir.pro/og-image.png?v=3" />
     <meta property="og:image:secure_url" content="https://visir.pro/og-image.png?v=3" />
@@ -41,7 +41,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://visir.pro/" />
-    <meta name="twitter:title" content="Visir - Reclaim your 2 hours today." />
+    <meta name="twitter:title" content="Visir: Never Alt-Tab Again | Unified Email, Slack & Calendar" />
     <meta name="twitter:description" content="Email, Slack, and Tasks lived apart. We married them. Finally meet your new mental home. 100% Local, 100% Yours." />
     <meta name="twitter:image" content="https://visir.pro/og-image.png?v=3" />
     <meta name="twitter:image:alt" content="Visir Logo" />
@@ -224,12 +224,27 @@
     <!-- Preload critical logo removed: handled by component eagerly -->
     <!-- <link rel="preload" href="/assets/visir/visir_foreground.webp" as="image" type="image/webp" fetchpriority="high"> -->
     
-    <!-- Preload critical font -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap&subset=latin" as="style">
+    <!-- Load fonts asynchronously to prevent render blocking -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap&subset=latin" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap&subset=latin" rel="stylesheet"></noscript>
     
-    <!-- Load fonts synchronously for better reliability with font-display: swap -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap&subset=latin" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap&subset=latin" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap&subset=latin" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap&subset=latin" rel="stylesheet"></noscript>
+    
+    <!-- Fallback polyfill for browsers that don't support onload on link -->
+    <script>
+      (function() {
+        var links = document.querySelectorAll('link[rel="preload"][as="style"]');
+        links.forEach(function(link) {
+          if (!link.onload) {
+            link.onload = function() {
+              this.onload = null;
+              this.rel = 'stylesheet';
+            };
+          }
+        });
+      })();
+    </script>
     
     <!-- Critical CSS Variables for initial render -->
     <style>

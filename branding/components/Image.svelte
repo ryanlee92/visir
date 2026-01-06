@@ -10,6 +10,8 @@
   export let transition: boolean = true;
   export let sizes: string = '100vw'; // Default sizes for responsive images
   export let srcset: string = ''; // Optional srcset for responsive images
+  export let width: number | string | undefined = undefined; // Image width for layout shift prevention
+  export let height: number | string | undefined = undefined; // Image height for layout shift prevention
   
   // Start with loaded=false if we want skeletons, but for debugging/fixing let's trust the browser
   let loaded = false;
@@ -46,6 +48,8 @@
     {alt}
     srcset={srcset || undefined}
     {sizes}
+    width={width}
+    height={height}
     class={`${transition ? `transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}` : ''} ${imgClass} relative z-10`}
     style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; image-rendering: high-quality;"
     loading={eager ? 'eager' : 'lazy'}

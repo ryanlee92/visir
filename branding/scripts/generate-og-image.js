@@ -228,6 +228,47 @@ async function generateOGImage() {
   ctx.font = '500 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
   ctx.fillText('Reclaim your focus.', centerX, gradientTextY);
   
+  // CTA 버튼: "Get Started Free" (비디오 위, 그라데이션 텍스트 아래)
+  const ctaY = gradientTextY + 90;
+  const ctaText = 'Get Started Free';
+  const ctaPaddingX = 40;
+  const ctaPaddingY = 16;
+  
+  // CTA 텍스트 크기 측정
+  ctx.font = '600 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  const ctaTextMetrics = ctx.measureText(ctaText);
+  const ctaWidth = ctaTextMetrics.width + ctaPaddingX * 2;
+  const ctaHeight = 48 + ctaPaddingY * 2;
+  const ctaX = centerX - ctaWidth / 2;
+  
+  // CTA 버튼 배경 (그라데이션)
+  const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaWidth, ctaY + ctaHeight);
+  ctaGradient.addColorStop(0, '#818cf8'); // indigo-400
+  ctaGradient.addColorStop(0.5, '#a78bfa'); // purple-400
+  ctaGradient.addColorStop(1, '#f472b6'); // pink-400
+  ctx.fillStyle = ctaGradient;
+  
+  // 둥근 모서리 버튼
+  const ctaRadius = 12;
+  ctx.beginPath();
+  ctx.moveTo(ctaX + ctaRadius, ctaY);
+  ctx.lineTo(ctaX + ctaWidth - ctaRadius, ctaY);
+  ctx.quadraticCurveTo(ctaX + ctaWidth, ctaY, ctaX + ctaWidth, ctaY + ctaRadius);
+  ctx.lineTo(ctaX + ctaWidth, ctaY + ctaHeight - ctaRadius);
+  ctx.quadraticCurveTo(ctaX + ctaWidth, ctaY + ctaHeight, ctaX + ctaWidth - ctaRadius, ctaY + ctaHeight);
+  ctx.lineTo(ctaX + ctaRadius, ctaY + ctaHeight);
+  ctx.quadraticCurveTo(ctaX, ctaY + ctaHeight, ctaX, ctaY + ctaHeight - ctaRadius);
+  ctx.lineTo(ctaX, ctaY + ctaRadius);
+  ctx.quadraticCurveTo(ctaX, ctaY, ctaX + ctaRadius, ctaY);
+  ctx.closePath();
+  ctx.fill();
+  
+  // CTA 텍스트 (흰색)
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '600 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(ctaText, centerX, ctaY + ctaPaddingY + 24);
+  
   // 임시 프레임 파일 정리
   if (fs.existsSync(tempFramePath)) {
     try {
