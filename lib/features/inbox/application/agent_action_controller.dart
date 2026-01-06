@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:Visir/features/inbox/application/inbox_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:Visir/config/providers.dart';
@@ -314,15 +315,12 @@ class AgentActionController extends _$AgentActionController {
   }) async {
     if (userMessage.trim().isEmpty && (files == null || files.isEmpty)) return;
 
-    // 태그된 inboxes를 inboxes에 병합 (중복 제거)
+    // 태그된 inboxes만 사용 (사용자가 명시적으로 선택한 경우에만)
+    // 초기 context는 제공하지 않으므로, widget.inboxes는 사용하지 않음
     final combinedInboxes = <InboxEntity>[];
-    if (inboxes != null) combinedInboxes.addAll(inboxes);
-    if (taggedInboxes != null) {
-      for (final inbox in taggedInboxes) {
-        if (!combinedInboxes.any((i) => i.uniqueId == inbox.uniqueId)) {
-          combinedInboxes.add(inbox);
-        }
-      }
+    // taggedInboxes만 사용 (사용자가 명시적으로 선택한 경우)
+    if (taggedInboxes != null && taggedInboxes.isNotEmpty) {
+      combinedInboxes.addAll(taggedInboxes);
     }
 
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
@@ -452,35 +450,34 @@ class AgentActionController extends _$AgentActionController {
       // 첫 메시지인지 확인 (user 메시지 1개만 있는 경우)
       final isFirstMessage = messages.length == 1 && messages.first.role == 'user';
 
-      // Project context 가져오기
-      final projectContext = await _buildProjectContext(selectedProject);
+      // 초기 context는 제공하지 않음 - AI가 필요한 context를 감지하여 검색 함수 호출
+      // Project context는 제공하지 않음 (계획에 따라 초기 context 제거)
+      String projectContext = '';
+      String taggedContext = '';
+      String? channelContext;
+      String? inboxContext; // 사용자가 명시적으로 선택한 inbox가 있는 경우에만 설정됨
 
       // Projects 리스트 가져오기 (Available Projects 리스트 제공용)
       final projects = ref.read(projectListControllerProvider);
       final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
 
-      // 태그된 항목들을 컨텍스트로 제공
-      final taggedContext = _buildTaggedContext(taggedTasks: taggedTasks, taggedEvents: taggedEvents, taggedConnections: taggedConnections);
+      // 명시적으로 태그된 항목이 있는 경우에만 context 추가 (사용자가 직접 선택한 경우)
+      if (taggedTasks != null && taggedTasks.isNotEmpty || taggedEvents != null && taggedEvents.isNotEmpty || taggedConnections != null && taggedConnections.isNotEmpty) {
+        taggedContext = _buildTaggedContext(taggedTasks: taggedTasks, taggedEvents: taggedEvents, taggedConnections: taggedConnections);
+      }
 
-      // 태그된 채널의 메시지 가져오기 (최근 3일)
-      String? channelContext;
+      // 명시적으로 태그된 채널이 있는 경우에만 context 추가
       if (taggedChannels != null && taggedChannels.isNotEmpty) {
         channelContext = await _buildChannelContext(taggedChannels);
       }
 
-      // 인박스 컨텍스트 가져오기
-      // 사용자 질문에서 자동 감지된 inbox가 있으면 첫 요청부터 전체 내용 포함
-      String? inboxContext;
+      // 명시적으로 제공된 inbox가 있는 경우에만 context 추가 (사용자가 직접 선택한 경우)
+      // 초기 context는 제공하지 않음 - AI가 필요한 context를 감지하여 검색 함수 호출
+      // 사용자가 명시적으로 선택한 inbox가 있는 경우에만 context 추가
       if (inboxes != null && inboxes.isNotEmpty) {
         final requestedNumbers = state.loadedInboxNumbers;
         final summaryOnly = requestedNumbers.isEmpty;
-        // 첨부 파일 정보는 항상 포함 (AI가 판단할 수 있도록)
-        inboxContext = await _buildInboxContext(
-          inboxes,
-          summaryOnly: summaryOnly,
-          requestedInboxNumbers: requestedNumbers,
-          includeAttachmentInfo: true, // 항상 첨부 파일 정보 포함하여 AI가 판단하도록
-        );
+        inboxContext = await _buildInboxContext(inboxes, summaryOnly: summaryOnly, requestedInboxNumbers: requestedNumbers, includeAttachmentInfo: true);
       }
 
       // API 키 선택: useUserApiKey가 true이면 사용자 API 키, false이면 환경 변수 API 키
@@ -643,6 +640,10 @@ class AgentActionController extends _$AgentActionController {
         enhancedUserMessage = enhancedUserMessage + contextSuffix;
       }
 
+      print('[AgentChat] AI 호출 시작. 재귀 호출: $isRecursiveCall');
+      print(
+        '[AgentChat] Context 정보 - projectContext: ${projectContext.length}자, taggedContext: ${taggedContext.length}자, channelContext: ${channelContext?.length ?? 0}자, inboxContext: ${inboxContext?.length ?? 0}자',
+      );
       final response = await _repository.generateGeneralChat(
         userMessage: enhancedUserMessage,
         conversationHistory: filteredHistory,
@@ -656,6 +657,7 @@ class AgentActionController extends _$AgentActionController {
         userId: userId,
         systemPrompt: systemPrompt,
       );
+      print('[AgentChat] AI 호출 완료');
 
       final aiResponse = response.fold((failure) {
         // 크레딧 부족 예외 처리
@@ -683,8 +685,10 @@ class AgentActionController extends _$AgentActionController {
         return null;
       }, (response) => response);
 
+      print('[AgentChat] AI 응답 수신: ${aiResponse != null ? '있음' : '없음'}');
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
+        print('[AgentChat] AI 메시지 길이: ${aiMessage.length}자');
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
@@ -728,6 +732,11 @@ class AgentActionController extends _$AgentActionController {
         // MCP 함수 호출 감지 및 실행
         final executor = McpFunctionExecutor();
         final allFunctionCalls = executor.parseFunctionCalls(aiMessage);
+
+        print('[AgentChat] AI 응답 파싱 완료. 함수 호출 개수: ${allFunctionCalls.length}');
+        if (allFunctionCalls.isNotEmpty) {
+          print('[AgentChat] 함수 호출 목록: ${allFunctionCalls.map((c) => c['function']).join(', ')}');
+        }
 
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
@@ -776,31 +785,204 @@ class AgentActionController extends _$AgentActionController {
           var updatedAvailableInboxes = availableInboxes;
           var updatedLoadedInboxNumbers = state.loadedInboxNumbers;
 
-          // 확인이 필요한 함수 목록 (DB 쓰기, 전송, 삭제, 수정 등)
-          final functionsRequiringConfirmation = {
-            // 전송 관련
-            'sendMail',
-            'replyMail',
-            'forwardMail',
-            // 삭제 관련
-            'deleteTask',
-            'deleteEvent',
-            'deleteMail',
-            // 수정 관련
-            'updateTask',
-            'updateEvent',
-            // 상태 변경
-            'markMailAsRead',
-            'markMailAsUnread',
-            'archiveMail',
-            'responseCalendarInvitation',
-            // 생성 (DB에 쓰는 작업)
-            'createTask',
-            'createEvent',
-          };
+          // MCP 함수 실행기 인스턴스 생성
+          final executor = McpFunctionExecutor();
+
+          // 검색 함수와 일반 함수 분리
+          // 검색 함수: searchInbox, searchTask, searchCalendarEvent
+          // 읽기 전용 함수: getInboxDetails (검색 결과를 가져오는 함수이므로 검색 함수와 함께 처리)
+          final searchFunctionCalls = <Map<String, dynamic>>[];
+          final otherFunctionCalls = <Map<String, dynamic>>[];
+
+          for (final call in functionCalls) {
+            final functionName = call['function'] as String? ?? '';
+            if (functionName == 'searchInbox' || functionName == 'searchTask' || functionName == 'searchCalendarEvent' || functionName == 'getInboxDetails') {
+              searchFunctionCalls.add(call);
+            } else {
+              otherFunctionCalls.add(call);
+            }
+          }
+
+          // 검색 함수를 먼저 처리 (silent 실행)
+          print('[AgentChat] 검색 함수 개수: ${searchFunctionCalls.length}, 일반 함수 개수: ${otherFunctionCalls.length}, 재귀 호출: $isRecursiveCall');
+          if (searchFunctionCalls.isNotEmpty && !isRecursiveCall) {
+            print('[AgentChat] 검색 함수 처리 시작');
+            String? searchContext;
+
+            for (final searchCall in searchFunctionCalls) {
+              final functionName = searchCall['function'] as String;
+              var functionArgs = searchCall['arguments'] as Map<String, dynamic>;
+
+              // 태그된 항목들을 자동으로 파라미터에 추가
+              functionArgs = _enrichFunctionArgsWithTaggedItems(
+                functionName: functionName,
+                args: functionArgs,
+                taggedTasks: updatedTaggedTasks,
+                taggedEvents: updatedTaggedEvents,
+                taggedConnections: taggedConnections,
+                availableInboxes: updatedAvailableInboxes,
+              );
+
+              // 크레딧 정보를 함수 인자에 추가
+              functionArgs['_remaining_credits'] = remainingCredits;
+
+              // 검색 함수 실행
+              final tabType = _getTabTypeForFunction(functionName);
+              final result = await executor.executeFunction(
+                functionName,
+                functionArgs,
+                tabType: tabType,
+                availableTasks: updatedTaggedTasks,
+                availableEvents: updatedTaggedEvents,
+                availableConnections: taggedConnections,
+                availableInboxes: updatedAvailableInboxes,
+                remainingCredits: remainingCredits,
+              );
+
+              // 검색 결과 처리
+              print('[AgentChat] 검색 함수 실행 완료: $functionName, success: ${result['success']}, results: ${result['results'] != null ? (result['results'] as List?)?.length : 0}');
+              if (result['success'] == true && result['results'] != null) {
+                final searchResults = result['results'] as List<dynamic>?;
+                print('[AgentChat] 검색 결과: ${searchResults?.length ?? 0}개');
+                if (searchResults != null && searchResults.isNotEmpty) {
+                  // 검색 결과를 silent 메시지로 추가
+                  final silentMessage = AgentActionMessage(role: 'assistant', content: '[검색 완료: ${searchResults.length}개의 결과를 찾았습니다]', excludeFromHistory: true);
+                  final updatedMessagesWithSearch = [...messages, silentMessage];
+                  state = state.copyWith(messages: updatedMessagesWithSearch);
+
+                  // 검색 결과를 context로 변환
+                  String? currentSearchContext;
+                  if (functionName == 'searchInbox') {
+                    currentSearchContext = await _buildInboxContextFromSearchResults(searchResults);
+                    // 검색된 inbox를 availableInboxes에 추가
+                    // 검색 결과는 inboxControllerProvider에 반영되어 있으므로, 거기서 찾아서 추가
+                    final searchResultInboxes = <InboxEntity>[];
+                    final searchResultNumbers = <int>{};
+                    final inboxList = ref.read(inboxControllerProvider);
+                    final allInboxes = inboxList?.inboxes ?? [];
+
+                    for (final resultItem in searchResults) {
+                      if (resultItem is Map<String, dynamic>) {
+                        final inboxId = resultItem['id'] as String?;
+                        final inboxNumber = resultItem['number'] as int?;
+                        if (inboxId != null) {
+                          // 먼저 updatedAvailableInboxes에서 찾기
+                          var foundInbox = updatedAvailableInboxes?.firstWhereOrNull((inbox) => inbox.id == inboxId);
+                          // 없으면 inboxControllerProvider에서 찾기
+                          if (foundInbox == null) {
+                            foundInbox = allInboxes.firstWhereOrNull((inbox) => inbox.id == inboxId);
+                          }
+                          if (foundInbox != null) {
+                            searchResultInboxes.add(foundInbox);
+                            if (inboxNumber != null) {
+                              searchResultNumbers.add(inboxNumber);
+                            }
+                          }
+                        }
+                      }
+                    }
+                    if (searchResultInboxes.isNotEmpty) {
+                      final existingIds = updatedAvailableInboxes?.map((e) => e.id).toSet() ?? {};
+                      final newInboxes = searchResultInboxes.where((e) => !existingIds.contains(e.id)).toList();
+                      updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
+                      updatedLoadedInboxNumbers = {...updatedLoadedInboxNumbers, ...searchResultNumbers};
+                    }
+                  } else if (functionName == 'searchTask') {
+                    currentSearchContext = _buildTaskContextFromSearchResults(searchResults);
+                    // 검색된 task를 taggedTasks에 추가
+                    final searchResultTasks = <TaskEntity>[];
+                    for (final resultItem in searchResults) {
+                      if (resultItem is Map<String, dynamic>) {
+                        final taskId = resultItem['id'] as String?;
+                        if (taskId != null) {
+                          final allTasks = ref.read(taskListControllerProvider).tasks;
+                          final foundTask = allTasks.firstWhereOrNull((task) => task.id == taskId && !task.isEventDummyTask);
+                          if (foundTask != null) {
+                            searchResultTasks.add(foundTask);
+                          }
+                        }
+                      }
+                    }
+                    if (searchResultTasks.isNotEmpty) {
+                      final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
+                      final newTasks = searchResultTasks.where((e) => !existingIds.contains(e.id)).toList();
+                      updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
+                    }
+                  } else if (functionName == 'searchCalendarEvent') {
+                    currentSearchContext = _buildEventContextFromSearchResults(searchResults);
+                    // 검색된 event를 taggedEvents에 추가
+                    final searchResultEvents = <EventEntity>[];
+                    for (final resultItem in searchResults) {
+                      if (resultItem is Map<String, dynamic>) {
+                        final eventId = resultItem['id'] as String? ?? resultItem['uniqueId'] as String?;
+                        if (eventId != null) {
+                          final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+                          final foundEvent = allEvents.firstWhereOrNull((event) => event.eventId == eventId || event.uniqueId == eventId);
+                          if (foundEvent != null) {
+                            searchResultEvents.add(foundEvent);
+                          }
+                        }
+                      }
+                    }
+                    if (searchResultEvents.isNotEmpty) {
+                      final existingIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+                      final newEvents = searchResultEvents.where((e) => !existingIds.contains(e.uniqueId)).toList();
+                      updatedTaggedEvents = [...(updatedTaggedEvents ?? []), ...newEvents];
+                    }
+                  }
+
+                  // 검색 결과를 context에 추가
+                  print('[AgentChat] 검색 결과 context 생성: ${currentSearchContext?.length ?? 0}자');
+                  if (currentSearchContext != null && currentSearchContext.isNotEmpty) {
+                    searchContext = searchContext == null ? currentSearchContext : '$searchContext\n\n$currentSearchContext';
+                  }
+                } else {
+                  print('[AgentChat] 검색 결과가 비어있음');
+                }
+              } else {
+                print('[AgentChat] 검색 함수 실행 실패: ${result['error']}');
+              }
+            }
+
+            // 검색 결과를 context로 추가하여 AI 재호출
+            print('[AgentChat] 검색 context 최종 확인: ${searchContext?.length ?? 0}자');
+            if (searchContext != null && searchContext.isNotEmpty) {
+              print('[AgentChat] AI 재호출 시작 (검색 결과 포함)');
+              // 검색 결과를 context로 추가하여 재호출
+              await _generateGeneralChat(
+                userMessage,
+                selectedProject: selectedProject,
+                updatedMessages: messages,
+                taggedTasks: updatedTaggedTasks,
+                taggedEvents: updatedTaggedEvents,
+                taggedConnections: taggedConnections,
+                taggedChannels: taggedChannels,
+                taggedProjects: taggedProjects,
+                inboxes: updatedAvailableInboxes,
+                files: files,
+                isRecursiveCall: true, // 재귀 호출 플래그 설정
+              );
+              print('[AgentChat] AI 재호출 완료 (검색 결과 포함)');
+              return; // 검색 함수 처리 후 종료
+            } else {
+              print('[AgentChat] 검색 context가 비어있어 재호출하지 않음');
+            }
+          } else {
+            print('[AgentChat] 검색 함수가 없거나 재귀 호출이므로 일반 함수 처리');
+          }
+
+          // 검색 함수가 없거나 재귀 호출인 경우, 일반 함수 처리
+          final functionCallsToProcess = isRecursiveCall ? functionCalls : otherFunctionCalls;
+          print('[AgentChat] 처리할 함수 호출 개수: ${functionCallsToProcess.length}');
+
+          if (functionCallsToProcess.isEmpty) {
+            print('[AgentChat] 처리할 함수가 없어 종료');
+            // 검색 함수만 있었고 이미 처리되었으므로 종료
+            return;
+          }
 
           // 함수 호출을 의존성에 따라 그룹화
-          final executionGroups = _groupFunctionCalls(functionCalls);
+          final executionGroups = _groupFunctionCalls(functionCallsToProcess);
 
           // 모든 그룹의 결과를 수집할 리스트
           final allGroupResults = <Map<String, dynamic>?>[];
@@ -826,8 +1008,8 @@ class AgentActionController extends _$AgentActionController {
                 // 크레딧 정보를 함수 인자에 추가하여 크레딧을 넘기는 작업 방지
                 functionArgs['_remaining_credits'] = remainingCredits;
 
-                // 확인이 필요한 함수인지 체크
-                final requiresConfirmation = functionsRequiringConfirmation.contains(functionName);
+                // 확인이 필요한 함수인지 체크 (McpFunctionExecutor의 메서드 사용)
+                final requiresConfirmation = executor.requiresConfirmation(functionName);
 
                 if (requiresConfirmation) {
                   // 확인이 필요한 함수는 실행하지 않고 pendingFunctionCalls에 저장
@@ -844,7 +1026,7 @@ class AgentActionController extends _$AgentActionController {
                     'action_id': actionId,
                     'function_name': functionName,
                     'function_args': functionArgs,
-                    'index': functionCalls.indexOf(functionCall),
+                    'index': functionCallsToProcess.indexOf(functionCall),
                     'message_index': targetMessageIndex, // 메시지 인덱스 저장
                     'updated_tagged_tasks': updatedTaggedTasks,
                     'updated_tagged_events': updatedTaggedEvents,
@@ -1182,8 +1364,12 @@ class AgentActionController extends _$AgentActionController {
           _saveChatHistory(taggedProjects: taggedProjects);
         } else {
           // 일반 응답
+          print('[AgentChat] 일반 응답 처리 시작. 메시지 길이: ${aiMessage.length}자');
+          print('[AgentChat] 현재 messages 개수: ${messages.length}');
           final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
           final updatedMessagesWithResponse = [...messages, assistantMessage];
+          print('[AgentChat] Assistant 메시지 추가 완료. 총 메시지 개수: ${updatedMessagesWithResponse.length}');
+          print('[AgentChat] Assistant 메시지 내용 (처음 100자): ${aiMessage.length > 100 ? aiMessage.substring(0, 100) : aiMessage}');
 
           // AI 응답에서 <need_attachment> 태그 파싱하여 첨부 파일 다운로드
           if (!isRecursiveCall && inboxes != null && inboxes.isNotEmpty) {
@@ -1208,54 +1394,12 @@ class AgentActionController extends _$AgentActionController {
             }
           }
 
-          // need_more_action 태그 파싱 (기존 로직 유지)
-          if (!isRecursiveCall) {
-            final needMoreActionData = _parseNeedMoreActionTag(aiMessage);
-
-            if (needMoreActionData != null && inboxes != null && inboxes.isNotEmpty) {
-              // 태그에서 inbox 번호 추출
-              Set<int> allRequestedNumbers = needMoreActionData['inbox_numbers'] as Set<int>? ?? {};
-
-              // 룰베이스 제거: 키워드 기반 자동 감지 제거, AI가 태그로 명시적으로 요청할 때만 처리
-
-              if (allRequestedNumbers.isNotEmpty) {
-                // 요청된 inbox 번호가 유효한지 확인 (1부터 inboxes.length까지)
-                final validNumbers = allRequestedNumbers.where((num) => num > 0 && num <= inboxes.length).toSet();
-
-                // 이미 로드한 inbox는 제외
-                final newNumbers = validNumbers.difference(state.loadedInboxNumbers);
-
-                if (newNumbers.isNotEmpty) {
-                  // 요청된 inbox의 전체 내용을 포함하여 재요청
-                  final updatedLoadedNumbers = {...state.loadedInboxNumbers, ...newNumbers};
-                  // 첫 번째 응답 메시지는 아직 state에 저장하지 않음 (재귀 호출에서 최종 메시지로 대체될 예정)
-                  state = state.copyWith(loadedInboxNumbers: updatedLoadedNumbers, isLoading: true);
-
-                  // 재요청 (같은 사용자 메시지로, _generateGeneralChat 직접 호출)
-                  // 재귀 호출에서는 첫 번째 응답을 포함한 messages를 전달하되,
-                  // 재귀 호출 내부에서는 마지막 user 메시지를 사용하여 AI를 호출
-                  await _generateGeneralChat(
-                    userMessage,
-                    selectedProject: selectedProject,
-                    updatedMessages: updatedMessagesWithResponse, // 첫 번째 응답 포함하여 재귀 호출에 전달
-                    taggedTasks: taggedTasks,
-                    taggedEvents: taggedEvents,
-                    taggedConnections: taggedConnections,
-                    taggedChannels: taggedChannels,
-                    taggedProjects: taggedProjects,
-                    inboxes: inboxes, // 같은 인박스 목록 사용 (전체 내용 포함)
-                    isRecursiveCall: true, // 재귀 호출 플래그 설정
-                  );
-                  // 재귀 호출 완료 후 첫 번째 호출 종료
-                  // 재귀 호출에서 이미 최종 메시지가 state에 저장되었으므로 추가 작업 불필요
-                  return;
-                }
-              }
-            }
-          }
+          // need_more_action 태그는 더 이상 필요하지 않음
+          // AI가 필요한 정보가 있으면 직접 MCP 함수를 호출할 수 있음 (searchInbox, getInboxDetails 등)
 
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
           if (isRecursiveCall) {
+            print('[AgentChat] 재귀 호출이므로 여기서 종료');
             // 재귀 호출 완료 시 로딩 상태 해제
             // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
             // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
@@ -1267,16 +1411,24 @@ class AgentActionController extends _$AgentActionController {
                     updatedMessagesWithResponse[2].role == 'assistant'
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
+            print('[AgentChat] 재귀 호출 - finalMessages 개수: ${finalMessages.length}');
             state = state.copyWith(messages: finalMessages, isLoading: false);
+            print('[AgentChat] 재귀 호출 - State 업데이트 완료. messages 개수: ${state.messages.length}');
             return;
           }
 
+          print('[AgentChat] 일반 응답 - State 업데이트 전. 현재 state messages 개수: ${state.messages.length}');
+          print('[AgentChat] 일반 응답 - 업데이트할 messages 개수: ${updatedMessagesWithResponse.length}');
           state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
+          print('[AgentChat] 일반 응답 - State 업데이트 완료. 새로운 state messages 개수: ${state.messages.length}');
+          print('[AgentChat] 일반 응답 - isLoading: ${state.isLoading}');
 
           // 히스토리 저장
           _saveChatHistory(taggedProjects: taggedProjects);
+          print('[AgentChat] 히스토리 저장 완료');
         }
       } else {
+        print('[AgentChat] AI 응답이 없음. State 업데이트');
         state = state.copyWith(messages: messages, isLoading: false);
         // 히스토리 저장
         _saveChatHistory(taggedProjects: taggedProjects);
@@ -1552,315 +1704,86 @@ class AgentActionController extends _$AgentActionController {
     return enrichedArgs;
   }
 
-  /// Project와 subproject의 task 정보를 context로 제공합니다.
-  /// project가 null인 경우 project filter 없이 모든 task와 event를 포함합니다.
-  Future<String> _buildProjectContext(ProjectEntity? project) async {
-    final projects = ref.read(projectListControllerProvider);
-    final tasks = ref.read(taskListControllerProvider.select((v) => v.tasks.where((t) => t.linkedEvent == null).toList()));
-    final events = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
-
-    // project가 null인 경우 project filter 없이 모든 task와 event를 포함
-    if (project == null) {
-      return _buildAllTasksAndEventsContext(tasks: tasks, events: events);
-    }
-
-    // Project와 subproject ID 찾기
-    final projectWithDepth = projects.sortedProjectWithDepth.firstWhereOrNull((p) => p.project.uniqueId == project.uniqueId);
-    if (projectWithDepth == null) {
-      return '';
-    }
-
-    final allProject = <ProjectEntity>{project};
-
-    // Subproject 찾기 - 기존 로직 사용 (isPointedProjectId)
-    final visitedIds = <String>{};
-    Set<ProjectEntity> findDescendants(String targetParentId) {
-      try {
-        // 무한 루프 방지
-        if (visitedIds.contains(targetParentId)) {
-          return {};
-        }
-        visitedIds.add(targetParentId);
-
-        // targetParentId에 해당하는 프로젝트 찾기
-        final targetProject = projects.firstWhereOrNull((p) => p.isPointedProjectId(targetParentId));
-
-        if (targetProject == null) {
-          return {};
-        }
-
-        // parentId가 targetProject를 가리키는 프로젝트들을 찾음
-        final childrenProjects = projects.where((p) => targetProject.isPointedProjectId(p.parentId)).toList();
-
-        if (childrenProjects.isEmpty) {
-          return {};
-        }
-
-        final descendants = <ProjectEntity>{...childrenProjects};
-        // 재귀적으로 하위 서브프로젝트도 찾음
-        for (final child in childrenProjects) {
-          descendants.addAll(findDescendants(child.uniqueId));
-        }
-        return descendants;
-      } catch (e) {
-        return {};
-      }
-    }
-
-    try {
-      final descendants = findDescendants(project.uniqueId);
-      allProject.addAll(descendants);
-    } catch (e) {
-      // Ignore exceptions
-    }
-
-    // 해당 project들의 task 필터링 - 엄격한 필터링
-    // projectId가 null이 아니고, allProject에 포함된 프로젝트인지 확인
-    final relevantTasks = tasks.where((t) {
-      if (t.projectId == null || t.isCancelled) return false;
-      return allProject.any((p) => p.isPointedProjectId(t.projectId));
-    }).toList();
-
-    // 태스크를 우선순위로 정렬: 진행 중인 태스크 > 최근 태스크 > 완료된 태스크
-    final sortedTasks = List<TaskEntity>.from(relevantTasks);
-    sortedTasks.sort((a, b) {
-      // 진행 중인 태스크 우선
-      if (a.status == TaskStatus.none && b.status == TaskStatus.done) return -1;
-      if (a.status == TaskStatus.done && b.status == TaskStatus.none) return 1;
-      // 최근 날짜 우선
-      final aDate = a.startAt ?? a.startDate;
-      final bDate = b.startAt ?? b.startDate;
-      return bDate.compareTo(aDate);
-    });
-
-    // 최대 100개 태스크만 포함 (토큰 제한 고려) - 최근 작업 우선
-    final limitedTasks = sortedTasks.take(100).toList();
-
-    // Context 문자열 생성 - 원시 데이터를 JSON 형태로 제공하여 AI가 분석하도록
+  /// 검색 결과로부터 인박스 컨텍스트를 생성합니다.
+  Future<String> _buildInboxContextFromSearchResults(List<dynamic> searchResults) async {
     final buffer = StringBuffer();
+    buffer.writeln('## 검색된 인박스 항목');
 
-    // 오늘 날짜를 timezone 포함해서 추가
-    final timezone = ref.read(timezoneProvider).value;
-    final now = DateTime.now();
-    final timezoneOffset = now.timeZoneOffset;
-    final timezoneOffsetHours = timezoneOffset.inHours;
-    final timezoneOffsetMinutes = timezoneOffset.inMinutes.remainder(60).abs();
-    final timezoneOffsetString =
-        '${timezoneOffsetHours >= 0 ? '+' : '-'}${timezoneOffsetHours.abs().toString().padLeft(2, '0')}:${timezoneOffsetMinutes.toString().padLeft(2, '0')}';
-    final todayString =
-        '${now.toIso8601String().split('T')[0]}T${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}$timezoneOffsetString';
-    buffer.writeln('Current Date and Time: $todayString (Timezone: $timezone)');
-    buffer.writeln('');
+    for (final result in searchResults.take(10)) {
+      if (result is Map<String, dynamic>) {
+        final title = result['title'] as String? ?? '';
+        final description = result['description'] as String? ?? '';
+        final sender = result['sender'] as String? ?? '';
+        final inboxId = result['id'] as String?;
 
-    buffer.writeln('Current Project: ${project.name}');
-    if (project.description != null && project.description!.isNotEmpty) {
-      buffer.writeln('Project Description: ${project.description}');
-    }
-
-    // 서브프로젝트 정보 추가
-    final subprojects = allProject.where((p) => p.uniqueId != project.uniqueId).toList();
-    if (subprojects.isNotEmpty) {
-      buffer.writeln('\nSubprojects:');
-      for (final subproject in subprojects) {
-        buffer.writeln('- ${subproject.name}${subproject.description != null && subproject.description!.isNotEmpty ? ': ${subproject.description}' : ''}');
+        if (inboxId != null) {
+          buffer.writeln('- Inbox ID: $inboxId');
+          if (title.isNotEmpty) buffer.writeln('  Title: $title');
+          if (sender.isNotEmpty) buffer.writeln('  Sender: $sender');
+          if (description.isNotEmpty) {
+            final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
+            buffer.writeln('  Description: $desc');
+          }
+          buffer.writeln('');
+        }
       }
     }
 
-    // 디버깅: 포함된 프로젝트 ID 목록 (개발용)
-    buffer.writeln('\n[DEBUG] Included Project IDs: ${allProject.map((p) => p.uniqueId).join(", ")}');
-    buffer.writeln('[DEBUG] Current Project ID: ${project.uniqueId}');
-    buffer.writeln('[DEBUG] Relevant tasks count: ${relevantTasks.length}');
-    buffer.writeln('[DEBUG] Limited tasks count: ${limitedTasks.length}');
-
-    // 태스크 통계 정보 추가 (전체 태스크 기준)
-    final doneTasks = relevantTasks.where((t) => t.status == TaskStatus.done).length;
-    final totalTasks = relevantTasks.length;
-    final limitedDoneTasks = limitedTasks.where((t) => t.status == TaskStatus.done).length;
-    final limitedTotalTasks = limitedTasks.length;
-
-    buffer.writeln('\nTask Statistics:');
-    buffer.writeln('- Total tasks: $totalTasks (showing ${limitedTotalTasks > 0 ? limitedTotalTasks : 0} most relevant below)');
-    buffer.writeln('- Completed: $doneTasks (${limitedDoneTasks > 0 ? limitedDoneTasks : 0} in the list below)');
-    buffer.writeln('- In progress: ${totalTasks - doneTasks} (${limitedTotalTasks - limitedDoneTasks} in the list below)');
-    if (relevantTasks.length > limitedTasks.length) {
-      buffer.writeln('- Note: Showing top ${limitedTasks.length} most relevant tasks below (sorted by priority and recency, out of ${totalTasks} total tasks)');
-    }
-
-    // 제한된 태스크를 원시 데이터 형태로 제공 (AI가 필터링, 통계, 분석 수행)
-    if (limitedTasks.isNotEmpty) {
-      // 추가 검증: allProject에 포함된 작업만 포함
-      final validProjectNames = allProject.map((p) => p.name).toSet();
-
-      buffer.writeln('\nTasks in this project and subprojects (raw data for AI analysis):');
-      buffer.writeln(
-        'CRITICAL: All tasks listed below MUST belong to the Current Project "${project.name}" or its subprojects listed above. Valid project names are: ${validProjectNames.join(", ")}',
-      );
-      buffer.writeln('Do NOT include tasks from other projects that are not listed in the Subprojects section.');
-      buffer.writeln('Analyze these tasks, filter out irrelevant ones (like dummy tasks, original recurrence tasks), calculate statistics, and provide insights.');
-      buffer.writeln(
-        'IMPORTANT: The task list below contains ${limitedTasks.length} tasks sorted by priority and recency. Use these actual tasks to answer questions about the project. Each task includes a "projectName" field - ONLY use tasks where projectName is "${project.name}" or matches one of the subprojects listed above. If a task has a different projectName, it should be excluded from your response.',
-      );
-
-      // JSON 형태로 구조화된 데이터 제공 (간소화된 정보만)
-      // 한 번 더 필터링하여 allProject에 포함된 작업만 포함
-      final tasksJson = limitedTasks
-          .where((task) {
-            if (task.projectId == null) return false;
-            // allProject에 포함된 프로젝트인지 확인
-            return allProject.any((p) => p.isPointedProjectId(task.projectId));
-          })
-          .map((task) {
-            final taskProject = allProject.where((p) => p.isPointedProjectId(task.projectId)).firstOrNull;
-            return {
-              'id': task.id,
-              'title': task.title ?? 'Untitled',
-              'status': task.status.name,
-              'isDone': task.status == TaskStatus.done,
-              'isOriginalRecurrenceTask': task.isOriginalRecurrenceTask,
-              'isEventDummyTask': task.isEventDummyTask,
-              'startAt': task.startAt?.toIso8601String(),
-              'endAt': task.endAt?.toIso8601String(),
-              'projectName': taskProject?.name,
-              'projectId': task.projectId, // 디버깅용
-            };
-          })
-          .toList();
-
-      buffer.writeln('[DEBUG] Tasks JSON count: ${tasksJson.length}');
-
-      buffer.writeln(jsonEncode(tasksJson));
-    } else {
-      buffer.writeln('\nNo tasks found in this project and subprojects.');
-      buffer.writeln('Note: Even though the statistics above show ${totalTasks} total tasks, no tasks matched the filtering criteria or all tasks were filtered out.');
-    }
-
-    final contextString = buffer.toString();
-    return contextString;
+    return buffer.toString();
   }
 
-  /// project filter 없이 모든 task와 event를 context로 제공합니다.
-  Future<String> _buildAllTasksAndEventsContext({required List<TaskEntity> tasks, required List<EventEntity> events}) async {
-    final projects = ref.read(projectListControllerProvider);
-
-    // 모든 task 필터링 (cancelled 제외)
-    final relevantTasks = tasks.where((t) => !t.isCancelled).toList();
-
-    // 태스크를 우선순위로 정렬: 진행 중인 태스크 > 최근 태스크 > 완료된 태스크
-    final sortedTasks = List<TaskEntity>.from(relevantTasks);
-    sortedTasks.sort((a, b) {
-      // 진행 중인 태스크 우선
-      if (a.status == TaskStatus.none && b.status == TaskStatus.done) return -1;
-      if (a.status == TaskStatus.done && b.status == TaskStatus.none) return 1;
-      // 최근 날짜 우선
-      final aDate = a.startAt ?? a.startDate;
-      final bDate = b.startAt ?? b.startDate;
-      return bDate.compareTo(aDate);
-    });
-
-    // 최대 100개 태스크만 포함 (토큰 제한 고려) - 최근 작업 우선
-    final limitedTasks = sortedTasks.take(100).toList();
-
-    // 이벤트를 날짜순으로 정렬
-    final sortedEvents = List<EventEntity>.from(events);
-    sortedEvents.sort((a, b) {
-      return b.startDate.compareTo(a.startDate);
-    });
-
-    // 최대 100개 이벤트만 포함 (토큰 제한 고려) - 최근 이벤트 우선
-    final limitedEvents = sortedEvents.take(100).toList();
-
-    // Context 문자열 생성
+  /// 검색 결과로부터 태스크 컨텍스트를 생성합니다.
+  String _buildTaskContextFromSearchResults(List<dynamic> searchResults) {
     final buffer = StringBuffer();
+    buffer.writeln('## 검색된 태스크');
 
-    // 오늘 날짜를 timezone 포함해서 추가
-    final timezone = ref.read(timezoneProvider).value;
-    final now = DateTime.now();
-    final timezoneOffset = now.timeZoneOffset;
-    final timezoneOffsetHours = timezoneOffset.inHours;
-    final timezoneOffsetMinutes = timezoneOffset.inMinutes.remainder(60).abs();
-    final timezoneOffsetString =
-        '${timezoneOffsetHours >= 0 ? '+' : '-'}${timezoneOffsetHours.abs().toString().padLeft(2, '0')}:${timezoneOffsetMinutes.toString().padLeft(2, '0')}';
-    final todayString =
-        '${now.toIso8601String().split('T')[0]}T${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}$timezoneOffsetString';
-    buffer.writeln('Current Date and Time: $todayString (Timezone: $timezone)');
-    buffer.writeln('');
+    for (final result in searchResults.take(10)) {
+      if (result is Map<String, dynamic>) {
+        final taskId = result['id'] as String?;
+        final title = result['title'] as String? ?? '';
+        final description = result['description'] as String? ?? '';
+        final status = result['status'] as String? ?? '';
 
-    buffer.writeln('All Tasks and Events (No Project Filter)');
-
-    // 태스크 통계 정보 추가
-    final doneTasks = relevantTasks.where((t) => t.status == TaskStatus.done).length;
-    final totalTasks = relevantTasks.length;
-    final limitedDoneTasks = limitedTasks.where((t) => t.status == TaskStatus.done).length;
-    final limitedTotalTasks = limitedTasks.length;
-
-    buffer.writeln('\nTask Statistics:');
-    buffer.writeln('- Total tasks: $totalTasks (showing ${limitedTotalTasks > 0 ? limitedTotalTasks : 0} most relevant below)');
-    buffer.writeln('- Completed: $doneTasks (${limitedDoneTasks > 0 ? limitedDoneTasks : 0} in the list below)');
-    buffer.writeln('- In progress: ${totalTasks - doneTasks} (${limitedTotalTasks - limitedDoneTasks} in the list below)');
-    if (relevantTasks.length > limitedTasks.length) {
-      buffer.writeln('- Note: Showing top ${limitedTasks.length} most relevant tasks below (sorted by priority and recency, out of ${totalTasks} total tasks)');
+        if (taskId != null) {
+          buffer.writeln('- Task ID: $taskId');
+          if (title.isNotEmpty) buffer.writeln('  Title: $title');
+          if (description.isNotEmpty) {
+            final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
+            buffer.writeln('  Description: $desc');
+          }
+          if (status.isNotEmpty) buffer.writeln('  Status: $status');
+          buffer.writeln('');
+        }
+      }
     }
 
-    buffer.writeln('\nEvent Statistics:');
-    buffer.writeln('- Total events: ${events.length} (showing ${limitedEvents.length} most recent below)');
+    return buffer.toString();
+  }
 
-    // 제한된 태스크를 원시 데이터 형태로 제공
-    if (limitedTasks.isNotEmpty) {
-      buffer.writeln('\nAll Tasks (raw data for AI analysis):');
-      buffer.writeln('CRITICAL: These are ALL tasks across all projects. No project filtering has been applied.');
-      buffer.writeln('Analyze these tasks, filter out irrelevant ones (like dummy tasks, original recurrence tasks), calculate statistics, and provide insights.');
+  /// 검색 결과로부터 이벤트 컨텍스트를 생성합니다.
+  String _buildEventContextFromSearchResults(List<dynamic> searchResults) {
+    final buffer = StringBuffer();
+    buffer.writeln('## 검색된 이벤트');
 
-      final tasksJson = limitedTasks.map((task) {
-        final taskProject = task.projectId != null ? projects.firstWhereOrNull((p) => p.isPointedProjectId(task.projectId)) : null;
-        return {
-          'id': task.id,
-          'title': task.title ?? 'Untitled',
-          'status': task.status.name,
-          'isDone': task.status == TaskStatus.done,
-          'isOriginalRecurrenceTask': task.isOriginalRecurrenceTask,
-          'isEventDummyTask': task.isEventDummyTask,
-          'startAt': task.startAt?.toIso8601String(),
-          'endAt': task.endAt?.toIso8601String(),
-          'projectName': taskProject?.name,
-          'projectId': task.projectId,
-        };
-      }).toList();
+    for (final result in searchResults.take(10)) {
+      if (result is Map<String, dynamic>) {
+        final eventId = result['id'] as String? ?? result['uniqueId'] as String?;
+        final title = result['title'] as String? ?? '';
+        final description = result['description'] as String? ?? '';
 
-      buffer.writeln(jsonEncode(tasksJson));
-    } else {
-      buffer.writeln('\nNo tasks found.');
+        if (eventId != null) {
+          buffer.writeln('- Event ID: $eventId');
+          if (title.isNotEmpty) buffer.writeln('  Title: $title');
+          if (description.isNotEmpty) {
+            final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
+            buffer.writeln('  Description: $desc');
+          }
+          buffer.writeln('');
+        }
+      }
     }
 
-    // 제한된 이벤트를 원시 데이터 형태로 제공
-    if (limitedEvents.isNotEmpty) {
-      buffer.writeln('\nAll Events (raw data for AI analysis):');
-      buffer.writeln('CRITICAL: These are ALL events across all calendars. No project filtering has been applied.');
-      buffer.writeln('Analyze these events and provide insights.');
-
-      final eventsJson = limitedEvents.map((event) {
-        return {
-          'id': event.eventId,
-          'title': event.title ?? 'Untitled',
-          'description': event.description,
-          'calendar_id': event.calendar.uniqueId,
-          'calendar_name': event.calendar.name,
-          'start_at': event.startDate.toIso8601String(),
-          'end_at': event.endDate.toIso8601String(),
-          'location': event.location,
-          'rrule': event.rrule?.toString(),
-          'attendees': event.attendees.map((a) => a.email).whereType<String>().toList(),
-          'conference_link': event.conferenceLink,
-          'isAllDay': event.isAllDay,
-        };
-      }).toList();
-
-      buffer.writeln(jsonEncode(eventsJson));
-    } else {
-      buffer.writeln('\nNo events found.');
-    }
-
-    final contextString = buffer.toString();
-    return contextString;
+    return buffer.toString();
   }
 
   /// 태그된 채널의 메시지를 컨텍스트로 제공합니다 (최근 3일).
@@ -2382,23 +2305,6 @@ class AgentActionController extends _$AgentActionController {
     }
 
     return attachmentFiles;
-  }
-
-  /// AI 응답에서 <need_more_action> 태그를 파싱합니다.
-  Map<String, dynamic>? _parseNeedMoreActionTag(String aiResponse) {
-    try {
-      final RegExp tagRegex = RegExp(r'<need_more_action>\s*(\{[^}]+\})\s*</need_more_action>', caseSensitive: false);
-      final match = tagRegex.firstMatch(aiResponse);
-      if (match == null) return null;
-
-      final jsonStr = match.group(1);
-      if (jsonStr == null) return null;
-
-      final jsonData = jsonDecode(jsonStr) as Map<String, dynamic>;
-      return jsonData;
-    } catch (e) {
-      return null;
-    }
   }
 
   /// 대화 시작 메시지의 summary를 생성합니다.

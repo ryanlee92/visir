@@ -839,7 +839,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
         .handleMessageWithoutAction(
           plainText,
           selectedProject: effectiveSelectedProject,
-          inboxes: widget.inboxes,
+          inboxes: null, // 초기 context는 제공하지 않음 - 사용자가 명시적으로 선택한 경우에만 전달
           taggedTasks: taggedTasks,
           taggedEvents: taggedEvents,
           taggedInboxes: taggedInboxes,

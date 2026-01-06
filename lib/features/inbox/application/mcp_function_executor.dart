@@ -40,6 +40,7 @@ import 'package:Visir/features/common/domain/entities/connection_entity.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dart';
+import 'package:Visir/features/inbox/application/inbox_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_list_controller.dart';
 import 'package:Visir/features/inbox/providers.dart';
@@ -54,6 +55,57 @@ import 'package:uuid/uuid.dart';
 /// MCP 함수 호출을 파싱하고 실행하는 클래스
 class McpFunctionExecutor {
   WidgetRef get ref => Utils.ref;
+
+  /// 함수 이름을 기반으로 confirm이 필요한지 판단합니다.
+  /// write/send 관련 함수만 confirm이 필요합니다.
+  bool requiresConfirmation(String functionName) {
+    // Confirm 필요한 함수 목록 (DB 쓰기, 전송, 삭제, 수정 등)
+    const functionsRequiringConfirmation = {
+      // 전송 관련
+      'sendMail',
+      'replyMail',
+      'replyAllMail',
+      'forwardMail',
+      // 삭제 관련
+      'deleteTask',
+      'deleteEvent',
+      'deleteMail',
+      'deleteMessage',
+      'deleteProject',
+      // 수정 관련
+      'updateTask',
+      'updateEvent',
+      'updateProject',
+      // 상태 변경
+      'markMailAsRead',
+      'markMailAsUnread',
+      'archiveMail',
+      'unarchiveMail',
+      'responseCalendarInvitation',
+      // 생성 (DB에 쓰는 작업)
+      'createTask',
+      'createEvent',
+      'createProject',
+      // 기타 데이터 변경 함수
+      'sendMessage',
+      'replyMessage',
+      'editMessage',
+      'moveTask',
+      'moveEvent',
+      'moveProject',
+      'pinInbox',
+      'unpinInbox',
+      'pinMail',
+      'unpinMail',
+      'markMailAsImportant',
+      'markMailAsNotImportant',
+      'spamMail',
+      'unspamMail',
+      'moveMailToLabel',
+    };
+
+    return functionsRequiringConfirmation.contains(functionName);
+  }
 
   /// AI 응답에서 함수 호출을 파싱합니다.
   /// OpenAI의 function calling 형식 또는 커스텀 JSON 형식을 지원합니다.
@@ -287,7 +339,7 @@ class McpFunctionExecutor {
         case 'getProjectDetails':
           return await _executeGetProjectDetails(arguments);
         case 'getInboxDetails':
-          return await _executeGetInboxDetails(arguments, tabType: tabType);
+          return await _executeGetInboxDetails(arguments, tabType: tabType, availableInboxes: availableInboxes);
         case 'listInboxes':
           return await _executeListInboxes(arguments, tabType: tabType);
 
@@ -610,13 +662,13 @@ class McpFunctionExecutor {
     if (availableTasks != null && availableTasks.isNotEmpty) {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
     if (task == null) {
       final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     if (task == null) {
       return {'success': false, 'error': 'Task not found'};
     }
@@ -692,13 +744,13 @@ class McpFunctionExecutor {
     if (availableTasks != null && availableTasks.isNotEmpty) {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
     if (task == null) {
       final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     if (task == null) {
       return {'success': false, 'error': 'Task not found'};
     }
@@ -726,13 +778,13 @@ class McpFunctionExecutor {
     if (availableTasks != null && availableTasks.isNotEmpty) {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
     if (task == null) {
       final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     if (task == null) {
       return {'success': false, 'error': 'Task not found'};
     }
@@ -2110,13 +2162,13 @@ class McpFunctionExecutor {
     if (availableTasks != null && availableTasks.isNotEmpty) {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
     if (task == null) {
       final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
-    
+
     if (task == null) {
       return {'success': false, 'error': 'Task not found'};
     }
@@ -2686,7 +2738,7 @@ class McpFunctionExecutor {
     }
   }
 
-  Future<Map<String, dynamic>> _executeGetInboxDetails(Map<String, dynamic> args, {required TabType tabType}) async {
+  Future<Map<String, dynamic>> _executeGetInboxDetails(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes}) async {
     final inboxId = args['inboxId'] as String?;
 
     if (inboxId == null || inboxId.isEmpty) {
@@ -2694,9 +2746,18 @@ class McpFunctionExecutor {
     }
 
     try {
-      final inboxList = ref.read(inboxListControllerProvider);
-      final inboxes = inboxList?.inboxes ?? [];
-      final inbox = inboxes.firstWhereOrNull((i) => i.id == inboxId);
+      // 먼저 availableInboxes에서 찾기 (검색 결과에서 온 경우)
+      InboxEntity? inbox;
+      if (availableInboxes != null && availableInboxes.isNotEmpty) {
+        inbox = availableInboxes.firstWhereOrNull((i) => i.id == inboxId);
+      }
+
+      // availableInboxes에서 찾지 못한 경우에만 inboxControllerProvider에서 찾기
+      if (inbox == null) {
+        final inboxList = ref.read(inboxControllerProvider);
+        final inboxes = inboxList?.inboxes ?? [];
+        inbox = inboxes.firstWhereOrNull((i) => i.id == inboxId);
+      }
 
       if (inbox == null) {
         return {'success': false, 'error': 'Inbox not found'};
@@ -2718,6 +2779,10 @@ class McpFunctionExecutor {
         'message': '인박스 정보를 가져왔습니다.',
       };
     } catch (e) {
+      // Provider가 dispose된 경우를 포함한 모든 에러 처리
+      if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
+        return {'success': false, 'error': 'Provider has been disposed'};
+      }
       return {'success': false, 'error': 'Failed to get inbox details: ${e.toString()}'};
     }
   }
@@ -2728,7 +2793,7 @@ class McpFunctionExecutor {
     final limit = args['limit'] as int?;
 
     try {
-      final inboxList = ref.read(inboxListControllerProvider);
+      final inboxList = ref.read(inboxControllerProvider);
       var inboxes = inboxList?.inboxes ?? [];
 
       // Filter by pinned status
@@ -2760,6 +2825,10 @@ class McpFunctionExecutor {
 
       return {'success': true, 'results': results, 'message': '${results.length}개의 인박스를 찾았습니다.'};
     } catch (e) {
+      // Provider가 dispose된 경우를 포함한 모든 에러 처리
+      if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
+        return {'success': false, 'error': 'Provider has been disposed'};
+      }
       return {'success': false, 'error': 'Failed to list inboxes: ${e.toString()}'};
     }
   }
@@ -3511,7 +3580,12 @@ class McpFunctionExecutor {
     }
   }
 
-  Future<Map<String, dynamic>> _executeLinkToProject(Map<String, dynamic> args, {required TabType tabType, List<InboxEntity>? availableInboxes, List<TaskEntity>? availableTasks}) async {
+  Future<Map<String, dynamic>> _executeLinkToProject(
+    Map<String, dynamic> args, {
+    required TabType tabType,
+    List<InboxEntity>? availableInboxes,
+    List<TaskEntity>? availableTasks,
+  }) async {
     final inboxId = args['inboxId'] as String?;
     final taskId = args['taskId'] as String?;
     final projectId = args['projectId'] as String?;
@@ -3530,13 +3604,7 @@ class McpFunctionExecutor {
       }
 
       final updatedTask = task.copyWith(projectId: projectId, updatedAt: DateTime.now());
-      await TaskAction.upsertTask(
-        task: updatedTask,
-        originalTask: task,
-        calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag,
-        tabType: tabType,
-        showToast: false,
-      );
+      await TaskAction.upsertTask(task: updatedTask, originalTask: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
       return {'success': true, 'taskId': updatedTask.id, 'message': 'Task moved to project successfully'};
     }
 
@@ -3612,15 +3680,15 @@ class McpFunctionExecutor {
     }
 
     try {
-      // Search inbox using inbox_list_controller
-      final inboxController = ref.read(inboxListControllerProvider.notifier);
+      // Search inbox using inbox_controller
+      final inboxController = ref.read(inboxControllerProvider.notifier);
       await inboxController.search(query: query);
 
       // Wait a bit for search to complete
       await Future.delayed(const Duration(milliseconds: 500));
 
       // Get search results
-      final inboxList = ref.read(inboxListControllerProvider);
+      final inboxList = ref.read(inboxControllerProvider);
       final searchResults = inboxList?.inboxes ?? [];
 
       // Limit results to 20
@@ -3643,6 +3711,10 @@ class McpFunctionExecutor {
 
       return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 인박스 항목을 찾았습니다.'};
     } catch (e) {
+      // Provider가 dispose된 경우를 포함한 모든 에러 처리
+      if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
+        return {'success': false, 'error': 'Provider has been disposed'};
+      }
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
   }
@@ -3922,7 +3994,7 @@ class McpFunctionExecutor {
     }
 
     try {
-      final inboxList = ref.read(inboxListControllerProvider);
+      final inboxList = ref.read(inboxControllerProvider);
       final inboxes = inboxList?.inboxes ?? [];
       final inbox = inboxes.firstWhereOrNull((i) => i.id == inboxId);
 
@@ -3943,6 +4015,10 @@ class McpFunctionExecutor {
       // Note: This might need to be implemented in inbox controller
       return {'success': false, 'error': 'Pinning not supported for this inbox type'};
     } catch (e) {
+      // Provider가 dispose된 경우를 포함한 모든 에러 처리
+      if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
+        return {'success': false, 'error': 'Provider has been disposed'};
+      }
       return {'success': false, 'error': 'Failed to pin inbox: ${e.toString()}'};
     }
   }
@@ -3955,7 +4031,7 @@ class McpFunctionExecutor {
     }
 
     try {
-      final inboxList = ref.read(inboxListControllerProvider);
+      final inboxList = ref.read(inboxControllerProvider);
       final inboxes = inboxList?.inboxes ?? [];
       final inbox = inboxes.firstWhereOrNull((i) => i.id == inboxId);
 
@@ -3975,6 +4051,10 @@ class McpFunctionExecutor {
       // For other inbox types, update locally
       return {'success': false, 'error': 'Unpinning not supported for this inbox type'};
     } catch (e) {
+      // Provider가 dispose된 경우를 포함한 모든 에러 처리
+      if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
+        return {'success': false, 'error': 'Provider has been disposed'};
+      }
       return {'success': false, 'error': 'Failed to unpin inbox: ${e.toString()}'};
     }
   }
