@@ -463,7 +463,6 @@ class MicrosoftApiHandler {
 
         if (statusCode == 429 && attempt < maxAttempts - 1) {
           final waitSeconds = _resolveRetryAfterSeconds(error, attempt);
-          debugPrint('Microsoft contacts rate limited. Retrying in ${waitSeconds}s (attempt ${attempt + 1}/$maxAttempts)');
           await Future.delayed(Duration(seconds: waitSeconds));
           attempt++;
           continue;
@@ -531,10 +530,8 @@ class MicrosoftApiHandler {
         return result;
       }
     } on DioException catch (error, stackTrace) {
-      debugPrint('Failed to fetch Microsoft contacts: ${error.message}');
       debugPrintStack(stackTrace: stackTrace);
     } catch (error, stackTrace) {
-      debugPrint('Failed to fetch Microsoft contacts: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
 

@@ -69,28 +69,21 @@ class GoogleApiHandler {
     required String redirectUrl,
     required String type,
   }) async {
-    debugPrint('[GoogleApiHandler.getCode] Starting - type: $type, redirectUrl: $redirectUrl, isWindows: ${PlatformX.isWindows}');
     Completer<Map<String, String?>> completer = Completer<Map<String, String?>>();
 
     if (PlatformX.isWindows) {
-      debugPrint('[GoogleApiHandler.getCode] Windows platform - setting up AppLinks listener');
       final appLinks = AppLinks();
       onGetCodeStream?.cancel();
       onGetCodeStream = appLinks.uriLinkStream.listen((uri) {
-        debugPrint('[GoogleApiHandler.getCode] Received URI: ${uri.toString()}');
         if (uri.toString().contains('com.wavetogether.fillin://google')) {
           String? code = uri.queryParameters['code'];
-          debugPrint('[GoogleApiHandler.getCode] Code from URI: $code');
           try {
             if (code != null) {
-              debugPrint('[GoogleApiHandler.getCode] Completing with code and redirect: $redirectUrl');
               onGetCodeStream?.cancel();
               completer.complete({'code': code, 'redirect': redirectUrl});
-            } else {
-              debugPrint('[GoogleApiHandler.getCode] ERROR: Code is null in URI');
             }
           } catch (e) {
-            debugPrint('[GoogleApiHandler.getCode] ERROR in Windows listener: $e');
+            // Error handling
           }
         }
       });
@@ -112,44 +105,33 @@ class GoogleApiHandler {
 
     final url = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', oauthParams);
 
-    debugPrint('[GoogleApiHandler.getCode] OAuth URL: ${url.toString()}');
-    debugPrint('[GoogleApiHandler.getCode] OAuth params: ${oauthParams.map((k, v) => MapEntry(k, k == 'client_id' ? v : (k == 'redirect_uri' ? v : '***')))}');
-    debugPrint('[GoogleApiHandler.getCode] callbackUrlScheme: ${PlatformX.isWindows || PlatformX.isWeb ? redirectUrl : callbackUrl}');
-
     FlutterWebAuth2.authenticate(
           url: url.toString(),
           callbackUrlScheme: PlatformX.isWindows || PlatformX.isWeb ? redirectUrl : callbackUrl,
           options: FlutterWebAuth2Options(intentFlags: ephemeralIntentFlags, useWebview: false),
         )
         .catchError((error) {
-          debugPrint('[GoogleApiHandler.getCode] FlutterWebAuth2 error: $error');
           if (PlatformX.isWindows) {
-            debugPrint('[GoogleApiHandler.getCode] Windows platform - returning error string');
             return error.toString();
           }
           completer.completeError(error);
           return error.toString();
         })
         .then((result) {
-          debugPrint('[GoogleApiHandler.getCode] FlutterWebAuth2 result: $result');
           if (PlatformX.isWindows) {
-            debugPrint('[GoogleApiHandler.getCode] Windows platform - skipping result processing');
             return;
           }
           final code = Uri.parse(result).queryParameters['code'];
-          debugPrint('[GoogleApiHandler.getCode] Extracted code: $code');
           try {
             if (code == null) {
-              debugPrint('[GoogleApiHandler.getCode] ERROR: Code is null in result');
               completer.completeError('Code is null');
               return;
             } else {
               final redirect = PlatformX.isWeb ? redirectUrl : '${callbackUrl}:/';
-              debugPrint('[GoogleApiHandler.getCode] Completing with code and redirect: $redirect');
               completer.complete({'code': code, 'redirect': redirect});
             }
           } catch (e) {
-            debugPrint('[GoogleApiHandler.getCode] ERROR processing result: $e');
+            // Error handling
           }
         });
 
@@ -157,7 +139,6 @@ class GoogleApiHandler {
   }
 
   static Future<OAuthEntity?> integrate(List<String> scope, String type) async {
-    debugPrint('[GoogleApiHandler.integrate] Starting integration - type: $type, scope: $scope');
     AccessToken? accessToken;
     String? refreshToken;
     String? serverCode;
@@ -166,14 +147,6 @@ class GoogleApiHandler {
     String? name;
 
     final clientId = await getClientId();
-    debugPrint('[GoogleApiHandler.integrate] ClientId: ${clientId.identifier}');
-    final secret = clientId.secret;
-    debugPrint('[GoogleApiHandler.integrate] ClientSecret: ${secret != null && secret.isNotEmpty ? 'present (${secret.length} chars)' : 'EMPTY or NULL'}');
-    debugPrint('[GoogleApiHandler.integrate] Platform: Windows=${PlatformX.isWindows}, Web=${PlatformX.isWeb}');
-    debugPrint('[GoogleApiHandler.integrate] Using Desktop Client ID: ${PlatformX.isWindows}');
-    debugPrint(
-      '[GoogleApiHandler.integrate] Desktop Secret from function: ${googleCliendSecretDesktop.isNotEmpty ? 'present (${googleCliendSecretDesktop.length} chars)' : 'EMPTY'}',
-    );
 
     final configFile = await rootBundle.loadString('assets/config/config.json');
     final env = Environment.fromJson(json.decode(configFile) as Map<String, dynamic>);
@@ -181,75 +154,47 @@ class GoogleApiHandler {
     final callDatetime = DateTime.now();
 
     final redirectUrl = GoogleApiHandler.redirectUrl(type);
-    debugPrint('[GoogleApiHandler.integrate] RedirectUrl: $redirectUrl, callbackUrl: $callbackUrl');
 
     final result = await getCode(clientId: clientId, env: env, scope: scope, callbackUrl: callbackUrl, type: type, redirectUrl: redirectUrl);
-    debugPrint('[GoogleApiHandler.integrate] getCode result: $result');
 
     final code = result['code'];
     final redirect = result['redirect'];
-    debugPrint('[GoogleApiHandler.integrate] Code: $code, Redirect: $redirect');
 
     if (code == null) {
-      debugPrint('[GoogleApiHandler.integrate] ERROR: Code is null!');
       return null;
     }
     if (redirect == null) {
-      debugPrint('[GoogleApiHandler.integrate] ERROR: Redirect is null!');
       return null;
     }
 
     final tokenUrl = Uri.https('oauth2.googleapis.com', 'token');
-    debugPrint('[GoogleApiHandler.integrate] Requesting token with code: $code, redirect_uri: $redirect');
-    debugPrint('[GoogleApiHandler.integrate] Token request details:');
-    debugPrint('  - client_id: ${clientId.identifier}');
-    debugPrint('  - client_secret: ${clientId.secret != null && clientId.secret!.isNotEmpty ? 'present (${clientId.secret!.length} chars)' : 'NULL or EMPTY'}');
-    debugPrint('  - redirect_uri: $redirect');
-    debugPrint('  - grant_type: authorization_code');
-    debugPrint('  - code length: ${code.length}');
 
     final tokenRequestBody = {'client_id': clientId.identifier, 'client_secret': clientId.secret ?? '', 'redirect_uri': redirect, 'grant_type': 'authorization_code', 'code': code};
-    debugPrint('[GoogleApiHandler.integrate] Token request body: ${tokenRequestBody.map((k, v) => MapEntry(k, k == 'client_secret' ? (v.isNotEmpty ? '***' : 'EMPTY') : v))}');
 
     final response = await http.post(tokenUrl, body: tokenRequestBody);
 
-    debugPrint('[GoogleApiHandler.integrate] Token response status: ${response.statusCode}');
-    debugPrint('[GoogleApiHandler.integrate] Token response body: ${response.body}');
-
     final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
-    debugPrint('[GoogleApiHandler.integrate] Parsed response body: $responseBody');
 
     final tokenType = responseBody['token_type'] as String?;
     final accessTokenStr = responseBody['access_token'] as String?;
     final expiresIn = responseBody['expires_in'] as int?;
     final refreshTokenStr = responseBody['refresh_token'] as String?;
 
-    debugPrint(
-      '[GoogleApiHandler.integrate] token_type: $tokenType, access_token: ${accessTokenStr != null ? 'present' : 'null'}, expires_in: $expiresIn, refresh_token: ${refreshTokenStr != null ? 'present' : 'null'}',
-    );
-
     if (tokenType == null || accessTokenStr == null || expiresIn == null) {
-      debugPrint('[GoogleApiHandler.integrate] ERROR: Missing required token fields');
       return null;
     }
 
     accessToken = AccessToken(tokenType, accessTokenStr, callDatetime.add(Duration(seconds: expiresIn)).toUtc());
     refreshToken = refreshTokenStr;
 
-    if (refreshToken == null) {
-      debugPrint('[GoogleApiHandler.integrate] WARNING: refresh_token is null');
-    }
     final rawServerCode = responseBody['server_code'] as String?;
-    debugPrint('[GoogleApiHandler.integrate] server_code: ${rawServerCode != null ? 'present' : 'null'}');
 
     if (rawServerCode != null) {
       try {
-        debugPrint('[GoogleApiHandler.integrate] Requesting server tokens with server_code');
         final tokenRes = await Supabase.instance.client.functions.invoke('get_google_server_tokens', body: {'server_code': rawServerCode});
         serverCode = jsonEncode(tokenRes.data);
-        debugPrint('[GoogleApiHandler.integrate] Server tokens received');
       } catch (e) {
-        debugPrint('[GoogleApiHandler.integrate] ERROR getting server tokens: $e');
+        // Error handling
       }
     }
 
@@ -257,13 +202,11 @@ class GoogleApiHandler {
     final baseClient = http.Client();
 
     final client = authenticatedClient(baseClient, _newCredentials);
-    debugPrint('[GoogleApiHandler.integrate] Fetching user info from People API');
 
     final value = await PeopleServiceApi(client).people.get('people/me', personFields: 'emailAddresses,names,photos');
     email = value.emailAddresses?.first.value;
     imageUrl = value.photos?.first.url;
     name = value.names?.first.displayName;
-    debugPrint('[GoogleApiHandler.integrate] User info - email: $email, name: $name, imageUrl: ${imageUrl != null ? 'present' : 'null'}');
 
     final notificationImage = await Utils.getNotificationImage(imageUrl: imageUrl, providerPath: type == 'mail' ? "assets/logos/logo_gmail.png" : "assets/logos/logo_gcal.png");
 
@@ -276,7 +219,6 @@ class GoogleApiHandler {
     }
 
     if (email != null) {
-      debugPrint('[GoogleApiHandler.integrate] Creating OAuthEntity with email: $email');
       final oauth = OAuthEntity(
         email: email,
         name: name,
@@ -287,11 +229,9 @@ class GoogleApiHandler {
         serverCode: serverCode,
         type: OAuthType.google,
       );
-      debugPrint('[GoogleApiHandler.integrate] Integration successful!');
       return oauth;
     }
 
-    debugPrint('[GoogleApiHandler.integrate] ERROR: Email is null, returning null');
     return null;
   }
 

@@ -2270,15 +2270,11 @@ class MainCalendarWidgetState extends ConsumerState<MainCalendarWidget> with Aut
         // Next Schedule 위젯 데이터 업데이트
         final nextScheduleIds = await Utils.updateNextScheduleWidgetData(ref: ref, result: result, events: newEvents, projects: ref.read(projectListControllerProvider));
         if (nextScheduleIds != null) {
-          final oldTaskId = _nextScheduleTaskId;
-          final oldEventId = _nextScheduleEventId;
           _nextScheduleTaskId = nextScheduleIds.taskId;
           _nextScheduleEventId = nextScheduleIds.eventId;
-          print('NextScheduleWidget: Updated IDs - taskId: $_nextScheduleTaskId, eventId: $_nextScheduleEventId (old: taskId=$oldTaskId, eventId=$oldEventId)');
         } else {
           _nextScheduleTaskId = null;
           _nextScheduleEventId = null;
-          print('NextScheduleWidget: Cleared IDs (no next schedule)');
         }
       });
     }

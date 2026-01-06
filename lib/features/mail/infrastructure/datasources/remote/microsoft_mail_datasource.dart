@@ -135,10 +135,8 @@ class MicrosoftMailDatasource implements MailDatasource {
         }
       }
     } on DioException catch (error, stackTrace) {
-      debugPrint('Failed to fetch Microsoft mail folders: ${error.message}');
       debugPrintStack(stackTrace: stackTrace);
     } catch (error, stackTrace) {
-      debugPrint('Failed to fetch Microsoft mail folders: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
 

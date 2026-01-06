@@ -588,13 +588,11 @@ class NotificationControllerInternal extends _$NotificationControllerInternal {
     final calNotificationImageEntries = <MapEntry<String, String>>[];
     linkedCalendars.forEach((o) {
       final calOauth = oauths.where((e) => e.email == o.email).firstOrNull;
-      debugPrint('############## updateLinkedCalendar calNotificationImage: calendar_id=${o.id}, email=${o.email}, notificationUrl=${calOauth?.notificationUrl}');
       if (calOauth?.notificationUrl != null) {
         calNotificationImageEntries.add(MapEntry(o.id, calOauth!.notificationUrl!));
       }
     });
     final calNotificationImage = Map<String, String>.fromEntries(calNotificationImageEntries);
-    debugPrint('############## updateLinkedCalendar calNotificationImage final: $calNotificationImage');
     final linkedCalendarIds = linkedCalendars.map((e) => e.id).toList()..sort((a, b) => a.compareTo(b));
 
     await repository.updateLinkedCalendar(

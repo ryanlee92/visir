@@ -22,7 +22,6 @@ class ScreenshotGenerator {
     try {
       return await controller.capture(delay: delay, pixelRatio: pixelRatio);
     } catch (e) {
-      debugPrint('스크린샷 캡처 실패: $e');
       return null;
     }
   }
@@ -64,7 +63,6 @@ class ScreenshotGenerator {
 
       return success;
     } catch (e) {
-      debugPrint('스크린샷 저장 실패: $e');
       Utils.showToast(
         ToastModel(
           message: TextSpan(text: '스크린샷 저장에 실패했습니다.'),
@@ -113,7 +111,6 @@ class ScreenshotGenerator {
 
       return true;
     } catch (e) {
-      debugPrint('클립보드 복사 실패: $e');
       Utils.showToast(
         ToastModel(
           message: TextSpan(text: '클립보드 복사에 실패했습니다.'),

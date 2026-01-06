@@ -184,12 +184,9 @@ class TaskAction {
     DateTime? startDate,
     bool showToast = true,
   }) async {
-    debugPrint('[TaskAction] upsertTask 시작: task.id=${task.id}, task.title=${task.title}, tabType=$tabType, originalTask=${originalTask?.id}');
-
     if (task.isUnscheduled) tabType = TabType.task;
 
     if (tabType == TabType.task) {
-      debugPrint('[TaskAction] upsertTask: taskListController.saveTask 호출, tabType=$tabType');
       await Utils.ref
           .read(taskListControllerProvider.notifier)
           .saveTask(
@@ -199,9 +196,7 @@ class TaskAction {
             selectedStartDate: selectedStartDate ?? originalTask?.startAt,
             selectedEndDate: selectedEndDate ?? originalTask?.endAt?.add(Duration(days: originalTask.isAllDay == true ? 1 : 0)),
           );
-      debugPrint('[TaskAction] upsertTask: taskListController.saveTask 완료');
     } else {
-      debugPrint('[TaskAction] upsertTask: calendarTaskListController.saveTask 호출, tabType=$tabType');
       await Utils.ref
           .read(calendarTaskListControllerProvider(tabType: tabType).notifier)
           .saveTask(
@@ -211,7 +206,6 @@ class TaskAction {
             selectedEndDate: selectedEndDate ?? originalTask?.endAt?.add(Duration(days: originalTask.isAllDay == true ? 1 : 0)),
             targetTab: tabType,
           );
-      debugPrint('[TaskAction] upsertTask: calendarTaskListController.saveTask 완료');
     }
 
     upsertLinkedTaskForInboxIfLinked(task);

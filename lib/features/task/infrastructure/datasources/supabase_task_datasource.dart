@@ -149,14 +149,10 @@ class SupabaseTaskDatasource extends TaskDatasource {
 
   @override
   Future<void> saveTask({required TaskEntity task}) async {
-    debugPrint('[SupabaseTaskDatasource] saveTask 시작: task.id=${task.id}, task.title=${task.title}');
     try {
       final json = task.toJson();
-      debugPrint('[SupabaseTaskDatasource] saveTask: DB upsert 호출 전, task.id=${task.id}');
       await client.from(taskDatabaseTable).upsert(json);
-      debugPrint('[SupabaseTaskDatasource] saveTask: DB upsert 호출 완료, task.id=${task.id}');
     } catch (e) {
-      debugPrint('[SupabaseTaskDatasource] saveTask: DB upsert 실패, 에러=$e');
       rethrow;
     }
   }

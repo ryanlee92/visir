@@ -228,8 +228,6 @@ class CalendarTaskListController extends _$CalendarTaskListController {
     bool? updateTaskStatus,
     required TabType targetTab,
   }) async {
-    debugPrint('[CalendarTaskListController] saveTask 시작: originalTask.id=${originalTask?.id}, newTask.id=${newTask?.id}, newTask.title=${newTask?.title}, targetTab=$targetTab');
-
     if (ref.read(shouldUseMockDataProvider)) {
       if (newTask == null) return;
       state = CalendarTaskResultEntity(tasks: [...(state.tasks), newTask], startDateTime: state.startDateTime, endDateTime: state.endDateTime);
@@ -262,8 +260,6 @@ class CalendarTaskListController extends _$CalendarTaskListController {
       }
     }
 
-    debugPrint('[CalendarTaskListController] saveTask: internal controller 호출 전, controllers.length=${_controllers[defaultOAuthUniqueKey]?.length ?? 0}');
-
     _controllers[defaultOAuthUniqueKey]?.entries.forEach((e) {
       e.value
           .saveTask(
@@ -277,13 +273,11 @@ class CalendarTaskListController extends _$CalendarTaskListController {
             tabType: tabType,
           )
           .then((e) {
-            debugPrint('[CalendarTaskListController] saveTask: internal controller 완료');
             resultCount++;
             if (resultCount != 1) return;
             completer.complete();
           })
           .catchError((error) {
-            debugPrint('[CalendarTaskListController] saveTask: internal controller 에러: $error');
             resultCount++;
             if (resultCount != 1) return;
             completer.complete();
@@ -468,10 +462,6 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     required TabType tabType,
     required RecurringTaskEditType? recurringTaskEditType,
   }) async {
-    debugPrint(
-      '[CalendarTaskListControllerInternal] saveTask 시작: originalTask.id=${originalTask?.id}, newTask.id=${newTask?.id}, newTask.title=${newTask?.title}, targetTab=$targetTab, tabType=$tabType, targetYear=$targetYear, targetMonth=$targetMonth',
-    );
-
     BuildContext context = Utils.mainContext;
     String recurrence =
         originalTask?.rrule?.toString(options: RecurrenceRuleToStringOptions(isTimeUtc: true)) ??
@@ -790,13 +780,8 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
     required TabType? targetTab,
     required TabType tabType,
   }) async {
-    debugPrint(
-      '[CalendarTaskListControllerInternal] _upsertTask 시작: task.id=${task.id}, task.title=${task.title}, targetTab=$targetTab, tabType=$tabType, targetYear=$targetYear, targetMonth=$targetMonth, doNotUpdateState=$doNotUpdateState',
-    );
-
     final pref = ref.read(localPrefControllerProvider).value;
     if (pref == null) {
-      debugPrint('[CalendarTaskListControllerInternal] _upsertTask: pref가 null이어서 종료');
       return [];
     }
 
@@ -811,37 +796,27 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
       DateTime updatedTimestamp = DateTime.now();
 
       _updateState(list: list, updatedTimestamp: updatedTimestamp, isLocalUpdate: true);
-      debugPrint('[CalendarTaskListControllerInternal] _upsertTask: 로컬 상태 업데이트 완료');
     }
 
     final targetDate = ref.read(calendarDisplayDateProvider(tabType).select((v) => v[CalendarDisplayType.main] ?? DateTime.now()));
-    debugPrint(
-      '[CalendarTaskListControllerInternal] _upsertTask: targetTab=$targetTab, tabType=$tabType, targetDate.year=${targetDate.year}, targetDate.month=${targetDate.month}, targetYear=$targetYear, targetMonth=$targetMonth',
-    );
 
     if (targetTab != tabType || targetDate.year != targetYear || targetDate.month != targetMonth) {
-      debugPrint('[CalendarTaskListControllerInternal] _upsertTask: 조건 불일치로 로컬만 업데이트하고 종료');
       return list;
     }
     if (ref.read(shouldUseMockDataProvider)) {
-      debugPrint('[CalendarTaskListControllerInternal] _upsertTask: mock data 모드로 종료');
       return list;
     }
 
-    debugPrint('[CalendarTaskListControllerInternal] _upsertTask: _taskRepository.saveTask 호출 전, task.id=${task.id}');
     final eventResult = await _taskRepository.saveTask(task: task);
-    debugPrint('[CalendarTaskListControllerInternal] _upsertTask: _taskRepository.saveTask 호출 완료, eventResult=${eventResult.isRight() ? "성공" : "실패"}');
 
     return eventResult.fold(
       (l) {
-        debugPrint('[CalendarTaskListControllerInternal] _upsertTask: 저장 실패, 에러=$l');
         if (doNotUpdateState != true) {
           _updateState(list: previousState, updatedTimestamp: updatedTimestamp, isLocalUpdate: true);
         }
         return previousState;
       },
       (r) async {
-        debugPrint('[CalendarTaskListControllerInternal] _upsertTask: 저장 성공, 반환된 task.id=${r.id}');
         final remoteFetchList = tasks
           ..removeWhere((e) => e.id == r.id)
           ..add(r)
@@ -849,7 +824,6 @@ class CalendarTaskListControllerInternal extends _$CalendarTaskListControllerInt
 
         if (doNotUpdateState == true) {
           _updateState(list: remoteFetchList, updatedTimestamp: updatedTimestamp, isLocalUpdate: false);
-          debugPrint('[CalendarTaskListControllerInternal] _upsertTask: doNotUpdateState==true로 원격 상태 업데이트 완료');
         }
 
         return [...remoteFetchList];
