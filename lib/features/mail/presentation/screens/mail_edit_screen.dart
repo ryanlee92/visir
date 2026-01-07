@@ -703,15 +703,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
     return suggestion;
   }
 
-  Widget suggestionBuilder(
-    BuildContext context,
-    TagsEditorState<MailUserEntity> state,
-    MailUserEntity data,
-    int index,
-    int lenght,
-    bool highlight,
-    String? suggestionValid,
-  ) {
+  Widget suggestionBuilder(BuildContext context, TagsEditorState<MailUserEntity> state, MailUserEntity data, int index, int lenght, bool highlight, String? suggestionValid) {
     return Container(
       width: double.maxFinite,
       height: 46,
@@ -801,12 +793,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
 
     for (MailFileEntity a in attachments) {
       if (a.data != null) {
-        final partBuilder = await builder.addBinary(
-          a.data!,
-          MediaType.fromText(a.mimeType),
-          filename: a.name,
-          disposition: ContentDispositionHeader.attachment(),
-        );
+        final partBuilder = await builder.addBinary(a.data!, MediaType.fromText(a.mimeType), filename: a.name, disposition: ContentDispositionHeader.attachment());
         partBuilder.addHeader('Content-ID', '<${a.cid}>');
       }
     }
@@ -828,29 +815,12 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
     if (isDraft) {
       MailAction.saveDarft(
         minimize: !isCloseButtonPressed,
-        mail: MailEntity(
-          mailType: from.type!,
-          from: from,
-          draftId: draftId,
-          draftHtml: body,
-          messageId: messageId,
-          threadId: threadId,
-          mimeMessage: mimeMessage,
-          subject: subject,
-        ),
+        mail: MailEntity(mailType: from.type!, from: from, draftId: draftId, draftHtml: body, messageId: messageId, threadId: threadId, mimeMessage: mimeMessage, subject: subject),
       );
     } else {
       MailAction.sendMail(
         mimeMessage: mimeMessage,
-        mail: MailEntity(
-          mailType: from.type!,
-          from: from,
-          draftId: draftId,
-          messageId: messageId,
-          threadId: threadId,
-          mimeMessage: mimeMessage,
-          subject: subject,
-        ),
+        mail: MailEntity(mailType: from.type!, from: from, draftId: draftId, messageId: messageId, threadId: threadId, mimeMessage: mimeMessage, subject: subject),
       );
 
       logAnalyticsEvent(eventName: 'mail_sent');
@@ -1075,10 +1045,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
   Widget build(BuildContext context) {
     _scrollController ??= ModalScrollController.ofSyncGroup(context)?.addAndGet() ?? ScrollController();
     final mailUsers =
-        ref.watch(
-          localPrefControllerProvider.select((e) => e.value!.mailOAuths?.map((e) => MailUserEntity(email: e.email, name: e.name, type: e.type.mailType))),
-        ) ??
-        [];
+        ref.watch(localPrefControllerProvider.select((e) => e.value!.mailOAuths?.map((e) => MailUserEntity(email: e.email, name: e.name, type: e.type.mailType)))) ?? [];
 
     final useHardwareKeyboard = context.viewInset.bottom == 0;
 
@@ -1155,17 +1122,9 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                 shortcuts: [
                                   VisirButtonKeyboardShortcut(
                                     message: context.tr.mail_discard_draft,
-                                    keys: [
-                                      LogicalKeyboardKey.backspace,
-                                      if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                      if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                    ],
+                                    keys: [LogicalKeyboardKey.backspace, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                                     subkeys: [
-                                      [
-                                        LogicalKeyboardKey.delete,
-                                        if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                        if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                      ],
+                                      [LogicalKeyboardKey.delete, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                                     ],
                                   ),
                                 ],
@@ -1181,11 +1140,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                               shortcuts: [
                                 VisirButtonKeyboardShortcut(
                                   message: '',
-                                  keys: [
-                                    LogicalKeyboardKey.enter,
-                                    if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                    if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                  ],
+                                  keys: [LogicalKeyboardKey.enter, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                                 ),
                               ],
                             ),
@@ -1225,10 +1180,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                                 Container(
                                                   height: 42,
                                                   alignment: Alignment.center,
-                                                  child: Text(
-                                                    context.tr.mail_to,
-                                                    style: context.titleSmall?.textColor(context.onInverseSurface).appFont(context),
-                                                  ),
+                                                  child: Text(context.tr.mail_to, style: context.titleSmall?.textColor(context.onInverseSurface).appFont(context)),
                                                 ),
                                                 SizedBox(width: 12),
                                                 Expanded(
@@ -1262,10 +1214,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                                                 borderRadius: BorderRadius.circular(6),
                                                                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                                               ),
-                                                              child: Text(
-                                                                context.tr.mail_cc,
-                                                                style: context.labelLarge?.textColor(context.onBackground).appFont(context),
-                                                              ),
+                                                              child: Text(context.tr.mail_cc, style: context.labelLarge?.textColor(context.onBackground).appFont(context)),
                                                               onTap: () {
                                                                 showCc = true;
                                                                 setState(() {});
@@ -1282,10 +1231,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                                                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                                                 margin: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                                                               ),
-                                                              child: Text(
-                                                                context.tr.mail_bcc,
-                                                                style: context.labelLarge?.textColor(context.onBackground).appFont(context),
-                                                              ),
+                                                              child: Text(context.tr.mail_bcc, style: context.labelLarge?.textColor(context.onBackground).appFont(context)),
                                                               onTap: () {
                                                                 showBcc = true;
                                                                 setState(() {});
@@ -1330,8 +1276,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                                 ],
                                               ),
                                             ),
-                                          if (showCc)
-                                            Container(height: 1, width: double.maxFinite, color: context.surface, margin: EdgeInsets.symmetric(horizontal: 16)),
+                                          if (showCc) Container(height: 1, width: double.maxFinite, color: context.surface, margin: EdgeInsets.symmetric(horizontal: 16)),
                                           if (showBcc)
                                             Container(
                                               constraints: BoxConstraints(minHeight: 42),
@@ -1361,8 +1306,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                                 ],
                                               ),
                                             ),
-                                          if (showBcc)
-                                            Container(height: 1, width: double.maxFinite, color: context.surface, margin: EdgeInsets.symmetric(horizontal: 16)),
+                                          if (showBcc) Container(height: 1, width: double.maxFinite, color: context.surface, margin: EdgeInsets.symmetric(horizontal: 16)),
                                           Container(
                                             height: 42,
                                             child: Row(
@@ -1539,9 +1483,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                             children: [
                                               HtmlEditor(
                                                 onScrollInsideIframe: (dx, dy) {
-                                                  _scrollController?.jumpTo(
-                                                    min(max(0, _scrollController!.offset + dy), _scrollController!.position.maxScrollExtent),
-                                                  );
+                                                  _scrollController?.jumpTo(min(max(0, _scrollController!.offset + dy), _scrollController!.position.maxScrollExtent));
                                                 },
                                                 controller: _bodyController,
                                                 htmlEditorOptions: HtmlEditorOptions(
@@ -1691,21 +1633,14 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                   Positioned(
                                     top: getDropTargetSize()?.height,
                                     child: Container(
-                                      color: context.surface,
+                                      color: context.background.withValues(alpha: 0.75),
                                       height: scrollViewHeight - (getDropTargetSize()?.height ?? 0),
                                       width: getDropTargetSize()?.width,
                                       padding: EdgeInsets.all(16),
                                       child: DottedBorder(
-                                        options: RoundedRectDottedBorderOptions(
-                                          radius: Radius.circular(8),
-                                          dashPattern: [12, 12],
-                                          color: context.outline,
-                                          strokeWidth: 6,
-                                        ),
+                                        options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
                                         child: Container(
-                                          child: Center(
-                                            child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface)),
-                                          ),
+                                          child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
                                         ),
                                       ),
                                     ),
@@ -1743,12 +1678,7 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                           decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(8)),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                            child: Text(
-                                              e.name,
-                                              style: context.bodyLarge?.textColor(context.onSurface),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
+                                            child: Text(e.name, style: context.bodyLarge?.textColor(context.onSurface), maxLines: 1, overflow: TextOverflow.ellipsis),
                                           ),
                                         ),
                                       ),
