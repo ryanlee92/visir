@@ -7578,6 +7578,12 @@ abstract class AppLocalizations {
   /// **'Loading...'**
   String get loading;
 
+  /// No description provided for @chat_history.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat History'**
+  String get chat_history;
+
   /// No description provided for @chat_history_search_hint.
   ///
   /// In en, this message translates to:

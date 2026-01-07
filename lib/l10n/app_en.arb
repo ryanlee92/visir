@@ -1711,6 +1711,7 @@
   "agent_tag_section_event": "Event",
   "agent_tag_section_connections": "Connections",
   "loading": "Loading...",
+  "chat_history": "Chat History",
   "chat_history_search_hint": "Search history...",
   "chat_history_conversation_start": "Conversation start",
   "chat_history_messages_count": "{count} messages",

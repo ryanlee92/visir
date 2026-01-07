@@ -4239,6 +4239,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loading => 'Loading...';
 
   @override
+  String get chat_history => 'Chat History';
+
+  @override
   String get chat_history_search_hint => 'Search history...';
 
   @override

@@ -2030,7 +2030,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                     backgroundColor: PlatformX.isMobileView ? context.background : null,
                                     type: ContextMenuActionType.tap,
                                     style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
-                                    options: VisirButtonOptions(message: '챗 히스토리', tooltipLocation: VisirButtonTooltipLocation.top, doNotConvertCase: true),
+                                    options: VisirButtonOptions(message: context.tr.chat_history, tooltipLocation: VisirButtonTooltipLocation.top, doNotConvertCase: true),
                                     beforePopup: () {
                                       // 기본적으로 모든 프로젝트의 최근 히스토리 표시
                                       ref.read(agentChatHistoryFilterProvider.notifier).setFilter(null);
