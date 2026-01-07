@@ -1128,6 +1128,7 @@
   },
   "no_project_suggested": "No Project",
   "agent_select_model_hint": "Change agent model",
+  "agent_suggested_actions_hint": "Suggested actions",
   "agent_use_taskey_api_key": "With Visir API Key",
   "agent_use_user_api_key": "With User API Key",
   "agent_select_project_hint": "Add project based context",

@@ -148,17 +148,17 @@ class _ContextMenuState extends ConsumerState<ContextMenu> with WidgetsBindingOb
     }
 
     if (paddingLeft < margin + resizedWidthDiff) {
-      paddingRight = paddingRight - (margin + resizedWidthDiff - paddingLeft);
+      paddingRight = max(margin, paddingRight - (margin + resizedWidthDiff - paddingLeft));
       paddingLeft = margin + resizedWidthDiff;
     }
 
     if (paddingTop < margin + resizedHeightDiff) {
-      paddingBottom = paddingBottom - (margin + resizedHeightDiff - paddingTop);
+      paddingBottom = max(margin, paddingBottom - (margin + resizedHeightDiff - paddingTop));
       paddingTop = margin + resizedHeightDiff;
     }
 
     if (paddingRight < margin + resizedWidthDiff) {
-      paddingLeft += (paddingRight - margin - resizedWidthDiff);
+      paddingLeft = max(margin, paddingLeft + (paddingRight - margin - resizedWidthDiff));
       paddingRight = margin + resizedWidthDiff;
     }
 
@@ -175,7 +175,8 @@ class _ContextMenuState extends ConsumerState<ContextMenu> with WidgetsBindingOb
     }
 
     if (PopupMenuLocation.bottom == widget.popupMenuLocation && paddingTop > margin + height && paddingBottom <= margin + resizedHeightDiff) {
-      paddingBottom = screenHeight - widget.topLeft.dy + margin;
+      print('####### 123444 ${paddingLeft} ${screenHeight}');
+      paddingBottom = (context.screenSize.height - widget.topLeft.dy) / screenRatio;
       paddingTop = screenHeight - paddingBottom - height;
     }
 

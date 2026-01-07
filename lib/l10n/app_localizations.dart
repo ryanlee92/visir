@@ -6431,6 +6431,12 @@ abstract class AppLocalizations {
   /// **'Change agent model'**
   String get agent_select_model_hint;
 
+  /// No description provided for @agent_suggested_actions_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested actions'**
+  String get agent_suggested_actions_hint;
+
   /// No description provided for @agent_use_taskey_api_key.
   ///
   /// In en, this message translates to:

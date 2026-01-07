@@ -3488,6 +3488,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agent_select_model_hint => 'Change agent model';
 
   @override
+  String get agent_suggested_actions_hint => 'Suggested actions';
+
+  @override
   String get agent_use_taskey_api_key => 'With Visir API Key';
 
   @override

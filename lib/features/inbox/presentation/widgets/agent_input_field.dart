@@ -1029,8 +1029,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     // 파일 목록 확인하여 uploadable 상태 업데이트
     final messageFileList = ref.watch(agentFileListControllerProvider(tabType: widget.tabType).select((v) => v));
     uploadable = messageController.text.trim().isNotEmpty || messageFileList.where((e) => (e.ok ?? false)).toList().isNotEmpty;
-
     final selectedModel = ref.watch(selectedAgentModelProvider).value;
+    final showSuggestedActions = agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null);
+
     return KeyboardShortcut(
       bypassTextField: true,
       onKeyDown: onKeyDown,
@@ -1056,7 +1057,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null))
+                    if (PlatformX.isDesktopView && showSuggestedActions)
                       AgentActionSuggestionsWidget(
                         inboxes: widget.inboxes ?? [],
                         upNextTask: widget.upNextTask,
@@ -1992,6 +1993,34 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                           Expanded(
                             child: Row(
                               children: [
+                                if (PlatformX.isMobileView && showSuggestedActions)
+                                  IntrinsicWidth(
+                                    child: Builder(
+                                      builder: (context) {
+                                        return PopupMenu(
+                                          forcePopup: true,
+                                          location: PopupMenuLocation.bottom,
+                                          width: context.width - 32,
+                                          borderRadius: 6,
+                                          type: ContextMenuActionType.tap,
+                                          style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
+                                          options: VisirButtonOptions(
+                                            message: context.tr.agent_suggested_actions_hint,
+                                            tooltipLocation: VisirButtonTooltipLocation.top,
+                                            doNotConvertCase: true,
+                                          ),
+                                          popup: AgentActionSuggestionsWidget(
+                                            inboxes: widget.inboxes ?? [],
+                                            upNextTask: widget.upNextTask,
+                                            upNextEvent: widget.upNextEvent,
+                                            onActionTap: widget.onActionTap,
+                                            onCustomPrompt: widget.onCustomPrompt,
+                                          ),
+                                          child: VisirIcon(type: VisirIconType.bookmark, size: 14, isSelected: true),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 IntrinsicWidth(
                                   child: PopupMenu(
                                     location: PopupMenuLocation.right,

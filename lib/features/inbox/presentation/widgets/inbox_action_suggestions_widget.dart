@@ -1,5 +1,6 @@
 import 'package:Visir/dependency/contextmenu/src/ContextMenuArea.dart' show ContextMenuActionType;
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
@@ -431,6 +432,39 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
     // 모바일에서는 가로 스크롤이므로 한 줄만 필요, 데스크톱에서는 여러 줄 가능
     // final maxHeight = tagHeight;
     final suggestionWidgets = suggestions.map((suggestion) {
+      if (PlatformX.isMobileView) {
+        return VisirButton(
+          type: VisirButtonAnimationType.scaleAndOpacity,
+          style: VisirButtonStyle(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), backgroundColor: context.surface.withValues(alpha: 0.7)),
+          onTap: suggestion.onTap,
+          child: Row(
+            children: [
+              VisirIcon(type: suggestion.icon, size: 16, color: context.onSurface, isSelected: true),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(text: suggestion.actionName, style: context.titleMedium?.textColor(context.onSurface).appFont(context).textBold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    if (suggestion.itemName != null)
+                      Text.rich(
+                        TextSpan(text: suggestion.itemName, style: context.bodyLarge?.textColor(context.onSurface)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
       return IntrinsicWidth(
         child: VisirButton(
           type: VisirButtonAnimationType.scaleAndOpacity,
@@ -466,6 +500,15 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
         ),
       );
     }).toList();
+
+    if (PlatformX.isMobileView) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6.0),
+        child: Column(
+          children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(bottom: 6), child: widget))],
+        ),
+      );
+    }
 
     return Container(
       padding: const EdgeInsets.only(top: 8),

@@ -150,6 +150,7 @@ enum VisirIconType {
   brain,
   google,
   apple,
+  bookmark,
 }
 
 extension VisirIconTypeX on VisirIconType {
@@ -451,6 +452,8 @@ extension VisirIconTypeX on VisirIconType {
       case VisirIconType.apple:
         // Apple 브랜드 로고는 Image.asset으로 처리되므로 여기서는 사용되지 않음
         return HugeIcons.strokeRoundedApple;
+      case VisirIconType.bookmark:
+        return isSelected ? HugeIcons.solidRoundedBookBookmark02 : HugeIcons.strokeRoundedBookBookmark02;
     }
   }
 }
