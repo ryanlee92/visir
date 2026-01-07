@@ -745,6 +745,48 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
           final double screenWidth = constratins.maxWidth;
           final bool large = screenWidth >= widget.breakpoint;
 
+          final dropTarget = Utils.buildDropTarget(
+            disable: !(widget.enableDropTarget ?? false),
+            child: Stack(
+              children: [
+                Positioned.fill(child: masterWidget(large)),
+                Positioned.fill(
+                  child: ValueListenableBuilder(
+                    valueListenable: isDragging,
+                    builder: (context, isDraggingValue, child) {
+                      return IgnorePointer(
+                        child: AnimatedOpacity(
+                          opacity: isDraggingValue ? 1 : 0,
+                          duration: Duration(milliseconds: 250),
+                          child: Container(
+                            decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                            padding: EdgeInsets.all(16),
+                            child: DottedBorder(
+                              options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                              child: Container(
+                                child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            onDropEnter: () {
+              isDragging.value = true;
+            },
+            onDropLeave: () {
+              isDragging.value = false;
+            },
+            onDrop: (files) {
+              widget.onDragDone?.call(files);
+              isDragging.value = false;
+            },
+          );
+
           if (large) {
             final largeDetail = desktopSelectedItemArea(large);
             return RepaintBoundary(
@@ -759,49 +801,7 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
                     ),
                   ResizableChild(
                     size: ResizableSize.expand(min: widget.minMasterResizableWidth ?? 120, max: widget.maxMasterResizableWidth),
-                    child: DesktopCard(
-                      child: Utils.buildDropTarget(
-                        disable: !(widget.enableDropTarget ?? false),
-                        child: Stack(
-                          children: [
-                            Positioned.fill(child: masterWidget(large)),
-                            Positioned.fill(
-                              child: ValueListenableBuilder(
-                                valueListenable: isDragging,
-                                builder: (context, isDraggingValue, child) {
-                                  return IgnorePointer(
-                                    child: AnimatedOpacity(
-                                      opacity: isDraggingValue ? 1 : 0,
-                                      duration: Duration(milliseconds: 250),
-                                      child: Container(
-                                        decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
-                                        padding: EdgeInsets.all(16),
-                                        child: DottedBorder(
-                                          options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
-                                          child: Container(
-                                            child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        onDropEnter: () {
-                          isDragging.value = true;
-                        },
-                        onDropLeave: () {
-                          isDragging.value = false;
-                        },
-                        onDrop: (files) {
-                          widget.onDragDone?.call(files);
-                          isDragging.value = false;
-                        },
-                      ),
-                    ),
+                    child: DesktopCard(child: dropTarget),
                     divider: ResizableDivider(thickness: DesktopScaffold.cardPadding, color: Colors.transparent),
                   ),
                   if (largeDetail != null)
@@ -821,7 +821,7 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
             );
           } else {
             if (!PlatformX.isDesktopView) {
-              return Container(color: context.background, child: masterWidget(large));
+              return Container(color: context.background, child: dropTarget);
             }
 
             return PageTransitionSwitcher(
@@ -835,7 +835,7 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
               },
               child: focus == Focus.details && selectedItem != null
                   ? Builder(builder: (ctx) => detailWidget(ctx, selectedItem!.id, large, true) ?? Container(color: context.background))
-                  : Container(color: context.background, child: masterWidget(large)),
+                  : Container(color: context.background, child: dropTarget),
             );
           }
         },

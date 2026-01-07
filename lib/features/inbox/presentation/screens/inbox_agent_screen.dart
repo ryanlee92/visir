@@ -948,21 +948,32 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                     ),
 
                                     Positioned.fill(
-                                      child: IgnorePointer(
-                                        child: AnimatedOpacity(
-                                          opacity: onFileEntered ? 1 : 0,
-                                          duration: Duration(milliseconds: 250),
-                                          child: Container(
-                                            decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
-                                            padding: EdgeInsets.all(16),
-                                            child: DottedBorder(
-                                              options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                                      child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return IgnorePointer(
+                                            child: AnimatedOpacity(
+                                              opacity: onFileEntered ? 1 : 0,
+                                              duration: Duration(milliseconds: 250),
                                               child: Container(
-                                                child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                                                decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                                                height: constraints.maxHeight,
+                                                width: constraints.maxWidth,
+                                                padding: EdgeInsets.all(16),
+                                                child: DottedBorder(
+                                                  options: RoundedRectDottedBorderOptions(
+                                                    radius: Radius.circular(8),
+                                                    dashPattern: [12, 12],
+                                                    color: context.outline,
+                                                    strokeWidth: 6,
+                                                  ),
+                                                  child: Container(
+                                                    child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ],
