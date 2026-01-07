@@ -38,7 +38,6 @@ class _AgentChatHistoryWidgetState extends ConsumerState<AgentChatHistoryWidget>
   @override
   void initState() {
     super.initState();
-    _scrollController ??= ModalScrollController.ofSyncGroup(context)?.addAndGet() ?? ScrollController();
   }
 
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
@@ -54,6 +53,11 @@ class _AgentChatHistoryWidgetState extends ConsumerState<AgentChatHistoryWidget>
   Widget build(BuildContext context) {
     final historiesAsync = ref.watch(agentChatHistoryControllerProvider);
     final projects = ref.watch(projectListControllerProvider);
+
+    _scrollController ??= ModalScrollController.ofSyncGroup(context)?.addAndGet() ?? ScrollController();
+
+    final titleStyle = PlatformX.isMobileView ? context.titleMedium : context.titleSmall;
+    final textStyle = PlatformX.isMobileView ? context.bodyLarge : context.bodySmall;
 
     return historiesAsync.when(
       data: (histories) {
@@ -164,7 +168,7 @@ class _AgentChatHistoryWidgetState extends ConsumerState<AgentChatHistoryWidget>
 
               return VisirButton(
                 type: VisirButtonAnimationType.scaleAndOpacity,
-                style: VisirButtonStyle(padding: const EdgeInsets.all(12), borderRadius: BorderRadius.circular(0)),
+                style: VisirButtonStyle(padding: const EdgeInsets.all(12)),
                 onTap: () {
                   if (widget.onHistorySelected != null) {
                     widget.onHistorySelected!(history.id);
@@ -190,7 +194,7 @@ class _AgentChatHistoryWidgetState extends ConsumerState<AgentChatHistoryWidget>
                               children: [
                                 VisirIcon(type: project.icon ?? VisirIconType.project, size: 12, color: Colors.white, isSelected: true),
                                 const SizedBox(width: 4),
-                                Text(project.name, style: context.bodySmall?.copyWith(color: Colors.white)),
+                                Text(project.name, style: textStyle?.copyWith(color: Colors.white)),
                               ],
                             ),
                           ),
@@ -199,7 +203,7 @@ class _AgentChatHistoryWidgetState extends ConsumerState<AgentChatHistoryWidget>
                         Expanded(
                           child: Text(
                             previewText,
-                            style: context.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: context.onSurface),
+                            style: titleStyle?.copyWith(color: context.onSurface).textBold,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -209,11 +213,11 @@ class _AgentChatHistoryWidgetState extends ConsumerState<AgentChatHistoryWidget>
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Text(history.updatedAt.forceDateTimeString, style: context.bodySmall?.copyWith(color: context.onSurfaceVariant)),
+                        Text(history.updatedAt.forceDateTimeString, style: textStyle?.copyWith(color: context.onSurfaceVariant)),
                         const SizedBox(width: 8),
-                        Text('•', style: context.bodySmall?.copyWith(color: context.onSurfaceVariant)),
+                        Text('•', style: textStyle?.copyWith(color: context.onSurfaceVariant)),
                         const SizedBox(width: 8),
-                        Text(context.tr.chat_history_messages_count(history.messages.length), style: context.bodySmall?.copyWith(color: context.onSurfaceVariant)),
+                        Text(context.tr.chat_history_messages_count(history.messages.length), style: textStyle?.copyWith(color: context.onSurfaceVariant)),
                       ],
                     ),
                   ],
@@ -298,10 +302,10 @@ class _AgentChatHistoryPopupMenuState extends ConsumerState<AgentChatHistoryPopu
           // 히스토리 목록
           Expanded(
             child: AgentChatHistoryWidget(
-                onHistorySelected: (sessionId) {
-                  ref.read(agentActionControllerProvider.notifier).resumeChatFromHistory(sessionId);
-                },
-              ),
+              onHistorySelected: (sessionId) {
+                ref.read(agentActionControllerProvider.notifier).resumeChatFromHistory(sessionId);
+              },
+            ),
           ),
         ],
       ),
