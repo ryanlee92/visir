@@ -7,6 +7,7 @@ import 'package:Visir/features/calendar/application/calendar_event_list_controll
 import 'package:Visir/features/calendar/providers.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 
 import 'package:Visir/features/common/presentation/widgets/bottom_sheet_scroll_physics.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
@@ -413,60 +414,19 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
     final cardRadius = isMobileView ? 12.0 : DesktopScaffold.cardRadius;
 
     if (isMobileView) {
-      return DropRegion(
-        onDropEnter: (details) {
+      return Utils.buildDropTarget(
+        onDropEnter: () {
           onFileEntered = true;
           setState(() {});
         },
-        onDropLeave: (details) {
+        onDropLeave: () {
           onFileEntered = false;
           setState(() {});
         },
-        onDropEnded: (details) {
+        onDrop: (files) {
+          _agentInputFieldStateKey.currentState?.uploadFiles(files: files);
           onFileEntered = false;
           setState(() {});
-        },
-        formats: Formats.standardFormats,
-        onDropOver: (DropOverEvent event) {
-          if (event.session.allowedOperations.contains(DropOperation.copy)) {
-            return DropOperation.copy;
-          } else {
-            return DropOperation.none;
-          }
-        },
-        onPerformDrop: (event) async {
-          for (final item in event.session.items) {
-            final reader = item.dataReader!;
-
-            /// Binary formats need to be read as streams
-            if (reader.canProvide(Formats.png)) {
-              reader.getFile(Formats.png, (file) async {
-                final bytes = await file.readAll();
-                final name = file.fileName ?? await reader.getSuggestedName();
-                final platformFile = PlatformFile(name: '${name}.png', size: bytes.length, bytes: bytes);
-                _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
-              });
-              return;
-            }
-
-            reader.getFile(
-              null,
-              (file) async {
-                final bytes = await file.readAll();
-                final name = file.fileName ?? await reader.getSuggestedName();
-                final extension = reader.getFormats(Formats.standardFormats).firstOrNull;
-                if (extension is SimpleFileFormat) {
-                  final extString =
-                      (extension.uniformTypeIdentifiers ?? extension.mimeTypes ?? extension.fallbackFormats).firstOrNull?.split('.').lastOrNull?.split('/').lastOrNull ?? '';
-                  final platformFile = PlatformFile(name: '${name}.$extString', size: bytes.lengthInBytes, bytes: bytes, identifier: '${name}.$extString');
-                  _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
-                }
-              },
-              onError: (error) {
-                print('Error reading value $error');
-              },
-            );
-          }
         },
         child: Stack(
           children: [
@@ -883,21 +843,19 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                 child: Stack(
                                   children: [
                                     Positioned.fill(
-                                      child: DropTarget(
-                                        onDragEntered: (details) {
+                                      child: Utils.buildDropTarget(
+                                        onDropEnter: () {
                                           onFileEntered = true;
                                           setState(() {});
                                         },
-                                        onDragExited: (details) {
+                                        onDropLeave: () {
                                           onFileEntered = false;
                                           setState(() {});
                                         },
-                                        onDragDone: (detail) async {
-                                          for (final e in detail.files) {
-                                            final bytes = await e.readAsBytes();
-                                            final platformFile = PlatformFile(path: e.path, name: e.name, size: bytes.lengthInBytes, bytes: bytes, identifier: e.path);
-                                            _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
-                                          }
+                                        onDrop: (files) {
+                                          _agentInputFieldStateKey.currentState?.uploadFiles(files: files);
+                                          onFileEntered = false;
+                                          setState(() {});
                                         },
                                         child: Column(
                                           children: [

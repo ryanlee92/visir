@@ -43,6 +43,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:html/parser.dart' as html;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:mime/mime.dart';
+import 'package:super_clipboard/super_clipboard.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 import 'package:uuid/uuid.dart';
 
 enum FocusType { none, to, cc, bcc, subject, body }
@@ -1452,28 +1454,23 @@ class MailEditScreenState extends ConsumerState<MailEditScreen> with WidgetsBind
                                           Container(height: 1, width: double.maxFinite, color: context.surface, margin: EdgeInsets.symmetric(horizontal: 16)),
                                         ],
                                       ),
-                                      DropTarget(
-                                        onDragDone: (detail) {
-                                          final files = detail.files.map((e) {
-                                            return MailFileEntity(
-                                              id: Uuid().v4(),
-                                              cid: Uuid().v4(),
-                                              name: e.name,
-                                              data: File(e.path).readAsBytesSync(),
-                                              mimeType: lookupMimeType(e.path) ?? '',
-                                            );
-                                          }).toList();
-                                          attachments.addAll(files);
-                                          isDragging = false;
-                                          isEdited = true;
-                                          setState(() {});
-                                        },
-                                        onDragEntered: (detail) {
+                                      Utils.buildDropTarget(
+                                        onDropEnter: () {
                                           isDragging = true;
                                           setState(() {});
                                         },
-                                        onDragExited: (detail) {
+                                        onDropLeave: () {
                                           isDragging = false;
+                                          setState(() {});
+                                        },
+                                        onDrop: (files) {
+                                          attachments.addAll(
+                                            files.map(
+                                              (e) => MailFileEntity(id: Uuid().v4(), cid: Uuid().v4(), name: e.name, data: e.bytes, mimeType: lookupMimeType(e.name) ?? ''),
+                                            ),
+                                          );
+                                          isDragging = false;
+                                          isEdited = true;
                                           setState(() {});
                                         },
                                         child: Padding(

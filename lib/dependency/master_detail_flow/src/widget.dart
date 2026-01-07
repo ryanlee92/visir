@@ -14,6 +14,8 @@ import 'package:Visir/features/common/presentation/widgets/wave_refresh_header.d
 import 'package:Visir/features/common/provider.dart';
 import 'package:animations/animations.dart';
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart' hide Focus;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Focus;
@@ -215,7 +217,7 @@ class MasterDetailsFlow extends ConsumerStatefulWidget {
 
   final bool? isDetailExpanded;
   final Widget? bottom;
-  final void Function(DropDoneDetails)? onDragDone;
+  final void Function(List<PlatformFile> files)? onDragDone;
   final Color? separatorColor;
   final String? debugKey;
   final void Function(double width) onTargetResized;
@@ -312,6 +314,7 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
   @override
   void dispose() {
     refreshController.dispose();
+    isDragging.dispose();
     masterFocusNode?.removeListener(masterFocusListener);
     detailsFocusNode?.removeListener(detailsFocusListener);
     widget.masterLoadingNotifier?.removeListener(checkLoadingBarListener);
@@ -590,8 +593,7 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
     return AnimatedSwitcher(
       key: ValueKey<MasterItem?>(selectedItem),
       duration: widget.transitionAnimationDuration,
-      transitionBuilder: (Widget child, Animation<double> animation) =>
-          const FadeUpwardsPageTransitionsBuilder().buildTransitions<void>(null, null, animation, null, child),
+      transitionBuilder: (Widget child, Animation<double> animation) => const FadeUpwardsPageTransitionsBuilder().buildTransitions<void>(null, null, animation, null, child),
       child: Material(
         elevation: 0,
         color: Colors.transparent,
@@ -729,6 +731,8 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
     return listener;
   }
 
+  ValueNotifier<bool> isDragging = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     final resizableClosableWidget = widget.tabType != null ? ref.watch(resizableClosableWidgetProvider(widget.tabType!)) : null;
@@ -756,7 +760,47 @@ class MasterDetailsFlowState extends ConsumerState<MasterDetailsFlow> {
                   ResizableChild(
                     size: ResizableSize.expand(min: widget.minMasterResizableWidth ?? 120, max: widget.maxMasterResizableWidth),
                     child: DesktopCard(
-                      child: DropTarget(enable: widget.enableDropTarget ?? true, onDragDone: widget.onDragDone, child: masterWidget(large)),
+                      child: Utils.buildDropTarget(
+                        disable: !(widget.enableDropTarget ?? false),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(child: masterWidget(large)),
+                            Positioned.fill(
+                              child: ValueListenableBuilder(
+                                valueListenable: isDragging,
+                                builder: (context, isDraggingValue, child) {
+                                  return IgnorePointer(
+                                    child: AnimatedOpacity(
+                                      opacity: isDraggingValue ? 1 : 0,
+                                      duration: Duration(milliseconds: 250),
+                                      child: Container(
+                                        decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                                        padding: EdgeInsets.all(16),
+                                        child: DottedBorder(
+                                          options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                                          child: Container(
+                                            child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        onDropEnter: () {
+                          isDragging.value = true;
+                        },
+                        onDropLeave: () {
+                          isDragging.value = false;
+                        },
+                        onDrop: (files) {
+                          widget.onDragDone?.call(files);
+                          isDragging.value = false;
+                        },
+                      ),
                     ),
                     divider: ResizableDivider(thickness: DesktopScaffold.cardPadding, color: Colors.transparent),
                   ),

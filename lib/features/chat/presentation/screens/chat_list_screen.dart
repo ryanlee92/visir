@@ -988,21 +988,15 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
                                       ? 53
                                       : 1,
                                   enableDropTarget: messageController.editingMessageId == null,
-                                  onDragDone: (detail) async {
+                                  onDragDone: (files) async {
                                     if (tabNotifier.value != widget.tabType) return;
-                                    for (final e in detail.files) {
-                                      final bytes = await e.readAsBytes();
-                                      final platformFile = PlatformFile(name: e.name, size: bytes.lengthInBytes, bytes: bytes, identifier: e.path);
-                                      ref
-                                          .read(chatFileListControllerProvider(tabType: widget.tabType, isThread: false).notifier)
-                                          .getFileUploadUrl(type: _channel.type, file: platformFile);
+                                    for (final e in files) {
+                                      ref.read(chatFileListControllerProvider(tabType: widget.tabType, isThread: false).notifier).getFileUploadUrl(type: _channel.type, file: e);
                                     }
                                   },
                                   bottom: Container(
                                     color: backgroundColor,
-                                    padding: EdgeInsets.only(
-                                      bottom: max(0, MediaQuery.of(context).viewInsets.bottom - tabMargin - scrollViewBottomPadding.bottom),
-                                    ),
+                                    padding: EdgeInsets.only(bottom: max(0, MediaQuery.of(context).viewInsets.bottom - tabMargin - scrollViewBottomPadding.bottom)),
                                     child: Container(
                                       key: inputAreaKey,
                                       width: double.maxFinite,
@@ -1171,14 +1165,8 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
                                                         child: Row(
                                                           children: [
                                                             if (showReadCursorLine())
-                                                              Container(
-                                                                width: 39.4,
-                                                                height: 1,
-                                                                color: showReadCursorLine() ? context.error : context.surfaceVariant,
-                                                              ),
-                                                            Expanded(
-                                                              child: Container(height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant),
-                                                            ),
+                                                              Container(width: 39.4, height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant),
+                                                            Expanded(child: Container(height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant)),
                                                             Padding(
                                                               padding: EdgeInsets.symmetric(horizontal: 12),
                                                               child: Text(
@@ -1188,16 +1176,11 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
                                                                 style: context.bodyMedium?.textColor(context.surfaceTint).appFont(context),
                                                               ),
                                                             ),
-                                                            Expanded(
-                                                              child: Container(height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant),
-                                                            ),
+                                                            Expanded(child: Container(height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant)),
                                                             if (showReadCursorLine())
                                                               Padding(
                                                                 padding: EdgeInsets.only(left: 12),
-                                                                child: Text(
-                                                                  context.tr.chat_new,
-                                                                  style: context.labelMedium?.textColor(context.error).appFont(context),
-                                                                ),
+                                                                child: Text(context.tr.chat_new, style: context.labelMedium?.textColor(context.error).appFont(context)),
                                                               ),
                                                           ],
                                                         ),
@@ -1207,9 +1190,7 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
                                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
                                                         child: Row(
                                                           children: [
-                                                            Expanded(
-                                                              child: Container(height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant),
-                                                            ),
+                                                            Expanded(child: Container(height: 1, color: showReadCursorLine() ? context.error : context.surfaceVariant)),
                                                             Padding(
                                                               padding: EdgeInsets.only(left: 12),
                                                               child: Text(context.tr.chat_new, style: context.labelMedium?.textColor(context.error)),
@@ -1236,23 +1217,13 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
                                                   },
                                                   onEdit: () {
                                                     var delta = HtmlToDelta().convert(
-                                                      message.toHtml(
-                                                        channel: _channel,
-                                                        channels: channels,
-                                                        members: members,
-                                                        groups: groups,
-                                                        emojis: emojis,
-                                                        forEdit: true,
-                                                      ),
+                                                      message.toHtml(channel: _channel, channels: channels, members: members, groups: groups, emojis: emojis, forEdit: true),
                                                       transformTableAsEmbed: false,
                                                     );
                                                     messageController.document = Document.fromJson(delta.toJson());
                                                     messageController.editingMessageId = message.id;
                                                     messageInputFieldKey.currentState?.requestFocus();
-                                                    messageController.updateSelection(
-                                                      TextSelection.collapsed(offset: messageController.text.length),
-                                                      ChangeSource.local,
-                                                    );
+                                                    messageController.updateSelection(TextSelection.collapsed(offset: messageController.text.length), ChangeSource.local);
                                                   },
                                                   moveToChannel: widget.moveToChannel,
                                                   prevMesasge: prevMessage,

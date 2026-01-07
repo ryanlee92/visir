@@ -45,6 +45,7 @@ import 'package:Visir/features/mail/presentation/screens/mail_input_screen.dart'
 import 'package:Visir/features/preference/presentation/screens/preference_screen.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:crypto/crypto.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:emoji_extension/emoji_extension.dart' hide Color;
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -67,6 +68,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:super_clipboard/super_clipboard.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 import 'package:tuple/tuple.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_compress/video_compress.dart';
@@ -2170,6 +2173,87 @@ class Utils {
   static String textTrimmer(String? text) {
     if (text == null) return '';
     return text.replaceAll(RegExp(r'[\u200B-\u200D\uFEFF\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000\s]+'), ' ').trim();
+  }
+
+  static Widget buildDropTarget({bool? disable, required Widget child, void Function()? onDropEnter, void Function()? onDropLeave, void Function(List<PlatformFile>)? onDrop}) {
+    if (disable == true) return child;
+    if (PlatformX.isMobile) {
+      return DropRegion(
+        onDropEnter: (details) {
+          onDropEnter?.call();
+        },
+        onDropLeave: (details) {
+          onDropLeave?.call();
+        },
+        onDropEnded: (details) {
+          onDropLeave?.call();
+        },
+        formats: Formats.standardFormats,
+        onDropOver: (DropOverEvent event) {
+          if (event.session.allowedOperations.contains(DropOperation.copy)) {
+            return DropOperation.copy;
+          } else {
+            return DropOperation.none;
+          }
+        },
+        onPerformDrop: (event) async {
+          List<PlatformFile> files = [];
+          for (final item in event.session.items) {
+            final reader = item.dataReader!;
+
+            /// Binary formats need to be read as streams
+            if (reader.canProvide(Formats.png)) {
+              reader.getFile(Formats.png, (file) async {
+                final bytes = await file.readAll();
+                final name = file.fileName ?? await reader.getSuggestedName();
+                final platformFile = PlatformFile(name: '${name}.png', size: bytes.length, bytes: bytes);
+                files.add(platformFile);
+              });
+              return;
+            }
+
+            reader.getFile(
+              null,
+              (file) async {
+                final bytes = await file.readAll();
+                final name = file.fileName ?? await reader.getSuggestedName();
+                final extension = reader.getFormats(Formats.standardFormats).firstOrNull;
+                if (extension is SimpleFileFormat) {
+                  final extString =
+                      (extension.uniformTypeIdentifiers ?? extension.mimeTypes ?? extension.fallbackFormats).firstOrNull?.split('.').lastOrNull?.split('/').lastOrNull ?? '';
+                  final platformFile = PlatformFile(name: '${name}.$extString', size: bytes.length, bytes: bytes);
+                  files.add(platformFile);
+                }
+              },
+              onError: (error) {
+                print('Error reading value $error');
+              },
+            );
+          }
+
+          onDrop?.call(files);
+        },
+        child: child,
+      );
+    }
+
+    return DropTarget(
+      onDragDone: (detail) async {
+        List<PlatformFile> files = [];
+        for (final file in detail.files) {
+          final bytes = await file.readAsBytes();
+          files.add(PlatformFile(name: file.name, size: bytes.length, bytes: bytes));
+        }
+        onDrop?.call(files);
+      },
+      onDragEntered: (detail) {
+        onDropEnter?.call();
+      },
+      onDragExited: (detail) {
+        onDropLeave?.call();
+      },
+      child: child,
+    );
   }
 }
 

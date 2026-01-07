@@ -42,6 +42,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_image_platform_interface/cached_network_image_platform_interface.dart' show ImageRenderMethodForWeb;
 import 'package:collection/collection.dart';
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -206,6 +207,7 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
 
     scrollController?.removeListener(scrollListener);
     scrollController?.dispose();
+    isDragging.dispose();
 
     textFormFieldfocusNode.unfocus();
     replyController.removeListener(onTextChanged);
@@ -656,6 +658,8 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
     return false;
   }
 
+  ValueNotifier<bool> isDragging = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
     scrollController ??= ModalScrollController.ofSyncGroup(context)?.addAndGet() ?? ScrollController();
@@ -760,23 +764,20 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                               left: 0,
                               right: 0,
                               bottom: max(0, MediaQuery.of(context).viewInsets.bottom - (widget.isFromMobileTaskEdit == true ? 0 : kMainTabBarHeight - 6)),
-                              child: DropTarget(
-                                enable: replyController.editingMessageId == null,
-                                onDragDone: (detail) async {
+                              child: Utils.buildDropTarget(
+                                disable: replyController.editingMessageId != null,
+                                onDropEnter: () {
+                                  isDragging.value = true;
+                                },
+                                onDropLeave: () {
+                                  isDragging.value = false;
+                                },
+                                onDrop: (files) async {
                                   if (tabNotifier.value != widget.tabType) return;
-                                  for (final e in detail.files) {
-                                    final bytes = await e.readAsBytes();
-                                    final platformFile = PlatformFile(
-                                      path: e.path,
-                                      name: path.basename(e.path),
-                                      size: bytes.lengthInBytes,
-                                      bytes: bytes,
-                                      identifier: e.path,
-                                    );
-                                    ref
-                                        .read(chatFileListControllerProvider(tabType: widget.tabType, isThread: true).notifier)
-                                        .getFileUploadUrl(type: _channel.type, file: platformFile);
+                                  for (final e in files) {
+                                    ref.read(chatFileListControllerProvider(tabType: widget.tabType, isThread: true).notifier).getFileUploadUrl(type: _channel.type, file: e);
                                   }
+                                  isDragging.value = false;
                                 },
                                 child: Padding(
                                   padding: EdgeInsets.only(bottom: inputAreaHeightValue),
@@ -840,23 +841,13 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                               backgroundColor: _parent.id == replyController.editingMessageId ? context.primary.withValues(alpha: 0.1) : null,
                                               onEdit: () {
                                                 var delta = HtmlToDelta().convert(
-                                                  _parent.toHtml(
-                                                    channel: _channel,
-                                                    channels: channels,
-                                                    members: members,
-                                                    groups: groups,
-                                                    emojis: emojis,
-                                                    forEdit: true,
-                                                  ),
+                                                  _parent.toHtml(channel: _channel, channels: channels, members: members, groups: groups, emojis: emojis, forEdit: true),
                                                   transformTableAsEmbed: false,
                                                 );
                                                 replyController.document = Document.fromJson(delta.toJson());
                                                 replyController.editingMessageId = _parent.id;
                                                 messageInputFieldKey.currentState?.requestFocus();
-                                                replyController.updateSelection(
-                                                  TextSelection.collapsed(offset: replyController.text.length),
-                                                  ChangeSource.local,
-                                                );
+                                                replyController.updateSelection(TextSelection.collapsed(offset: replyController.text.length), ChangeSource.local);
                                               },
                                             ),
                                           ),
@@ -865,10 +856,7 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 7),
                                               child: Row(
                                                 children: [
-                                                  Text(
-                                                    '${replies.length} ${context.tr.chat_replies}',
-                                                    style: context.labelMedium?.textColor(context.surfaceTint),
-                                                  ),
+                                                  Text('${replies.length} ${context.tr.chat_replies}', style: context.labelMedium?.textColor(context.surfaceTint)),
                                                   SizedBox(width: 12),
                                                   Expanded(child: Container(height: 1, color: context.surfaceVariant)),
                                                 ],
@@ -910,14 +898,7 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                           channelLastReadAt: null,
                                           onEdit: () {
                                             var delta = HtmlToDelta().convert(
-                                              reply.toHtml(
-                                                channel: _channel,
-                                                channels: channels,
-                                                members: members,
-                                                groups: groups,
-                                                emojis: emojis,
-                                                forEdit: true,
-                                              ),
+                                              reply.toHtml(channel: _channel, channels: channels, members: members, groups: groups, emojis: emojis, forEdit: true),
                                               transformTableAsEmbed: false,
                                             );
                                             replyController.document = Document.fromJson(delta.toJson());
@@ -973,10 +954,7 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                                 decoration: BoxDecoration(
                                                   color: backgroundColor,
                                                   borderRadius: BorderRadius.circular(8),
-                                                  border: Border.all(
-                                                    color: (textFormFieldfocusNode.hasFocus) ? context.surfaceVariant : context.outline,
-                                                    width: 1,
-                                                  ),
+                                                  border: Border.all(color: (textFormFieldfocusNode.hasFocus) ? context.surfaceVariant : context.outline, width: 1),
                                                 ),
                                                 child: MessageInputField(
                                                   key: messageInputFieldKey,
@@ -1125,6 +1103,29 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: ValueListenableBuilder(
+                                valueListenable: isDragging,
+                                builder: (context, isDraggingValue, child) {
+                                  return IgnorePointer(
+                                    child: AnimatedOpacity(
+                                      opacity: isDraggingValue ? 1 : 0,
+                                      duration: Duration(milliseconds: 250),
+                                      child: Container(
+                                        decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                                        padding: EdgeInsets.all(16),
+                                        child: DottedBorder(
+                                          options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                                          child: Container(
+                                            child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],
