@@ -1,5 +1,6 @@
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/dependency/contextmenu/src/ContextMenuArea.dart';
+import 'package:Visir/features/common/presentation/widgets/keyboard_shortcut.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
@@ -47,6 +48,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:mime/mime.dart';
+import 'package:super_clipboard/super_clipboard.dart';
+import 'package:uuid/uuid.dart';
 
 class AgentInputField extends ConsumerStatefulWidget {
   final AgentTagController? messageController;
@@ -915,8 +920,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   Future<void> uploadFiles({required List<PlatformFile> files}) async {
     if (files.isNotEmpty) {
       for (final f in files) {
-        final compressedFile = await Utils.compressOnlyVideoFileInMobile(originalFile: f);
-        ref.read(agentFileListControllerProvider(tabType: widget.tabType).notifier).addFile(file: compressedFile);
+        ref.read(agentFileListControllerProvider(tabType: widget.tabType).notifier).addFile(file: f);
       }
     }
   }
@@ -967,6 +971,51 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   ThemeMode? prevThemeMode;
 
+  Future<void> _paste() async {
+    final clipboard = SystemClipboard.instance;
+    if (clipboard == null) return;
+
+    final reader = await clipboard.read();
+
+    for (final item in reader.items) {
+      await item.getFile(null, (file) async {
+        String fileName = file.fileName ?? Uuid().v4();
+        Uint8List? bytes = await file.readAll();
+        String? mimeType = lookupMimeType('', headerBytes: bytes);
+
+        if (mimeType == null) {
+          // messageController.clipboardPaste();
+          return;
+        }
+
+        if (messageController.editingMessageId != null) return;
+
+        // fileName 없는 경우: MIME 타입으로 분기
+        if (file.fileName == null) {
+          final ext = extensionFromMime(mimeType);
+          fileName = 'Clipboard_${DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).add_Hms().format(DateTime.now())}.$ext';
+        }
+
+        final platformFile = PlatformFile(name: fileName, size: bytes.lengthInBytes, bytes: bytes, identifier: fileName);
+        ref.read(agentFileListControllerProvider(tabType: widget.tabType).notifier).addFile(file: platformFile);
+      });
+    }
+  }
+
+  bool onKeyDown(KeyEvent event) {
+    final logicalKeyPressed = ServicesBinding.instance.keyboard.logicalKeysPressed.where((e) => e != LogicalKeyboardKey.escape).toList();
+    final controlPressed = PlatformX.isApple ? logicalKeyPressed.isMetaPressed : logicalKeyPressed.isControlPressed;
+
+    if (logicalKeyPressed.length == 2 && controlPressed) {
+      if (logicalKeyPressed.contains(LogicalKeyboardKey.keyV)) {
+        _paste();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final projects = ref.watch(projectListControllerProvider);
@@ -982,1275 +1031,1284 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     uploadable = messageController.text.trim().isNotEmpty || messageFileList.where((e) => (e.ok ?? false)).toList().isNotEmpty;
 
     final selectedModel = ref.watch(selectedAgentModelProvider).value;
-    return Container(
-      key: _inputFieldKey,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: _isDragOverInputField ? context.primary.withValues(alpha: 0.7) : context.tertiary.withValues(alpha: 0.7),
-          strokeAlign: BorderSide.strokeAlignOutside,
-          width: _isDragOverInputField ? 2 : 1,
+    return KeyboardShortcut(
+      bypassTextField: true,
+      onKeyDown: onKeyDown,
+      child: Container(
+        key: _inputFieldKey,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _isDragOverInputField ? context.primary.withValues(alpha: 0.7) : context.tertiary.withValues(alpha: 0.7),
+            strokeAlign: BorderSide.strokeAlignOutside,
+            width: _isDragOverInputField ? 2 : 1,
+          ),
+          color: _isDragOverInputField ? context.primary.withValues(alpha: 0.1) : context.background,
+          borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius),
+          boxShadow: PopupMenu.popupShadow,
         ),
-        color: _isDragOverInputField ? context.primary.withValues(alpha: 0.1) : context.background,
-        borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius),
-        boxShadow: PopupMenu.popupShadow,
-      ),
-      padding: EdgeInsets.only(bottom: 6),
-      clipBehavior: Clip.none,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null))
-                    AgentActionSuggestionsWidget(
-                      inboxes: widget.inboxes ?? [],
-                      upNextTask: widget.upNextTask,
-                      upNextEvent: widget.upNextEvent,
-                      onActionTap: widget.onActionTap,
-                      onCustomPrompt: widget.onCustomPrompt,
+        padding: EdgeInsets.only(bottom: 6),
+        clipBehavior: Clip.none,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null))
+                      AgentActionSuggestionsWidget(
+                        inboxes: widget.inboxes ?? [],
+                        upNextTask: widget.upNextTask,
+                        upNextEvent: widget.upNextEvent,
+                        onActionTap: widget.onActionTap,
+                        onCustomPrompt: widget.onCustomPrompt,
+                      ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Container(
+                        constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: AgentTemporaryFileList(tabType: widget.tabType),
+                      ),
                     ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Container(
-                      constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: AgentTemporaryFileList(tabType: widget.tabType),
-                    ),
-                  ),
-                  SizedBox(height: 6),
+                    SizedBox(height: 6),
 
-                  Flexible(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Container(
-                              constraints: BoxConstraints(maxHeight: isMobileView ? 140 : 280),
-                              padding: EdgeInsets.only(left: 3, right: 3),
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: context.textFieldPadding(9), top: 6),
-                                child: Builder(
-                                  builder: (context) {
-                                    final baseStyle = context.titleSmall!.textColor(context.outlineVariant);
-                                    Color inputHintColor = PlatformX.isDesktopView ? context.inverseSurface : context.surfaceTint;
-                                    final baseHorizontalSpacing = HorizontalSpacing(0, 0);
-                                    final baseVerticalSpacing = VerticalSpacing(0, 0);
+                    Flexible(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Container(
+                                constraints: BoxConstraints(maxHeight: isMobileView ? 140 : 280),
+                                padding: EdgeInsets.only(left: 3, right: 3),
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: context.textFieldPadding(9), top: 6),
+                                  child: Builder(
+                                    builder: (context) {
+                                      final baseStyle = context.titleSmall!.textColor(context.outlineVariant);
+                                      Color inputHintColor = PlatformX.isDesktopView ? context.inverseSurface : context.surfaceTint;
+                                      final baseHorizontalSpacing = HorizontalSpacing(0, 0);
+                                      final baseVerticalSpacing = VerticalSpacing(0, 0);
 
-                                    editor =
-                                        editor ??
-                                        QuillEditor(
-                                          key: editorKey,
-                                          controller: messageController,
-                                          focusNode: focusNode,
-                                          scrollController: ScrollController(),
-                                          cursorStyle: CursorStyle(
-                                            color: context.primary,
-                                            backgroundColor: Colors.transparent,
-                                            width: 1,
-                                            radius: Radius.zero,
-                                            offset: Offset(
-                                              0,
-                                              PlatformX.isMacOS
-                                                  ? -1
-                                                  : PlatformX.isIOS
-                                                  ? 2 / context.devicePixelRatio
-                                                  : 0,
+                                      editor =
+                                          editor ??
+                                          QuillEditor(
+                                            key: editorKey,
+                                            controller: messageController,
+                                            focusNode: focusNode,
+                                            scrollController: ScrollController(),
+                                            cursorStyle: CursorStyle(
+                                              color: context.primary,
+                                              backgroundColor: Colors.transparent,
+                                              width: 1,
+                                              radius: Radius.zero,
+                                              offset: Offset(
+                                                0,
+                                                PlatformX.isMacOS
+                                                    ? -1
+                                                    : PlatformX.isIOS
+                                                    ? 2 / context.devicePixelRatio
+                                                    : 0,
+                                              ),
+                                              paintAboveText: true,
+                                              opacityAnimates: false,
                                             ),
-                                            paintAboveText: true,
-                                            opacityAnimates: false,
-                                          ),
-                                          config: QuillEditorConfig(
-                                            autoFocus: false,
-                                            placeholder: [
-                                              context.tr.chat_message,
-                                              if (PlatformX.isDesktopView)
-                                                (widget.onLastMessageSelected != null
-                                                    ? context.tr.chat_focus_last_message(
-                                                        [(PlatformX.isApple ? LogicalKeyboardKey.meta : LogicalKeyboardKey.control).title, LogicalKeyboardKey.arrowUp.title].join(),
-                                                      )
-                                                    : ''),
-                                            ].join(' '),
-                                            expands: false,
-                                            onTapOutsideEnabled: PlatformX.isMobileView,
-                                            scrollable: true,
-                                            keyboardAppearance: context.isDarkMode ? Brightness.dark : Brightness.light,
-                                            padding: EdgeInsets.only(top: 2, bottom: 3),
-                                            textSpanBuilder: (context, node, textOffset, text, style, recognizer) {
-                                              String remainingText = text;
-                                              final List<InlineSpan> spans = [];
-                                              final RegExp mentionRegex = RegExp(r'\u200b\u0040([^]*?)\u200b', unicode: true);
+                                            config: QuillEditorConfig(
+                                              autoFocus: false,
+                                              placeholder: [
+                                                context.tr.chat_message,
+                                                if (PlatformX.isDesktopView)
+                                                  (widget.onLastMessageSelected != null
+                                                      ? context.tr.chat_focus_last_message(
+                                                          [
+                                                            (PlatformX.isApple ? LogicalKeyboardKey.meta : LogicalKeyboardKey.control).title,
+                                                            LogicalKeyboardKey.arrowUp.title,
+                                                          ].join(),
+                                                        )
+                                                      : ''),
+                                              ].join(' '),
+                                              expands: false,
+                                              onTapOutsideEnabled: PlatformX.isMobileView,
+                                              scrollable: true,
+                                              keyboardAppearance: context.isDarkMode ? Brightness.dark : Brightness.light,
+                                              padding: EdgeInsets.only(top: 2, bottom: 3),
+                                              textSpanBuilder: (context, node, textOffset, text, style, recognizer) {
+                                                String remainingText = text;
+                                                final List<InlineSpan> spans = [];
+                                                final RegExp mentionRegex = RegExp(r'\u200b\u0040([^]*?)\u200b', unicode: true);
 
-                                              int offset = 0;
+                                                int offset = 0;
 
-                                              final mentionMatches = mentionRegex.allMatches(text);
+                                                final mentionMatches = mentionRegex.allMatches(text);
 
-                                              // Get tagged entities from controller
-                                              final taggedTasks = messageController.taggedTasks;
-                                              final taggedEvents = messageController.taggedEvents;
-                                              final taggedInboxes = messageController.taggedInboxes;
-                                              final taggedConnections = messageController.taggedConnections;
-                                              final taggedChannels = messageController.taggedChannels;
-                                              final taggedProjects = messageController.taggedProjects;
+                                                // Get tagged entities from controller
+                                                final taggedTasks = messageController.taggedTasks;
+                                                final taggedEvents = messageController.taggedEvents;
+                                                final taggedInboxes = messageController.taggedInboxes;
+                                                final taggedConnections = messageController.taggedConnections;
+                                                final taggedChannels = messageController.taggedChannels;
+                                                final taggedProjects = messageController.taggedProjects;
 
-                                              for (final match in mentionMatches) {
-                                                if (match.start > offset) {
-                                                  spans.add(TextSpan(text: text.substring(offset, match.start)));
-                                                }
+                                                for (final match in mentionMatches) {
+                                                  if (match.start > offset) {
+                                                    spans.add(TextSpan(text: text.substring(offset, match.start)));
+                                                  }
 
-                                                final piece = text.substring(match.start, match.end);
-                                                String tagName = piece.replaceAll('@', '').replaceAll('\u200b', '').trim();
+                                                  final piece = text.substring(match.start, match.end);
+                                                  String tagName = piece.replaceAll('@', '').replaceAll('\u200b', '').trim();
 
-                                                // Find matching entity from tagged entities
-                                                InboxEntity? targetInbox = taggedInboxes.where((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagName).firstOrNull;
+                                                  // Find matching entity from tagged entities
+                                                  InboxEntity? targetInbox = taggedInboxes
+                                                      .where((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagName)
+                                                      .firstOrNull;
 
-                                                TaskEntity? targetTask = taggedTasks.where((e) => e.title != null && tagName == e.title).firstOrNull;
+                                                  TaskEntity? targetTask = taggedTasks.where((e) => e.title != null && tagName == e.title).firstOrNull;
 
-                                                EventEntity? targetEvent = taggedEvents.where((e) => e.title != null && tagName == e.title).firstOrNull;
+                                                  EventEntity? targetEvent = taggedEvents.where((e) => e.title != null && tagName == e.title).firstOrNull;
 
-                                                ConnectionEntity? targetConnection = taggedConnections
-                                                    .where((e) => (e.name != null && tagName == e.name) || (e.email != null && tagName == e.email))
-                                                    .firstOrNull;
+                                                  ConnectionEntity? targetConnection = taggedConnections
+                                                      .where((e) => (e.name != null && tagName == e.name) || (e.email != null && tagName == e.email))
+                                                      .firstOrNull;
 
-                                                MessageChannelEntity? targetChannel = taggedChannels.where((e) => e.name != null && tagName == e.name).firstOrNull;
+                                                  MessageChannelEntity? targetChannel = taggedChannels.where((e) => e.name != null && tagName == e.name).firstOrNull;
 
-                                                ProjectEntity? targetProject = taggedProjects.where((e) => tagName == e.name).firstOrNull;
+                                                  ProjectEntity? targetProject = taggedProjects.where((e) => tagName == e.name).firstOrNull;
 
-                                                if (targetInbox != null) {
-                                                  final displayName = targetInbox.suggestion?.decryptedSummary ?? targetInbox.decryptedTitle;
-                                                  final name = '@$displayName';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                  if (targetInbox != null) {
+                                                    final displayName = targetInbox.suggestion?.decryptedSummary ?? targetInbox.decryptedTitle;
+                                                    final name = '@$displayName';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
 
-                                                  // Get inbox provider for avatarUrl and icon
-                                                  final inboxProviders = targetInbox.providers;
-                                                  final firstProvider = inboxProviders.isNotEmpty ? inboxProviders.first : null;
-                                                  final avatarUrl = firstProvider?.avatarUrl;
-                                                  final providerIcon = firstProvider?.icon;
+                                                    // Get inbox provider for avatarUrl and icon
+                                                    final inboxProviders = targetInbox.providers;
+                                                    final firstProvider = inboxProviders.isNotEmpty ? inboxProviders.first : null;
+                                                    final avatarUrl = firstProvider?.avatarUrl;
+                                                    final providerIcon = firstProvider?.icon;
 
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.only(left: 4, right: 6, top: 4, bottom: 4),
-                                                        decoration: BoxDecoration(
-                                                          color: context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            avatarUrl != null || providerIcon != null
-                                                                ? ClipRRect(
-                                                                    borderRadius: BorderRadius.circular(6),
-                                                                    child: avatarUrl != null
-                                                                        ? ProxyNetworkImage(imageUrl: avatarUrl, width: 12, height: 12, fit: BoxFit.cover)
-                                                                        : Image.asset(providerIcon!, width: 12, height: 12, fit: BoxFit.cover),
-                                                                  )
-                                                                : Container(
-                                                                    width: 12,
-                                                                    height: 12,
-                                                                    alignment: Alignment.center,
-                                                                    child: VisirIcon(type: VisirIconType.inbox, size: 12, color: context.onBackground, isSelected: true),
-                                                                  ),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 4, bottom: 4),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              avatarUrl != null || providerIcon != null
+                                                                  ? ClipRRect(
+                                                                      borderRadius: BorderRadius.circular(6),
+                                                                      child: avatarUrl != null
+                                                                          ? ProxyNetworkImage(imageUrl: avatarUrl, width: 12, height: 12, fit: BoxFit.cover)
+                                                                          : Image.asset(providerIcon!, width: 12, height: 12, fit: BoxFit.cover),
+                                                                    )
+                                                                  : Container(
+                                                                      width: 12,
+                                                                      height: 12,
+                                                                      alignment: Alignment.center,
+                                                                      child: VisirIcon(type: VisirIconType.inbox, size: 12, color: context.onBackground, isSelected: true),
+                                                                    ),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else if (targetProject != null) {
-                                                  final displayName = targetProject.name;
-                                                  final name = '@${targetProject.name}';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.only(left: 4, right: 6, top: 4, bottom: 4),
-                                                        decoration: BoxDecoration(
-                                                          color: targetProject.color != null ? targetProject.color!.withValues(alpha: 0.15) : context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(
-                                                            color: targetProject.color != null
-                                                                ? targetProject.color!.withValues(alpha: 0.3)
-                                                                : context.outline.withValues(alpha: 0.2),
-                                                            width: 1,
+                                                            ],
                                                           ),
                                                         ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Container(
-                                                              width: 12,
-                                                              height: 12,
-                                                              alignment: Alignment.center,
-                                                              child: VisirIcon(
-                                                                type: targetProject.icon ?? VisirIconType.inbox,
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetProject != null) {
+                                                    final displayName = targetProject.name;
+                                                    final name = '@${targetProject.name}';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.only(left: 4, right: 6, top: 4, bottom: 4),
+                                                          decoration: BoxDecoration(
+                                                            color: targetProject.color != null ? targetProject.color!.withValues(alpha: 0.15) : context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(
+                                                              color: targetProject.color != null
+                                                                  ? targetProject.color!.withValues(alpha: 0.3)
+                                                                  : context.outline.withValues(alpha: 0.2),
+                                                              width: 1,
+                                                            ),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              Container(
+                                                                width: 12,
+                                                                height: 12,
+                                                                alignment: Alignment.center,
+                                                                child: VisirIcon(
+                                                                  type: targetProject.icon ?? VisirIconType.inbox,
+                                                                  size: 12,
+                                                                  color: targetProject.color ?? context.onBackground,
+                                                                  isSelected: true,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetTask != null) {
+                                                    final displayName = targetTask.title!;
+                                                    final name = '@${targetTask.title!}';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              VisirIcon(type: VisirIconType.task, size: 12, color: context.onBackground, isSelected: true),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetEvent != null) {
+                                                    final displayName = targetEvent.title!;
+                                                    final name = '@${targetEvent.title!}';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              VisirIcon(type: VisirIconType.calendar, size: 12, color: context.onBackground, isSelected: true),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetConnection != null) {
+                                                    final displayName = targetConnection.name ?? targetConnection.email ?? '';
+                                                    final name = '@$displayName';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              VisirIcon(type: VisirIconType.attendee, size: 12, color: context.onBackground, isSelected: true),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetChannel != null) {
+                                                    final displayName = targetChannel.name ?? '';
+                                                    final name = '@$displayName';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              VisirIcon(type: VisirIconType.chatChannel, size: 12, color: context.onBackground, isSelected: true),
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else if (targetProject != null) {
+                                                    final displayName = targetProject.name;
+                                                    final name = '@$displayName';
+                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
+                                                    spans.add(
+                                                      WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(maxWidth: 200),
+                                                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                          decoration: BoxDecoration(
+                                                            color: context.surface,
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                                            children: [
+                                                              VisirIcon(
+                                                                type: targetProject.icon ?? VisirIconType.project,
                                                                 size: 12,
                                                                 color: targetProject.color ?? context.onBackground,
                                                                 isSelected: true,
                                                               ),
-                                                            ),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
+                                                              const SizedBox(width: 4),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  displayName,
+                                                                  style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else if (targetTask != null) {
-                                                  final displayName = targetTask.title!;
-                                                  final name = '@${targetTask.title!}';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            VisirIcon(type: VisirIconType.task, size: 12, color: context.onBackground, isSelected: true),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else if (targetEvent != null) {
-                                                  final displayName = targetEvent.title!;
-                                                  final name = '@${targetEvent.title!}';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            VisirIcon(type: VisirIconType.calendar, size: 12, color: context.onBackground, isSelected: true),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else if (targetConnection != null) {
-                                                  final displayName = targetConnection.name ?? targetConnection.email ?? '';
-                                                  final name = '@$displayName';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            VisirIcon(type: VisirIconType.attendee, size: 12, color: context.onBackground, isSelected: true),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else if (targetChannel != null) {
-                                                  final displayName = targetChannel.name ?? '';
-                                                  final name = '@$displayName';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            VisirIcon(type: VisirIconType.chatChannel, size: 12, color: context.onBackground, isSelected: true),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else if (targetProject != null) {
-                                                  final displayName = targetProject.name;
-                                                  final name = '@$displayName';
-                                                  final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
-                                                  spans.add(
-                                                    WidgetSpan(
-                                                      alignment: PlaceholderAlignment.middle,
-                                                      child: Container(
-                                                        constraints: const BoxConstraints(maxWidth: 200),
-                                                        margin: const EdgeInsets.symmetric(horizontal: 2),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: context.surface,
-                                                          borderRadius: BorderRadius.circular(6),
-                                                          border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
-                                                        ),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            VisirIcon(
-                                                              type: targetProject.icon ?? VisirIconType.project,
-                                                              size: 12,
-                                                              color: targetProject.color ?? context.onBackground,
-                                                              isSelected: true,
-                                                            ),
-                                                            const SizedBox(width: 4),
-                                                            Flexible(
-                                                              child: Text(
-                                                                displayName,
-                                                                style: TextStyle(color: context.onBackground, fontSize: style?.fontSize ?? 14, height: 1.0),
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                  if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
-                                                } else {
-                                                  spans.add(TextSpan(text: piece));
-                                                }
-
-                                                offset = match.end;
-                                              }
-
-                                              if (offset < text.length) {
-                                                remainingText = text.substring(offset);
-                                                spans.add(TextSpan(text: remainingText));
-                                              }
-
-                                              return TextSpan(children: spans, style: style);
-                                            },
-                                            onTapDown: (details, getPosition) {
-                                              if (PlatformX.isMobileView) {
-                                                messageController.skipRequestKeyboard = false;
-                                              }
-                                              return false;
-                                            },
-                                            customStyles: DefaultStyles(
-                                              h1: DefaultTextBlockStyle(
-                                                baseStyle.copyWith(
-                                                  // fontSize: 34,
-                                                  // color: baseStyle.color,
-                                                  // letterSpacing: -0.5,
-                                                  // height: 1.083,
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.none,
-                                                ),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing.zero,
-                                                VerticalSpacing.zero,
-                                                null,
-                                              ),
-                                              h2: DefaultTextBlockStyle(
-                                                baseStyle.copyWith(
-                                                  fontSize: 30,
-                                                  color: baseStyle.color,
-                                                  letterSpacing: -0.8,
-                                                  height: 1.067,
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.none,
-                                                ),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing.zero,
-                                                VerticalSpacing.zero,
-                                                null,
-                                              ),
-                                              h3: DefaultTextBlockStyle(
-                                                baseStyle.copyWith(
-                                                  // fontSize: 24,
-                                                  // letterSpacing: -0.5,
-                                                  // height: 1.083,
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.none,
-                                                ),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing.zero,
-                                                VerticalSpacing.zero,
-                                                null,
-                                              ),
-                                              h4: DefaultTextBlockStyle(
-                                                baseStyle.copyWith(
-                                                  // fontSize: 20,
-                                                  // letterSpacing: -0.4,
-                                                  // height: 1.1,
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.none,
-                                                ),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing.zero,
-                                                VerticalSpacing.zero,
-                                                null,
-                                              ),
-                                              h5: DefaultTextBlockStyle(
-                                                baseStyle.copyWith(
-                                                  // fontSize: 18,
-                                                  // letterSpacing: -0.2,
-                                                  // height: 1.11,
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.none,
-                                                ),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing.zero,
-                                                VerticalSpacing.zero,
-                                                null,
-                                              ),
-                                              h6: DefaultTextBlockStyle(
-                                                baseStyle.copyWith(
-                                                  // fontSize: 16,
-                                                  // letterSpacing: -0.1,
-                                                  // height: 1.125,
-                                                  fontWeight: FontWeight.bold,
-                                                  decoration: TextDecoration.none,
-                                                ),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing.zero,
-                                                VerticalSpacing.zero,
-                                                null,
-                                              ),
-                                              lineHeightNormal: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              lineHeightTight: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              lineHeightOneAndHalf: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              lineHeightDouble: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              paragraph: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              subscript: baseStyle.copyWith(fontFeatures: [FontFeature.liningFigures(), FontFeature.subscripts()]),
-                                              superscript: baseStyle.copyWith(fontFeatures: [FontFeature.liningFigures(), FontFeature.superscripts()]),
-                                              bold: TextStyle(fontWeight: FontWeight.bold),
-                                              italic: TextStyle(fontStyle: FontStyle.italic),
-                                              strikeThrough: TextStyle(decoration: TextDecoration.lineThrough),
-                                              inlineCode: InlineCodeStyle(
-                                                backgroundColor: context.surfaceVariant,
-                                                radius: const Radius.circular(4),
-                                                style: baseStyle,
-                                                header1: baseStyle.copyWith(fontSize: 32, fontWeight: FontWeight.w500),
-                                                header2: baseStyle.copyWith(fontSize: 22, fontWeight: FontWeight.w500),
-                                                header3: baseStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w500),
-                                              ),
-                                              link: baseStyle.copyWith(color: context.primary, decoration: TextDecoration.underline),
-                                              placeHolder: DefaultTextBlockStyle(
-                                                baseStyle.textColor(inputHintColor),
-                                                baseHorizontalSpacing,
-                                                VerticalSpacing(0, 0),
-                                                VerticalSpacing.zero,
-                                                BoxDecoration(color: context.error),
-                                              ),
-                                              lists: DefaultListBlockStyle(baseStyle, baseHorizontalSpacing, baseVerticalSpacing, VerticalSpacing(0, 6), null, null),
-                                              quote: DefaultTextBlockStyle(
-                                                baseStyle.textColor(baseStyle.color!.withValues(alpha: 0.6)),
-                                                baseHorizontalSpacing,
-                                                baseVerticalSpacing,
-                                                VerticalSpacing(6, 2),
-                                                BoxDecoration(
-                                                  border: Border(left: BorderSide(width: 4, color: Colors.grey.shade300)),
-                                                ),
-                                              ),
-                                              code: DefaultTextBlockStyle(
-                                                baseStyle,
-                                                baseHorizontalSpacing,
-                                                baseVerticalSpacing,
-                                                VerticalSpacing.zero,
-                                                BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(4)),
-                                              ),
-                                              indent: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, baseVerticalSpacing, const VerticalSpacing(0, 0), null),
-                                              align: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              leading: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
-                                              sizeSmall: baseStyle,
-                                              sizeLarge: baseStyle,
-                                              sizeHuge: baseStyle,
-                                            ),
-                                            onKeyPressed: (event, node) {
-                                              if (isDummy) return KeyEventResult.ignored;
-                                              if (event is KeyDownEvent) {
-                                                final logicalKeyPressed = ServicesBinding.instance.keyboard.logicalKeysPressed
-                                                    .where((e) => e != LogicalKeyboardKey.escape)
-                                                    .toList();
-                                                final keyboardControlPressed =
-                                                    (logicalKeyPressed.isMetaPressed && PlatformX.isApple) || (logicalKeyPressed.isControlPressed && !PlatformX.isApple);
-
-                                                // Handle tag list navigation
-                                                if (tagListVisible && tagList.isNotEmpty) {
-                                                  if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-                                                    highlightNextTag();
-                                                    return KeyEventResult.handled;
-                                                  } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                                                    highlightPreviousTag();
-                                                    return KeyEventResult.handled;
-                                                  } else if (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.tab) {
-                                                    enterTag();
-                                                    return KeyEventResult.handled;
+                                                    );
+                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                  } else {
+                                                    spans.add(TextSpan(text: piece));
                                                   }
+
+                                                  offset = match.end;
                                                 }
 
-                                                if (keyboardControlPressed && logicalKeyPressed.contains(LogicalKeyboardKey.arrowUp)) {
-                                                  if (widget.onLastMessageSelected != null) {
-                                                    widget.onLastMessageSelected?.call();
-                                                    focusNode.unfocus();
-                                                    return KeyEventResult.handled;
-                                                  }
+                                                if (offset < text.length) {
+                                                  remainingText = text.substring(offset);
+                                                  spans.add(TextSpan(text: remainingText));
                                                 }
 
-                                                final styles = messageController.getAllSelectionStyles();
-                                                bool hasListNumbers = false;
-                                                bool hasListBullets = false;
-                                                bool hasQuote = false;
-                                                bool hasCodeBlock = false;
-
-                                                for (final style in styles) {
-                                                  for (final attr in style.attributes.values) {
-                                                    if (attr.key == 'list' && attr.value == 'ordered') {
-                                                      hasListNumbers = true;
-                                                    } else if (attr.key == 'list' && attr.value == 'bullet') {
-                                                      hasListBullets = true;
-                                                    } else if (attr.key == 'blockquote') {
-                                                      hasQuote = true;
-                                                    } else if (attr.key == 'code-block') {
-                                                      hasCodeBlock = true;
-                                                    }
-                                                  }
+                                                return TextSpan(children: spans, style: style);
+                                              },
+                                              onTapDown: (details, getPosition) {
+                                                if (PlatformX.isMobileView) {
+                                                  messageController.skipRequestKeyboard = false;
                                                 }
+                                                return false;
+                                              },
+                                              customStyles: DefaultStyles(
+                                                h1: DefaultTextBlockStyle(
+                                                  baseStyle.copyWith(
+                                                    // fontSize: 34,
+                                                    // color: baseStyle.color,
+                                                    // letterSpacing: -0.5,
+                                                    // height: 1.083,
+                                                    fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration.none,
+                                                  ),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  VerticalSpacing.zero,
+                                                  null,
+                                                ),
+                                                h2: DefaultTextBlockStyle(
+                                                  baseStyle.copyWith(
+                                                    fontSize: 30,
+                                                    color: baseStyle.color,
+                                                    letterSpacing: -0.8,
+                                                    height: 1.067,
+                                                    fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration.none,
+                                                  ),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  VerticalSpacing.zero,
+                                                  null,
+                                                ),
+                                                h3: DefaultTextBlockStyle(
+                                                  baseStyle.copyWith(
+                                                    // fontSize: 24,
+                                                    // letterSpacing: -0.5,
+                                                    // height: 1.083,
+                                                    fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration.none,
+                                                  ),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  VerticalSpacing.zero,
+                                                  null,
+                                                ),
+                                                h4: DefaultTextBlockStyle(
+                                                  baseStyle.copyWith(
+                                                    // fontSize: 20,
+                                                    // letterSpacing: -0.4,
+                                                    // height: 1.1,
+                                                    fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration.none,
+                                                  ),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  VerticalSpacing.zero,
+                                                  null,
+                                                ),
+                                                h5: DefaultTextBlockStyle(
+                                                  baseStyle.copyWith(
+                                                    // fontSize: 18,
+                                                    // letterSpacing: -0.2,
+                                                    // height: 1.11,
+                                                    fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration.none,
+                                                  ),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  VerticalSpacing.zero,
+                                                  null,
+                                                ),
+                                                h6: DefaultTextBlockStyle(
+                                                  baseStyle.copyWith(
+                                                    // fontSize: 16,
+                                                    // letterSpacing: -0.1,
+                                                    // height: 1.125,
+                                                    fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration.none,
+                                                  ),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  VerticalSpacing.zero,
+                                                  null,
+                                                ),
+                                                lineHeightNormal: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                lineHeightTight: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                lineHeightOneAndHalf: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                lineHeightDouble: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                paragraph: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                subscript: baseStyle.copyWith(fontFeatures: [FontFeature.liningFigures(), FontFeature.subscripts()]),
+                                                superscript: baseStyle.copyWith(fontFeatures: [FontFeature.liningFigures(), FontFeature.superscripts()]),
+                                                bold: TextStyle(fontWeight: FontWeight.bold),
+                                                italic: TextStyle(fontStyle: FontStyle.italic),
+                                                strikeThrough: TextStyle(decoration: TextDecoration.lineThrough),
+                                                inlineCode: InlineCodeStyle(
+                                                  backgroundColor: context.surfaceVariant,
+                                                  radius: const Radius.circular(4),
+                                                  style: baseStyle,
+                                                  header1: baseStyle.copyWith(fontSize: 32, fontWeight: FontWeight.w500),
+                                                  header2: baseStyle.copyWith(fontSize: 22, fontWeight: FontWeight.w500),
+                                                  header3: baseStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w500),
+                                                ),
+                                                link: baseStyle.copyWith(color: context.primary, decoration: TextDecoration.underline),
+                                                placeHolder: DefaultTextBlockStyle(
+                                                  baseStyle.textColor(inputHintColor),
+                                                  baseHorizontalSpacing,
+                                                  VerticalSpacing(0, 0),
+                                                  VerticalSpacing.zero,
+                                                  BoxDecoration(color: context.error),
+                                                ),
+                                                lists: DefaultListBlockStyle(baseStyle, baseHorizontalSpacing, baseVerticalSpacing, VerticalSpacing(0, 6), null, null),
+                                                quote: DefaultTextBlockStyle(
+                                                  baseStyle.textColor(baseStyle.color!.withValues(alpha: 0.6)),
+                                                  baseHorizontalSpacing,
+                                                  baseVerticalSpacing,
+                                                  VerticalSpacing(6, 2),
+                                                  BoxDecoration(
+                                                    border: Border(left: BorderSide(width: 4, color: Colors.grey.shade300)),
+                                                  ),
+                                                ),
+                                                code: DefaultTextBlockStyle(
+                                                  baseStyle,
+                                                  baseHorizontalSpacing,
+                                                  baseVerticalSpacing,
+                                                  VerticalSpacing.zero,
+                                                  BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(4)),
+                                                ),
+                                                indent: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, baseVerticalSpacing, const VerticalSpacing(0, 0), null),
+                                                align: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                leading: DefaultTextBlockStyle(baseStyle, baseHorizontalSpacing, VerticalSpacing.zero, VerticalSpacing.zero, null),
+                                                sizeSmall: baseStyle,
+                                                sizeLarge: baseStyle,
+                                                sizeHuge: baseStyle,
+                                              ),
+                                              onKeyPressed: (event, node) {
+                                                if (isDummy) return KeyEventResult.ignored;
+                                                if (event is KeyDownEvent) {
+                                                  final logicalKeyPressed = ServicesBinding.instance.keyboard.logicalKeysPressed
+                                                      .where((e) => e != LogicalKeyboardKey.escape)
+                                                      .toList();
+                                                  final keyboardControlPressed =
+                                                      (logicalKeyPressed.isMetaPressed && PlatformX.isApple) || (logicalKeyPressed.isControlPressed && !PlatformX.isApple);
 
-                                                if (event.logicalKey == LogicalKeyboardKey.escape) {
-                                                  final result = widget.onPressEscape!.call();
-                                                  if (result) {
-                                                    widget.focusNode!.requestFocus();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                }
-
-                                                // Handle automatic list toggling
-                                                if (event.logicalKey == LogicalKeyboardKey.space) {
-                                                  // Get the current line's text
-                                                  final selection = messageController.selection;
-
-                                                  // Get the text from the start of the document to the cursor position
-                                                  final textBeforeCursor = messageController.document.toPlainText().substring(0, selection.start);
-                                                  // Find the last newline before the cursor
-                                                  final lastNewline = textBeforeCursor.lastIndexOf('\n');
-                                                  // Get the text from the last newline to the cursor
-                                                  final currentLineText = textBeforeCursor.substring(lastNewline + 1).trim();
-
-                                                  // Check if we're at the end of the line
-                                                  if (currentLineText == '1.' || currentLineText == '1. ') {
-                                                    if (!hasListNumbers) {
-                                                      // Toggle numbered list
-                                                      toggleListNumbers?.call();
-                                                      // Remove the prefix string
-                                                      final prefixLength = currentLineText.length;
-                                                      messageController.replaceText(
-                                                        selection.start - prefixLength,
-                                                        prefixLength,
-                                                        '',
-                                                        TextSelection.collapsed(offset: selection.start - prefixLength),
-                                                      );
+                                                  // Handle tag list navigation
+                                                  if (tagListVisible && tagList.isNotEmpty) {
+                                                    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                                                      highlightNextTag();
                                                       return KeyEventResult.handled;
-                                                    }
-                                                  } else if (currentLineText == '-' || currentLineText == '- ' || currentLineText == '*' || currentLineText == '* ') {
-                                                    if (!hasListBullets) {
-                                                      // Toggle bullet list
-                                                      toggleListBullets?.call();
-                                                      // Remove the prefix string
-                                                      final prefixLength = currentLineText.length;
-                                                      messageController.replaceText(
-                                                        selection.start - prefixLength,
-                                                        prefixLength,
-                                                        '',
-                                                        TextSelection.collapsed(offset: selection.start - prefixLength),
-                                                      );
+                                                    } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                                                      highlightPreviousTag();
                                                       return KeyEventResult.handled;
-                                                    }
-                                                  } else if (currentLineText == '>' || currentLineText == '> ') {
-                                                    if (!hasQuote) {
-                                                      // Toggle quote
-                                                      toggleQuote?.call();
-                                                      // Remove the prefix string
-                                                      final prefixLength = currentLineText.length;
-                                                      messageController.replaceText(
-                                                        selection.start - prefixLength,
-                                                        prefixLength,
-                                                        '',
-                                                        TextSelection.collapsed(offset: selection.start - prefixLength),
-                                                      );
+                                                    } else if (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.tab) {
+                                                      enterTag();
                                                       return KeyEventResult.handled;
                                                     }
                                                   }
-                                                } else if (event.logicalKey == LogicalKeyboardKey.backquote) {
-                                                  // Get the current selection
-                                                  final selection = messageController.selection;
 
-                                                  // Get the text from the start of the document to the cursor position
-                                                  final textBeforeCursor = messageController.document.toPlainText().substring(0, selection.start);
+                                                  if (keyboardControlPressed && logicalKeyPressed.contains(LogicalKeyboardKey.arrowUp)) {
+                                                    if (widget.onLastMessageSelected != null) {
+                                                      widget.onLastMessageSelected?.call();
+                                                      focusNode.unfocus();
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                  }
 
-                                                  // Check for three backticks
-                                                  if (!hasCodeBlock && textBeforeCursor.endsWith('``')) {
-                                                    // Count how many backticks we have in the last 3 characters
-                                                    final lastThreeChars = textBeforeCursor.substring(textBeforeCursor.length - 2);
-                                                    final backtickCount = lastThreeChars.split('').where((c) => c == '`').length;
-                                                    if (backtickCount == 2) {
-                                                      // final isEmpty = messageController.document.toPlainText().trim() == '``';
-                                                      // Remove the backticks
-                                                      messageController.replaceText(
-                                                        selection.start - backtickCount,
-                                                        backtickCount,
-                                                        '',
-                                                        TextSelection.collapsed(offset: selection.start - backtickCount),
-                                                      );
+                                                  final styles = messageController.getAllSelectionStyles();
+                                                  bool hasListNumbers = false;
+                                                  bool hasListBullets = false;
+                                                  bool hasQuote = false;
+                                                  bool hasCodeBlock = false;
 
+                                                  for (final style in styles) {
+                                                    for (final attr in style.attributes.values) {
+                                                      if (attr.key == 'list' && attr.value == 'ordered') {
+                                                        hasListNumbers = true;
+                                                      } else if (attr.key == 'list' && attr.value == 'bullet') {
+                                                        hasListBullets = true;
+                                                      } else if (attr.key == 'blockquote') {
+                                                        hasQuote = true;
+                                                      } else if (attr.key == 'code-block') {
+                                                        hasCodeBlock = true;
+                                                      }
+                                                    }
+                                                  }
+
+                                                  if (event.logicalKey == LogicalKeyboardKey.escape) {
+                                                    final result = widget.onPressEscape!.call();
+                                                    if (result) {
+                                                      widget.focusNode!.requestFocus();
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                  }
+
+                                                  // Handle automatic list toggling
+                                                  if (event.logicalKey == LogicalKeyboardKey.space) {
+                                                    // Get the current line's text
+                                                    final selection = messageController.selection;
+
+                                                    // Get the text from the start of the document to the cursor position
+                                                    final textBeforeCursor = messageController.document.toPlainText().substring(0, selection.start);
+                                                    // Find the last newline before the cursor
+                                                    final lastNewline = textBeforeCursor.lastIndexOf('\n');
+                                                    // Get the text from the last newline to the cursor
+                                                    final currentLineText = textBeforeCursor.substring(lastNewline + 1).trim();
+
+                                                    // Check if we're at the end of the line
+                                                    if (currentLineText == '1.' || currentLineText == '1. ') {
+                                                      if (!hasListNumbers) {
+                                                        // Toggle numbered list
+                                                        toggleListNumbers?.call();
+                                                        // Remove the prefix string
+                                                        final prefixLength = currentLineText.length;
+                                                        messageController.replaceText(
+                                                          selection.start - prefixLength,
+                                                          prefixLength,
+                                                          '',
+                                                          TextSelection.collapsed(offset: selection.start - prefixLength),
+                                                        );
+                                                        return KeyEventResult.handled;
+                                                      }
+                                                    } else if (currentLineText == '-' || currentLineText == '- ' || currentLineText == '*' || currentLineText == '* ') {
+                                                      if (!hasListBullets) {
+                                                        // Toggle bullet list
+                                                        toggleListBullets?.call();
+                                                        // Remove the prefix string
+                                                        final prefixLength = currentLineText.length;
+                                                        messageController.replaceText(
+                                                          selection.start - prefixLength,
+                                                          prefixLength,
+                                                          '',
+                                                          TextSelection.collapsed(offset: selection.start - prefixLength),
+                                                        );
+                                                        return KeyEventResult.handled;
+                                                      }
+                                                    } else if (currentLineText == '>' || currentLineText == '> ') {
+                                                      if (!hasQuote) {
+                                                        // Toggle quote
+                                                        toggleQuote?.call();
+                                                        // Remove the prefix string
+                                                        final prefixLength = currentLineText.length;
+                                                        messageController.replaceText(
+                                                          selection.start - prefixLength,
+                                                          prefixLength,
+                                                          '',
+                                                          TextSelection.collapsed(offset: selection.start - prefixLength),
+                                                        );
+                                                        return KeyEventResult.handled;
+                                                      }
+                                                    }
+                                                  } else if (event.logicalKey == LogicalKeyboardKey.backquote) {
+                                                    // Get the current selection
+                                                    final selection = messageController.selection;
+
+                                                    // Get the text from the start of the document to the cursor position
+                                                    final textBeforeCursor = messageController.document.toPlainText().substring(0, selection.start);
+
+                                                    // Check for three backticks
+                                                    if (!hasCodeBlock && textBeforeCursor.endsWith('``')) {
+                                                      // Count how many backticks we have in the last 3 characters
+                                                      final lastThreeChars = textBeforeCursor.substring(textBeforeCursor.length - 2);
+                                                      final backtickCount = lastThreeChars.split('').where((c) => c == '`').length;
+                                                      if (backtickCount == 2) {
+                                                        // final isEmpty = messageController.document.toPlainText().trim() == '``';
+                                                        // Remove the backticks
+                                                        messageController.replaceText(
+                                                          selection.start - backtickCount,
+                                                          backtickCount,
+                                                          '',
+                                                          TextSelection.collapsed(offset: selection.start - backtickCount),
+                                                        );
+
+                                                        toggleCodeBlock?.call();
+                                                        return KeyEventResult.handled;
+                                                      }
+                                                    }
+
+                                                    // Find the last backtick before the cursor
+                                                    final lastBacktick = textBeforeCursor.lastIndexOf('`', textBeforeCursor.length - 1);
+                                                    if (lastBacktick != -1) {
+                                                      // Get the text between backticks
+                                                      final codeText = textBeforeCursor.substring(lastBacktick + 1, textBeforeCursor.length);
+                                                      // Only proceed if there's actual text between the backticks
+                                                      if (codeText.isNotEmpty) {
+                                                        // Remove both backticks and the text between them
+                                                        messageController.replaceText(lastBacktick, codeText.length + 1, '', TextSelection.collapsed(offset: lastBacktick));
+                                                        // Toggle inline code
+                                                        toggleInlineCode?.call();
+                                                        // Insert the text
+                                                        messageController.replaceText(lastBacktick, 0, codeText, TextSelection.collapsed(offset: lastBacktick + codeText.length));
+                                                        return KeyEventResult.handled;
+                                                      }
+                                                    }
+                                                  } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
+                                                    if (!hasListBullets && !hasListNumbers && !hasQuote && !hasCodeBlock) {
+                                                      // Check if cursor is at the end of or inside a tag
+                                                      final text = messageController.text;
+                                                      final selection = messageController.selection;
+                                                      final cursorPosition = selection.baseOffset;
+
+                                                      final RegExp tagRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
+                                                      final tagMatches = tagRegex.allMatches(text);
+
+                                                      for (final match in tagMatches) {
+                                                        final tagStart = match.start;
+                                                        final tagEnd = match.end;
+
+                                                        // If cursor is at the end of tag or inside tag, delete entire tag
+                                                        if (cursorPosition > tagStart && cursorPosition <= tagEnd) {
+                                                          final tagContent = match.group(1) ?? '';
+
+                                                          // Remove the entire tag
+                                                          final beforeTag = text.substring(0, tagStart);
+                                                          final afterTag = text.substring(tagEnd);
+                                                          final newText = beforeTag + afterTag;
+
+                                                          // Update text and move cursor to where tag was
+                                                          final newCursorPosition = tagStart.clamp(0, newText.length);
+                                                          messageController.text = newText;
+                                                          messageController.updateSelection(TextSelection.collapsed(offset: newCursorPosition), ChangeSource.local);
+
+                                                          // Remove entity from tagged lists
+                                                          messageController.taggedInboxes.removeWhere((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagContent);
+                                                          messageController.taggedTasks.removeWhere((e) => e.title == tagContent);
+                                                          messageController.taggedEvents.removeWhere((e) => e.title == tagContent);
+                                                          messageController.taggedConnections.removeWhere((e) => e.name == tagContent || e.email == tagContent);
+
+                                                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                            if (!mounted) return;
+                                                            setState(() {});
+                                                          });
+
+                                                          return KeyEventResult.handled;
+                                                        }
+                                                      }
+
+                                                      Future.delayed(const Duration(milliseconds: 100), () {
+                                                        if (messageController.text.trim().isEmpty) {
+                                                          final attributes = <Attribute>{};
+                                                          for (final style in messageController.getAllSelectionStyles()) {
+                                                            for (final attr in style.attributes.values) {
+                                                              attributes.add(attr);
+                                                            }
+                                                          }
+                                                          for (final attribute in attributes) {
+                                                            messageController.formatSelection(Attribute.clone(attribute, null));
+                                                          }
+                                                        }
+                                                      });
+                                                    }
+                                                  }
+
+                                                  if (logicalKeyPressed.length == 4) {
+                                                    if (keyboardControlPressed &&
+                                                        logicalKeyPressed.isShiftPressed &&
+                                                        logicalKeyPressed.isAltPressed &&
+                                                        logicalKeyPressed.contains(LogicalKeyboardKey.keyC)) {
                                                       toggleCodeBlock?.call();
                                                       return KeyEventResult.handled;
                                                     }
-                                                  }
-
-                                                  // Find the last backtick before the cursor
-                                                  final lastBacktick = textBeforeCursor.lastIndexOf('`', textBeforeCursor.length - 1);
-                                                  if (lastBacktick != -1) {
-                                                    // Get the text between backticks
-                                                    final codeText = textBeforeCursor.substring(lastBacktick + 1, textBeforeCursor.length);
-                                                    // Only proceed if there's actual text between the backticks
-                                                    if (codeText.isNotEmpty) {
-                                                      // Remove both backticks and the text between them
-                                                      messageController.replaceText(lastBacktick, codeText.length + 1, '', TextSelection.collapsed(offset: lastBacktick));
-                                                      // Toggle inline code
+                                                  } else if (logicalKeyPressed.length == 3) {
+                                                    if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyX)) {
+                                                      toggleStrikeThrough?.call();
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                    if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyC)) {
                                                       toggleInlineCode?.call();
-                                                      // Insert the text
-                                                      messageController.replaceText(lastBacktick, 0, codeText, TextSelection.collapsed(offset: lastBacktick + codeText.length));
                                                       return KeyEventResult.handled;
                                                     }
-                                                  }
-                                                } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
-                                                  if (!hasListBullets && !hasListNumbers && !hasQuote && !hasCodeBlock) {
-                                                    // Check if cursor is at the end of or inside a tag
-                                                    final text = messageController.text;
-                                                    final selection = messageController.selection;
-                                                    final cursorPosition = selection.baseOffset;
-
-                                                    final RegExp tagRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
-                                                    final tagMatches = tagRegex.allMatches(text);
-
-                                                    for (final match in tagMatches) {
-                                                      final tagStart = match.start;
-                                                      final tagEnd = match.end;
-
-                                                      // If cursor is at the end of tag or inside tag, delete entire tag
-                                                      if (cursorPosition > tagStart && cursorPosition <= tagEnd) {
-                                                        final tagContent = match.group(1) ?? '';
-
-                                                        // Remove the entire tag
-                                                        final beforeTag = text.substring(0, tagStart);
-                                                        final afterTag = text.substring(tagEnd);
-                                                        final newText = beforeTag + afterTag;
-
-                                                        // Update text and move cursor to where tag was
-                                                        final newCursorPosition = tagStart.clamp(0, newText.length);
-                                                        messageController.text = newText;
-                                                        messageController.updateSelection(TextSelection.collapsed(offset: newCursorPosition), ChangeSource.local);
-
-                                                        // Remove entity from tagged lists
-                                                        messageController.taggedInboxes.removeWhere((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagContent);
-                                                        messageController.taggedTasks.removeWhere((e) => e.title == tagContent);
-                                                        messageController.taggedEvents.removeWhere((e) => e.title == tagContent);
-                                                        messageController.taggedConnections.removeWhere((e) => e.name == tagContent || e.email == tagContent);
-
-                                                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                          if (!mounted) return;
-                                                          setState(() {});
-                                                        });
-
-                                                        return KeyEventResult.handled;
-                                                      }
+                                                    if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.digit7)) {
+                                                      toggleListNumbers?.call();
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                    if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.digit8)) {
+                                                      toggleListBullets?.call();
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                    if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.digit9)) {
+                                                      toggleQuote?.call();
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                  } else if (logicalKeyPressed.length == 2) {
+                                                    if (keyboardControlPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyV)) {
+                                                      // pasteFileFromClipboard(
+                                                      //   isReply: widget.isThread,
+                                                      //   controller: messageController,
+                                                      //   tabType: widget.tabType,
+                                                      //   channel: widget.channel,
+                                                      // );
+                                                      // return KeyEventResult.handled;
                                                     }
 
-                                                    Future.delayed(const Duration(milliseconds: 100), () {
-                                                      if (messageController.text.trim().isEmpty) {
-                                                        final attributes = <Attribute>{};
-                                                        for (final style in messageController.getAllSelectionStyles()) {
-                                                          for (final attr in style.attributes.values) {
-                                                            attributes.add(attr);
-                                                          }
+                                                    if (keyboardControlPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyK)) {
+                                                      return KeyEventResult.handled;
+                                                    }
+
+                                                    if (logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.tab)) {
+                                                      messageController.indentSelection(false);
+                                                      return KeyEventResult.handled;
+                                                    }
+                                                  } else if (logicalKeyPressed.length == 1) {
+                                                    switch (event.logicalKey) {
+                                                      case LogicalKeyboardKey.arrowDown:
+                                                        if (tagListVisible && tagList.isNotEmpty) {
+                                                          highlightNextTag();
+                                                          return KeyEventResult.handled;
                                                         }
-                                                        for (final attribute in attributes) {
-                                                          messageController.formatSelection(Attribute.clone(attribute, null));
+                                                        break;
+                                                      case LogicalKeyboardKey.arrowUp:
+                                                        if (tagListVisible && tagList.isNotEmpty) {
+                                                          highlightPreviousTag();
+                                                          return KeyEventResult.handled;
                                                         }
-                                                      }
-                                                    });
-                                                  }
-                                                }
-
-                                                if (logicalKeyPressed.length == 4) {
-                                                  if (keyboardControlPressed &&
-                                                      logicalKeyPressed.isShiftPressed &&
-                                                      logicalKeyPressed.isAltPressed &&
-                                                      logicalKeyPressed.contains(LogicalKeyboardKey.keyC)) {
-                                                    toggleCodeBlock?.call();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                } else if (logicalKeyPressed.length == 3) {
-                                                  if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyX)) {
-                                                    toggleStrikeThrough?.call();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                  if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyC)) {
-                                                    toggleInlineCode?.call();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                  if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.digit7)) {
-                                                    toggleListNumbers?.call();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                  if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.digit8)) {
-                                                    toggleListBullets?.call();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                  if (keyboardControlPressed && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.digit9)) {
-                                                    toggleQuote?.call();
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                } else if (logicalKeyPressed.length == 2) {
-                                                  if (keyboardControlPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyV)) {
-                                                    // pasteFileFromClipboard(
-                                                    //   isReply: widget.isThread,
-                                                    //   controller: messageController,
-                                                    //   tabType: widget.tabType,
-                                                    //   channel: widget.channel,
-                                                    // );
-                                                    // return KeyEventResult.handled;
+                                                        break;
+                                                      case LogicalKeyboardKey.tab:
+                                                        if (tagListVisible && tagList.isNotEmpty) {
+                                                          enterTag();
+                                                          return KeyEventResult.handled;
+                                                        } else {
+                                                          messageController.indentSelection(true);
+                                                          return KeyEventResult.handled;
+                                                        }
+                                                      default:
+                                                        break;
+                                                    }
                                                   }
 
-                                                  if (keyboardControlPressed && logicalKeyPressed.contains(LogicalKeyboardKey.keyK)) {
-                                                    return KeyEventResult.handled;
-                                                  }
-
-                                                  if (logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.tab)) {
-                                                    messageController.indentSelection(false);
-                                                    return KeyEventResult.handled;
-                                                  }
-                                                } else if (logicalKeyPressed.length == 1) {
                                                   switch (event.logicalKey) {
-                                                    case LogicalKeyboardKey.arrowDown:
-                                                      if (tagListVisible && tagList.isNotEmpty) {
-                                                        highlightNextTag();
-                                                        return KeyEventResult.handled;
-                                                      }
-                                                      break;
-                                                    case LogicalKeyboardKey.arrowUp:
-                                                      if (tagListVisible && tagList.isNotEmpty) {
-                                                        highlightPreviousTag();
-                                                        return KeyEventResult.handled;
-                                                      }
-                                                      break;
-                                                    case LogicalKeyboardKey.tab:
+                                                    case LogicalKeyboardKey.enter:
+                                                    case LogicalKeyboardKey.numpadEnter:
                                                       if (tagListVisible && tagList.isNotEmpty) {
                                                         enterTag();
                                                         return KeyEventResult.handled;
                                                       } else {
-                                                        messageController.indentSelection(true);
-                                                        return KeyEventResult.handled;
+                                                        if (HardwareKeyboard.instance.isShiftPressed) {
+                                                          return KeyEventResult.ignored;
+                                                        } else {
+                                                          postMessage(html: messageController.html, uploadable: uploadable);
+                                                          return KeyEventResult.handled;
+                                                        }
                                                       }
                                                     default:
                                                       break;
                                                   }
-                                                }
+                                                } else if (event is KeyRepeatEvent) {
+                                                  final logicalKeyPressed = ServicesBinding.instance.keyboard.logicalKeysPressed.where((e) => e != LogicalKeyboardKey.escape);
 
-                                                switch (event.logicalKey) {
-                                                  case LogicalKeyboardKey.enter:
-                                                  case LogicalKeyboardKey.numpadEnter:
-                                                    if (tagListVisible && tagList.isNotEmpty) {
-                                                      enterTag();
-                                                      return KeyEventResult.handled;
-                                                    } else {
-                                                      if (HardwareKeyboard.instance.isShiftPressed) {
-                                                        return KeyEventResult.ignored;
-                                                      } else {
-                                                        postMessage(html: messageController.html, uploadable: uploadable);
-                                                        return KeyEventResult.handled;
-                                                      }
+                                                  if (logicalKeyPressed.length == 1) {
+                                                    switch (event.logicalKey) {
+                                                      case LogicalKeyboardKey.arrowDown:
+                                                        if (tagListVisible && tagList.isNotEmpty) {
+                                                          highlightNextTag();
+                                                          return KeyEventResult.handled;
+                                                        }
+                                                        break;
+                                                      case LogicalKeyboardKey.arrowUp:
+                                                        if (tagListVisible && tagList.isNotEmpty) {
+                                                          highlightPreviousTag();
+                                                          return KeyEventResult.handled;
+                                                        }
+                                                        break;
+                                                      case LogicalKeyboardKey.tab:
+                                                        if (tagListVisible && tagList.isNotEmpty) {
+                                                          enterTag();
+                                                          return KeyEventResult.handled;
+                                                        } else {
+                                                          messageController.indentSelection(true);
+                                                          return KeyEventResult.handled;
+                                                        }
+                                                      default:
+                                                        break;
                                                     }
-                                                  default:
-                                                    break;
-                                                }
-                                              } else if (event is KeyRepeatEvent) {
-                                                final logicalKeyPressed = ServicesBinding.instance.keyboard.logicalKeysPressed.where((e) => e != LogicalKeyboardKey.escape);
-
-                                                if (logicalKeyPressed.length == 1) {
-                                                  switch (event.logicalKey) {
-                                                    case LogicalKeyboardKey.arrowDown:
-                                                      if (tagListVisible && tagList.isNotEmpty) {
-                                                        highlightNextTag();
-                                                        return KeyEventResult.handled;
-                                                      }
-                                                      break;
-                                                    case LogicalKeyboardKey.arrowUp:
-                                                      if (tagListVisible && tagList.isNotEmpty) {
-                                                        highlightPreviousTag();
-                                                        return KeyEventResult.handled;
-                                                      }
-                                                      break;
-                                                    case LogicalKeyboardKey.tab:
-                                                      if (tagListVisible && tagList.isNotEmpty) {
-                                                        enterTag();
-                                                        return KeyEventResult.handled;
-                                                      } else {
-                                                        messageController.indentSelection(true);
-                                                        return KeyEventResult.handled;
-                                                      }
-                                                    default:
-                                                      break;
                                                   }
                                                 }
-                                              }
 
-                                              return KeyEventResult.ignored;
-                                            },
-                                            customShortcuts: {
-                                              SingleActivator(LogicalKeyboardKey.digit1, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit2, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit3, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit4, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit5, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit6, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit0, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.keyK, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit1, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit2, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit3, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit4, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit5, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit6, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.digit0, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                              SingleActivator(LogicalKeyboardKey.keyF, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
-                                            },
-                                          ),
-                                        );
+                                                return KeyEventResult.ignored;
+                                              },
+                                              customShortcuts: {
+                                                SingleActivator(LogicalKeyboardKey.digit1, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit2, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit3, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit4, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit5, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit6, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit0, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.keyK, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit1, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit2, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit3, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit4, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit5, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit6, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.digit0, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                                SingleActivator(LogicalKeyboardKey.keyF, control: !PlatformX.isMacOS, meta: PlatformX.isMacOS): const DoNothingIntent(),
+                                              },
+                                            ),
+                                          );
 
-                                    return DefaultTextStyle(style: context.titleSmall!.textColor(context.outlineVariant), child: editor!);
-                                  },
+                                      return DefaultTextStyle(style: context.titleSmall!.textColor(context.outlineVariant), child: editor!);
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    height: 28,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              IntrinsicWidth(
-                                child: PopupMenu(
-                                  location: PopupMenuLocation.right,
-                                  width: 480,
-                                  height: 600,
-                                  borderRadius: 12,
-                                  backgroundColor: PlatformX.isMobileView ? context.background : null,
-                                  type: ContextMenuActionType.tap,
-                                  style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
-                                  options: VisirButtonOptions(message: '챗 히스토리', tooltipLocation: VisirButtonTooltipLocation.top, doNotConvertCase: true),
-                                  beforePopup: () {
-                                    // 기본적으로 모든 프로젝트의 최근 히스토리 표시
-                                    ref.read(agentChatHistoryFilterProvider.notifier).setFilter(null);
-                                    ref.read(agentChatHistorySearchQueryProvider.notifier).setSearchQuery('');
-                                    ref.read(agentChatHistorySortProvider.notifier).setSortType(AgentChatHistorySortType.updatedAtDesc);
-                                  },
-                                  popup: AgentChatHistoryPopupMenu(projectId: contextProject?.uniqueId),
-                                  child: VisirIcon(type: VisirIconType.clock, size: 14, isSelected: true),
-                                ),
-                              ),
-                              IntrinsicWidth(
-                                child: VisirButton(
-                                  enabled: true,
-                                  type: VisirButtonAnimationType.scaleAndOpacity,
-                                  style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
-                                  options: VisirButtonOptions(
-                                    message: context.tr.attach,
-                                    customShortcutTooltip: context.tr.drag_and_drop,
-                                    tooltipLocation: VisirButtonTooltipLocation.top,
-                                    doNotConvertCase: true,
-                                  ),
-                                  onTap: isDummy ? null : onPressUpload,
-                                  child: onPickingFiles
-                                      ? CustomCircularLoadingIndicator(size: 14, color: focusNode.hasFocus ? context.onInverseSurface : context.surface)
-                                      : SizedBox(
-                                          width: 14,
-                                          height: 14,
-                                          child: VisirIcon(type: VisirIconType.file, size: 14, isSelected: focusNode.hasFocus),
-                                        ),
-                                ),
-                              ),
-                              IntrinsicWidth(
-                                child: PopupMenu(
-                                  beforePopup: () => FocusScope.of(context).unfocus(),
-                                  enabled: true,
-                                  forcePopup: true,
-                                  location: PopupMenuLocation.bottom,
-                                  width: 180,
-                                  borderRadius: 6,
-                                  type: ContextMenuActionType.tap,
-                                  popup: isDummy
-                                      ? null
-                                      : Builder(
-                                          builder: (context) {
-                                            final sortedProjects = projects.sortedProjectWithDepth;
-                                            return SelectionWidget<ProjectEntity?>(
-                                              current: contextProject,
-                                              items: [...sortedProjects.map((e) => e.project).toList()],
-                                              options: (project) => VisirButtonOptions(
-                                                tooltipLocation: project?.description?.isNotEmpty == true ? VisirButtonTooltipLocation.right : VisirButtonTooltipLocation.none,
-                                                message: project?.description,
-                                              ),
-                                              getChild: (project) {
-                                                final depth = sortedProjects.firstWhereOrNull((e) => e.project.uniqueId == project?.uniqueId)?.depth ?? 0;
-                                                return Row(
-                                                  children: [
-                                                    SizedBox(width: 10 + depth * 12),
-                                                    if (project != null)
-                                                      Container(
-                                                        width: 16,
-                                                        height: 16,
-                                                        decoration: BoxDecoration(color: project.color, borderRadius: BorderRadius.circular(6)),
-                                                        alignment: Alignment.center,
-                                                        child: project.icon == null ? null : VisirIcon(type: project.icon!, size: 12, color: Colors.white, isSelected: true),
-                                                      ),
-                                                    if (project != null) SizedBox(width: 6),
-                                                    Expanded(
-                                                      child: Text(
-                                                        project?.name ?? context.tr.agent_select_project_remove,
-                                                        style: context.bodyMedium!.textColor(context.shadow),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 12),
-                                                  ],
-                                                );
-                                              },
-                                              onSelect: (p) {
-                                                contextProject = p;
-                                                widget.onProjectChanged?.call(p);
-                                                setState(() {});
-                                              },
-                                            );
-                                          },
-                                        ),
-                                  style: VisirButtonStyle(
-                                    margin: EdgeInsets.only(left: 6),
-                                    borderRadius: BorderRadius.circular(8),
-                                    padding: EdgeInsets.symmetric(horizontal: 6),
-                                    backgroundColor: contextProject?.color?.withValues(alpha: 0.5),
-                                    height: 28,
-                                  ),
-                                  options: contextProject?.description?.isNotEmpty == true
-                                      ? VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.top, message: contextProject!.description)
-                                      : null,
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 14,
-                                        height: 14,
-                                        child: VisirIcon(type: contextProject?.icon ?? VisirIconType.project, size: 14, isSelected: contextProject != null),
-                                      ),
-                                      if (contextProject != null) SizedBox(width: 4),
-                                      if (contextProject != null) Text(contextProject!.name, style: context.bodyLarge?.textColor(context.onBackground)),
-                                      if (contextProject != null) SizedBox(width: 3),
-                                      if (contextProject != null)
-                                        VisirButton(
-                                          style: VisirButtonStyle(padding: EdgeInsets.all(4), hoverColor: Colors.transparent, borderRadius: BorderRadius.circular(6)),
-                                          options: VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.top, message: context.tr.agent_select_project_remove),
-                                          onTap: () {
-                                            contextProject = null;
-                                            widget.onProjectChanged?.call(null);
-                                            setState(() {});
-                                          },
-                                          child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, isSelected: true),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            IntrinsicWidth(
-                              child: Builder(
-                                builder: (context) {
-                                  final aiApiKeys = ref.watch(aiApiKeysProvider);
-
-                                  return PopupMenu(
-                                    forcePopup: true,
-                                    location: PopupMenuLocation.bottom,
-                                    width: 200,
-                                    borderRadius: 6,
+                    Container(
+                      height: 28,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                IntrinsicWidth(
+                                  child: PopupMenu(
+                                    location: PopupMenuLocation.right,
+                                    width: 480,
+                                    height: 600,
+                                    borderRadius: 12,
+                                    backgroundColor: PlatformX.isMobileView ? context.background : null,
                                     type: ContextMenuActionType.tap,
                                     style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
+                                    options: VisirButtonOptions(message: '챗 히스토리', tooltipLocation: VisirButtonTooltipLocation.top, doNotConvertCase: true),
+                                    beforePopup: () {
+                                      // 기본적으로 모든 프로젝트의 최근 히스토리 표시
+                                      ref.read(agentChatHistoryFilterProvider.notifier).setFilter(null);
+                                      ref.read(agentChatHistorySearchQueryProvider.notifier).setSearchQuery('');
+                                      ref.read(agentChatHistorySortProvider.notifier).setSortType(AgentChatHistorySortType.updatedAtDesc);
+                                    },
+                                    popup: AgentChatHistoryPopupMenu(projectId: contextProject?.uniqueId),
+                                    child: VisirIcon(type: VisirIconType.clock, size: 14, isSelected: true),
+                                  ),
+                                ),
+                                IntrinsicWidth(
+                                  child: VisirButton(
+                                    enabled: true,
+                                    type: VisirButtonAnimationType.scaleAndOpacity,
+                                    style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
                                     options: VisirButtonOptions(
-                                      message: context.tr.agent_select_model_hint,
+                                      message: context.tr.attach,
+                                      customShortcutTooltip: context.tr.drag_and_drop,
                                       tooltipLocation: VisirButtonTooltipLocation.top,
                                       doNotConvertCase: true,
                                     ),
-                                    popup: Builder(
-                                      builder: (context) {
-                                        final apiKeys = aiApiKeys;
-                                        final currentUseUserApiKey = selectedModel?.useUserApiKey ?? false;
+                                    onTap: isDummy ? null : onPressUpload,
+                                    child: onPickingFiles
+                                        ? CustomCircularLoadingIndicator(size: 14, color: focusNode.hasFocus ? context.onInverseSurface : context.surface)
+                                        : SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: VisirIcon(type: VisirIconType.file, size: 14, isSelected: focusNode.hasFocus),
+                                          ),
+                                  ),
+                                ),
+                                IntrinsicWidth(
+                                  child: PopupMenu(
+                                    beforePopup: () => FocusScope.of(context).unfocus(),
+                                    enabled: true,
+                                    forcePopup: true,
+                                    location: PopupMenuLocation.bottom,
+                                    width: 180,
+                                    borderRadius: 6,
+                                    type: ContextMenuActionType.tap,
+                                    popup: isDummy
+                                        ? null
+                                        : Builder(
+                                            builder: (context) {
+                                              final sortedProjects = projects.sortedProjectWithDepth;
+                                              return SelectionWidget<ProjectEntity?>(
+                                                current: contextProject,
+                                                items: [...sortedProjects.map((e) => e.project).toList()],
+                                                options: (project) => VisirButtonOptions(
+                                                  tooltipLocation: project?.description?.isNotEmpty == true ? VisirButtonTooltipLocation.right : VisirButtonTooltipLocation.none,
+                                                  message: project?.description,
+                                                ),
+                                                getChild: (project) {
+                                                  final depth = sortedProjects.firstWhereOrNull((e) => e.project.uniqueId == project?.uniqueId)?.depth ?? 0;
+                                                  return Row(
+                                                    children: [
+                                                      SizedBox(width: 10 + depth * 12),
+                                                      if (project != null)
+                                                        Container(
+                                                          width: 16,
+                                                          height: 16,
+                                                          decoration: BoxDecoration(color: project.color, borderRadius: BorderRadius.circular(6)),
+                                                          alignment: Alignment.center,
+                                                          child: project.icon == null ? null : VisirIcon(type: project.icon!, size: 12, color: Colors.white, isSelected: true),
+                                                        ),
+                                                      if (project != null) SizedBox(width: 6),
+                                                      Expanded(
+                                                        child: Text(
+                                                          project?.name ?? context.tr.agent_select_project_remove,
+                                                          style: context.bodyMedium!.textColor(context.shadow),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 12),
+                                                    ],
+                                                  );
+                                                },
+                                                onSelect: (p) {
+                                                  contextProject = p;
+                                                  widget.onProjectChanged?.call(p);
+                                                  setState(() {});
+                                                },
+                                              );
+                                            },
+                                          ),
+                                    style: VisirButtonStyle(
+                                      margin: EdgeInsets.only(left: 6),
+                                      borderRadius: BorderRadius.circular(8),
+                                      padding: EdgeInsets.symmetric(horizontal: 6),
+                                      backgroundColor: contextProject?.color?.withValues(alpha: 0.5),
+                                      height: 28,
+                                    ),
+                                    options: contextProject?.description?.isNotEmpty == true
+                                        ? VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.top, message: contextProject!.description)
+                                        : null,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 14,
+                                          height: 14,
+                                          child: VisirIcon(type: contextProject?.icon ?? VisirIconType.project, size: 14, isSelected: contextProject != null),
+                                        ),
+                                        if (contextProject != null) SizedBox(width: 4),
+                                        if (contextProject != null) Text(contextProject!.name, style: context.bodyLarge?.textColor(context.onBackground)),
+                                        if (contextProject != null) SizedBox(width: 3),
+                                        if (contextProject != null)
+                                          VisirButton(
+                                            style: VisirButtonStyle(padding: EdgeInsets.all(4), hoverColor: Colors.transparent, borderRadius: BorderRadius.circular(6)),
+                                            options: VisirButtonOptions(tooltipLocation: VisirButtonTooltipLocation.top, message: context.tr.agent_select_project_remove),
+                                            onTap: () {
+                                              contextProject = null;
+                                              widget.onProjectChanged?.call(null);
+                                              setState(() {});
+                                            },
+                                            child: VisirIcon(type: VisirIconType.closeWithCircle, size: 12, isSelected: true),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IntrinsicWidth(
+                                child: Builder(
+                                  builder: (context) {
+                                    final aiApiKeys = ref.watch(aiApiKeysProvider);
 
-                                        // Visir API Key 섹션: 모든 모델
-                                        final taskeyApiModels = AgentModel.values.toList();
+                                    return PopupMenu(
+                                      forcePopup: true,
+                                      location: PopupMenuLocation.bottom,
+                                      width: 200,
+                                      borderRadius: 6,
+                                      type: ContextMenuActionType.tap,
+                                      style: VisirButtonStyle(padding: EdgeInsets.all(6), borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(left: 6)),
+                                      options: VisirButtonOptions(
+                                        message: context.tr.agent_select_model_hint,
+                                        tooltipLocation: VisirButtonTooltipLocation.top,
+                                        doNotConvertCase: true,
+                                      ),
+                                      popup: Builder(
+                                        builder: (context) {
+                                          final apiKeys = aiApiKeys;
+                                          final currentUseUserApiKey = selectedModel?.useUserApiKey ?? false;
 
-                                        // User API Key 섹션: 사용자가 API 키를 입력한 provider의 모델만
-                                        final userApiModels = <AgentModel>[];
-                                        for (final provider in AiProvider.values) {
-                                          final hasApiKey = apiKeys[provider.key] != null && apiKeys[provider.key]!.isNotEmpty;
-                                          if (hasApiKey) {
-                                            userApiModels.addAll(AgentModel.values.where((model) => model.provider == provider).toList());
+                                          // Visir API Key 섹션: 모든 모델
+                                          final taskeyApiModels = AgentModel.values.toList();
+
+                                          // User API Key 섹션: 사용자가 API 키를 입력한 provider의 모델만
+                                          final userApiModels = <AgentModel>[];
+                                          for (final provider in AiProvider.values) {
+                                            final hasApiKey = apiKeys[provider.key] != null && apiKeys[provider.key]!.isNotEmpty;
+                                            if (hasApiKey) {
+                                              userApiModels.addAll(AgentModel.values.where((model) => model.provider == provider).toList());
+                                            }
                                           }
-                                        }
 
-                                        // 현재 선택된 모델이 어떤 섹션에 속하는지 결정
-                                        final isCurrentModelInVisirSection = taskeyApiModels.contains(selectedModel?.model) && !currentUseUserApiKey;
-                                        final isCurrentModelInUserSection = userApiModels.contains(selectedModel?.model) && currentUseUserApiKey;
+                                          // 현재 선택된 모델이 어떤 섹션에 속하는지 결정
+                                          final isCurrentModelInVisirSection = taskeyApiModels.contains(selectedModel?.model) && !currentUseUserApiKey;
+                                          final isCurrentModelInUserSection = userApiModels.contains(selectedModel?.model) && currentUseUserApiKey;
 
-                                        return Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                                          children: [
-                                            // Use Visir API Key 섹션 헤더
-                                            Padding(
-                                              padding: EdgeInsets.only(left: 12, top: 8, bottom: 3),
-                                              child: Text(context.tr.agent_use_taskey_api_key, style: context.labelSmall?.textColor(context.inverseSurface).textBold),
-                                            ),
-                                            // Visir API Key 모델들
-                                            SelectionWidget<AgentModel>(
-                                              current: isCurrentModelInVisirSection ? selectedModel?.model : null,
-                                              items: taskeyApiModels,
-                                              getChildHeight: (model) => 28,
-                                              getTitle: (model) => model.displayName,
-                                              onSelect: (model) {
-                                                ref.read(agentActionControllerProvider.notifier).setModel(model, useUserApiKey: false);
-                                              },
-                                            ),
-                                            // Use User API Key 섹션 헤더 (API 키가 있을 때만)
-                                            if (userApiModels.isNotEmpty) ...[
+                                          return Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            children: [
+                                              // Use Visir API Key 섹션 헤더
                                               Padding(
-                                                padding: EdgeInsets.only(left: 12, top: 12, bottom: 3),
-                                                child: Text(context.tr.agent_use_user_api_key, style: context.labelSmall?.textColor(context.inverseSurface).textBold),
+                                                padding: EdgeInsets.only(left: 12, top: 8, bottom: 3),
+                                                child: Text(context.tr.agent_use_taskey_api_key, style: context.labelSmall?.textColor(context.inverseSurface).textBold),
                                               ),
-                                              // User API Key 모델들
+                                              // Visir API Key 모델들
                                               SelectionWidget<AgentModel>(
-                                                current: isCurrentModelInUserSection ? selectedModel?.model : null,
-                                                items: userApiModels,
+                                                current: isCurrentModelInVisirSection ? selectedModel?.model : null,
+                                                items: taskeyApiModels,
                                                 getChildHeight: (model) => 28,
                                                 getTitle: (model) => model.displayName,
                                                 onSelect: (model) {
-                                                  ref.read(agentActionControllerProvider.notifier).setModel(model, useUserApiKey: true);
+                                                  ref.read(agentActionControllerProvider.notifier).setModel(model, useUserApiKey: false);
                                                 },
                                               ),
+                                              // Use User API Key 섹션 헤더 (API 키가 있을 때만)
+                                              if (userApiModels.isNotEmpty) ...[
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 12, top: 12, bottom: 3),
+                                                  child: Text(context.tr.agent_use_user_api_key, style: context.labelSmall?.textColor(context.inverseSurface).textBold),
+                                                ),
+                                                // User API Key 모델들
+                                                SelectionWidget<AgentModel>(
+                                                  current: isCurrentModelInUserSection ? selectedModel?.model : null,
+                                                  items: userApiModels,
+                                                  getChildHeight: (model) => 28,
+                                                  getTitle: (model) => model.displayName,
+                                                  onSelect: (model) {
+                                                    ref.read(agentActionControllerProvider.notifier).setModel(model, useUserApiKey: true);
+                                                  },
+                                                ),
+                                              ],
                                             ],
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(width: 14, height: 14, child: VisirIcon(type: VisirIconType.agent, size: 14, isSelected: true)),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          aiApiKeys.keys.isEmpty
-                                              ? selectedModel?.model.displayName ?? ''
-                                              : '${selectedModel?.model.displayName ?? ''} (${(selectedModel?.useUserApiKey ?? false) ? context.tr.agent_use_user_api_key : context.tr.agent_use_taskey_api_key})',
-                                          style: context.bodyLarge?.textColor(context.onBackground),
-                                        ),
-                                        SizedBox(width: 3),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            IntrinsicWidth(
-                              child: VisirButton(
-                                type: VisirButtonAnimationType.scaleAndOpacity,
-                                style: VisirButtonStyle(padding: EdgeInsets.all(6), margin: EdgeInsets.only(right: 6), borderRadius: BorderRadius.circular(4)),
-                                options: VisirButtonOptions(
-                                  tabType: widget.tabType,
-                                  tooltipLocation: VisirButtonTooltipLocation.top,
-                                  doNotConvertCase: true,
-                                  bypassTextField: true,
-                                  shortcuts: [
-                                    VisirButtonKeyboardShortcut(
-                                      message: context.tr.send,
-                                      keys: [LogicalKeyboardKey.enter],
-                                      prevOnKeyDown: widget.onKeyDown,
-                                      prevOnKeyRepeat: widget.onKeyRepeat,
-                                      onTrigger: () {
-                                        if (isDummy) return false;
-                                        if (!widget.focusNode!.hasFocus) return false;
-                                        // Don't send if tag list is visible
-                                        if (tagListVisible && tagList.isNotEmpty) return false;
-                                        postMessage(html: messageController.html, uploadable: uploadable);
-                                        return true;
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  postMessage(html: messageController.html, uploadable: uploadable);
-                                },
-                                child: ValueListenableBuilder(
-                                  valueListenable: sendingFailedMessageInputFieldNotifier,
-                                  builder: (context, value, child) {
-                                    return AnimatedSwitcher(
-                                      duration: Duration(milliseconds: 250),
-                                      child: VisirIcon(
-                                        type: VisirIconType.send,
-                                        key: ValueKey('message_list_controller:send_button_${value.toString()}_${uploadable.toString()}'),
-                                        size: 14,
-                                        isSelected: uploadable,
-                                        color: uploadable
-                                            ? value
-                                                  ? context.error
-                                                  : context.primary
-                                            : null,
+                                          );
+                                        },
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(width: 14, height: 14, child: VisirIcon(type: VisirIconType.agent, size: 14, isSelected: true)),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            aiApiKeys.keys.isEmpty
+                                                ? selectedModel?.model.displayName ?? ''
+                                                : '${selectedModel?.model.displayName ?? ''} (${(selectedModel?.useUserApiKey ?? false) ? context.tr.agent_use_user_api_key : context.tr.agent_use_taskey_api_key})',
+                                            style: context.bodyLarge?.textColor(context.onBackground),
+                                          ),
+                                          SizedBox(width: 3),
+                                        ],
                                       ),
                                     );
                                   },
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              IntrinsicWidth(
+                                child: VisirButton(
+                                  type: VisirButtonAnimationType.scaleAndOpacity,
+                                  style: VisirButtonStyle(padding: EdgeInsets.all(6), margin: EdgeInsets.only(right: 6), borderRadius: BorderRadius.circular(4)),
+                                  options: VisirButtonOptions(
+                                    tabType: widget.tabType,
+                                    tooltipLocation: VisirButtonTooltipLocation.top,
+                                    doNotConvertCase: true,
+                                    bypassTextField: true,
+                                    shortcuts: [
+                                      VisirButtonKeyboardShortcut(
+                                        message: context.tr.send,
+                                        keys: [LogicalKeyboardKey.enter],
+                                        prevOnKeyDown: widget.onKeyDown,
+                                        prevOnKeyRepeat: widget.onKeyRepeat,
+                                        onTrigger: () {
+                                          if (isDummy) return false;
+                                          if (!widget.focusNode!.hasFocus) return false;
+                                          // Don't send if tag list is visible
+                                          if (tagListVisible && tagList.isNotEmpty) return false;
+                                          postMessage(html: messageController.html, uploadable: uploadable);
+                                          return true;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    postMessage(html: messageController.html, uploadable: uploadable);
+                                  },
+                                  child: ValueListenableBuilder(
+                                    valueListenable: sendingFailedMessageInputFieldNotifier,
+                                    builder: (context, value, child) {
+                                      return AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 250),
+                                        child: VisirIcon(
+                                          type: VisirIconType.send,
+                                          key: ValueKey('message_list_controller:send_button_${value.toString()}_${uploadable.toString()}'),
+                                          size: 14,
+                                          isSelected: uploadable,
+                                          color: uploadable
+                                              ? value
+                                                    ? context.error
+                                                    : context.primary
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
 
-              if (_isDragOverInputField)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(color: context.primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius)),
-                    child: Center(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: context.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: context.primary.withValues(alpha: 0.3), width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            VisirIcon(type: _isDraggingInbox ? VisirIconType.inbox : VisirIconType.task, size: 16, color: context.primary, isSelected: true),
-                            SizedBox(width: 6),
-                            Text(_isDraggingInbox ? 'Drop inbox' : (_isDraggingTask ? 'Drop task' : 'Drop here'), style: context.bodyMedium?.textColor(context.primary).textBold),
-                          ],
+                if (_isDragOverInputField)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(color: context.primary.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(DesktopScaffold.cardRadius)),
+                      child: Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: context.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: context.primary.withValues(alpha: 0.3), width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              VisirIcon(type: _isDraggingInbox ? VisirIconType.inbox : VisirIconType.task, size: 16, color: context.primary, isSelected: true),
+                              SizedBox(width: 6),
+                              Text(_isDraggingInbox ? 'Drop inbox' : (_isDraggingTask ? 'Drop task' : 'Drop here'), style: context.bodyMedium?.textColor(context.primary).textBold),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
