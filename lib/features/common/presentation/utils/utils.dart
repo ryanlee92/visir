@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -2178,6 +2179,34 @@ class Utils {
   static Widget buildDropTarget({bool? disable, required Widget child, void Function()? onDropEnter, void Function()? onDropLeave, void Function(List<PlatformFile>)? onDrop}) {
     if (disable == true) return child;
     if (PlatformX.isMobile) {
+      Future<PlatformFile?> Function(DataReader reader) getFile = (DataReader reader) async {
+        Completer<PlatformFile?> completer = Completer<PlatformFile?>();
+        if (reader.canProvide(Formats.png)) {
+          reader.getFile(Formats.png, (file) async {
+            final bytes = await file.readAll();
+            final name = file.fileName ?? await reader.getSuggestedName();
+            final platformFile = PlatformFile(name: '${name}.png', size: bytes.length, bytes: bytes);
+            completer.complete(platformFile);
+          });
+        } else {
+          reader.getFile(null, (file) async {
+            final bytes = await file.readAll();
+            final name = file.fileName ?? await reader.getSuggestedName();
+            final extension = reader.getFormats(Formats.standardFormats).firstOrNull;
+            if (extension is SimpleFileFormat) {
+              final extString =
+                  (extension.uniformTypeIdentifiers ?? extension.mimeTypes ?? extension.fallbackFormats).firstOrNull?.split('.').lastOrNull?.split('/').lastOrNull ?? '';
+              final platformFile = PlatformFile(name: '${name}.$extString', size: bytes.length, bytes: bytes);
+              completer.complete(platformFile);
+            } else {
+              completer.complete(null);
+            }
+          });
+        }
+
+        return completer.future;
+      };
+
       return DropRegion(
         onDropEnter: (details) {
           onDropEnter?.call();
@@ -2200,36 +2229,12 @@ class Utils {
           List<PlatformFile> files = [];
           for (final item in event.session.items) {
             final reader = item.dataReader!;
-
-            /// Binary formats need to be read as streams
-            if (reader.canProvide(Formats.png)) {
-              reader.getFile(Formats.png, (file) async {
-                final bytes = await file.readAll();
-                final name = file.fileName ?? await reader.getSuggestedName();
-                final platformFile = PlatformFile(name: '${name}.png', size: bytes.length, bytes: bytes);
-                files.add(platformFile);
-              });
-              return;
-            }
-
-            reader.getFile(
-              null,
-              (file) async {
-                final bytes = await file.readAll();
-                final name = file.fileName ?? await reader.getSuggestedName();
-                final extension = reader.getFormats(Formats.standardFormats).firstOrNull;
-                if (extension is SimpleFileFormat) {
-                  final extString =
-                      (extension.uniformTypeIdentifiers ?? extension.mimeTypes ?? extension.fallbackFormats).firstOrNull?.split('.').lastOrNull?.split('/').lastOrNull ?? '';
-                  final platformFile = PlatformFile(name: '${name}.$extString', size: bytes.length, bytes: bytes);
-                  files.add(platformFile);
-                }
-              },
-              onError: (error) {
-                print('Error reading value $error');
-              },
-            );
+            final platformFile = await getFile(reader);
+            if (platformFile == null) continue;
+            files.add(platformFile);
           }
+
+          print('files: ${files.length} ${event.session.items.length}');
 
           onDrop?.call(files);
         },
