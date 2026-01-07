@@ -176,9 +176,8 @@ Future<ProviderContainer> createProviderContainer() async {
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..maxConnectionsPerHost = 2000
-      ..badCertificateCallback = (_, __, ___) => true;
+    final client = super.createHttpClient(context)..maxConnectionsPerHost = 2000;
+    return client;
   }
 }
 
