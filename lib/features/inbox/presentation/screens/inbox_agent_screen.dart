@@ -16,6 +16,9 @@ import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/wave_refresh_footer.dart';
 import 'package:Visir/features/common/presentation/widgets/wave_refresh_header.dart';
 import 'package:Visir/features/common/provider.dart' hide TextScaler;
+import 'package:desktop_drop/desktop_drop.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 import 'package:Visir/features/inbox/application/agent_action_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dart';
@@ -74,6 +77,8 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
   final GlobalKey _agentInputFieldKey = GlobalKey();
   final GlobalKey<AgentInputFieldState> _agentInputFieldStateKey = GlobalKey<AgentInputFieldState>();
   RefreshController _refreshController = RefreshController();
+
+  bool onFileEntered = false;
 
   String getDateString({required DateTime date, bool? forceDate}) {
     if (DateUtils.isSameDay(DateTime.now(), date) && forceDate != true) return DateFormat.jm().format(date);
@@ -790,90 +795,132 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                               child: Material(
                                 clipBehavior: Clip.none,
                                 color: Colors.transparent,
-                                child: Column(
+                                child: Stack(
                                   children: [
-                                    Expanded(
-                                      child: LayoutBuilder(
-                                        builder: (context, constraints) {
-                                          return Stack(
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                              Positioned.fill(
-                                                child: DailySummaryWidget(
-                                                  events: events,
-                                                  tasks: tasks,
-                                                  inboxes: inboxes,
-                                                  selectedProject: _selectedProject,
-                                                  projects: projects,
-                                                  userName: userName,
-                                                  onDragStart: (inbox, task) {
-                                                    if (PlatformX.isDesktopView) {
-                                                      _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
-                                                    } else {
-                                                      _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
-                                                      if (inbox == null) return;
-                                                      widget.onDragStart?.call(inbox);
-                                                    }
-                                                  },
-                                                  onDragUpdate: (inbox, task, offset) {
-                                                    if (PlatformX.isDesktopView) {
-                                                      if (inbox == null) return;
-                                                      _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
-                                                      timeblockDropWidgetKey.currentState?.onInboxDragUpdate(inbox, offset);
-                                                    } else {
-                                                      _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
-                                                      if (inbox == null) return;
-                                                      widget.onDragUpdate?.call(inbox, offset);
-                                                    }
-                                                  },
-                                                  onDragEnd: (inbox, task, offset) {
-                                                    if (PlatformX.isDesktopView) {
-                                                      _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
-                                                      if (inbox == null) return;
-                                                      timeblockDropWidgetKey.currentState?.onInboxDragEnd(inbox, offset);
-                                                    } else {
-                                                      _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
-                                                      if (inbox == null) return;
-                                                      widget.onDragEnd?.call(inbox, offset);
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                              Positioned(left: 0, bottom: 0, right: 0, child: AgentActionMessagesWidget(maxHeight: constraints.maxHeight)),
-                                            ],
-                                          );
+                                    Positioned.fill(
+                                      child: DropTarget(
+                                        onDragEntered: (details) {
+                                          onFileEntered = true;
+                                          setState(() {});
                                         },
+                                        onDragExited: (details) {
+                                          onFileEntered = false;
+                                          setState(() {});
+                                        },
+                                        onDragDone: (detail) async {
+                                          for (final e in detail.files) {
+                                            final bytes = await e.readAsBytes();
+                                            final platformFile = PlatformFile(path: e.path, name: e.name, size: bytes.lengthInBytes, bytes: bytes, identifier: e.path);
+                                            _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
+                                          }
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: LayoutBuilder(
+                                                builder: (context, constraints) {
+                                                  return Stack(
+                                                    clipBehavior: Clip.none,
+                                                    children: [
+                                                      Positioned.fill(
+                                                        child: DailySummaryWidget(
+                                                          events: events,
+                                                          tasks: tasks,
+                                                          inboxes: inboxes,
+                                                          selectedProject: _selectedProject,
+                                                          projects: projects,
+                                                          userName: userName,
+                                                          onDragStart: (inbox, task) {
+                                                            if (PlatformX.isDesktopView) {
+                                                              _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                            } else {
+                                                              _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                              if (inbox == null) return;
+                                                              widget.onDragStart?.call(inbox);
+                                                            }
+                                                          },
+                                                          onDragUpdate: (inbox, task, offset) {
+                                                            if (PlatformX.isDesktopView) {
+                                                              if (inbox == null) return;
+                                                              _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                              timeblockDropWidgetKey.currentState?.onInboxDragUpdate(inbox, offset);
+                                                            } else {
+                                                              _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                              if (inbox == null) return;
+                                                              widget.onDragUpdate?.call(inbox, offset);
+                                                            }
+                                                          },
+                                                          onDragEnd: (inbox, task, offset) {
+                                                            if (PlatformX.isDesktopView) {
+                                                              _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                              if (inbox == null) return;
+                                                              timeblockDropWidgetKey.currentState?.onInboxDragEnd(inbox, offset);
+                                                            } else {
+                                                              _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                              if (inbox == null) return;
+                                                              widget.onDragEnd?.call(inbox, offset);
+                                                            }
+                                                          },
+                                                        ),
+                                                      ),
+                                                      Positioned(left: 0, bottom: 0, right: 0, child: AgentActionMessagesWidget(maxHeight: constraints.maxHeight)),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            AgentInputField(
+                                              key: _agentInputFieldStateKey,
+                                              fieldKey: _agentInputFieldStateKey,
+                                              messageController: _messageController,
+                                              focusNode: _focusNode,
+                                              onPressEscape: () => true,
+                                              tabType: tabType,
+                                              initialProject: _selectedProject,
+                                              inboxes: filteredInboxes,
+                                              upNextTask: nextItem?.task,
+                                              upNextEvent: nextItem?.event,
+                                              onProjectChanged: (p) {
+                                                setState(() {
+                                                  _selectedProject = p;
+                                                });
+                                              },
+                                              onActionTap: (mcpFunctionName, {inbox, task, event}) {
+                                                final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
+                                                if (actionType != null) {
+                                                  ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
+                                                }
+                                              },
+                                              onCustomPrompt: (title, prompt) {
+                                                final controller = ref.read(agentActionControllerProvider.notifier);
+                                                final message = prompt.isNotEmpty ? prompt : title;
+                                                if (message.isNotEmpty) {
+                                                  controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    AgentInputField(
-                                      key: _agentInputFieldStateKey,
-                                      fieldKey: _agentInputFieldStateKey,
-                                      messageController: _messageController,
-                                      focusNode: _focusNode,
-                                      onPressEscape: () => true,
-                                      tabType: tabType,
-                                      initialProject: _selectedProject,
-                                      inboxes: filteredInboxes,
-                                      upNextTask: nextItem?.task,
-                                      upNextEvent: nextItem?.event,
-                                      onProjectChanged: (p) {
-                                        setState(() {
-                                          _selectedProject = p;
-                                        });
-                                      },
-                                      onActionTap: (mcpFunctionName, {inbox, task, event}) {
-                                        final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
-                                        if (actionType != null) {
-                                          ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
-                                        }
-                                      },
-                                      onCustomPrompt: (title, prompt) {
-                                        final controller = ref.read(agentActionControllerProvider.notifier);
-                                        final message = prompt.isNotEmpty ? prompt : title;
-                                        if (message.isNotEmpty) {
-                                          controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
-                                        }
-                                      },
+
+                                    Positioned.fill(
+                                      child: IgnorePointer(
+                                        child: AnimatedOpacity(
+                                          opacity: onFileEntered ? 1 : 0,
+                                          duration: Duration(milliseconds: 250),
+                                          child: Container(
+                                            decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                                            padding: EdgeInsets.all(16),
+                                            child: DottedBorder(
+                                              options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                                              child: Container(
+                                                child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
