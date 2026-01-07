@@ -1,13 +1,11 @@
-import 'package:Visir/dependency/contextmenu/src/ContextMenuArea.dart' show ContextMenuActionType;
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
-import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
+import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
-import 'package:Visir/features/inbox/presentation/widgets/custom_action_prompt_add_widget.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -436,7 +434,10 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
         return VisirButton(
           type: VisirButtonAnimationType.scaleAndOpacity,
           style: VisirButtonStyle(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), backgroundColor: context.surface.withValues(alpha: 0.7)),
-          onTap: suggestion.onTap,
+          onTap: () {
+            suggestion.onTap();
+            Navigator.of(Utils.mainContext).maybePop();
+          },
           child: Row(
             children: [
               VisirIcon(type: suggestion.icon, size: 16, color: context.onSurface, isSelected: true),

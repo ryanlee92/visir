@@ -24,6 +24,7 @@ import 'package:Visir/features/mail/presentation/screens/mail_screen.dart';
 import 'package:Visir/features/task/presentation/screens/task_screen.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,6 +32,13 @@ final kMainTabBarHeight = 52.0;
 final kMobileDevicePixelRatio = 1.2;
 
 ScrollController? modalScrollController;
+
+ValueNotifier<bool> forceSmallTabbarNotifier = ValueNotifier(false);
+
+bool get forceSmallTabbar => forceSmallTabbarNotifier.value;
+void set forceSmallTabbar(bool value) {
+  forceSmallTabbarNotifier.value = value;
+}
 
 class MobileScaffold extends ConsumerStatefulWidget {
   final List<TabType> mobileTabValues;
@@ -92,10 +100,19 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
     tabController = PageController(initialPage: widget.mobileTabValues.indexOf(tabNotifier.value));
     tabNotifier.addListener(onTabChanged);
     isShowcaseOn.addListener(onShowcaseOnChanged);
+    forceSmallTabbarNotifier.addListener(onForceSmallTabbarChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       tabController.addListener(onTabControllerChanged);
     });
+  }
+
+  void onForceSmallTabbarChanged() {
+    if (forceSmallTabbarNotifier.value) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        MobileScaffold.largeTabBar.value = false;
+      });
+    }
   }
 
   void onTabControllerChanged() {
@@ -130,12 +147,13 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
   void dispose() {
     if (PlatformX.isAndroid) BackButtonInterceptor.remove(onBackButtonPressed);
     isShowcaseOn.removeListener(onShowcaseOnChanged);
+    forceSmallTabbarNotifier.removeListener(onForceSmallTabbarChanged);
     tabController.removeListener(onTabControllerChanged);
     tabNotifier.removeListener(onTabChanged);
     controller.dispose();
     tabController.dispose();
-    eventStreamController.close(); // Memory optimization: close StreamController
-    backButtonExitTimer?.cancel(); // Memory optimization: cancel timer
+    eventStreamController.close();
+    backButtonExitTimer?.cancel();
     super.dispose();
   }
 
@@ -312,7 +330,7 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
           scrollableContext = notification.context;
         }
 
-        if (notification is ScrollUpdateNotification) {
+        if (notification is ScrollUpdateNotification && !forceSmallTabbar) {
           if ((notification.dragDetails?.delta.dy ?? 0) > 0) {
             MobileScaffold.largeTabBar.value = true;
           } else if ((notification.dragDetails?.delta.dy ?? 0) < 0) {
@@ -404,6 +422,7 @@ class _MobileScaffoldState extends ConsumerState<MobileScaffold> {
                                     onTap: value
                                         ? null
                                         : () {
+                                            if (forceSmallTabbar) return;
                                             MobileScaffold.largeTabBar.value = true;
                                           },
                                     style: VisirButtonStyle(hoverColor: Colors.transparent),

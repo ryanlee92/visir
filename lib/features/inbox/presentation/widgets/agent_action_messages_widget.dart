@@ -7,6 +7,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/date_time_ex
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
+import 'package:Visir/features/common/presentation/widgets/mobile_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/calendar/application/calendar_list_controller.dart';
@@ -2085,6 +2086,9 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       topLeft: Radius.circular(PlatformX.isMobileView ? 20 : DesktopScaffold.cardRadius),
       topRight: Radius.circular(PlatformX.isMobileView ? 20 : DesktopScaffold.cardRadius),
     );
+
+    forceSmallTabbar = !isEmpty;
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       switchInCurve: Curves.easeOut,
