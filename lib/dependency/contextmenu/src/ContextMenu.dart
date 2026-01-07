@@ -175,7 +175,6 @@ class _ContextMenuState extends ConsumerState<ContextMenu> with WidgetsBindingOb
     }
 
     if (PopupMenuLocation.bottom == widget.popupMenuLocation && paddingTop > margin + height && paddingBottom <= margin + resizedHeightDiff) {
-      print('####### 123444 ${paddingLeft} ${screenHeight}');
       paddingBottom = (context.screenSize.height - widget.topLeft.dy) / screenRatio;
       paddingTop = screenHeight - paddingBottom - height;
     }
