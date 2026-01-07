@@ -422,6 +422,10 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
           onFileEntered = false;
           setState(() {});
         },
+        onDropEnded: (details) {
+          onFileEntered = false;
+          setState(() {});
+        },
         formats: Formats.standardFormats,
         onDropOver: (DropOverEvent event) {
           if (event.session.allowedOperations.contains(DropOperation.copy)) {
@@ -438,8 +442,8 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
             if (reader.canProvide(Formats.png)) {
               reader.getFile(Formats.png, (file) async {
                 final bytes = await file.readAll();
-                final extension = 'png';
-                final platformFile = PlatformFile(name: '${file.fileName!}.$extension', size: bytes.lengthInBytes, bytes: bytes, identifier: '${file.fileName!}.$extension');
+                final name = file.fileName ?? await reader.getSuggestedName();
+                final platformFile = PlatformFile(name: '${name}.png', size: bytes.length, bytes: bytes);
                 _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
               });
               return;
@@ -449,11 +453,12 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
               null,
               (file) async {
                 final bytes = await file.readAll();
+                final name = file.fileName ?? await reader.getSuggestedName();
                 final extension = reader.getFormats(Formats.standardFormats).firstOrNull;
                 if (extension is SimpleFileFormat) {
                   final extString =
                       (extension.uniformTypeIdentifiers ?? extension.mimeTypes ?? extension.fallbackFormats).firstOrNull?.split('.').lastOrNull?.split('/').lastOrNull ?? '';
-                  final platformFile = PlatformFile(name: '${file.fileName!}.$extString', size: bytes.lengthInBytes, bytes: bytes, identifier: '${file.fileName!}.$extString');
+                  final platformFile = PlatformFile(name: '${name}.$extString', size: bytes.lengthInBytes, bytes: bytes, identifier: '${name}.$extString');
                   _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
                 }
               },
