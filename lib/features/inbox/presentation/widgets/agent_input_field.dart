@@ -283,7 +283,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
         extraOptions.onPressed?.call();
         widget.focusNode!.requestFocus();
       },
-      child: VisirIcon(type: icon, color: !widget.focusNode!.hasFocus ? context.inverseSurface : context.onBackground, size: 14),
+      child: VisirIcon(type: icon, color: !widget.focusNode!.hasFocus ? context.inverseSurface : context.onBackground, size: iconSize),
     );
   }
 
@@ -2016,7 +2016,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                             onActionTap: widget.onActionTap,
                                             onCustomPrompt: widget.onCustomPrompt,
                                           ),
-                                          child: VisirIcon(type: VisirIconType.bookmark, size: 14, isSelected: true),
+                                          child: VisirIcon(type: VisirIconType.bookmark, size: iconSize, isSelected: true),
                                         );
                                       },
                                     ),
@@ -2038,7 +2038,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                       ref.read(agentChatHistorySortProvider.notifier).setSortType(AgentChatHistorySortType.updatedAtDesc);
                                     },
                                     popup: AgentChatHistoryPopupMenu(projectId: contextProject?.uniqueId),
-                                    child: VisirIcon(type: VisirIconType.clock, size: 14, isSelected: true),
+                                    child: VisirIcon(type: VisirIconType.clock, size: iconSize, isSelected: true),
                                   ),
                                 ),
                                 IntrinsicWidth(
@@ -2054,11 +2054,11 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                     ),
                                     onTap: isDummy ? null : onPressUpload,
                                     child: onPickingFiles
-                                        ? CustomCircularLoadingIndicator(size: 14, color: focusNode.hasFocus ? context.onInverseSurface : context.surface)
+                                        ? CustomCircularLoadingIndicator(size: iconSize, color: focusNode.hasFocus ? context.onInverseSurface : context.surface)
                                         : SizedBox(
                                             width: 14,
                                             height: 14,
-                                            child: VisirIcon(type: VisirIconType.file, size: 14, isSelected: focusNode.hasFocus),
+                                            child: VisirIcon(type: VisirIconType.file, size: iconSize, isSelected: focusNode.hasFocus),
                                           ),
                                   ),
                                 ),
@@ -2130,9 +2130,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                     child: Row(
                                       children: [
                                         SizedBox(
-                                          width: 14,
-                                          height: 14,
-                                          child: VisirIcon(type: contextProject?.icon ?? VisirIconType.project, size: 14, isSelected: contextProject != null),
+                                          width: iconSize,
+                                          height: iconSize,
+                                          child: VisirIcon(type: contextProject?.icon ?? VisirIconType.project, size: iconSize, isSelected: contextProject != null),
                                         ),
                                         if (contextProject != null) SizedBox(width: 4),
                                         if (contextProject != null) Text(contextProject!.name, style: context.bodyLarge?.textColor(context.onBackground)),
@@ -2237,7 +2237,11 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                       ),
                                       child: Row(
                                         children: [
-                                          SizedBox(width: 14, height: 14, child: VisirIcon(type: VisirIconType.agent, size: 14, isSelected: true)),
+                                          SizedBox(
+                                            width: iconSize,
+                                            height: iconSize,
+                                            child: VisirIcon(type: VisirIconType.agent, size: iconSize, isSelected: true),
+                                          ),
                                           SizedBox(width: 4),
                                           Text(
                                             aiApiKeys.keys.isEmpty
@@ -2289,7 +2293,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                         child: VisirIcon(
                                           type: VisirIconType.send,
                                           key: ValueKey('message_list_controller:send_button_${value.toString()}_${uploadable.toString()}'),
-                                          size: 14,
+                                          size: iconSize,
                                           isSelected: uploadable,
                                           color: uploadable
                                               ? value
@@ -2410,6 +2414,8 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     setState(() {});
   }
 
+  double get iconSize => PlatformX.isMobileView ? 16.0 : 14.0;
+
   Widget _buildTagListOverlay(Offset caretGlobalPosition) {
     final double itemHeight = 36.0;
     final double sectionHeaderHeight = 28.0;
@@ -2443,7 +2449,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
           color: Colors.transparent,
           child: Container(
             width: 300,
-            constraints: BoxConstraints(maxHeight: (totalHeight + 14).clamp(0, double.infinity)),
+            constraints: BoxConstraints(maxHeight: (totalHeight + iconSize).clamp(0, double.infinity)),
             padding: const EdgeInsets.symmetric(vertical: 6),
             decoration: BoxDecoration(
               color: context.surface,
