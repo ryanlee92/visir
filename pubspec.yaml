@@ -211,6 +211,7 @@ dependencies:
         git: 
             url: https://github.com/ryanlee92/flutter_infinite_marquee.git
             ref: 3717fe4
+    super_drag_and_drop: ^0.9.1
 
 dev_dependencies:
     freezed: ^3.1.0

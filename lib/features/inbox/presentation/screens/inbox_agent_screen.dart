@@ -49,6 +49,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons_full.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer_text/shimmer_text.dart';
+import 'package:super_clipboard/super_clipboard.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 class InboxAgentScreen extends ConsumerStatefulWidget {
   final void Function(InboxEntity inbox)? onDragStart;
@@ -411,259 +413,337 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
     final cardRadius = isMobileView ? 12.0 : DesktopScaffold.cardRadius;
 
     if (isMobileView) {
-      return Stack(
-        children: [
-          Container(
-            height: headerSectionHeight,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Container(
-                  child: weatherData != null ? Image.asset(weatherData.condition.assets, fit: BoxFit.cover) : Image.asset(WeatherCondition.clear.assets, fit: BoxFit.cover),
-                ),
-                if (weatherData == null)
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(color: context.background.withValues(alpha: 0.9)),
-                  ),
-                if (weatherData != null) Container(color: context.background.withValues(alpha: 0.65)),
-                MediaQuery(
-                  data: context.mediaQuery.copyWith(textScaler: TextScaler.linear(1)),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: headerPadding,
-                        child: Material(
-                          clipBehavior: Clip.none,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      '${context.tr.agentic_home_hi}${userName == null ? '' : userName.split(' ').first}',
-                                      style: context.headlineLarge?.textColor(context.onBackground).textBold,
-                                    ),
-                                  ),
-                                  if (weatherData != null)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(weatherData.temperature.round().toString(), style: context.titleLarge?.textColor(context.onBackground).appFont(context)),
-                                            HugeIcon(
-                                              icon: weatherData.useFahrenheit ? HugeIcons.solidRoundedFahrenheit : HugeIcons.solidRoundedCelsius,
-                                              size: context.textScaler.scale(context.titleLarge!.fontSize!),
-                                              color: context.onBackground,
-                                            ),
-                                          ],
-                                        ),
-                                        Text(weatherData.name, style: context.bodySmall?.textColor(context.inverseSurface)),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                              SizedBox(height: 6),
-                              if (!_isSuggestionLoading)
-                                Text(summaryText, style: context.titleMedium?.textColor(context.surfaceTint), maxLines: 2, overflow: TextOverflow.ellipsis),
-                              if (_isSuggestionLoading)
-                                ShimmerText(
-                                  text: context.tr.inbox_agent_loading_dynamic(fetchDurationString),
-                                  textSize: context.titleMedium!.fontSize!,
-                                  textFamily: context.titleMedium?.appFont(context).fontFamily ?? '',
-                                  textColor: context.surfaceTint,
-                                  shiningColor: context.inverseSurface,
-                                  letterspacing: 0,
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      ProjectSummaryCardsWidget(
-                        key: projectSummaryCardsWidgetKey,
-                        projectMap: projectMap,
-                        projectHide: projectHide,
-                        resizableController: resizableController,
-                        onProjectSelected: (project) {
-                          setState(() {
-                            _selectedProject = project;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned.fill(
-            top: headerSectionHeight - 20,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: context.background,
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: ValueListenableBuilder(
-              valueListenable: MobileScaffold.largeTabBar,
-              builder: (context, largeTabBar, child) {
-                final tabMargin = (largeTabBar ? MobileScaffold.bottomPaddingForLargeTabBar : MobileScaffold.bottomPaddingForSmallTabBar);
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SmartRefresher(
-                      controller: _refreshController,
-                      enablePullDown: !_isSuggestionLoading,
-                      enablePullUp: false,
-                      hitTestBehavior: HitTestBehavior.translucent,
-                      header: WaveRefreshHeader(),
-                      footer: WaveRefreshFooter(),
-                      onRefresh: () async {
-                        try {
-                          await ref.read(inboxControllerProvider.notifier).refresh();
-                          _refreshController.refreshCompleted();
-                        } catch (e) {
-                          _refreshController.refreshFailed();
-                        }
-                      },
-                      physics: BottomSheetScrollPhysics(),
-                      child: SingleChildScrollView(
-                        hitTestBehavior: HitTestBehavior.translucent,
-                        physics: NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.only(top: headerSectionHeight - 20, bottom: (_agentInputFieldHeight > 0 ? _agentInputFieldHeight + 8 : 0) + tabMargin + 8),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: context.background,
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                          ),
-                          constraints: BoxConstraints(minHeight: constraints.maxHeight - headerSectionHeight - 20 + context.padding.bottom),
-                          child: DailySummaryWidget(
-                            events: events,
-                            tasks: tasks,
-                            inboxes: inboxes,
-                            selectedProject: _selectedProject,
-                            projects: projects,
-                            userName: userName,
-                            onDragStart: (inbox, task) {
-                              _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
-                              if (inbox == null) return;
-                              widget.onDragStart?.call(inbox);
-                            },
-                            onDragUpdate: (inbox, task, offset) {
-                              _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
-                              if (inbox == null) return;
-                              widget.onDragUpdate?.call(inbox, offset);
-                            },
-                            onDragEnd: (inbox, task, offset) {
-                              _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
-                              if (inbox == null) return;
-                              widget.onDragEnd?.call(inbox, offset);
-                            },
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
+      return DropRegion(
+        onDropEnter: (details) {
+          onFileEntered = true;
+          setState(() {});
+        },
+        onDropLeave: (details) {
+          onFileEntered = false;
+          setState(() {});
+        },
+        formats: Formats.standardFormats,
+        onDropOver: (DropOverEvent event) {
+          if (event.session.allowedOperations.contains(DropOperation.copy)) {
+            return DropOperation.copy;
+          } else {
+            return DropOperation.none;
+          }
+        },
+        onPerformDrop: (event) async {
+          for (final item in event.session.items) {
+            final reader = item.dataReader!;
 
-          ValueListenableBuilder(
-            valueListenable: MobileScaffold.largeTabBar,
-            builder: (context, largeTabBar, child) {
-              final tabMargin = (largeTabBar ? MobileScaffold.bottomPaddingForLargeTabBar : MobileScaffold.bottomPaddingForSmallTabBar);
-              return Stack(
+            /// Binary formats need to be read as streams
+            if (reader.canProvide(Formats.png)) {
+              reader.getFile(Formats.png, (file) async {
+                final bytes = await file.readAll();
+                final extension = 'png';
+                final platformFile = PlatformFile(name: '${file.fileName!}.$extension', size: bytes.lengthInBytes, bytes: bytes, identifier: '${file.fileName!}.$extension');
+                _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
+              });
+              return;
+            }
+
+            reader.getFile(
+              null,
+              (file) async {
+                final bytes = await file.readAll();
+                final extension = reader.getFormats(Formats.standardFormats).firstOrNull;
+                if (extension is SimpleFileFormat) {
+                  final extString =
+                      (extension.uniformTypeIdentifiers ?? extension.mimeTypes ?? extension.fallbackFormats).firstOrNull?.split('.').lastOrNull?.split('/').lastOrNull ?? '';
+                  final platformFile = PlatformFile(name: '${file.fileName!}.$extString', size: bytes.lengthInBytes, bytes: bytes, identifier: '${file.fileName!}.$extString');
+                  _agentInputFieldStateKey.currentState?.uploadFiles(files: [platformFile]);
+                }
+              },
+              onError: (error) {
+                print('Error reading value $error');
+              },
+            );
+          }
+        },
+        child: Stack(
+          children: [
+            Container(
+              height: headerSectionHeight,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  // Positioned(
-                  //   bottom: 0,
-                  //   left: 0,
-                  //   right: 0,
-                  //   height: tabMargin + 8,
-                  //   child: Container(color: context.background),
-                  // ),
-                  AnimatedPositioned(
-                    duration: Duration(milliseconds: 250),
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: context.background,
-                      padding: EdgeInsets.only(bottom: _agentInputFieldHeight),
-                      child: AgentActionMessagesWidget(maxHeight: (context.height / ref.read(zoomRatioProvider) - max(context.padding.top - 8, 20)) - _agentInputFieldHeight),
-                    ),
+                  Container(
+                    child: weatherData != null ? Image.asset(weatherData.condition.assets, fit: BoxFit.cover) : Image.asset(WeatherCondition.clear.assets, fit: BoxFit.cover),
                   ),
-                  AnimatedPositioned(
-                    duration: Duration(milliseconds: 250),
-                    bottom: 0,
-                    left: 8,
-                    right: 8,
-                    child: NotificationListener<SizeChangedLayoutNotification>(
-                      onNotification: (notification) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          final RenderBox? renderBox = _agentInputFieldKey.currentContext?.findRenderObject() as RenderBox?;
-                          if (renderBox != null) {
-                            final height = renderBox.size.height;
-                            if (height != _agentInputFieldHeight) {
-                              setState(() {
-                                _agentInputFieldHeight = height;
-                              });
-                            }
-                          }
-                        });
-                        return true;
-                      },
-                      child: SizeChangedLayoutNotifier(
-                        child: Container(
-                          key: _agentInputFieldKey,
-                          padding: EdgeInsets.only(bottom: max(MediaQuery.of(context).viewInsets.bottom / ref.read(zoomRatioProvider) + 8, tabMargin + 8)),
-                          child: AgentInputField(
-                            key: _agentInputFieldStateKey,
-                            fieldKey: _agentInputFieldStateKey,
-                            messageController: _messageController,
-                            focusNode: _focusNode,
-                            onPressEscape: () => true,
-                            tabType: tabType,
-                            initialProject: _selectedProject,
-                            inboxes: filteredInboxes,
-                            upNextTask: nextItem?.task,
-                            upNextEvent: nextItem?.event,
-                            onProjectChanged: (p) {
-                              setState(() {
-                                _selectedProject = p;
-                              });
-                            },
-                            onActionTap: (mcpFunctionName, {inbox, task, event}) {
-                              final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
-                              if (actionType != null) {
-                                ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
-                              }
-                            },
-                            onCustomPrompt: (title, prompt) {
-                              final controller = ref.read(agentActionControllerProvider.notifier);
-                              final message = prompt.isNotEmpty ? prompt : title;
-                              if (message.isNotEmpty) {
-                                controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
-                              }
-                            },
+                  if (weatherData == null)
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(color: context.background.withValues(alpha: 0.9)),
+                    ),
+                  if (weatherData != null) Container(color: context.background.withValues(alpha: 0.65)),
+                  MediaQuery(
+                    data: context.mediaQuery.copyWith(textScaler: TextScaler.linear(1)),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: headerPadding,
+                          child: Material(
+                            clipBehavior: Clip.none,
+                            color: Colors.transparent,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '${context.tr.agentic_home_hi}${userName == null ? '' : userName.split(' ').first}',
+                                        style: context.headlineLarge?.textColor(context.onBackground).textBold,
+                                      ),
+                                    ),
+                                    if (weatherData != null)
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(weatherData.temperature.round().toString(), style: context.titleLarge?.textColor(context.onBackground).appFont(context)),
+                                              HugeIcon(
+                                                icon: weatherData.useFahrenheit ? HugeIcons.solidRoundedFahrenheit : HugeIcons.solidRoundedCelsius,
+                                                size: context.textScaler.scale(context.titleLarge!.fontSize!),
+                                                color: context.onBackground,
+                                              ),
+                                            ],
+                                          ),
+                                          Text(weatherData.name, style: context.bodySmall?.textColor(context.inverseSurface)),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                                SizedBox(height: 6),
+                                if (!_isSuggestionLoading)
+                                  Text(summaryText, style: context.titleMedium?.textColor(context.surfaceTint), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                if (_isSuggestionLoading)
+                                  ShimmerText(
+                                    text: context.tr.inbox_agent_loading_dynamic(fetchDurationString),
+                                    textSize: context.titleMedium!.fontSize!,
+                                    textFamily: context.titleMedium?.appFont(context).fontFamily ?? '',
+                                    textColor: context.surfaceTint,
+                                    shiningColor: context.inverseSurface,
+                                    letterspacing: 0,
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                        ProjectSummaryCardsWidget(
+                          key: projectSummaryCardsWidgetKey,
+                          projectMap: projectMap,
+                          projectHide: projectHide,
+                          resizableController: resizableController,
+                          onProjectSelected: (project) {
+                            setState(() {
+                              _selectedProject = project;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              );
-            },
-          ),
-        ],
+              ),
+            ),
+            Positioned.fill(
+              top: headerSectionHeight - 20,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.background,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: ValueListenableBuilder(
+                valueListenable: MobileScaffold.largeTabBar,
+                builder: (context, largeTabBar, child) {
+                  final tabMargin = (largeTabBar ? MobileScaffold.bottomPaddingForLargeTabBar : MobileScaffold.bottomPaddingForSmallTabBar);
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SmartRefresher(
+                        controller: _refreshController,
+                        enablePullDown: !_isSuggestionLoading,
+                        enablePullUp: false,
+                        hitTestBehavior: HitTestBehavior.translucent,
+                        header: WaveRefreshHeader(),
+                        footer: WaveRefreshFooter(),
+                        onRefresh: () async {
+                          try {
+                            await ref.read(inboxControllerProvider.notifier).refresh();
+                            _refreshController.refreshCompleted();
+                          } catch (e) {
+                            _refreshController.refreshFailed();
+                          }
+                        },
+                        physics: BottomSheetScrollPhysics(),
+                        child: SingleChildScrollView(
+                          hitTestBehavior: HitTestBehavior.translucent,
+                          physics: NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.only(top: headerSectionHeight - 20, bottom: (_agentInputFieldHeight > 0 ? _agentInputFieldHeight + 8 : 0) + tabMargin + 8),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: context.background,
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                            ),
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight - headerSectionHeight - 20 + context.padding.bottom),
+                            child: DailySummaryWidget(
+                              events: events,
+                              tasks: tasks,
+                              inboxes: inboxes,
+                              selectedProject: _selectedProject,
+                              projects: projects,
+                              userName: userName,
+                              onDragStart: (inbox, task) {
+                                _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                if (inbox == null) return;
+                                widget.onDragStart?.call(inbox);
+                              },
+                              onDragUpdate: (inbox, task, offset) {
+                                _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                if (inbox == null) return;
+                                widget.onDragUpdate?.call(inbox, offset);
+                              },
+                              onDragEnd: (inbox, task, offset) {
+                                _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                if (inbox == null) return;
+                                widget.onDragEnd?.call(inbox, offset);
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+
+            ValueListenableBuilder(
+              valueListenable: MobileScaffold.largeTabBar,
+              builder: (context, largeTabBar, child) {
+                final tabMargin = (largeTabBar ? MobileScaffold.bottomPaddingForLargeTabBar : MobileScaffold.bottomPaddingForSmallTabBar);
+                return Stack(
+                  children: [
+                    // Positioned(
+                    //   bottom: 0,
+                    //   left: 0,
+                    //   right: 0,
+                    //   height: tabMargin + 8,
+                    //   child: Container(color: context.background),
+                    // ),
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 250),
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: context.background,
+                        padding: EdgeInsets.only(bottom: _agentInputFieldHeight),
+                        child: AgentActionMessagesWidget(maxHeight: (context.height / ref.read(zoomRatioProvider) - max(context.padding.top - 8, 20)) - _agentInputFieldHeight),
+                      ),
+                    ),
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 250),
+                      bottom: 0,
+                      left: 8,
+                      right: 8,
+                      child: NotificationListener<SizeChangedLayoutNotification>(
+                        onNotification: (notification) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            final RenderBox? renderBox = _agentInputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+                            if (renderBox != null) {
+                              final height = renderBox.size.height;
+                              if (height != _agentInputFieldHeight) {
+                                setState(() {
+                                  _agentInputFieldHeight = height;
+                                });
+                              }
+                            }
+                          });
+                          return true;
+                        },
+                        child: SizeChangedLayoutNotifier(
+                          child: Container(
+                            key: _agentInputFieldKey,
+                            padding: EdgeInsets.only(bottom: max(MediaQuery.of(context).viewInsets.bottom / ref.read(zoomRatioProvider) + 8, tabMargin + 8)),
+                            child: AgentInputField(
+                              key: _agentInputFieldStateKey,
+                              fieldKey: _agentInputFieldStateKey,
+                              messageController: _messageController,
+                              focusNode: _focusNode,
+                              onPressEscape: () => true,
+                              tabType: tabType,
+                              initialProject: _selectedProject,
+                              inboxes: filteredInboxes,
+                              upNextTask: nextItem?.task,
+                              upNextEvent: nextItem?.event,
+                              onProjectChanged: (p) {
+                                setState(() {
+                                  _selectedProject = p;
+                                });
+                              },
+                              onActionTap: (mcpFunctionName, {inbox, task, event}) {
+                                final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
+                                if (actionType != null) {
+                                  ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
+                                }
+                              },
+                              onCustomPrompt: (title, prompt) {
+                                final controller = ref.read(agentActionControllerProvider.notifier);
+                                final message = prompt.isNotEmpty ? prompt : title;
+                                if (message.isNotEmpty) {
+                                  controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            ValueListenableBuilder(
+              valueListenable: MobileScaffold.largeTabBar,
+              builder: (context, largeTabBar, child) {
+                final tabMargin = (largeTabBar ? MobileScaffold.bottomPaddingForLargeTabBar : MobileScaffold.bottomPaddingForSmallTabBar);
+                return Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedOpacity(
+                      opacity: onFileEntered ? 1 : 0,
+                      duration: Duration(milliseconds: 250),
+                      child: Container(
+                        decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                        padding: EdgeInsets.all(16),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: headerSectionHeight - 20, bottom: (_agentInputFieldHeight > 0 ? _agentInputFieldHeight + 8 : 0) + tabMargin + 8),
+                          child: DottedBorder(
+                            options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                            child: Container(
+                              child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       );
     }
 
