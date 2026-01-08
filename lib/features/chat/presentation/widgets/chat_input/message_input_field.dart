@@ -462,6 +462,7 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
   }
 
   Future<bool> postMessage({required bool uploadble, required String html}) async {
+    if (tagListOverlayEntry != null) return false;
     if (onPickingFiles) return true;
     if (!uploadble) return true;
 
