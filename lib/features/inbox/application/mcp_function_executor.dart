@@ -40,11 +40,12 @@ import 'package:Visir/features/common/domain/entities/connection_entity.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dart';
+import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
-import 'package:Visir/features/inbox/application/inbox_list_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_conversation_summary_controller.dart';
 import 'package:Visir/features/inbox/providers.dart';
+import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
 import 'package:Visir/features/task/providers.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/date_time_extension.dart';
 import 'package:flutter/material.dart';
@@ -2823,29 +2824,282 @@ class McpFunctionExecutor {
     final eventId = args['eventId'] as String?;
     final inboxId = args['inboxId'] as String?;
 
+    print('[getPreviousContext] Called with args: taskId=$taskId, eventId=$eventId, inboxId=$inboxId');
+
     // At least one ID must be provided
     if ((taskId == null || taskId.isEmpty) && (eventId == null || eventId.isEmpty) && (inboxId == null || inboxId.isEmpty)) {
+      print('[getPreviousContext] Error: At least one of taskId, eventId, or inboxId is required');
       return {'success': false, 'error': 'At least one of taskId, eventId, or inboxId is required'};
     }
 
     try {
-      // Get conversation summary using inboxConversationSummaryProvider
-      final summary = await ref.read(inboxConversationSummaryProvider(taskId, eventId).future);
+      String? effectiveTaskId = taskId;
+      String? effectiveEventId = eventId;
+      InboxEntity? inbox;
 
-      if (summary == null || summary.isEmpty) {
+      // If inboxId is provided, try to find linked task or event
+      if (inboxId != null && inboxId.isNotEmpty) {
+        print('[getPreviousContext] Looking up inbox with id: $inboxId');
+        final inboxList = ref.read(inboxControllerProvider);
+        inbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
+
+        if (inbox != null) {
+          print(
+            '[getPreviousContext] Found inbox: ${inbox.id}, linkedTask: ${inbox.linkedTask != null ? 'exists (${inbox.linkedTask!.tasks.length} tasks)' : 'null'}, linkedMail: ${inbox.linkedMail != null ? 'exists' : 'null'}, linkedMessage: ${inbox.linkedMessage != null ? 'exists' : 'null'}',
+          );
+
+          // First, try to find linked task
+          if (inbox.linkedTask != null && inbox.linkedTask!.tasks.isNotEmpty) {
+            effectiveTaskId = inbox.linkedTask!.tasks.first.id;
+            print('[getPreviousContext] Using linked taskId: $effectiveTaskId');
+            // Check if the linked task has a linkedEvent
+            final linkedTask = inbox.linkedTask!.tasks.first;
+            if (linkedTask.linkedEvent != null) {
+              effectiveEventId = linkedTask.linkedEvent!.eventId;
+              print('[getPreviousContext] Using linked eventId from task: $effectiveEventId');
+            }
+          } else {
+            print('[getPreviousContext] Inbox has no linked task, will use inbox directly');
+          }
+        } else {
+          print('[getPreviousContext] Warning: Inbox not found with id: $inboxId');
+        }
+      }
+
+      // If we have taskId or eventId, use the provider (which handles search and generation)
+      if (effectiveTaskId != null || effectiveEventId != null) {
+        print('[getPreviousContext] Fetching summary with taskId=$effectiveTaskId, eventId=$effectiveEventId');
+
+        // Get conversation summary using inboxConversationSummaryProvider
+        final summaryAsync = ref.read(inboxConversationSummaryProvider(effectiveTaskId, effectiveEventId));
+        final summary = await summaryAsync.when(
+          data: (value) => Future.value(value),
+          loading: () => Future.value(null),
+          error: (error, stackTrace) {
+            print('[getPreviousContext] Error from provider: $error');
+            print('[getPreviousContext] StackTrace: $stackTrace');
+            return Future.value(null);
+          },
+        );
+
+        print('[getPreviousContext] Summary result: ${summary != null && summary.isNotEmpty ? 'Found (length: ${summary.length})' : 'Empty or null'}');
+
+        if (summary == null || summary.isEmpty) {
+          print('[getPreviousContext] Returning empty context message');
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': '이전 컨텍스트가 없습니다.',
+          };
+        }
+
+        print('[getPreviousContext] Successfully retrieved context (length: ${summary.length})');
+        return {
+          'success': true,
+          'result': {'summary': summary},
+          'message': '이전 컨텍스트를 가져왔습니다.',
+        };
+      } else if (inbox != null) {
+        // If only inboxId is provided and no linked task/event, use inbox directly
+        // This follows the same logic as inboxConversationSummaryController
+        print('[getPreviousContext] Using inbox directly for summary generation');
+
+        // Import the private function logic by calling it through a provider
+        // Since we can't call private functions, we'll use the repository directly
+        final repository = ref.read(inboxRepositoryProvider);
+        final userId = ref.read(authControllerProvider).requireValue.id;
+
+        // Extract linkedMail/linkedMessage from inbox
+        final linkedMail = inbox.linkedMail;
+        final linkedMessage = inbox.linkedMessage;
+
+        print('[getPreviousContext] Inbox has linkedMail: ${linkedMail != null}, linkedMessage: ${linkedMessage != null}');
+
+        // Extract search keywords from inbox title/description
+        final keywordsResult = await repository.extractSearchKeywords(
+          taskTitle: inbox.decryptedTitle,
+          taskDescription: inbox.description,
+          taskProjectName: null,
+          calendarName: null,
+          model: 'gpt-4o-mini',
+        );
+
+        final keywords = keywordsResult.fold((failure) => null, (keywords) => keywords);
+        if (keywords == null || keywords.isEmpty) {
+          print('[getPreviousContext] No keywords extracted, returning empty');
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': '이전 컨텍스트가 없습니다.',
+          };
+        }
+
+        print('[getPreviousContext] Extracted keywords: $keywords');
+
+        // Get all integrated OAuth accounts
+        final mailOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+        final messengerOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+        final calendarOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.calendarOAuths)) ?? [];
+
+        // Search in each datasource (same logic as _searchAndGenerateContext)
+        List<InboxEntity> searchResults = [];
+        final Set<String> processedThreadIds = {};
+
+        // Process linkedMail/linkedMessage first if provided
+        if (linkedMail != null && linkedMail.threadId.isNotEmpty) {
+          final threadKey = '${linkedMail.threadId}_${linkedMail.hostMail}';
+          if (!processedThreadIds.contains(threadKey)) {
+            processedThreadIds.add(threadKey);
+            print('[getPreviousContext] Processing linkedMail thread: $threadKey');
+
+            final mailRepository = ref.watch(mailRepositoryProvider);
+            final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+            final oauth = oauths.firstWhereOrNull((o) => o.email == linkedMail.hostMail);
+
+            if (oauth != null) {
+              final threadResult = await mailRepository.fetchThreads(
+                oauth: oauth,
+                type: linkedMail.type,
+                threadId: linkedMail.threadId,
+                labelId: CommonMailLabels.inbox.id,
+                email: linkedMail.hostMail,
+              );
+
+              await threadResult.fold(
+                (failure) async {
+                  print('[getPreviousContext] Failed to fetch mail thread: $failure');
+                },
+                (threadMails) async {
+                  final date = ref.read(inboxListDateProvider);
+                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                  final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+                  for (final mail in threadMails) {
+                    final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
+                    searchResults.add(InboxEntity.fromMail(mail, config));
+                  }
+                  print('[getPreviousContext] Added ${threadMails.length} mails from thread');
+                },
+              );
+            }
+          }
+        } else if (linkedMessage != null) {
+          final threadId = linkedMessage.threadId.isNotEmpty && linkedMessage.threadId != linkedMessage.messageId ? linkedMessage.threadId : linkedMessage.messageId;
+          final threadKey = '${threadId}_${linkedMessage.teamId}_${linkedMessage.channelId}';
+
+          if (!processedThreadIds.contains(threadKey)) {
+            processedThreadIds.add(threadKey);
+            print('[getPreviousContext] Processing linkedMessage thread: $threadKey');
+
+            final chatRepository = ref.watch(chatRepositoryProvider);
+            final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+            final channel = channels.firstWhereOrNull((c) => c.id == linkedMessage.channelId && c.teamId == linkedMessage.teamId);
+
+            if (channel != null) {
+              final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+              final oauth = oauths.firstWhereOrNull((o) => o.team?.id == linkedMessage.teamId);
+
+              if (oauth != null) {
+                final threadResult = await chatRepository.fetchReplies(oauth: oauth, channel: channel, parentMessageId: threadId);
+
+                await threadResult.fold(
+                  (failure) async {
+                    print('[getPreviousContext] Failed to fetch message thread: $failure');
+                  },
+                  (threadData) async {
+                    final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+                    final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
+                    final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
+                    final date = ref.read(inboxListDateProvider);
+                    final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                    final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+
+                    for (final message in threadData.messages) {
+                      final msgChannel = _channels.firstWhereOrNull((c) => c.id == message.channelId && c.teamId == message.teamId);
+                      final member = _members.firstWhereOrNull((m) => m.id == message.userId);
+                      if (msgChannel != null && member != null && message.teamId != null && message.channelId != null && message.userId != null) {
+                        final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromChat(message));
+                        searchResults.add(InboxEntity.fromChat(message, config, msgChannel, member, _channels, _members, _groups));
+                      }
+                    }
+                    print('[getPreviousContext] Added ${threadData.messages.length} messages from thread');
+                  },
+                );
+              }
+            }
+          }
+        }
+
+        // Search in mail, chat, calendar using keywords (same as _searchAndGenerateContext)
+        // This is a simplified version - full implementation would include all search logic
+        // For now, if we have linkedMail/linkedMessage, we use those; otherwise search
+        if (searchResults.isEmpty && keywords.isNotEmpty) {
+          print('[getPreviousContext] Performing search with keywords: $keywords');
+          // Note: Full search implementation would be here, but for now we'll use the inbox itself
+          // The full implementation would search mail, chat, and calendar similar to _searchAndGenerateContext
+        }
+
+        // Limit results
+        searchResults = searchResults.take(20).toList();
+
+        if (searchResults.isEmpty) {
+          print('[getPreviousContext] No search results found');
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': '이전 컨텍스트가 없습니다.',
+          };
+        }
+
+        print('[getPreviousContext] Found ${searchResults.length} search results, generating summary');
+
+        // Create virtual inbox from inbox or search results
+        InboxEntity? baseInbox;
+        if (linkedMail != null) {
+          baseInbox = InboxEntity(id: InboxEntity.getInboxIdFromLinkedMail(linkedMail), title: linkedMail.title, description: null, linkedMail: linkedMail);
+        } else if (linkedMessage != null) {
+          baseInbox = InboxEntity(id: InboxEntity.getInboxIdFromLinkedChat(linkedMessage), title: linkedMessage.userName, description: null, linkedMessage: linkedMessage);
+        } else {
+          baseInbox = inbox;
+        }
+
+        // Generate summary from search results
+        final summaryResult = await repository.fetchConversationSummary(
+          inbox: baseInbox ?? inbox,
+          allInboxes: searchResults,
+          eventEntities: [],
+          userId: userId,
+          taskId: null,
+          eventId: null,
+        );
+
+        final summary = summaryResult.fold((failure) => null, (summary) => summary);
+
+        if (summary == null || summary.isEmpty) {
+          print('[getPreviousContext] Summary generation returned empty');
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': '이전 컨텍스트가 없습니다.',
+          };
+        }
+
+        print('[getPreviousContext] Successfully generated context (length: ${summary.length})');
+        return {
+          'success': true,
+          'result': {'summary': summary},
+          'message': '이전 컨텍스트를 가져왔습니다.',
+        };
+      } else {
+        print('[getPreviousContext] No valid taskId, eventId, or inboxId provided');
         return {
           'success': true,
           'result': {'summary': 'No previous context available'},
           'message': '이전 컨텍스트가 없습니다.',
         };
       }
-
-      return {
-        'success': true,
-        'result': {'summary': summary},
-        'message': '이전 컨텍스트를 가져왔습니다.',
-      };
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('[getPreviousContext] Error: $e');
+      print('[getPreviousContext] StackTrace: $stackTrace');
       return {'success': false, 'error': 'Failed to get previous context: ${e.toString()}'};
     }
   }

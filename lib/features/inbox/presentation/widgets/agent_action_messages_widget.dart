@@ -8,6 +8,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/platform_ext
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/mobile_scaffold.dart';
+import 'package:Visir/features/common/presentation/widgets/proxy_network_image.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/calendar/application/calendar_list_controller.dart';
@@ -1034,54 +1035,108 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     // because they are rendered inline via customWidgetBuilder.
     // Adding them to taggedItems would cause duplicate rendering (@mention + tagged_xxx tag)
 
-    // Convert tagged_item tags to inapp_entity tags for UI rendering
-    // (cleanedContent already initialized above with function call JSON removed)
-
-    // Convert all tagged_task to inapp_task (process in reverse order to maintain positions)
-    final taggedTaskMatches = taggedTaskRegex.allMatches(cleanedContent).toList();
-    for (final match in taggedTaskMatches.reversed) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          // Convert to inapp_task format
-          final inappTaskJson = jsonEncode(jsonData);
-          cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_task>$inappTaskJson</inapp_task>' + cleanedContent.substring(match.end);
+    // Convert tagged_item tags to \u200b@name\u200b format for user messages (like agentInputField)
+    // For assistant messages, convert to inapp_entity tags
+    if (isUser) {
+      // User messages: Convert to \u200b@name\u200b format (like agentInputField)
+      final taggedTaskMatches = taggedTaskRegex.allMatches(cleanedContent).toList();
+      for (final match in taggedTaskMatches.reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            final title = jsonData['title'] as String? ?? '';
+            if (title.isNotEmpty) {
+              // Convert to \u200b@name\u200b format
+              final tagString = '\u200b@$title\u200b';
+              cleanedContent = cleanedContent.substring(0, match.start) + tagString + cleanedContent.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // Skip invalid JSON
         }
-      } catch (e) {
-        // Skip invalid JSON
       }
-    }
 
-    // Convert all tagged_event to inapp_event (process in reverse order to maintain positions)
-    final taggedEventMatches = taggedEventRegex.allMatches(cleanedContent).toList();
-    for (final match in taggedEventMatches.reversed) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          // Convert to inapp_event format
-          final inappEventJson = jsonEncode(jsonData);
-          cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_event>$inappEventJson</inapp_event>' + cleanedContent.substring(match.end);
+      final taggedEventMatches = taggedEventRegex.allMatches(cleanedContent).toList();
+      for (final match in taggedEventMatches.reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            final title = jsonData['title'] as String? ?? '';
+            if (title.isNotEmpty) {
+              // Convert to \u200b@name\u200b format
+              final tagString = '\u200b@$title\u200b';
+              cleanedContent = cleanedContent.substring(0, match.start) + tagString + cleanedContent.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // Skip invalid JSON
         }
-      } catch (e) {
-        // Skip invalid JSON
       }
-    }
 
-    // Convert all tagged_inbox to inapp_inbox (process in reverse order to maintain positions)
-    final taggedInboxMatches = taggedInboxRegex.allMatches(cleanedContent).toList();
-    for (final match in taggedInboxMatches.reversed) {
-      try {
-        final jsonText = match.group(1)?.trim() ?? '';
-        if (jsonText.isNotEmpty) {
-          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
-          // Convert to inapp_inbox format
-          final inappInboxJson = jsonEncode(jsonData);
-          cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_inbox>$inappInboxJson</inapp_inbox>' + cleanedContent.substring(match.end);
+      final taggedInboxMatches = taggedInboxRegex.allMatches(cleanedContent).toList();
+      for (final match in taggedInboxMatches.reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            final title = jsonData['suggestion']?['summary'] as String? ?? jsonData['title'] as String? ?? '';
+            if (title.isNotEmpty) {
+              // Convert to \u200b@name\u200b format
+              final tagString = '\u200b@$title\u200b';
+              cleanedContent = cleanedContent.substring(0, match.start) + tagString + cleanedContent.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // Skip invalid JSON
         }
-      } catch (e) {
-        // Skip invalid JSON
+      }
+    } else {
+      // Assistant messages: Convert to inapp_entity tags (existing behavior)
+      final taggedTaskMatches = taggedTaskRegex.allMatches(cleanedContent).toList();
+      for (final match in taggedTaskMatches.reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            // Convert to inapp_task format
+            final inappTaskJson = jsonEncode(jsonData);
+            cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_task>$inappTaskJson</inapp_task>' + cleanedContent.substring(match.end);
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+
+      final taggedEventMatches = taggedEventRegex.allMatches(cleanedContent).toList();
+      for (final match in taggedEventMatches.reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            // Convert to inapp_event format
+            final inappEventJson = jsonEncode(jsonData);
+            cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_event>$inappEventJson</inapp_event>' + cleanedContent.substring(match.end);
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+
+      final taggedInboxMatches = taggedInboxRegex.allMatches(cleanedContent).toList();
+      for (final match in taggedInboxMatches.reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            // Convert to inapp_inbox format
+            final inappInboxJson = jsonEncode(jsonData);
+            cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_inbox>$inappInboxJson</inapp_inbox>' + cleanedContent.substring(match.end);
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
       }
     }
 
@@ -1279,18 +1334,62 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       // HtmlWidget doesn't easily support inline widgets in text, so we'll process the HTML string
       // and replace @mentions with special markers that we can handle in customWidgetBuilder
       String processedHtml = finalContent;
-      if (taggedItems.isNotEmpty) {
-        // Replace @mentions in HTML text with special placeholders
-        for (final entry in taggedItems.entries) {
-          final mentionKey = entry.key; // "@taskname"
-          final mentionName = mentionKey.substring(1); // "taskname"
-          // Escape special regex characters
-          final escapedMention = RegExp.escape(mentionKey);
-          // Replace @mentions that are not inside HTML tags
-          processedHtml = processedHtml.replaceAllMapped(
-            RegExp('(?<!<[^>]*)$escapedMention(?!<[^>]*>)', multiLine: true),
-            (match) => '<span class="tagged-mention" data-mention="$mentionName">$mentionKey</span>',
-          );
+
+      if (isUser) {
+        // User messages: Process \u200b@name\u200b format (like agentInputField)
+        // Convert \u200b@name\u200b to special HTML tags for rendering
+        final mentionRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
+        processedHtml = processedHtml.replaceAllMapped(mentionRegex, (match) {
+          final tagName = match.group(1) ?? '';
+          if (tagName.isEmpty) return match.group(0)!;
+
+          // Find matching entity from taggedItems
+          String? matchedKey;
+          for (final key in taggedItems.keys) {
+            final keyName = key.substring(1); // Remove @
+            if (keyName == tagName) {
+              matchedKey = key;
+              break;
+            }
+          }
+
+          if (matchedKey != null && taggedItems.containsKey(matchedKey)) {
+            final itemData = taggedItems[matchedKey]!;
+            final itemType = itemData['type'] as String;
+            final jsonData = itemData['data'] as Map<String, dynamic>;
+
+            // Convert to special HTML tag for customWidgetBuilder
+            final jsonText = jsonEncode(jsonData);
+            switch (itemType) {
+              case 'task':
+                return '<user_tagged_task>$jsonText</user_tagged_task>';
+              case 'event':
+                return '<user_tagged_event>$jsonText</user_tagged_event>';
+              case 'inbox':
+                return '<user_tagged_inbox>$jsonText</user_tagged_inbox>';
+              default:
+                return '<span class="tagged-mention" data-mention="$tagName">@$tagName</span>';
+            }
+          }
+
+          // If no match found, return as regular mention
+          return '<span class="tagged-mention" data-mention="$tagName">@$tagName</span>';
+        });
+      } else {
+        // Assistant messages: Process @mentions in HTML text
+        if (taggedItems.isNotEmpty) {
+          // Replace @mentions in HTML text with special placeholders
+          for (final entry in taggedItems.entries) {
+            final mentionKey = entry.key; // "@taskname"
+            final mentionName = mentionKey.substring(1); // "taskname"
+            // Escape special regex characters
+            final escapedMention = RegExp.escape(mentionKey);
+            // Replace @mentions that are not inside HTML tags
+            processedHtml = processedHtml.replaceAllMapped(
+              RegExp('(?<!<[^>]*)$escapedMention(?!<[^>]*>)', multiLine: true),
+              (match) => '<span class="tagged-mention" data-mention="$mentionName">$mentionKey</span>',
+            );
+          }
         }
       }
 
@@ -1308,6 +1407,155 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             // Hide conversation_title tags completely
             if (element.localName == 'conversation_title') {
               return const SizedBox.shrink();
+            }
+            // Handle user tagged items (like agentInputField)
+            if (element.localName == 'user_tagged_task') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                final title = jsonData['title'] as String? ?? '';
+                if (title.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.task, size: 12, color: isUser ? context.onPrimaryContainer : context.onBackground, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14), height: 1.0),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } catch (e) {
+                return Text('Error parsing task: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'user_tagged_event') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                final title = jsonData['title'] as String? ?? '';
+                if (title.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        VisirIcon(type: VisirIconType.calendar, size: 12, color: isUser ? context.onPrimaryContainer : context.onBackground, isSelected: true),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14), height: 1.0),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } catch (e) {
+                return Text('Error parsing event: $e', style: baseStyle?.copyWith(color: context.error));
+              }
+            }
+            if (element.localName == 'user_tagged_inbox') {
+              try {
+                final jsonText = element.text.trim();
+                if (jsonText.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+                final inbox = InboxEntity.fromJson(jsonData, local: true);
+                final displayName = inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle;
+
+                // Get inbox provider for avatarUrl and icon
+                final inboxProviders = inbox.providers;
+                final firstProvider = inboxProviders.isNotEmpty ? inboxProviders.first : null;
+                final avatarUrl = firstProvider?.avatarUrl;
+                final providerIcon = firstProvider?.icon;
+
+                return InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        avatarUrl != null || providerIcon != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: avatarUrl != null
+                                    ? ProxyNetworkImage(imageUrl: avatarUrl, width: 12, height: 12, fit: BoxFit.cover)
+                                    : Image.asset(providerIcon!, width: 12, height: 12, fit: BoxFit.cover),
+                              )
+                            : Container(
+                                width: 12,
+                                height: 12,
+                                alignment: Alignment.center,
+                                child: VisirIcon(type: VisirIconType.inbox, size: 12, color: isUser ? context.onPrimaryContainer : context.onBackground, isSelected: true),
+                              ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            displayName,
+                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14), height: 1.0),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } catch (e) {
+                return Text('Error parsing inbox: $e', style: baseStyle?.copyWith(color: context.error));
+              }
             }
             // Handle tagged mentions in HTML text
             if (element.localName == 'span' && element.classes.contains('tagged-mention')) {
