@@ -252,6 +252,7 @@ class InboxRepository {
     required InboxEntity inbox,
     required List<InboxEntity> allInboxes,
     List<EventEntity>? eventEntities,
+    List<TaskEntity>? taskEntities,
     String? model,
     String? apiKey,
     String? userId,
@@ -265,11 +266,11 @@ class InboxRepository {
 
       String? summary;
       if (datasource is OpenAiInboxDatasource) {
-        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, model: model, apiKey: apiKey);
+        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, taskEntities: taskEntities, model: model, apiKey: apiKey);
       } else if (datasource is GoogleAiInboxDatasource) {
-        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, model: model, apiKey: apiKey);
+        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, taskEntities: taskEntities, model: model, apiKey: apiKey);
       } else if (datasource is AnthropicAiInboxDatasource) {
-        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, model: model, apiKey: apiKey);
+        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, taskEntities: taskEntities, model: model, apiKey: apiKey);
       }
 
       // Step 3: Save AI summary to Supabase cache

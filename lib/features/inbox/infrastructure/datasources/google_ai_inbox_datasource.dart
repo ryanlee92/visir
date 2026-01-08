@@ -242,6 +242,7 @@ class GoogleAiInboxDatasource extends InboxDatasource {
     required InboxEntity inbox,
     required List<InboxEntity> allInboxes,
     List<EventEntity>? eventEntities,
+    List<TaskEntity>? taskEntities,
     String? model,
     String? apiKey,
   }) async {

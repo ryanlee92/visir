@@ -4273,4 +4273,129 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chat_history_sort_message_count_asc => 'Fewest messages';
+
+  @override
+  String get mcp_previous_context_not_available =>
+      'No previous context available';
+
+  @override
+  String get mcp_previous_context_retrieved => 'Previous context retrieved';
+
+  @override
+  String get mcp_failed_to_get_previous_context =>
+      'Failed to get previous context';
+
+  @override
+  String get mcp_mail_info_retrieved => 'Mail information retrieved';
+
+  @override
+  String mcp_found_mails(int count) {
+    return '$count mail(s) found';
+  }
+
+  @override
+  String get mcp_message_info_retrieved => 'Message information retrieved';
+
+  @override
+  String get mcp_unknown_user => 'Unknown user';
+
+  @override
+  String get mcp_unknown_channel => 'Unknown channel';
+
+  @override
+  String mcp_found_messages(int count) {
+    return '$count message(s) found';
+  }
+
+  @override
+  String mcp_tasks_today(int count) {
+    return '$count task(s) today';
+  }
+
+  @override
+  String mcp_events_today(int count) {
+    return '$count event(s) today';
+  }
+
+  @override
+  String get mcp_inbox_info_retrieved => 'Inbox information retrieved';
+
+  @override
+  String mcp_found_inboxes(int count) {
+    return '$count inbox(es) found';
+  }
+
+  @override
+  String get mcp_project_info_retrieved => 'Project information retrieved';
+
+  @override
+  String mcp_tasks_rescheduled(int count) {
+    return '$count task(s) rescheduled to today at appropriate times';
+  }
+
+  @override
+  String mcp_found_projects(int count) {
+    return '$count project(s) found';
+  }
+
+  @override
+  String mcp_found_tasks(int count) {
+    return '$count task(s) found';
+  }
+
+  @override
+  String mcp_found_events(int count) {
+    return '$count event(s) found';
+  }
+
+  @override
+  String get mcp_task_info_retrieved => 'Task information retrieved';
+
+  @override
+  String get mcp_event_info_retrieved => 'Event information retrieved';
+
+  @override
+  String mcp_found_calendars(int count) {
+    return '$count calendar(s) found';
+  }
+
+  @override
+  String mcp_found_inbox_items(int count) {
+    return '$count inbox item(s) found';
+  }
+
+  @override
+  String mcp_found_labels(int count) {
+    return '$count label(s) found';
+  }
+
+  @override
+  String mcp_found_attachments(int count) {
+    return '$count attachment(s) found';
+  }
+
+  @override
+  String mcp_found_upcoming_tasks(int count) {
+    return '$count upcoming task(s) found';
+  }
+
+  @override
+  String mcp_found_upcoming_events(int count) {
+    return '$count upcoming event(s) found';
+  }
+
+  @override
+  String mcp_found_overdue_tasks(int count) {
+    return '$count overdue task(s) found';
+  }
+
+  @override
+  String mcp_found_unscheduled_tasks(int count) {
+    return '$count unscheduled task(s) found';
+  }
+
+  @override
+  String mcp_found_completed_tasks(int count) {
+    return '$count completed task(s) found';
+  }
 }

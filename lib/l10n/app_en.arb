@@ -1728,5 +1728,160 @@
   "chat_history_sort_updated_desc": "Newest",
   "chat_history_sort_updated_asc": "Oldest",
   "chat_history_sort_message_count_desc": "Most messages",
-  "chat_history_sort_message_count_asc": "Fewest messages"
+  "chat_history_sort_message_count_asc": "Fewest messages",
+  "mcp_previous_context_not_available": "No previous context available",
+  "mcp_previous_context_retrieved": "Previous context retrieved",
+  "mcp_failed_to_get_previous_context": "Failed to get previous context",
+  "mcp_mail_info_retrieved": "Mail information retrieved",
+  "mcp_found_mails": "{count} mail(s) found",
+  "@mcp_found_mails": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_message_info_retrieved": "Message information retrieved",
+  "mcp_unknown_user": "Unknown user",
+  "mcp_unknown_channel": "Unknown channel",
+  "mcp_found_messages": "{count} message(s) found",
+  "@mcp_found_messages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_tasks_today": "{count} task(s) today",
+  "@mcp_tasks_today": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_events_today": "{count} event(s) today",
+  "@mcp_events_today": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_inbox_info_retrieved": "Inbox information retrieved",
+  "mcp_found_inboxes": "{count} inbox(es) found",
+  "@mcp_found_inboxes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_project_info_retrieved": "Project information retrieved",
+  "mcp_tasks_rescheduled": "{count} task(s) rescheduled to today at appropriate times",
+  "@mcp_tasks_rescheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_projects": "{count} project(s) found",
+  "@mcp_found_projects": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_tasks": "{count} task(s) found",
+  "@mcp_found_tasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_events": "{count} event(s) found",
+  "@mcp_found_events": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_task_info_retrieved": "Task information retrieved",
+  "mcp_event_info_retrieved": "Event information retrieved",
+  "mcp_found_calendars": "{count} calendar(s) found",
+  "@mcp_found_calendars": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_inbox_items": "{count} inbox item(s) found",
+  "@mcp_found_inbox_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_labels": "{count} label(s) found",
+  "@mcp_found_labels": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_attachments": "{count} attachment(s) found",
+  "@mcp_found_attachments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_upcoming_tasks": "{count} upcoming task(s) found",
+  "@mcp_found_upcoming_tasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_upcoming_events": "{count} upcoming event(s) found",
+  "@mcp_found_upcoming_events": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_overdue_tasks": "{count} overdue task(s) found",
+  "@mcp_found_overdue_tasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_unscheduled_tasks": "{count} unscheduled task(s) found",
+  "@mcp_found_unscheduled_tasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mcp_found_completed_tasks": "{count} completed task(s) found",
+  "@mcp_found_completed_tasks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

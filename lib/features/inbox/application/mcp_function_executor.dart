@@ -9,6 +9,7 @@ import 'package:Visir/features/chat/application/chat_member_list_controller.dart
 import 'package:Visir/features/chat/application/chat_group_list_controller.dart';
 import 'package:Visir/features/chat/application/chat_emoji_list_controller.dart';
 import 'package:Visir/features/chat/application/chat_list_controller.dart';
+import 'package:Visir/features/chat/domain/entities/message_entity.dart';
 import 'package:Visir/features/calendar/actions.dart';
 import 'package:Visir/features/calendar/application/calendar_event_list_controller.dart';
 import 'package:Visir/features/calendar/application/calendar_list_controller.dart';
@@ -20,6 +21,8 @@ import 'package:Visir/features/calendar/presentation/widgets/calendar_simple_cre
 import 'package:Visir/dependency/rrule/src/recurrence_rule.dart';
 import 'package:Visir/features/calendar/providers.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
+import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/mail/actions.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
@@ -33,6 +36,7 @@ import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/actions.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
+import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_reminder_option_type.dart';
@@ -43,7 +47,6 @@ import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dar
 import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
-import 'package:Visir/features/inbox/application/inbox_conversation_summary_controller.dart';
 import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
 import 'package:Visir/features/task/providers.dart';
@@ -695,9 +698,9 @@ class McpFunctionExecutor {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
-    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    // availableTasks에서 찾지 못하면 두 provider에서 최신 목록 가져오기
     if (task == null) {
-      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = _getAllTasksFromBothProviders();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
@@ -777,9 +780,9 @@ class McpFunctionExecutor {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
-    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    // availableTasks에서 찾지 못하면 두 provider에서 최신 목록 가져오기
     if (task == null) {
-      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = _getAllTasksFromBothProviders();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
@@ -811,9 +814,9 @@ class McpFunctionExecutor {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
-    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    // availableTasks에서 찾지 못하면 두 provider에서 최신 목록 가져오기
     if (task == null) {
-      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = _getAllTasksFromBothProviders();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
@@ -1689,7 +1692,7 @@ class McpFunctionExecutor {
         'threadCount': threads.length,
         'hasAttachments': mail.getAttachments().isNotEmpty,
       },
-      'message': '메일 정보를 가져왔습니다.',
+      'message': Utils.mainContext.tr.mcp_mail_info_retrieved,
     };
   }
 
@@ -1748,7 +1751,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 메일을 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_mails(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list mails: ${e.toString()}'};
     }
@@ -2056,7 +2059,7 @@ class McpFunctionExecutor {
           'hasFiles': message.files?.isNotEmpty ?? false,
           'reactions': message.reactions?.map((r) => {'emoji': r.name ?? '', 'users': r.users}).toList() ?? [],
         },
-        'message': '메시지 정보를 가져왔습니다.',
+        'message': Utils.mainContext.tr.mcp_message_info_retrieved,
       };
     } catch (e) {
       return {'success': false, 'error': 'Failed to get message details: ${e.toString()}'};
@@ -2098,7 +2101,7 @@ class McpFunctionExecutor {
       final results = messages.map((message) {
         final userId = message.userId;
         final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
-        final userName = member?.displayName ?? userId ?? '알 수 없는 사용자';
+        final userName = member?.displayName ?? userId ?? Utils.mainContext.tr.mcp_unknown_user;
 
         return {
           'id': message.id,
@@ -2112,7 +2115,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 메시지를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_messages(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list messages: ${e.toString()}'};
     }
@@ -2153,11 +2156,11 @@ class McpFunctionExecutor {
         final results = r.messages.map((message) {
           final userId = message.userId;
           final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
-          final userName = member?.displayName ?? userId ?? '알 수 없는 사용자';
+          final userName = member?.displayName ?? userId ?? Utils.mainContext.tr.mcp_unknown_user;
 
           final channelId = message.channelId;
           final channel = channelId != null ? allChannels.firstWhereOrNull((c) => c.id == channelId) : null;
-          final channelName = channel?.displayName ?? channel?.name ?? '알 수 없는 채널';
+          final channelName = channel?.displayName ?? channel?.name ?? Utils.mainContext.tr.mcp_unknown_channel;
 
           return {
             'id': message.id,
@@ -2170,7 +2173,7 @@ class McpFunctionExecutor {
           };
         }).toList();
 
-        return {'success': true, 'results': results, 'message': '${results.length}개의 메시지를 찾았습니다.'};
+        return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_messages(results.length)};
       });
     } catch (e) {
       return {'success': false, 'error': 'Failed to search messages: ${e.toString()}'};
@@ -2195,9 +2198,9 @@ class McpFunctionExecutor {
       task = availableTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
-    // availableTasks에서 찾지 못하면 taskListControllerProvider에서 최신 목록 가져오기
+    // availableTasks에서 찾지 못하면 두 provider에서 최신 목록 가져오기
     if (task == null) {
-      final allTasks = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = _getAllTasksFromBothProviders();
       task = allTasks.firstWhereOrNull((t) => t.id == taskId);
     }
 
@@ -2238,7 +2241,7 @@ class McpFunctionExecutor {
       return {'success': false, 'error': 'dueDate is required'};
     }
 
-    final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+    final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
     final task = allTasks.firstWhere((t) => t.id == taskId, orElse: () => throw Exception('Task not found'));
 
     DateTime? dueDate;
@@ -2273,7 +2276,7 @@ class McpFunctionExecutor {
 
     try {
       if (taskId != null) {
-        final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+        final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
         final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
         if (task == null) {
@@ -2335,7 +2338,7 @@ class McpFunctionExecutor {
       }
 
       if (taskId != null) {
-        final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+        final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
         final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
         if (task == null) {
@@ -2381,7 +2384,7 @@ class McpFunctionExecutor {
     }
 
     try {
-      final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
       final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
       if (task == null) {
@@ -2451,7 +2454,7 @@ class McpFunctionExecutor {
       final today = DateTime(now.year, now.month, now.day);
       final tomorrow = today.add(const Duration(days: 1));
 
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final todayTasks = allTasks.where((t) {
         if (t.isCancelled || t.isOriginalRecurrenceTask || t.isEventDummyTask) return false;
         if (t.status == TaskStatus.done) return false;
@@ -2472,7 +2475,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '오늘 ${results.length}개의 작업이 있습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_tasks_today(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get today tasks: ${e.toString()}'};
     }
@@ -2504,7 +2507,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '오늘 ${results.length}개의 일정이 있습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_events_today(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get today events: ${e.toString()}'};
     }
@@ -2517,7 +2520,7 @@ class McpFunctionExecutor {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
 
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final upcomingTasks = allTasks.where((t) {
         if (t.isCancelled || t.isOriginalRecurrenceTask || t.isEventDummyTask) return false;
         if (t.status != TaskStatus.none) return false;
@@ -2541,7 +2544,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '다가오는 작업 ${results.length}개를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_upcoming_tasks(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get upcoming tasks: ${e.toString()}'};
     }
@@ -2576,7 +2579,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '다가오는 일정 ${results.length}개를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_upcoming_events(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get upcoming events: ${e.toString()}'};
     }
@@ -2584,7 +2587,7 @@ class McpFunctionExecutor {
 
   Future<Map<String, dynamic>> _executeGetOverdueTasks(Map<String, dynamic> args, {required TabType tabType}) async {
     try {
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final overdueTasks = allTasks.where((t) {
         if (t.isCancelled || t.isOriginalRecurrenceTask || t.isEventDummyTask) return false;
         return t.status == TaskStatus.none && t.isOverdue && !t.isUnscheduled;
@@ -2603,7 +2606,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '지연된 작업 ${results.length}개를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_overdue_tasks(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get overdue tasks: ${e.toString()}'};
     }
@@ -2611,7 +2614,7 @@ class McpFunctionExecutor {
 
   Future<Map<String, dynamic>> _executeGetUnscheduledTasks(Map<String, dynamic> args, {required TabType tabType}) async {
     try {
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final unscheduledTasks = allTasks.where((t) {
         if (t.isCancelled || t.isOriginalRecurrenceTask || t.isEventDummyTask) return false;
         return t.status == TaskStatus.none && t.isUnscheduled;
@@ -2629,7 +2632,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '스케줄되지 않은 작업 ${results.length}개를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_unscheduled_tasks(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get unscheduled tasks: ${e.toString()}'};
     }
@@ -2639,7 +2642,7 @@ class McpFunctionExecutor {
     final limit = args['limit'] as int?;
 
     try {
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final completedTasks = allTasks.where((t) {
         if (t.isCancelled || t.isOriginalRecurrenceTask || t.isEventDummyTask) return false;
         return t.status == TaskStatus.done;
@@ -2660,7 +2663,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '완료된 작업 ${results.length}개를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_completed_tasks(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get completed tasks: ${e.toString()}'};
     }
@@ -2681,7 +2684,7 @@ class McpFunctionExecutor {
 
     try {
       if (taskId != null) {
-        final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+        final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
         final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
         if (task == null) {
@@ -2733,7 +2736,7 @@ class McpFunctionExecutor {
 
     try {
       if (taskId != null) {
-        final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+        final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
         final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
         if (task == null) {
@@ -2808,7 +2811,7 @@ class McpFunctionExecutor {
           'hasLinkedTask': inbox.linkedTask != null,
           'datetime': inbox.inboxDatetime.toIso8601String(),
         },
-        'message': '인박스 정보를 가져왔습니다.',
+        'message': Utils.mainContext.tr.mcp_inbox_info_retrieved,
       };
     } catch (e) {
       // Provider가 dispose된 경우를 포함한 모든 에러 처리
@@ -2852,50 +2855,48 @@ class McpFunctionExecutor {
         }
       }
 
-      // If we have taskId or eventId, use the provider (which handles search and generation)
+      // If we have taskId or eventId, use the same logic as _searchAndGenerateContext
       if (effectiveTaskId != null || effectiveEventId != null) {
-        // Get conversation summary using inboxConversationSummaryProvider
-        final summaryAsync = ref.read(inboxConversationSummaryProvider(effectiveTaskId, effectiveEventId));
-        final summary = await summaryAsync.when(
-          data: (value) => Future.value(value),
-          loading: () => Future.value(null),
-          error: (error, stackTrace) {
-            return Future.value(null);
-          },
-        );
+        // Get task/event entities
+        TaskEntity? task;
+        if (effectiveTaskId != null) {
+          final allTasks = _getAllTasksFromBothProviders(includeRecentMonths: true);
+          task = allTasks.firstWhereOrNull((t) => (t.isEvent ? t.eventId == effectiveEventId : t.id == effectiveTaskId));
+        }
+        final event = effectiveEventId != null
+            ? ref.read(calendarEventListControllerProvider(tabType: TabType.home).select((v) => v.eventsOnView.firstWhereOrNull((e) => e.uniqueId == effectiveEventId)))
+            : null;
 
-        if (summary == null || summary.isEmpty) {
+        if (task == null && event == null) {
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
-            'message': '이전 컨텍스트가 없습니다.',
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
           };
         }
 
-        return {
-          'success': true,
-          'result': {'summary': summary},
-          'message': '이전 컨텍스트를 가져왔습니다.',
-        };
-      } else if (inbox != null) {
-        // If only inboxId is provided and no linked task/event, use inbox directly
-        // This follows the same logic as inboxConversationSummaryController
-
-        // Import the private function logic by calling it through a provider
-        // Since we can't call private functions, we'll use the repository directly
+        // Use the same logic as _searchAndGenerateContext
         final repository = ref.read(inboxRepositoryProvider);
         final userId = ref.read(authControllerProvider).requireValue.id;
 
-        // Extract linkedMail/linkedMessage from inbox
-        final linkedMail = inbox.linkedMail;
-        final linkedMessage = inbox.linkedMessage;
+        final linkedMail = task?.linkedMails.firstOrNull;
+        final linkedMessage = task?.linkedMessages.firstOrNull;
 
-        // Extract search keywords from inbox title/description
+        // Extract search keywords
+        String? taskProjectName;
+        String? calendarName;
+
+        if (task != null && task.projectId != null) {
+          taskProjectName = ref.read(projectListControllerProvider).firstWhereOrNull((p) => p.uniqueId == task!.projectId)?.name;
+        } else if (event != null) {
+          calendarName = event.calendarName;
+        }
+
         final keywordsResult = await repository.extractSearchKeywords(
-          taskTitle: inbox.decryptedTitle,
-          taskDescription: inbox.description,
-          taskProjectName: null,
-          calendarName: null,
+          taskTitle: event?.title ?? task?.title ?? '',
+          taskDescription: event?.description ?? task?.description ?? '',
+          taskProjectName: taskProjectName,
+          calendarName: calendarName,
           model: 'gpt-4o-mini',
         );
 
@@ -2904,7 +2905,7 @@ class McpFunctionExecutor {
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
-            'message': '이전 컨텍스트가 없습니다.',
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
           };
         }
 
@@ -2915,6 +2916,7 @@ class McpFunctionExecutor {
 
         // Search in each datasource (same logic as _searchAndGenerateContext)
         List<InboxEntity> searchResults = [];
+        List<TaskEntity> taskEntities = [];
         final Set<String> processedThreadIds = {};
 
         // Process linkedMail/linkedMessage first if provided
@@ -2997,22 +2999,654 @@ class McpFunctionExecutor {
           }
         }
 
-        // Search in mail, chat, calendar using keywords (same as _searchAndGenerateContext)
-        // This is a simplified version - full implementation would include all search logic
-        // For now, if we have linkedMail/linkedMessage, we use those; otherwise search
-        if (searchResults.isEmpty && keywords.isNotEmpty) {
-          // Note: Full search implementation would be here, but for now we'll use the inbox itself
-          // The full implementation would search mail, chat, and calendar similar to _searchAndGenerateContext
+        // Search in tasks (local) - from both taskListControllerInternalProvider and calendarTaskListControllerInternalProvider
+        final taskQuery = keywords.join(' ');
+        if (taskQuery.isNotEmpty) {
+          final now = DateTime.now();
+          final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+          final startDate = threeMonthsAgo;
+          final endDate = now;
+
+          // Get tasks from both providers (include recent 3 months)
+          final allTasks = _getAllTasksFromBothProviders(includeRecentMonths: true);
+
+          // Filter by date range (last 3 months) and keywords
+          final filteredTasks = _filterLocalTasks(allTasks, startDate, endDate, taskQuery, null, null);
+          // Sort by date (closest to today first) and take 20
+          filteredTasks.sort((a, b) {
+            final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+            final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+            return bDate.compareTo(aDate);
+          });
+          taskEntities.addAll(filteredTasks.take(20));
         }
 
-        // Limit results
-        searchResults = searchResults.take(20).toList();
+        // Search in mail (same logic as _searchAndGenerateContext)
+        final mailQuery = keywords.join(' ');
+        if (mailQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+          for (final oauth in mailOAuths) {
+            final mailRepository = ref.watch(mailRepositoryProvider);
+            final user = ref.read(authControllerProvider).requireValue;
 
-        if (searchResults.isEmpty) {
+            final mailResult = await mailRepository.fetchMailsForLabel(
+              oauth: oauth,
+              user: user,
+              isInbox: false,
+              labelId: null,
+              email: null,
+              pageToken: null,
+              q: mailQuery,
+              startDate:
+                  event?.startDate.subtract(const Duration(days: 30)) ?? task?.startDate.subtract(const Duration(days: 30)) ?? DateTime.now().subtract(const Duration(days: 30)),
+              endDate: event?.endDate ?? task?.endDate ?? DateTime.now(),
+            );
+
+            await mailResult.fold(
+              (failure) async {
+                // Mail search failed, skip this OAuth account
+              },
+              (mails) async {
+                final Map<String, MailEntity> threadMap = {};
+
+                for (final mailList in mails.values) {
+                  for (final mail in mailList.messages) {
+                    if (mail.threadId == null || mail.threadId!.isEmpty) continue;
+
+                    final threadKey = '${mail.threadId}_${oauth.email}';
+
+                    if (processedThreadIds.contains(threadKey)) continue;
+
+                    if (!threadMap.containsKey(threadKey) || (mail.date != null && threadMap[threadKey]!.date != null && mail.date!.isAfter(threadMap[threadKey]!.date!))) {
+                      threadMap[threadKey] = mail;
+                    }
+                  }
+                }
+
+                for (final entry in threadMap.entries) {
+                  final threadKey = entry.key;
+                  final representativeMail = entry.value;
+
+                  if (processedThreadIds.contains(threadKey)) continue;
+                  processedThreadIds.add(threadKey);
+
+                  final threadResult = await mailRepository.fetchThreads(
+                    oauth: oauth,
+                    type: representativeMail.type,
+                    threadId: representativeMail.threadId!,
+                    labelId: CommonMailLabels.inbox.id,
+                    email: oauth.email,
+                  );
+
+                  await threadResult.fold(
+                    (failure) async {
+                      // Failed to fetch thread, skip this thread
+                    },
+                    (threadMails) async {
+                      final date = ref.read(inboxListDateProvider);
+                      final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                      final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+                      for (final mail in threadMails) {
+                        final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
+                        searchResults.add(InboxEntity.fromMail(mail, config));
+                      }
+                    },
+                  );
+                }
+              },
+            );
+          }
+        }
+
+        // Search in chat (same logic as _searchAndGenerateContext)
+        final chatQuery = keywords.join(' ');
+        if (chatQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+          for (final oauth in messengerOAuths) {
+            final chatRepository = ref.watch(chatRepositoryProvider);
+            final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+            final user = ref.read(authControllerProvider).requireValue;
+
+            final chatResult = await chatRepository.searchMessage(oauth: oauth, user: user, q: chatQuery, pageToken: null, channels: channels, sortType: SearchSortType.relevant);
+
+            await chatResult.fold(
+              (failure) async {
+                // Chat search failed, skip this OAuth account
+              },
+              (result) async {
+                final Map<String, MessageEntity> threadMap = {};
+
+                for (final message in result.messages) {
+                  final threadId = message.threadId?.isNotEmpty == true && message.threadId != message.id ? message.threadId! : message.id;
+                  final threadKey = '${threadId}_${message.teamId}_${message.channelId}';
+
+                  if (processedThreadIds.contains(threadKey)) continue;
+
+                  if (!threadMap.containsKey(threadKey) ||
+                      (message.createdAt != null && threadMap[threadKey]!.createdAt != null && message.createdAt!.isAfter(threadMap[threadKey]!.createdAt!))) {
+                    threadMap[threadKey] = message;
+                  }
+                }
+
+                for (final entry in threadMap.entries) {
+                  final threadKey = entry.key;
+                  final representativeMessage = entry.value;
+
+                  if (processedThreadIds.contains(threadKey)) continue;
+                  processedThreadIds.add(threadKey);
+
+                  final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+                  final channel = _channels.firstWhereOrNull((c) => c.id == representativeMessage.channelId && c.teamId == representativeMessage.teamId);
+
+                  if (channel == null) continue;
+
+                  final parentMessageId = representativeMessage.threadId?.isNotEmpty == true && representativeMessage.threadId != representativeMessage.id
+                      ? representativeMessage.threadId!
+                      : representativeMessage.id;
+
+                  if (parentMessageId == null) continue;
+
+                  final threadResult = await chatRepository.fetchReplies(oauth: oauth, channel: channel, parentMessageId: parentMessageId);
+
+                  await threadResult.fold(
+                    (failure) async {
+                      // Failed to fetch thread replies, skip this thread
+                    },
+                    (threadData) async {
+                      final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
+                      final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
+                      final date = ref.read(inboxListDateProvider);
+                      final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                      final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+
+                      for (final message in threadData.messages) {
+                        final member = _members.firstWhereOrNull((m) => m.id == message.userId);
+                        if (member != null && message.teamId != null && message.channelId != null && message.userId != null) {
+                          final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromChat(message));
+                          searchResults.add(InboxEntity.fromChat(message, config, channel, member, _channels, _members, _groups));
+                        }
+                      }
+                    },
+                  );
+                }
+              },
+            );
+          }
+        }
+
+        // Search in calendar (same logic as _searchAndGenerateContext)
+        List<EventEntity> eventEntities = [];
+        final calendarQuery = keywords.join(' ');
+        if (calendarQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+          for (final oauth in calendarOAuths) {
+            final calendarRepository = ref.watch(calendarRepositoryProvider);
+            final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+
+            await calendarListResult.fold(
+              (failure) async {
+                // Calendar list fetch failed, skip this OAuth account
+              },
+              (calendarMap) async {
+                final calendars = calendarMap.values
+                    .expand((e) => e)
+                    .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                    .toList();
+                if (calendars.isEmpty) return;
+
+                final eventResult = await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+
+                await eventResult.fold(
+                  (failure) async {
+                    // Calendar search failed, skip this OAuth account
+                  },
+                  (result) async {
+                    final now = DateTime.now();
+                    for (final eventList in result.events.values) {
+                      for (final foundEvent in eventList) {
+                        // Exclude events that start after now
+                        if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(now)) {
+                          continue;
+                        }
+                        if (event == null || foundEvent.uniqueId != event.uniqueId) {
+                          eventEntities.add(foundEvent);
+                        }
+                      }
+                    }
+                  },
+                );
+              },
+            );
+          }
+        }
+
+        // Sort by date (closest to today first) and limit total results
+        searchResults.sort((a, b) => b.inboxDatetime.compareTo(a.inboxDatetime));
+        taskEntities.sort((a, b) {
+          final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+          final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+          return bDate.compareTo(aDate);
+        });
+        eventEntities.sort((a, b) {
+          final aDate = a.startDate ?? DateTime(1970);
+          final bDate = b.startDate ?? DateTime(1970);
+          return bDate.compareTo(aDate);
+        });
+        searchResults = searchResults.take(20).toList();
+        taskEntities = taskEntities.take(20).toList();
+        eventEntities = eventEntities.take(20).toList();
+
+        if (searchResults.isEmpty && taskEntities.isEmpty && eventEntities.isEmpty) {
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
-            'message': '이전 컨텍스트가 없습니다.',
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
+          };
+        }
+
+        // Create virtual inbox from search results
+        final firstLinkedInbox = searchResults.firstWhereOrNull((i) => i.linkedMail != null || i.linkedMessage != null);
+
+        InboxEntity? baseInbox;
+        if (linkedMail != null) {
+          baseInbox = InboxEntity(id: InboxEntity.getInboxIdFromLinkedMail(linkedMail), title: linkedMail.title, description: null, linkedMail: linkedMail);
+        } else if (linkedMessage != null) {
+          baseInbox = InboxEntity(id: InboxEntity.getInboxIdFromLinkedChat(linkedMessage), title: linkedMessage.userName, description: null, linkedMessage: linkedMessage);
+        }
+
+        final virtualInbox =
+            baseInbox ??
+            InboxEntity(
+              id: 'search_${event?.uniqueId ?? task?.id}',
+              title: event?.title ?? task?.title ?? 'Untitled',
+              description: event?.description ?? task?.description,
+              linkedMail: firstLinkedInbox?.linkedMail,
+              linkedMessage: firstLinkedInbox?.linkedMessage,
+            );
+
+        // Generate summary from search results
+        final summaryResult = await repository.fetchConversationSummary(
+          inbox: virtualInbox,
+          allInboxes: searchResults,
+          eventEntities: eventEntities,
+          taskEntities: taskEntities,
+          userId: userId,
+          taskId: effectiveTaskId,
+          eventId: effectiveEventId,
+        );
+
+        final summary = summaryResult.fold((failure) => null, (summary) => summary);
+
+        if (summary == null || summary.isEmpty) {
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
+          };
+        }
+
+        return {
+          'success': true,
+          'result': {'summary': summary},
+          'message': Utils.mainContext.tr.mcp_previous_context_retrieved,
+        };
+      } else if (inbox != null) {
+        // If only inboxId is provided and no linked task/event, use inbox directly
+        // This follows the same logic as inboxConversationSummaryController
+
+        // Import the private function logic by calling it through a provider
+        // Since we can't call private functions, we'll use the repository directly
+        final repository = ref.read(inboxRepositoryProvider);
+        final userId = ref.read(authControllerProvider).requireValue.id;
+
+        // Extract linkedMail/linkedMessage from inbox
+        final linkedMail = inbox.linkedMail;
+        final linkedMessage = inbox.linkedMessage;
+
+        // Extract search keywords from inbox title/description
+        final keywordsResult = await repository.extractSearchKeywords(
+          taskTitle: inbox.decryptedTitle,
+          taskDescription: inbox.description,
+          taskProjectName: null,
+          calendarName: null,
+          model: 'gpt-4o-mini',
+        );
+
+        final keywords = keywordsResult.fold((failure) => null, (keywords) => keywords);
+        if (keywords == null || keywords.isEmpty) {
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
+          };
+        }
+
+        // Get all integrated OAuth accounts
+        final mailOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+        final messengerOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+        final calendarOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.calendarOAuths)) ?? [];
+
+        // Search in each datasource (same logic as _searchAndGenerateContext)
+        List<InboxEntity> searchResults = [];
+        List<TaskEntity> taskEntities = [];
+        List<EventEntity> eventEntities = [];
+        final Set<String> processedThreadIds = {};
+
+        // Process linkedMail/linkedMessage first if provided
+        if (linkedMail != null && linkedMail.threadId.isNotEmpty) {
+          final threadKey = '${linkedMail.threadId}_${linkedMail.hostMail}';
+          if (!processedThreadIds.contains(threadKey)) {
+            processedThreadIds.add(threadKey);
+
+            final mailRepository = ref.watch(mailRepositoryProvider);
+            final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+            final oauth = oauths.firstWhereOrNull((o) => o.email == linkedMail.hostMail);
+
+            if (oauth != null) {
+              final threadResult = await mailRepository.fetchThreads(
+                oauth: oauth,
+                type: linkedMail.type,
+                threadId: linkedMail.threadId,
+                labelId: CommonMailLabels.inbox.id,
+                email: linkedMail.hostMail,
+              );
+
+              await threadResult.fold(
+                (failure) async {
+                  // Failed to fetch thread
+                },
+                (threadMails) async {
+                  final date = ref.read(inboxListDateProvider);
+                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                  final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+                  for (final mail in threadMails) {
+                    final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
+                    searchResults.add(InboxEntity.fromMail(mail, config));
+                  }
+                },
+              );
+            }
+          }
+        } else if (linkedMessage != null) {
+          final threadId = linkedMessage.threadId.isNotEmpty && linkedMessage.threadId != linkedMessage.messageId ? linkedMessage.threadId : linkedMessage.messageId;
+          final threadKey = '${threadId}_${linkedMessage.teamId}_${linkedMessage.channelId}';
+
+          if (!processedThreadIds.contains(threadKey)) {
+            processedThreadIds.add(threadKey);
+
+            final chatRepository = ref.watch(chatRepositoryProvider);
+            final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+            final channel = channels.firstWhereOrNull((c) => c.id == linkedMessage.channelId && c.teamId == linkedMessage.teamId);
+
+            if (channel != null) {
+              final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+              final oauth = oauths.firstWhereOrNull((o) => o.team?.id == linkedMessage.teamId);
+
+              if (oauth != null) {
+                final threadResult = await chatRepository.fetchReplies(oauth: oauth, channel: channel, parentMessageId: threadId);
+
+                await threadResult.fold(
+                  (failure) async {
+                    // Failed to fetch thread replies
+                  },
+                  (threadData) async {
+                    final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+                    final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
+                    final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
+                    final date = ref.read(inboxListDateProvider);
+                    final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                    final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+
+                    for (final message in threadData.messages) {
+                      final msgChannel = _channels.firstWhereOrNull((c) => c.id == message.channelId && c.teamId == message.teamId);
+                      final member = _members.firstWhereOrNull((m) => m.id == message.userId);
+                      if (msgChannel != null && member != null && message.teamId != null && message.channelId != null && message.userId != null) {
+                        final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromChat(message));
+                        searchResults.add(InboxEntity.fromChat(message, config, msgChannel, member, _channels, _members, _groups));
+                      }
+                    }
+                  },
+                );
+              }
+            }
+          }
+        }
+
+        // Search in mail, chat, calendar, tasks using keywords (same as _searchAndGenerateContext)
+        if (searchResults.isEmpty && keywords.isNotEmpty) {
+          // Search in tasks (local) - from both taskListControllerInternalProvider and calendarTaskListControllerInternalProvider
+          final taskQuery = keywords.join(' ');
+          if (taskQuery.isNotEmpty) {
+            final now = DateTime.now();
+            final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+            final startDate = threeMonthsAgo;
+            final endDate = now;
+
+            // Get tasks from both providers (include recent 3 months)
+            final allTasks = _getAllTasksFromBothProviders(includeRecentMonths: true);
+
+            // Filter by date range (last 3 months) and keywords
+            final filteredTasks = _filterLocalTasks(allTasks, startDate, endDate, taskQuery, null, null);
+            // Sort by date (closest to today first) and take 20
+            filteredTasks.sort((a, b) {
+              final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+              final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+              return bDate.compareTo(aDate);
+            });
+            taskEntities.addAll(filteredTasks.take(20));
+          }
+
+          // Search in mail
+          final mailQuery = keywords.join(' ');
+          if (mailQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+            for (final oauth in mailOAuths) {
+              final mailRepository = ref.watch(mailRepositoryProvider);
+              final user = ref.read(authControllerProvider).requireValue;
+
+              final mailResult = await mailRepository.fetchMailsForLabel(
+                oauth: oauth,
+                user: user,
+                isInbox: false,
+                labelId: null,
+                email: null,
+                pageToken: null,
+                q: mailQuery,
+                startDate: DateTime.now().subtract(const Duration(days: 30)),
+                endDate: DateTime.now(),
+              );
+
+              await mailResult.fold(
+                (failure) async {
+                  // Mail search failed, skip this OAuth account
+                },
+                (mails) async {
+                  final Map<String, MailEntity> threadMap = {};
+
+                  for (final mailList in mails.values) {
+                    for (final mail in mailList.messages) {
+                      if (mail.threadId == null || mail.threadId!.isEmpty) continue;
+
+                      final threadKey = '${mail.threadId}_${oauth.email}';
+
+                      if (processedThreadIds.contains(threadKey)) continue;
+
+                      if (!threadMap.containsKey(threadKey) || (mail.date != null && threadMap[threadKey]!.date != null && mail.date!.isAfter(threadMap[threadKey]!.date!))) {
+                        threadMap[threadKey] = mail;
+                      }
+                    }
+                  }
+
+                  for (final entry in threadMap.entries) {
+                    final threadKey = entry.key;
+                    final representativeMail = entry.value;
+
+                    if (processedThreadIds.contains(threadKey)) continue;
+                    processedThreadIds.add(threadKey);
+
+                    final threadResult = await mailRepository.fetchThreads(
+                      oauth: oauth,
+                      type: representativeMail.type,
+                      threadId: representativeMail.threadId!,
+                      labelId: CommonMailLabels.inbox.id,
+                      email: oauth.email,
+                    );
+
+                    await threadResult.fold(
+                      (failure) async {
+                        // Failed to fetch thread, skip this thread
+                      },
+                      (threadMails) async {
+                        final date = ref.read(inboxListDateProvider);
+                        final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                        final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+                        for (final mail in threadMails) {
+                          final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
+                          searchResults.add(InboxEntity.fromMail(mail, config));
+                        }
+                      },
+                    );
+                  }
+                },
+              );
+            }
+          }
+
+          // Search in chat
+          final chatQuery = keywords.join(' ');
+          if (chatQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+            for (final oauth in messengerOAuths) {
+              final chatRepository = ref.watch(chatRepositoryProvider);
+              final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+              final user = ref.read(authControllerProvider).requireValue;
+
+              final chatResult = await chatRepository.searchMessage(oauth: oauth, user: user, q: chatQuery, pageToken: null, channels: channels, sortType: SearchSortType.relevant);
+
+              await chatResult.fold(
+                (failure) async {
+                  // Chat search failed, skip this OAuth account
+                },
+                (result) async {
+                  final Map<String, MessageEntity> threadMap = {};
+
+                  for (final message in result.messages) {
+                    final threadId = message.threadId?.isNotEmpty == true && message.threadId != message.id ? message.threadId! : message.id;
+                    final threadKey = '${threadId}_${message.teamId}_${message.channelId}';
+
+                    if (processedThreadIds.contains(threadKey)) continue;
+
+                    if (!threadMap.containsKey(threadKey) ||
+                        (message.createdAt != null && threadMap[threadKey]!.createdAt != null && message.createdAt!.isAfter(threadMap[threadKey]!.createdAt!))) {
+                      threadMap[threadKey] = message;
+                    }
+                  }
+
+                  for (final entry in threadMap.entries) {
+                    final threadKey = entry.key;
+                    final representativeMessage = entry.value;
+
+                    if (processedThreadIds.contains(threadKey)) continue;
+                    processedThreadIds.add(threadKey);
+
+                    final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+                    final channel = _channels.firstWhereOrNull((c) => c.id == representativeMessage.channelId && c.teamId == representativeMessage.teamId);
+
+                    if (channel == null) continue;
+
+                    final parentMessageId = representativeMessage.threadId?.isNotEmpty == true && representativeMessage.threadId != representativeMessage.id
+                        ? representativeMessage.threadId!
+                        : representativeMessage.id;
+
+                    if (parentMessageId == null) continue;
+
+                    final threadResult = await chatRepository.fetchReplies(oauth: oauth, channel: channel, parentMessageId: parentMessageId);
+
+                    await threadResult.fold(
+                      (failure) async {
+                        // Failed to fetch thread replies, skip this thread
+                      },
+                      (threadData) async {
+                        final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
+                        final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
+                        final date = ref.read(inboxListDateProvider);
+                        final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+                        final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+
+                        for (final message in threadData.messages) {
+                          final member = _members.firstWhereOrNull((m) => m.id == message.userId);
+                          if (member != null && message.teamId != null && message.channelId != null && message.userId != null) {
+                            final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromChat(message));
+                            searchResults.add(InboxEntity.fromChat(message, config, channel, member, _channels, _members, _groups));
+                          }
+                        }
+                      },
+                    );
+                  }
+                },
+              );
+            }
+          }
+
+          // Search in calendar
+          final calendarQuery = keywords.join(' ');
+          if (calendarQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+            for (final oauth in calendarOAuths) {
+              final calendarRepository = ref.watch(calendarRepositoryProvider);
+              final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+
+              await calendarListResult.fold(
+                (failure) async {
+                  // Calendar list fetch failed, skip this OAuth account
+                },
+                (calendarMap) async {
+                  final calendars = calendarMap.values
+                      .expand((e) => e)
+                      .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                      .toList();
+                  if (calendars.isEmpty) return;
+
+                  final eventResult = await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+
+                  await eventResult.fold(
+                    (failure) async {
+                      // Calendar search failed, skip this OAuth account
+                    },
+                    (result) async {
+                      final now = DateTime.now();
+                      for (final eventList in result.events.values) {
+                        for (final foundEvent in eventList) {
+                          // Exclude events that start after now
+                          if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(now)) {
+                            continue;
+                          }
+                          eventEntities.add(foundEvent);
+                        }
+                      }
+                    },
+                  );
+                },
+              );
+            }
+          }
+        }
+
+        // Sort by date (closest to today first) and limit results
+        searchResults.sort((a, b) => b.inboxDatetime.compareTo(a.inboxDatetime));
+        taskEntities.sort((a, b) {
+          final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+          final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+          return bDate.compareTo(aDate);
+        });
+        eventEntities.sort((a, b) {
+          final aDate = a.startDate ?? DateTime(1970);
+          final bDate = b.startDate ?? DateTime(1970);
+          return bDate.compareTo(aDate);
+        });
+        searchResults = searchResults.take(20).toList();
+        taskEntities = taskEntities.take(20).toList();
+        eventEntities = eventEntities.take(20).toList();
+
+        if (searchResults.isEmpty && taskEntities.isEmpty && eventEntities.isEmpty) {
+          return {
+            'success': true,
+            'result': {'summary': 'No previous context available'},
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
           };
         }
 
@@ -3030,7 +3664,8 @@ class McpFunctionExecutor {
         final summaryResult = await repository.fetchConversationSummary(
           inbox: baseInbox ?? inbox,
           allInboxes: searchResults,
-          eventEntities: [],
+          eventEntities: eventEntities,
+          taskEntities: taskEntities,
           userId: userId,
           taskId: null,
           eventId: null,
@@ -3042,24 +3677,24 @@ class McpFunctionExecutor {
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
-            'message': '이전 컨텍스트가 없습니다.',
+            'message': Utils.mainContext.tr.mcp_previous_context_not_available,
           };
         }
 
         return {
           'success': true,
           'result': {'summary': summary},
-          'message': '이전 컨텍스트를 가져왔습니다.',
+          'message': Utils.mainContext.tr.mcp_previous_context_retrieved,
         };
       } else {
         return {
           'success': true,
           'result': {'summary': 'No previous context available'},
-          'message': '이전 컨텍스트가 없습니다.',
+          'message': Utils.mainContext.tr.mcp_previous_context_not_available,
         };
       }
     } catch (e, stackTrace) {
-      return {'success': false, 'error': 'Failed to get previous context: ${e.toString()}'};
+      return {'success': false, 'error': '${Utils.mainContext.tr.mcp_failed_to_get_previous_context}: ${e.toString()}'};
     }
   }
 
@@ -3099,7 +3734,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 인박스를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_inboxes(results.length)};
     } catch (e) {
       // Provider가 dispose된 경우를 포함한 모든 에러 처리
       if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
@@ -3125,7 +3760,7 @@ class McpFunctionExecutor {
       }
 
       // 프로젝트에 속한 작업 개수 계산
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final projectTasks = allTasks.where((t) => t.projectId == projectId && !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask).toList();
       final taskCount = projectTasks.length;
       final doneTaskCount = projectTasks.where((t) => t.status == TaskStatus.done).length;
@@ -3141,7 +3776,7 @@ class McpFunctionExecutor {
           'doneTaskCount': doneTaskCount,
           'pendingTaskCount': taskCount - doneTaskCount,
         },
-        'message': '프로젝트 정보를 가져왔습니다.',
+        'message': Utils.mainContext.tr.mcp_project_info_retrieved,
       };
     } catch (e) {
       return {'success': false, 'error': 'Failed to get project details: ${e.toString()}'};
@@ -3163,7 +3798,7 @@ class McpFunctionExecutor {
     }
 
     // Get all tasks and events to find available time slots
-    final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask && e.startAt != null).toList();
+    final allTasks = availableTasks ?? _getAllTasksFromBothProviders().where((e) => !e.isEventDummyTask && e.startAt != null).toList();
     final allEvents = availableEvents ?? ref.read(calendarEventListControllerProvider(tabType: tabType)).eventsOnView.where((e) => e.startDate != null).toList();
 
     // Find the item to optimize
@@ -3298,7 +3933,7 @@ class McpFunctionExecutor {
 
     // Get all tasks and events for conflict checking
     // Use full task/event lists to check for conflicts, not just the ones being rescheduled
-    final Iterable<TaskEntity> allTasksForConflictCheck = ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask && e.startAt != null && e.endAt != null);
+    final allTasksForConflictCheck = _getAllTasksFromBothProviders().where((e) => !e.isEventDummyTask && e.startAt != null && e.endAt != null);
     final Iterable<EventEntity> allEventsForConflictCheck = ref
         .read(calendarEventListControllerProvider(tabType: tabType))
         .eventsOnView
@@ -3316,7 +3951,7 @@ class McpFunctionExecutor {
         }
       }
     } else {
-      for (final task in ref.read(taskListControllerProvider).tasks) {
+      for (final task in _getAllTasksFromBothProviders()) {
         if (!task.isEventDummyTask && task.id != null) {
           allTasksMap[task.id!] = task;
         }
@@ -3500,7 +4135,7 @@ class McpFunctionExecutor {
       results.add({'taskId': updatedTask.id, 'startAt': bestStartTime?.toIso8601String() ?? '', 'endAt': bestEndTime?.toIso8601String() ?? ''});
     }
 
-    return {'success': true, 'results': results, 'message': '${results.length}개의 작업이 오늘 적절한 시간에 재스케줄되었습니다.'};
+    return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_tasks_rescheduled(results.length)};
   }
 
   // Project actions
@@ -3591,7 +4226,7 @@ class McpFunctionExecutor {
         })
         .toList();
 
-    return {'success': true, 'results': results, 'message': '${results.length}개의 프로젝트를 찾았습니다.'};
+    return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_projects(results.length)};
   }
 
   Future<Map<String, dynamic>> _executeListTasks(Map<String, dynamic> args, {required TabType tabType}) async {
@@ -3602,7 +4237,7 @@ class McpFunctionExecutor {
     final limit = args['limit'] as int?;
 
     try {
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       var filteredTasks = allTasks.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask).toList();
 
       // Filter by project
@@ -3678,7 +4313,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 작업을 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_tasks(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list tasks: ${e.toString()}'};
     }
@@ -3749,7 +4384,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 일정을 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_events(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list events: ${e.toString()}'};
     }
@@ -3763,7 +4398,7 @@ class McpFunctionExecutor {
         return {'id': project.uniqueId, 'name': project.name, 'description': project.description, 'parentId': project.parentId};
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 프로젝트를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_projects(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to list projects: ${e.toString()}'};
     }
@@ -3777,7 +4412,7 @@ class McpFunctionExecutor {
     }
 
     try {
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
       if (task == null) {
@@ -3798,7 +4433,7 @@ class McpFunctionExecutor {
           'createdAt': task.createdAt?.toIso8601String(),
           'updatedAt': task.updatedAt?.toIso8601String(),
         },
-        'message': '작업 정보를 가져왔습니다.',
+        'message': Utils.mainContext.tr.mcp_task_info_retrieved,
       };
     } catch (e) {
       return {'success': false, 'error': 'Failed to get task details: ${e.toString()}'};
@@ -3834,7 +4469,7 @@ class McpFunctionExecutor {
           'isAllDay': event.isAllDay,
           'location': event.location,
         },
-        'message': '일정 정보를 가져왔습니다.',
+        'message': Utils.mainContext.tr.mcp_event_info_retrieved,
       };
     } catch (e) {
       return {'success': false, 'error': 'Failed to get event details: ${e.toString()}'};
@@ -3850,7 +4485,7 @@ class McpFunctionExecutor {
         return {'id': calendar.uniqueId, 'name': calendar.name, 'email': calendar.email, 'owned': calendar.owned, 'modifiable': calendar.modifiable};
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 캘린더를 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_calendars(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get calendar list: ${e.toString()}'};
     }
@@ -3872,7 +4507,7 @@ class McpFunctionExecutor {
 
     // If taskId is provided, directly update the task's project
     if (taskId != null && taskId.isNotEmpty) {
-      final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
       final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
       if (task == null) {
@@ -3946,6 +4581,61 @@ class McpFunctionExecutor {
       await TaskAction.upsertTask(task: task, calendarTaskEditSourceType: CalendarTaskEditSourceType.inboxDrag, tabType: tabType, showToast: false);
       return {'success': true, 'taskId': task.id, 'message': 'Inbox linked to project successfully'};
     }
+  }
+
+  /// Get all tasks from both taskListControllerInternalProvider and calendarTaskListControllerInternalProvider
+  List<TaskEntity> _getAllTasksFromBothProviders({bool includeRecentMonths = false}) {
+    final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+
+    // Get tasks from taskListControllerInternalProvider
+    final tasksFromTaskList =
+        ref
+            .read(taskListControllerInternalProvider(isSignedIn: isSignedIn, labelId: 'all'))
+            .value
+            ?.tasks
+            .where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask)
+            .toList() ??
+        [];
+
+    // Get tasks from calendarTaskListControllerInternalProvider
+    final tasksFromCalendar = <TaskEntity>[];
+    if (includeRecentMonths) {
+      final now = DateTime.now();
+      // Get tasks for current month, 1 month ago, and 2 months ago
+      for (int i = 0; i < 3; i++) {
+        final targetDate = DateTime(now.year, now.month - i, 1);
+        try {
+          final monthTasks = ref.read(calendarTaskListControllerInternalProvider(isSignedIn: isSignedIn, targetYear: targetDate.year, targetMonth: targetDate.month)).value ?? [];
+          tasksFromCalendar.addAll(monthTasks.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask));
+        } catch (e) {
+          // Skip if provider is not available
+        }
+      }
+    } else {
+      // Get tasks for current month only
+      final now = DateTime.now();
+      try {
+        final monthTasks = ref.read(calendarTaskListControllerInternalProvider(isSignedIn: isSignedIn, targetYear: now.year, targetMonth: now.month)).value ?? [];
+        tasksFromCalendar.addAll(monthTasks.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask));
+      } catch (e) {
+        // Skip if provider is not available
+      }
+    }
+
+    // Combine and deduplicate tasks
+    final allTasksMap = <String, TaskEntity>{};
+    for (final task in tasksFromTaskList) {
+      if (task.id != null) {
+        allTasksMap[task.id!] = task;
+      }
+    }
+    for (final task in tasksFromCalendar) {
+      if (task.id != null) {
+        allTasksMap[task.id!] = task;
+      }
+    }
+
+    return allTasksMap.values.toList();
   }
 
   /// 로컬 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
@@ -4100,7 +4790,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 인박스 항목을 찾았습니다.'};
+      return {'success': true, 'results': results, 'count': results.length, 'message': Utils.mainContext.tr.mcp_found_inbox_items(results.length)};
     } catch (e) {
       // Provider가 dispose된 경우를 포함한 모든 에러 처리
       if (e.toString().contains('disposed') || e.toString().contains('UnmountedRefException')) {
@@ -4113,6 +4803,7 @@ class McpFunctionExecutor {
   /// 로컬 태스크 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
   List<TaskEntity> _filterLocalTasks(List<TaskEntity> localTasks, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? taskId, bool? isDone) {
     var filtered = localTasks;
+    final now = DateTime.now();
 
     // ID 필터
     if (taskId != null && taskId.isNotEmpty) {
@@ -4120,14 +4811,24 @@ class McpFunctionExecutor {
       if (filtered.isEmpty) return [];
     }
 
-    // 날짜 범위 필터
+    // 날짜 범위 필터 (endDate가 null이면 now를 사용, startDate가 null이면 제한 없음)
     if (startDate != null || endDate != null) {
       filtered = filtered.where((task) {
         final taskDate = task.startAt ?? task.startDate;
         if (taskDate == null) return false;
+        // Always exclude tasks that start after now
+        if (taskDate.isAfter(now)) return false;
         if (startDate != null && taskDate.isBefore(startDate)) return false;
         if (endDate != null && taskDate.isAfter(endDate)) return false;
         return true;
+      }).toList();
+      if (filtered.isEmpty) return [];
+    } else {
+      // 날짜 범위 필터가 없어도 now 이후의 task는 제외
+      filtered = filtered.where((task) {
+        final taskDate = task.startAt ?? task.startDate;
+        if (taskDate == null) return false;
+        return !taskDate.isAfter(now);
       }).toList();
       if (filtered.isEmpty) return [];
     }
@@ -4156,7 +4857,7 @@ class McpFunctionExecutor {
     if (startDate == null && endDate == null) return false;
 
     try {
-      final allTasks = ref.read(taskListControllerProvider).tasks;
+      final allTasks = _getAllTasksFromBothProviders();
       if (allTasks.isEmpty) return false;
 
       // 날짜 범위에 해당하는 데이터가 있는지 확인
@@ -4219,7 +4920,7 @@ class McpFunctionExecutor {
 
       if (hasLocalData) {
         // 로컬 데이터에서 필터링
-        final allTasks = ref.read(taskListControllerProvider).tasks;
+        final allTasks = _getAllTasksFromBothProviders();
         searchResults = _filterLocalTasks(allTasks, startDate, endDate, searchKeyword, taskId, isDone);
       } else {
         // Remote search 실행
@@ -4238,7 +4939,12 @@ class McpFunctionExecutor {
         searchResults = _filterLocalTasks(tasks, startDate, endDate, searchKeyword, taskId, isDone);
       }
 
-      // Limit results to 20
+      // Sort by date (closest to today first) and limit results to 20
+      searchResults.sort((a, b) {
+        final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+        final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+        return bDate.compareTo(aDate);
+      });
       final limitedTasks = searchResults.take(20).toList();
 
       // Format results
@@ -4255,7 +4961,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 작업을 찾았습니다.'};
+      return {'success': true, 'results': results, 'count': results.length, 'message': Utils.mainContext.tr.mcp_found_tasks(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
@@ -4264,6 +4970,7 @@ class McpFunctionExecutor {
   /// 로컬 일정 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
   List<EventEntity> _filterLocalEvents(List<EventEntity> localEvents, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? eventId) {
     var filtered = localEvents;
+    final now = DateTime.now();
 
     // ID 필터
     if (eventId != null && eventId.isNotEmpty) {
@@ -4271,14 +4978,24 @@ class McpFunctionExecutor {
       if (filtered.isEmpty) return [];
     }
 
-    // 날짜 범위 필터
+    // 날짜 범위 필터 (endDate가 null이면 now를 사용, startDate가 null이면 제한 없음)
     if (startDate != null || endDate != null) {
       filtered = filtered.where((event) {
         final eventStart = event.startDate;
         if (eventStart == null) return false;
+        // Always exclude events that start after now
+        if (eventStart.isAfter(now)) return false;
         if (startDate != null && eventStart.isBefore(startDate)) return false;
         if (endDate != null && eventStart.isAfter(endDate)) return false;
         return true;
+      }).toList();
+      if (filtered.isEmpty) return [];
+    } else {
+      // 날짜 범위 필터가 없어도 now 이후의 event는 제외
+      filtered = filtered.where((event) {
+        final eventStart = event.startDate;
+        if (eventStart == null) return false;
+        return !eventStart.isAfter(now);
       }).toList();
       if (filtered.isEmpty) return [];
     }
@@ -4440,7 +5157,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'count': results.length, 'message': '${results.length}개의 일정을 찾았습니다.'};
+      return {'success': true, 'results': results, 'count': results.length, 'message': Utils.mainContext.tr.mcp_found_events(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Search error: ${e.toString()}'};
     }
@@ -4584,7 +5301,7 @@ class McpFunctionExecutor {
         }
       });
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 라벨을 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_labels(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get mail labels: ${e.toString()}'};
     }
@@ -4749,7 +5466,7 @@ class McpFunctionExecutor {
     }
 
     try {
-      final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
       final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
       if (task == null) {
@@ -4819,7 +5536,7 @@ class McpFunctionExecutor {
     }
 
     try {
-      final allTasks = availableTasks ?? ref.read(taskListControllerProvider).tasks.where((e) => !e.isEventDummyTask).toList();
+      final allTasks = availableTasks ?? _getAllTasksFromBothProviders();
       final task = allTasks.firstWhereOrNull((t) => t.id == taskId);
 
       if (task == null) {
@@ -4879,7 +5596,7 @@ class McpFunctionExecutor {
         };
       }).toList();
 
-      return {'success': true, 'results': results, 'message': '${results.length}개의 첨부파일을 찾았습니다.'};
+      return {'success': true, 'results': results, 'message': Utils.mainContext.tr.mcp_found_attachments(results.length)};
     } catch (e) {
       return {'success': false, 'error': 'Failed to get mail attachments: ${e.toString()}'};
     }

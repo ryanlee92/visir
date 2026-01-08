@@ -7643,6 +7643,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fewest messages'**
   String get chat_history_sort_message_count_asc;
+
+  /// No description provided for @mcp_previous_context_not_available.
+  ///
+  /// In en, this message translates to:
+  /// **'No previous context available'**
+  String get mcp_previous_context_not_available;
+
+  /// No description provided for @mcp_previous_context_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous context retrieved'**
+  String get mcp_previous_context_retrieved;
+
+  /// No description provided for @mcp_failed_to_get_previous_context.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to get previous context'**
+  String get mcp_failed_to_get_previous_context;
+
+  /// No description provided for @mcp_mail_info_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail information retrieved'**
+  String get mcp_mail_info_retrieved;
+
+  /// No description provided for @mcp_found_mails.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} mail(s) found'**
+  String mcp_found_mails(int count);
+
+  /// No description provided for @mcp_message_info_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Message information retrieved'**
+  String get mcp_message_info_retrieved;
+
+  /// No description provided for @mcp_unknown_user.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown user'**
+  String get mcp_unknown_user;
+
+  /// No description provided for @mcp_unknown_channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown channel'**
+  String get mcp_unknown_channel;
+
+  /// No description provided for @mcp_found_messages.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} message(s) found'**
+  String mcp_found_messages(int count);
+
+  /// No description provided for @mcp_tasks_today.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} task(s) today'**
+  String mcp_tasks_today(int count);
+
+  /// No description provided for @mcp_events_today.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} event(s) today'**
+  String mcp_events_today(int count);
+
+  /// No description provided for @mcp_inbox_info_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox information retrieved'**
+  String get mcp_inbox_info_retrieved;
+
+  /// No description provided for @mcp_found_inboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} inbox(es) found'**
+  String mcp_found_inboxes(int count);
+
+  /// No description provided for @mcp_project_info_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Project information retrieved'**
+  String get mcp_project_info_retrieved;
+
+  /// No description provided for @mcp_tasks_rescheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} task(s) rescheduled to today at appropriate times'**
+  String mcp_tasks_rescheduled(int count);
+
+  /// No description provided for @mcp_found_projects.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} project(s) found'**
+  String mcp_found_projects(int count);
+
+  /// No description provided for @mcp_found_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} task(s) found'**
+  String mcp_found_tasks(int count);
+
+  /// No description provided for @mcp_found_events.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} event(s) found'**
+  String mcp_found_events(int count);
+
+  /// No description provided for @mcp_task_info_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Task information retrieved'**
+  String get mcp_task_info_retrieved;
+
+  /// No description provided for @mcp_event_info_retrieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Event information retrieved'**
+  String get mcp_event_info_retrieved;
+
+  /// No description provided for @mcp_found_calendars.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} calendar(s) found'**
+  String mcp_found_calendars(int count);
+
+  /// No description provided for @mcp_found_inbox_items.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} inbox item(s) found'**
+  String mcp_found_inbox_items(int count);
+
+  /// No description provided for @mcp_found_labels.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} label(s) found'**
+  String mcp_found_labels(int count);
+
+  /// No description provided for @mcp_found_attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} attachment(s) found'**
+  String mcp_found_attachments(int count);
+
+  /// No description provided for @mcp_found_upcoming_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} upcoming task(s) found'**
+  String mcp_found_upcoming_tasks(int count);
+
+  /// No description provided for @mcp_found_upcoming_events.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} upcoming event(s) found'**
+  String mcp_found_upcoming_events(int count);
+
+  /// No description provided for @mcp_found_overdue_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} overdue task(s) found'**
+  String mcp_found_overdue_tasks(int count);
+
+  /// No description provided for @mcp_found_unscheduled_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unscheduled task(s) found'**
+  String mcp_found_unscheduled_tasks(int count);
+
+  /// No description provided for @mcp_found_completed_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} completed task(s) found'**
+  String mcp_found_completed_tasks(int count);
 }
 
 class _AppLocalizationsDelegate

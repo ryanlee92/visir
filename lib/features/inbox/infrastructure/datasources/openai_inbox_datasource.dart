@@ -489,6 +489,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     required InboxEntity inbox,
     required List<InboxEntity> allInboxes,
     List<EventEntity>? eventEntities,
+    List<TaskEntity>? taskEntities,
     String? model,
     String? apiKey,
   }) async {

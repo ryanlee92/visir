@@ -9,6 +9,7 @@ import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
+import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:collection/collection.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
@@ -478,6 +479,85 @@ Future<String?> _searchAndGenerateContext(
       }
     }
 
+    // Search in tasks (local) - from both taskListControllerProvider and calendarTaskListControllerInternalProvider
+    List<TaskEntity> taskEntities = [];
+    final taskQuery = keywords.join(' ');
+    if (taskQuery.isNotEmpty) {
+      final now = DateTime.now();
+      final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+      final startDate = threeMonthsAgo;
+      final endDate = now;
+      // Get tasks from calendarTaskListControllerInternalProvider for recent 3 months
+      final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+
+      // Get tasks from taskListControllerProvider
+      final tasksFromTaskList =
+          ref
+              .read(taskListControllerInternalProvider(isSignedIn: isSignedIn, labelId: 'all'))
+              .value
+              ?.tasks
+              .where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask)
+              .toList() ??
+          [];
+
+      final tasksFromCalendar = <TaskEntity>[];
+
+      // Get tasks for current month, 1 month ago, and 2 months ago
+      for (int i = 0; i < 3; i++) {
+        final targetDate = DateTime(now.year, now.month - i, 1);
+        try {
+          final monthTasks = ref.read(calendarTaskListControllerInternalProvider(isSignedIn: isSignedIn, targetYear: targetDate.year, targetMonth: targetDate.month)).value ?? [];
+          tasksFromCalendar.addAll(monthTasks.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask));
+        } catch (e) {
+          // Skip if provider is not available
+        }
+      }
+
+      // Combine and deduplicate tasks
+      final allTasksMap = <String, TaskEntity>{};
+      for (final task in tasksFromTaskList) {
+        if (task.id != null) {
+          allTasksMap[task.id!] = task;
+        }
+      }
+      for (final task in tasksFromCalendar) {
+        if (task.id != null) {
+          allTasksMap[task.id!] = task;
+        }
+      }
+      final allTasks = allTasksMap.values.toList();
+
+      // Filter by date range (last 3 months) and keywords
+      final nowForFilter = DateTime.now();
+      var filteredTasks = allTasks.where((t) {
+        final taskDate = t.startAt ?? t.startDate;
+        if (taskDate == null) return false;
+        // Always exclude tasks that start after now
+        if (taskDate.isAfter(nowForFilter)) return false;
+        if (taskDate.isBefore(startDate)) return false;
+        if (taskDate.isAfter(endDate)) return false;
+        return true;
+      }).toList();
+
+      // Filter by keywords
+      if (taskQuery.isNotEmpty) {
+        final keyword = taskQuery.toLowerCase();
+        filteredTasks = filteredTasks.where((t) {
+          final title = t.title?.toLowerCase() ?? '';
+          final description = t.description?.toLowerCase() ?? '';
+          return title.contains(keyword) || description.contains(keyword);
+        }).toList();
+      }
+
+      // Sort by date (closest to today first) and take 20
+      filteredTasks.sort((a, b) {
+        final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+        final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+        return bDate.compareTo(aDate);
+      });
+      taskEntities.addAll(filteredTasks.take(20));
+    }
+
     // Search in calendar (Google Calendar, Outlook Calendar)
     // Combine all keywords into a single query (space-separated) for better search results
     List<EventEntity> eventEntities = [];
@@ -509,8 +589,13 @@ Future<String?> _searchAndGenerateContext(
               },
               (result) async {
                 // Collect all events from the result, excluding the current event
+                final now = DateTime.now();
                 for (final eventList in result.events.values) {
                   for (final foundEvent in eventList) {
+                    // Exclude events that start after now
+                    if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(now)) {
+                      continue;
+                    }
                     // Exclude the current event if it exists
                     if (event == null || foundEvent.uniqueId != event.uniqueId) {
                       eventEntities.add(foundEvent);
@@ -524,10 +609,23 @@ Future<String?> _searchAndGenerateContext(
       }
     }
 
-    // Limit total results to avoid overwhelming the context
+    // Sort by date (closest to today first) and limit total results to avoid overwhelming the context
+    searchResults.sort((a, b) => b.inboxDatetime.compareTo(a.inboxDatetime));
+    taskEntities.sort((a, b) {
+      final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+      final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    eventEntities.sort((a, b) {
+      final aDate = a.startDate ?? DateTime(1970);
+      final bDate = b.startDate ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
     searchResults = searchResults.take(20).toList();
+    taskEntities = taskEntities.take(20).toList();
+    eventEntities = eventEntities.take(20).toList();
 
-    if (searchResults.isEmpty && eventEntities.isEmpty) {
+    if (searchResults.isEmpty && taskEntities.isEmpty && eventEntities.isEmpty) {
       ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
       return null;
     }
@@ -559,6 +657,7 @@ Future<String?> _searchAndGenerateContext(
       inbox: virtualInbox,
       allInboxes: searchResults,
       eventEntities: eventEntities,
+      taskEntities: taskEntities,
       userId: userId,
       taskId: taskId,
       eventId: eventId,
