@@ -979,6 +979,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     final Map<String, Map<String, dynamic>> taggedItems = {};
     final RegExp taggedTaskRegex = RegExp(r'<tagged_task>(.*?)</tagged_task>', dotAll: true);
     final RegExp taggedEventRegex = RegExp(r'<tagged_event>(.*?)</tagged_event>', dotAll: true);
+    final RegExp taggedInboxRegex = RegExp(r'<tagged_inbox>(.*?)</tagged_inbox>', dotAll: true);
     // tagged_connection, tagged_channel, tagged_project are handled inline via customWidgetBuilder
 
     // Extract tagged tasks
@@ -1006,6 +1007,22 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
           final title = jsonData['title'] as String? ?? '';
           if (title.isNotEmpty) {
             taggedItems['@$title'] = {'type': 'event', 'data': jsonData};
+          }
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Extract tagged inboxes
+    for (final match in taggedInboxRegex.allMatches(cleanedContent)) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final title = jsonData['suggestion']?['summary'] as String? ?? jsonData['title'] as String? ?? '';
+          if (title.isNotEmpty) {
+            taggedItems['@$title'] = {'type': 'inbox', 'data': jsonData};
           }
         }
       } catch (e) {
@@ -1046,6 +1063,22 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
           // Convert to inapp_event format
           final inappEventJson = jsonEncode(jsonData);
           cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_event>$inappEventJson</inapp_event>' + cleanedContent.substring(match.end);
+        }
+      } catch (e) {
+        // Skip invalid JSON
+      }
+    }
+
+    // Convert all tagged_inbox to inapp_inbox (process in reverse order to maintain positions)
+    final taggedInboxMatches = taggedInboxRegex.allMatches(cleanedContent).toList();
+    for (final match in taggedInboxMatches.reversed) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          // Convert to inapp_inbox format
+          final inappInboxJson = jsonEncode(jsonData);
+          cleanedContent = cleanedContent.substring(0, match.start) + '<inapp_inbox>$inappInboxJson</inapp_inbox>' + cleanedContent.substring(match.end);
         }
       } catch (e) {
         // Skip invalid JSON

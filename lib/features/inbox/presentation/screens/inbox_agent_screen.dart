@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
@@ -32,6 +33,7 @@ import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart
 import 'package:Visir/features/inbox/presentation/widgets/inbox_action_suggestions_widget.dart';
 import 'package:Visir/features/inbox/utils/agent_tag_controller.dart';
 import 'package:Visir/features/inbox/presentation/widgets/daily_summary_widget.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:Visir/features/inbox/presentation/widgets/project_summary_cards_widget.dart';
 import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
@@ -662,6 +664,63 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                 final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
                                 if (actionType != null) {
                                   ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
+                                } else {
+                                  // actionType이 null인 경우 (새로운 함수들: getPreviousContext, convertBraindumpToTask, markDoneAndReply 등)
+                                  // 드롭된 아이템을 messageController에 추가하고 액션 타이틀만 텍스트로 추가
+                                  if (_messageController != null) {
+                                    // 드롭된 아이템을 태그된 아이템에 추가
+                                    if (task != null && !_messageController!.taggedTasks.any((t) => t.id == task.id)) {
+                                      _messageController!.addTaggedData(task: task);
+                                    }
+                                    if (event != null && !_messageController!.taggedEvents.any((e) => e.eventId == event.eventId)) {
+                                      _messageController!.addTaggedData(event: event);
+                                    }
+                                    if (inbox != null && !_messageController!.taggedInboxes.any((i) => i.id == inbox.id)) {
+                                      _messageController!.addTaggedData(inbox: inbox);
+                                    }
+                                    
+                                    // 액션 타이틀 가져오기
+                                    String actionTitle = mcpFunctionName;
+                                    switch (mcpFunctionName) {
+                                      case 'getPreviousContext':
+                                        actionTitle = 'View Previous Context';
+                                        break;
+                                      case 'convertBraindumpToTask':
+                                        actionTitle = 'Convert to Task';
+                                        break;
+                                      case 'markDoneAndReply':
+                                        actionTitle = 'Mark Done & Reply';
+                                        break;
+                                      case 'reschedule':
+                                        actionTitle = 'Reschedule';
+                                        break;
+                                      case 'setDueDate':
+                                        actionTitle = 'Set Due Date';
+                                        break;
+                                      case 'setRecurrence':
+                                        actionTitle = 'Edit Recurrence';
+                                        break;
+                                      case 'removeRecurrence':
+                                        actionTitle = 'Remove Recurrence';
+                                        break;
+                                      case 'responseCalendarInvitation':
+                                        actionTitle = 'Respond to Invitation';
+                                        break;
+                                    }
+                                    
+                                    // 액션 타이틀을 텍스트로 추가 (함수 호출 태그 없이)
+                                    final currentText = _messageController!.document.toPlainText();
+                                    if (currentText.trim().isEmpty) {
+                                      _messageController!.text = actionTitle;
+                                    } else {
+                                      _messageController!.text = '$currentText\n$actionTitle';
+                                    }
+                                    
+                                    // 메시지 전송 (일반 메시지처럼 처리)
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      _agentInputFieldStateKey.currentState?.postMessage(uploadable: false, html: _messageController!.html);
+                                    });
+                                  }
                                 }
                               },
                               onCustomPrompt: (title, prompt) {
@@ -965,6 +1024,63 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                     final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
                                     if (actionType != null) {
                                       ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
+                                    } else {
+                                      // actionType이 null인 경우 (새로운 함수들: getPreviousContext, convertBraindumpToTask, markDoneAndReply 등)
+                                      // 드롭된 아이템을 messageController에 추가하고 액션 타이틀만 텍스트로 추가
+                                      if (_messageController != null) {
+                                        // 드롭된 아이템을 태그된 아이템에 추가
+                                        if (task != null && !_messageController!.taggedTasks.any((t) => t.id == task.id)) {
+                                          _messageController!.addTaggedData(task: task);
+                                        }
+                                        if (event != null && !_messageController!.taggedEvents.any((e) => e.eventId == event.eventId)) {
+                                          _messageController!.addTaggedData(event: event);
+                                        }
+                                        if (inbox != null && !_messageController!.taggedInboxes.any((i) => i.id == inbox.id)) {
+                                          _messageController!.addTaggedData(inbox: inbox);
+                                        }
+                                        
+                                        // 액션 타이틀 가져오기
+                                        String actionTitle = mcpFunctionName;
+                                        switch (mcpFunctionName) {
+                                          case 'getPreviousContext':
+                                            actionTitle = 'View Previous Context';
+                                            break;
+                                          case 'convertBraindumpToTask':
+                                            actionTitle = 'Convert to Task';
+                                            break;
+                                          case 'markDoneAndReply':
+                                            actionTitle = 'Mark Done & Reply';
+                                            break;
+                                          case 'reschedule':
+                                            actionTitle = 'Reschedule';
+                                            break;
+                                          case 'setDueDate':
+                                            actionTitle = 'Set Due Date';
+                                            break;
+                                          case 'setRecurrence':
+                                            actionTitle = 'Edit Recurrence';
+                                            break;
+                                          case 'removeRecurrence':
+                                            actionTitle = 'Remove Recurrence';
+                                            break;
+                                          case 'responseCalendarInvitation':
+                                            actionTitle = 'Respond to Invitation';
+                                            break;
+                                        }
+                                        
+                                      // 액션 타이틀을 텍스트로 추가 (함수 호출 태그 없이)
+                                      final currentText = _messageController!.document.toPlainText();
+                                      if (currentText.trim().isEmpty) {
+                                        _messageController!.text = actionTitle;
+                                      } else {
+                                        _messageController!.text = '$currentText\n$actionTitle';
+                                      }
+                                      
+                                      // 메시지 전송 (일반 메시지처럼 처리)
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        _agentInputFieldStateKey.currentState?.postMessage(uploadable: false, html: _messageController!.html);
+                                      });
+                                      }
                                     }
                                   },
                                   onCustomPrompt: (title, prompt) {

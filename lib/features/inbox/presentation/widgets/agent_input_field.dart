@@ -165,6 +165,11 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   bool _isDraggingTask = false;
   final GlobalKey _inputFieldKey = GlobalKey();
 
+  // Dropped item state for suggested actions
+  InboxEntity? _droppedInbox;
+  TaskEntity? _droppedTask;
+  EventEntity? _droppedEvent;
+
   void handleDragStart(InboxEntity? inbox, TaskEntity? task, Offset offset) {
     _isDraggingInbox = inbox != null;
     _isDraggingTask = task != null;
@@ -201,6 +206,32 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
       } else if (task != null) {
         _addTaskTag(task);
       }
+
+      // Store dropped item for suggested actions
+      // Important: If task has linkedEvent, treat it as event
+      if (inbox != null) {
+        setState(() {
+          _droppedInbox = inbox;
+          _droppedTask = null;
+          _droppedEvent = null;
+        });
+      } else if (task != null) {
+        if (task.linkedEvent != null) {
+          // Treat as event if linkedEvent exists
+          setState(() {
+            _droppedEvent = task.linkedEvent;
+            _droppedTask = null;
+            _droppedInbox = null;
+          });
+        } else {
+          // Treat as task
+          setState(() {
+            _droppedTask = task;
+            _droppedEvent = null;
+            _droppedInbox = null;
+          });
+        }
+      }
     }
 
     setState(() {
@@ -210,6 +241,14 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     });
 
     widget.onDragEnd?.call(inbox, task, offset);
+  }
+
+  void clearDroppedItem() {
+    setState(() {
+      _droppedInbox = null;
+      _droppedTask = null;
+      _droppedEvent = null;
+    });
   }
 
   void _addInboxTag(InboxEntity inbox) {
@@ -1062,6 +1101,10 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                         inboxes: widget.inboxes ?? [],
                         upNextTask: widget.upNextTask,
                         upNextEvent: widget.upNextEvent,
+                        droppedInbox: _droppedInbox,
+                        droppedTask: _droppedTask,
+                        droppedEvent: _droppedEvent ?? _droppedTask?.linkedEvent,
+                        hasTaggedItems: messageController.taggedInboxes.isNotEmpty || messageController.taggedTasks.isNotEmpty || messageController.taggedEvents.isNotEmpty,
                         onActionTap: widget.onActionTap,
                         onCustomPrompt: widget.onCustomPrompt,
                       ),
@@ -2013,6 +2056,11 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                             inboxes: widget.inboxes ?? [],
                                             upNextTask: widget.upNextTask,
                                             upNextEvent: widget.upNextEvent,
+                                            droppedInbox: _droppedInbox,
+                                            droppedTask: _droppedTask,
+                                            droppedEvent: _droppedEvent ?? _droppedTask?.linkedEvent,
+                                            hasTaggedItems:
+                                                messageController.taggedInboxes.isNotEmpty || messageController.taggedTasks.isNotEmpty || messageController.taggedEvents.isNotEmpty,
                                             onActionTap: widget.onActionTap,
                                             onCustomPrompt: widget.onCustomPrompt,
                                           ),

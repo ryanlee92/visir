@@ -210,6 +210,17 @@ VisirIconType _getIconForMcpFunction(String functionName) {
       return VisirIconType.calendar;
     case 'toggleTaskStatus':
       return VisirIconType.check;
+    case 'reschedule':
+      return VisirIconType.calendar;
+    case 'getPreviousContext':
+      return VisirIconType.brain;
+    case 'convertBraindumpToTask':
+      return VisirIconType.task;
+    case 'markDoneAndReply':
+      return VisirIconType.check;
+    case 'setRecurrence':
+    case 'removeRecurrence':
+      return VisirIconType.repeat;
 
     // Calendar Actions
     case 'createEvent':
@@ -256,6 +267,20 @@ String _getTitleForMcpFunction(BuildContext context, String functionName) {
       return context.tr.task_deleted;
     case 'toggleTaskStatus':
       return context.tr.task_done;
+    case 'reschedule':
+      return 'Reschedule'; // TODO: 번역 키 추가 필요
+    case 'setDueDate':
+      return 'Set Due Date'; // TODO: 번역 키 추가 필요
+    case 'getPreviousContext':
+      return 'View Previous Context'; // TODO: 번역 키 추가 필요
+    case 'convertBraindumpToTask':
+      return 'Convert to Task'; // TODO: 번역 키 추가 필요
+    case 'markDoneAndReply':
+      return 'Mark Done & Reply'; // TODO: 번역 키 추가 필요
+    case 'setRecurrence':
+      return 'Edit Recurrence'; // TODO: 번역 키 추가 필요
+    case 'removeRecurrence':
+      return 'Remove Recurrence'; // TODO: 번역 키 추가 필요
 
     // Calendar Actions
     case 'createEvent':
@@ -353,13 +378,357 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
   final List<InboxEntity> inboxes;
   final TaskEntity? upNextTask;
   final EventEntity? upNextEvent;
+  final InboxEntity? droppedInbox;
+  final TaskEntity? droppedTask;
+  final EventEntity? droppedEvent;
+  final bool hasTaggedItems;
   final Function(String mcpFunctionName, {InboxEntity? inbox, TaskEntity? task, EventEntity? event})? onActionTap;
   final Function(String title, String prompt)? onCustomPrompt;
 
-  const AgentActionSuggestionsWidget({super.key, required this.inboxes, this.upNextTask, this.upNextEvent, this.onActionTap, this.onCustomPrompt});
+  const AgentActionSuggestionsWidget({
+    super.key,
+    required this.inboxes,
+    this.upNextTask,
+    this.upNextEvent,
+    this.droppedInbox,
+    this.droppedTask,
+    this.droppedEvent,
+    this.hasTaggedItems = false,
+    this.onActionTap,
+    this.onCustomPrompt,
+  });
+
+  /// 드롭된 아이템의 속성에 따라 suggested action을 생성합니다.
+  List<McpActionSuggestion> _generateSuggestionsForDroppedItem(BuildContext context, WidgetRef ref) {
+    final suggestions = <McpActionSuggestion>[];
+
+    // Task의 경우 (linkedEvent == null인 경우만 task로 인지)
+    if (droppedTask != null && droppedTask!.linkedEvent == null) {
+      // status == done인 경우
+      if (droppedTask!.status == TaskStatus.done) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'getPreviousContext',
+            itemName: hasTaggedItems ? null : droppedTask!.title,
+            actionName: _getTitleForMcpFunction(context, 'getPreviousContext'),
+            icon: _getIconForMcpFunction('getPreviousContext'),
+            task: droppedTask,
+            onTap: () => onActionTap?.call('getPreviousContext', task: droppedTask!),
+          ),
+        );
+      }
+
+      // linkedMails 또는 linkedMessages가 있는 경우
+      if (droppedTask!.linkedMails.isNotEmpty || droppedTask!.linkedMessages.isNotEmpty) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'getPreviousContext',
+            itemName: hasTaggedItems ? null : droppedTask!.title,
+            actionName: _getTitleForMcpFunction(context, 'getPreviousContext'),
+            icon: _getIconForMcpFunction('getPreviousContext'),
+            task: droppedTask,
+            onTap: () => onActionTap?.call('getPreviousContext', task: droppedTask!),
+          ),
+        );
+      }
+
+      // status == braindump인 경우
+      if (droppedTask!.status == TaskStatus.braindump) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'convertBraindumpToTask',
+            itemName: hasTaggedItems ? null : droppedTask!.title,
+            actionName: _getTitleForMcpFunction(context, 'convertBraindumpToTask'),
+            icon: _getIconForMcpFunction('convertBraindumpToTask'),
+            task: droppedTask,
+            onTap: () => onActionTap?.call('convertBraindumpToTask', task: droppedTask!),
+          ),
+        );
+      }
+
+      // isOverdue인 경우
+      if (droppedTask!.isOverdue) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'reschedule',
+            itemName: hasTaggedItems ? null : droppedTask!.title,
+            actionName: _getTitleForMcpFunction(context, 'reschedule'),
+            icon: _getIconForMcpFunction('reschedule'),
+            task: droppedTask,
+            onTap: () => onActionTap?.call('reschedule', task: droppedTask!),
+          ),
+        );
+      }
+
+      // isUnscheduled인 경우
+      if (droppedTask!.isUnscheduled) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'setDueDate',
+            itemName: hasTaggedItems ? null : droppedTask!.title,
+            actionName: _getTitleForMcpFunction(context, 'setDueDate'),
+            icon: _getIconForMcpFunction('setDueDate'),
+            task: droppedTask,
+            onTap: () => onActionTap?.call('setDueDate', task: droppedTask!),
+          ),
+        );
+      }
+
+      // 조합 액션: status == none && linkedMails/linkedMessages가 있는 경우
+      if (droppedTask!.status == TaskStatus.none && (droppedTask!.linkedMails.isNotEmpty || droppedTask!.linkedMessages.isNotEmpty)) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'markDoneAndReply',
+            itemName: hasTaggedItems ? null : droppedTask!.title,
+            actionName: _getTitleForMcpFunction(context, 'markDoneAndReply'),
+            icon: _getIconForMcpFunction('markDoneAndReply'),
+            task: droppedTask,
+            onTap: () => onActionTap?.call('markDoneAndReply', task: droppedTask!),
+          ),
+        );
+      }
+    }
+
+    // Event의 경우 (linkedEvent != null인 경우 event로 인지)
+    if (droppedEvent != null) {
+      // linkedMails 또는 linkedMessages가 있는 경우 (task에서 가져온 경우)
+      if (droppedTask != null && (droppedTask!.linkedMails.isNotEmpty || droppedTask!.linkedMessages.isNotEmpty)) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'getPreviousContext',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'getPreviousContext'),
+            icon: _getIconForMcpFunction('getPreviousContext'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('getPreviousContext', event: droppedEvent!),
+          ),
+        );
+      }
+
+      // isRequest인 경우
+      if (droppedEvent!.isRequest) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'responseCalendarInvitation',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'responseCalendarInvitation'),
+            icon: _getIconForMcpFunction('responseCalendarInvitation'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('responseCalendarInvitation', event: droppedEvent!),
+          ),
+        );
+      }
+
+      // isDeclined인 경우
+      if (droppedEvent!.isDeclined) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'responseCalendarInvitation',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'responseCalendarInvitation'),
+            icon: _getIconForMcpFunction('responseCalendarInvitation'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('responseCalendarInvitation', event: droppedEvent!),
+          ),
+        );
+      }
+
+      // isMaybe인 경우
+      if (droppedEvent!.isMaybe) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'responseCalendarInvitation',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'responseCalendarInvitation'),
+            icon: _getIconForMcpFunction('responseCalendarInvitation'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('responseCalendarInvitation', event: droppedEvent!),
+          ),
+        );
+      }
+
+      // rrule이 있는 경우
+      if (droppedEvent!.rrule != null) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'setRecurrence',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'setRecurrence'),
+            icon: _getIconForMcpFunction('setRecurrence'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('setRecurrence', event: droppedEvent!),
+          ),
+        );
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'removeRecurrence',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'removeRecurrence'),
+            icon: _getIconForMcpFunction('removeRecurrence'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('removeRecurrence', event: droppedEvent!),
+          ),
+        );
+      }
+
+      // startDate가 과거인 경우
+      if (droppedEvent!.startDate.isBefore(DateTime.now())) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'reschedule',
+            itemName: hasTaggedItems ? null : droppedEvent!.title,
+            actionName: _getTitleForMcpFunction(context, 'reschedule'),
+            icon: _getIconForMcpFunction('reschedule'),
+            event: droppedEvent,
+            onTap: () => onActionTap?.call('reschedule', event: droppedEvent!),
+          ),
+        );
+      }
+    }
+
+    // Inbox의 경우
+    if (droppedInbox != null) {
+      // linkedMail 또는 linkedMessage가 있는 경우
+      if (droppedInbox!.linkedMail != null || droppedInbox!.linkedMessage != null) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'getPreviousContext',
+            itemName: hasTaggedItems ? null : (droppedInbox!.suggestion?.summary ?? droppedInbox!.decryptedTitle),
+            actionName: _getTitleForMcpFunction(context, 'getPreviousContext'),
+            icon: _getIconForMcpFunction('getPreviousContext'),
+            inbox: droppedInbox,
+            onTap: () => onActionTap?.call('getPreviousContext', inbox: droppedInbox!),
+          ),
+        );
+      }
+
+      final suggestion = droppedInbox!.suggestion;
+      if (suggestion != null) {
+        // suggestion.reason == meeting_invitation인 경우
+        if (suggestion.reason == InboxSuggestionReason.meeting_invitation) {
+          suggestions.add(
+            McpActionSuggestion(
+              mcpFunctionName: 'createEvent',
+              itemName: hasTaggedItems ? null : suggestion.summary,
+              actionName: _getTitleForMcpFunction(context, 'createEvent'),
+              icon: _getIconForMcpFunction('createEvent'),
+              inbox: droppedInbox,
+              onTap: () => onActionTap?.call('createEvent', inbox: droppedInbox!),
+            ),
+          );
+        }
+
+        // suggestion.reason == task_assignment인 경우
+        if (suggestion.reason == InboxSuggestionReason.task_assignment) {
+          suggestions.add(
+            McpActionSuggestion(
+              mcpFunctionName: 'createTask',
+              itemName: hasTaggedItems ? null : suggestion.summary,
+              actionName: _getTitleForMcpFunction(context, 'createTask'),
+              icon: _getIconForMcpFunction('createTask'),
+              inbox: droppedInbox,
+              onTap: () => onActionTap?.call('createTask', inbox: droppedInbox!),
+            ),
+          );
+        }
+
+        // suggestion.reason == scheduling_request인 경우
+        if (suggestion.reason == InboxSuggestionReason.scheduling_request) {
+          suggestions.add(
+            McpActionSuggestion(
+              mcpFunctionName: 'createEvent',
+              itemName: hasTaggedItems ? null : suggestion.summary,
+              actionName: _getTitleForMcpFunction(context, 'createEvent'),
+              icon: _getIconForMcpFunction('createEvent'),
+              inbox: droppedInbox,
+              onTap: () => onActionTap?.call('createEvent', inbox: droppedInbox!),
+            ),
+          );
+        }
+
+        // suggestion.reason == question인 경우
+        if (suggestion.reason == InboxSuggestionReason.question) {
+          if (droppedInbox!.linkedMail != null) {
+            suggestions.add(
+              McpActionSuggestion(
+                mcpFunctionName: 'replyMail',
+                itemName: hasTaggedItems ? null : suggestion.summary,
+                actionName: _getTitleForMcpFunction(context, 'replyMail'),
+                icon: _getIconForMcpFunction('replyMail'),
+                inbox: droppedInbox,
+                onTap: () => onActionTap?.call('replyMail', inbox: droppedInbox!),
+              ),
+            );
+          } else if (droppedInbox!.linkedMessage != null) {
+            suggestions.add(
+              McpActionSuggestion(
+                mcpFunctionName: 'replyMessage',
+                itemName: hasTaggedItems ? null : suggestion.summary,
+                actionName: _getTitleForMcpFunction(context, 'replyMessage'),
+                icon: _getIconForMcpFunction('replyMessage'),
+                inbox: droppedInbox,
+                onTap: () => onActionTap?.call('replyMessage', inbox: droppedInbox!),
+              ),
+            );
+          }
+        }
+      }
+
+      // linkedMail이 있는 경우
+      if (droppedInbox!.linkedMail != null) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'replyMail',
+            itemName: hasTaggedItems ? null : (droppedInbox!.suggestion?.summary ?? droppedInbox!.decryptedTitle),
+            actionName: _getTitleForMcpFunction(context, 'replyMail'),
+            icon: _getIconForMcpFunction('replyMail'),
+            inbox: droppedInbox,
+            onTap: () => onActionTap?.call('replyMail', inbox: droppedInbox!),
+          ),
+        );
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'forwardMail',
+            itemName: hasTaggedItems ? null : (droppedInbox!.suggestion?.summary ?? droppedInbox!.decryptedTitle),
+            actionName: _getTitleForMcpFunction(context, 'forwardMail'),
+            icon: _getIconForMcpFunction('forwardMail'),
+            inbox: droppedInbox,
+            onTap: () => onActionTap?.call('forwardMail', inbox: droppedInbox!),
+          ),
+        );
+      }
+
+      // linkedMessage가 있는 경우
+      if (droppedInbox!.linkedMessage != null) {
+        suggestions.add(
+          McpActionSuggestion(
+            mcpFunctionName: 'replyMessage',
+            itemName: hasTaggedItems ? null : (droppedInbox!.suggestion?.summary ?? droppedInbox!.decryptedTitle),
+            actionName: _getTitleForMcpFunction(context, 'replyMessage'),
+            icon: _getIconForMcpFunction('replyMessage'),
+            inbox: droppedInbox,
+            onTap: () => onActionTap?.call('replyMessage', inbox: droppedInbox!),
+          ),
+        );
+      }
+    }
+
+    return suggestions;
+  }
 
   List<McpActionSuggestion> _generateSuggestions(BuildContext context, WidgetRef ref) {
     final suggestions = <McpActionSuggestion>[];
+
+    // 드롭된 아이템 기반 suggested action 생성 (우선순위 높음)
+    if (droppedInbox != null || droppedTask != null || droppedEvent != null) {
+      final droppedSuggestions = _generateSuggestionsForDroppedItem(context, ref);
+      suggestions.addAll(droppedSuggestions);
+    }
+
+    // 태그된 아이템이 있으면 기존 inbox list 기반 suggested action은 표시하지 않음
+    if (hasTaggedItems) {
+      return suggestions;
+    }
 
     // Inbox 기반 액션 추천
     for (final inbox in inboxes) {

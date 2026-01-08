@@ -2361,6 +2361,140 @@ class AgentActionController extends _$AgentActionController {
     List<ProjectEntity>? taggedProjects,
     List<PlatformFile>? files,
   }) async {
+    // 사용자 메시지에서 함수 호출 파싱
+    final executor = McpFunctionExecutor();
+    final userFunctionCalls = executor.parseFunctionCalls(userMessage);
+    
+    // 사용자 메시지에서 함수 호출이 있으면 먼저 실행
+    if (userFunctionCalls.isNotEmpty) {
+      // 함수 호출을 제거한 순수 메시지 추출
+      String cleanUserMessage = userMessage;
+      for (final call in userFunctionCalls) {
+        final callJson = jsonEncode(call);
+        cleanUserMessage = cleanUserMessage.replaceAll('<function_call>$callJson</function_call>', '');
+        cleanUserMessage = cleanUserMessage.replaceAll(callJson, '');
+      }
+      cleanUserMessage = cleanUserMessage.trim();
+      
+      // 함수 호출이 있으면 함수를 먼저 실행하고 결과를 포함해서 AI에게 전달
+      final currentState = state;
+      final availableInboxes = currentState.availableInboxes?.isNotEmpty == true ? currentState.availableInboxes : inboxes;
+      final me = ref.read(authControllerProvider).value;
+      final remainingCredits = me?.userAiCredits ?? 0.0;
+      
+      // 함수 실행
+      final functionResults = <Map<String, dynamic>>[];
+      var updatedTaggedTasks = taggedTasks;
+      var updatedTaggedEvents = taggedEvents;
+      var updatedAvailableInboxes = availableInboxes;
+      
+      for (final call in userFunctionCalls) {
+        final functionName = call['function'] as String? ?? '';
+        var functionArgs = Map<String, dynamic>.from(call['arguments'] as Map<String, dynamic>? ?? {});
+        
+        // 태그된 항목들을 자동으로 파라미터에 추가
+        functionArgs = _enrichFunctionArgsWithTaggedItems(
+          functionName: functionName,
+          args: functionArgs,
+          taggedTasks: updatedTaggedTasks,
+          taggedEvents: updatedTaggedEvents,
+          taggedConnections: taggedConnections,
+          availableInboxes: updatedAvailableInboxes,
+        );
+        
+        // 크레딧 정보를 함수 인자에 추가
+        functionArgs['_remaining_credits'] = remainingCredits;
+        
+        // 함수 실행
+        final tabType = _getTabTypeForFunction(functionName);
+        final result = await executor.executeFunction(
+          functionName,
+          functionArgs,
+          tabType: tabType,
+          availableTasks: updatedTaggedTasks,
+          availableEvents: updatedTaggedEvents,
+          availableConnections: taggedConnections,
+          availableInboxes: updatedAvailableInboxes,
+          remainingCredits: remainingCredits,
+        );
+        
+        functionResults.add(result);
+        
+        // 결과에서 생성된 task/event ID 추출
+        if (result['success'] == true && result['result'] != null) {
+          final resultData = result['result'] as Map<String, dynamic>?;
+          if (resultData != null) {
+            final taskId = resultData['taskId'] as String?;
+            final eventId = resultData['eventId'] as String?;
+            if (taskId != null) {
+              final recentTaskIds = List<String>.from(currentState.recentTaskIds);
+              if (!recentTaskIds.contains(taskId)) {
+                recentTaskIds.add(taskId);
+                state = state.copyWith(recentTaskIds: recentTaskIds);
+              }
+            }
+            if (eventId != null) {
+              final recentEventIds = List<String>.from(currentState.recentEventIds);
+              if (!recentEventIds.contains(eventId)) {
+                recentEventIds.add(eventId);
+                state = state.copyWith(recentEventIds: recentEventIds);
+              }
+            }
+          }
+        }
+      }
+      
+      // 함수 실행 결과를 메시지로 변환
+      final functionResultsSummary = <String>[];
+      for (final result in functionResults) {
+        final success = result['success'] as bool? ?? false;
+        if (success) {
+          final message = result['message'] as String? ?? result['result']?.toString() ?? '완료되었습니다';
+          functionResultsSummary.add(message);
+        } else {
+          final error = result['error'] as String? ?? '오류가 발생했습니다';
+          functionResultsSummary.add('오류: $error');
+        }
+      }
+      
+      final functionResultsMessage = functionResultsSummary.isNotEmpty ? functionResultsSummary.join('\n') : '';
+      
+      // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
+      final cleanMessage = cleanUserMessage.isNotEmpty ? cleanUserMessage : userMessage.replaceAll(RegExp(r'<function_call>.*?</function_call>', dotAll: true), '').trim();
+      final messageWithTags = _buildMessageWithTaggedItems(
+        userMessage: cleanMessage,
+        taggedTasks: updatedTaggedTasks,
+        taggedEvents: updatedTaggedEvents,
+        taggedConnections: taggedConnections,
+        taggedChannels: taggedChannels,
+        taggedProjects: taggedProjects,
+      );
+      
+      final currentState2 = state;
+      final messagesWithFunctionResults = [
+        ...currentState2.messages,
+        AgentActionMessage(role: 'user', content: messageWithTags, files: files),
+        if (functionResultsMessage.isNotEmpty)
+          AgentActionMessage(role: 'assistant', content: functionResultsMessage, excludeFromHistory: false),
+      ];
+      state = state.copyWith(messages: messagesWithFunctionResults, isLoading: true);
+      
+      // 함수 실행 결과를 포함해서 AI에게 전달
+      final inboxesToUse = currentState2.availableInboxes?.isNotEmpty == true ? currentState2.availableInboxes : inboxes;
+      await _generateGeneralChat(
+        cleanMessage.isNotEmpty ? cleanMessage : '함수 실행 완료',
+        updatedMessages: messagesWithFunctionResults,
+        taggedTasks: updatedTaggedTasks,
+        taggedEvents: updatedTaggedEvents,
+        taggedConnections: taggedConnections,
+        taggedChannels: taggedChannels,
+        taggedProjects: taggedProjects,
+        inboxes: inboxesToUse,
+        files: files,
+      );
+      return;
+    }
+    
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
     final messageWithTags = _buildMessageWithTaggedItems(
       userMessage: userMessage,

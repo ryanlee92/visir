@@ -779,6 +779,15 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'eventId', type: 'string', description: 'Filter by specific event ID (optional)', required: false),
         ],
       ),
+      McpFunctionSchema(
+        name: 'getPreviousContext',
+        description: 'Gets the conversation summary (previous context) for a task, event, or inbox item. Uses AI to generate a summary of related conversations, emails, and messages.',
+        parameters: [
+          McpFunctionParameter(name: 'taskId', type: 'string', description: 'Task ID (optional, provide if getting context for a task)', required: false),
+          McpFunctionParameter(name: 'eventId', type: 'string', description: 'Event ID (optional, provide if getting context for an event)', required: false),
+          McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID (optional, provide if getting context for an inbox item)', required: false),
+        ],
+      ),
     ];
   }
 

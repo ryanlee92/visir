@@ -43,6 +43,7 @@ import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dar
 import 'package:Visir/features/inbox/application/inbox_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_linked_task_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_list_controller.dart';
+import 'package:Visir/features/inbox/application/inbox_conversation_summary_controller.dart';
 import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/task/providers.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/date_time_extension.dart';
@@ -340,6 +341,8 @@ class McpFunctionExecutor {
           return await _executeGetProjectDetails(arguments);
         case 'getInboxDetails':
           return await _executeGetInboxDetails(arguments, tabType: tabType, availableInboxes: availableInboxes);
+        case 'getPreviousContext':
+          return await _executeGetPreviousContext(arguments, tabType: tabType);
         case 'listInboxes':
           return await _executeListInboxes(arguments, tabType: tabType);
 
@@ -2812,6 +2815,38 @@ class McpFunctionExecutor {
         return {'success': false, 'error': 'Provider has been disposed'};
       }
       return {'success': false, 'error': 'Failed to get inbox details: ${e.toString()}'};
+    }
+  }
+
+  Future<Map<String, dynamic>> _executeGetPreviousContext(Map<String, dynamic> args, {required TabType tabType}) async {
+    final taskId = args['taskId'] as String?;
+    final eventId = args['eventId'] as String?;
+    final inboxId = args['inboxId'] as String?;
+
+    // At least one ID must be provided
+    if ((taskId == null || taskId.isEmpty) && (eventId == null || eventId.isEmpty) && (inboxId == null || inboxId.isEmpty)) {
+      return {'success': false, 'error': 'At least one of taskId, eventId, or inboxId is required'};
+    }
+
+    try {
+      // Get conversation summary using inboxConversationSummaryProvider
+      final summary = await ref.read(inboxConversationSummaryProvider(taskId, eventId).future);
+
+      if (summary == null || summary.isEmpty) {
+        return {
+          'success': true,
+          'result': {'summary': 'No previous context available'},
+          'message': '이전 컨텍스트가 없습니다.',
+        };
+      }
+
+      return {
+        'success': true,
+        'result': {'summary': summary},
+        'message': '이전 컨텍스트를 가져왔습니다.',
+      };
+    } catch (e) {
+      return {'success': false, 'error': 'Failed to get previous context: ${e.toString()}'};
     }
   }
 

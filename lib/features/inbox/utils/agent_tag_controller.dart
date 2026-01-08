@@ -59,8 +59,10 @@ class AgentTagController extends QuillController {
   }
 
   set text(String value) {
+    // Document.fromJson은 마지막 줄이 \n으로 끝나야 함
+    final textWithNewline = value.endsWith('\n') ? value : '$value\n';
     document = Document.fromJson([
-      {'insert': value},
+      {'insert': textWithNewline},
     ]);
     notifyListeners();
   }
