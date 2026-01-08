@@ -27,7 +27,13 @@ class _SequentialTypingAnimationState extends State<_SequentialTypingAnimation> 
         children: [
           // 첫 번째 텍스트
           DefaultTextStyle(
-            style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w500, color: widget.isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1C1C1B), letterSpacing: -0.5),
+            style: GoogleFonts.outfit(
+              fontSize: 32,
+              fontWeight: FontWeight.w500,
+              color: widget.isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1C1C1B),
+              letterSpacing: -0.5,
+              height: 1.2,
+            ),
             child: _isFirstComplete
                 ? Text('Stop juggling apps.')
                 : AnimatedTextKit(
@@ -46,7 +52,7 @@ class _SequentialTypingAnimationState extends State<_SequentialTypingAnimation> 
           const SizedBox(height: 8),
           // 두 번째 텍스트 (gradient 적용) - 항상 공간 확보
           SizedBox(
-            height: 28, // 텍스트 높이 고정
+            height: 32, // 텍스트 높이 고정
             child: _isFirstComplete
                 ? ShaderMask(
                     shaderCallback: (bounds) => LinearGradient(
@@ -57,7 +63,7 @@ class _SequentialTypingAnimationState extends State<_SequentialTypingAnimation> 
                       ],
                     ).createShader(bounds),
                     child: DefaultTextStyle(
-                      style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, letterSpacing: -0.5),
+                      style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w500, color: Colors.white, letterSpacing: -0.5, height: 1.2),
                       child: _isSecondComplete
                           ? Text('Reclaim your focus.')
                           : AnimatedTextKit(

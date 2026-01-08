@@ -644,6 +644,10 @@ class AgentActionController extends _$AgentActionController {
         enhancedUserMessage = enhancedUserMessage + contextSuffix;
       }
 
+      print(
+        '[AgentAction] Calling generateGeneralChat with userMessage: ${enhancedUserMessage.substring(0, enhancedUserMessage.length > 100 ? 100 : enhancedUserMessage.length)}...',
+      );
+      print('[AgentAction] User message contains 첨부파일: ${enhancedUserMessage.contains('첨부파일')}');
       final response = await _repository.generateGeneralChat(
         userMessage: enhancedUserMessage,
         conversationHistory: filteredHistory,
@@ -658,38 +662,50 @@ class AgentActionController extends _$AgentActionController {
         systemPrompt: systemPrompt,
       );
 
-      final aiResponse = response.fold((failure) {
-        // 크레딧 부족 예외 처리
-        failure.whenOrNull(
-          insufficientCredits: (_, required, available) {
-            // 크레딧을 토큰 수로 변환
-            final requiredTokens = AiPricingCalculator.calculateTokensFromCredits(required);
-            final availableTokens = AiPricingCalculator.calculateTokensFromCredits(available);
-            // 크레딧 구매 화면으로 이동
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Utils.showPopupDialog(
-                child: AiCreditsScreen(
-                  isSmall: true,
-                  isInPrefScreen: false,
-                  warning: Utils.mainContext.tr.ai_credits_insufficient_message(
-                    Utils.numberFormatter(requiredTokens.toDouble(), fractionDigits: 0),
-                    Utils.numberFormatter(availableTokens.toDouble(), fractionDigits: 0),
+      final aiResponse = response.fold(
+        (failure) {
+          print('[AgentAction] generateGeneralChat failed: $failure');
+          // 크레딧 부족 예외 처리
+          failure.whenOrNull(
+            insufficientCredits: (_, required, available) {
+              // 크레딧을 토큰 수로 변환
+              final requiredTokens = AiPricingCalculator.calculateTokensFromCredits(required);
+              final availableTokens = AiPricingCalculator.calculateTokensFromCredits(available);
+              // 크레딧 구매 화면으로 이동
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Utils.showPopupDialog(
+                  child: AiCreditsScreen(
+                    isSmall: true,
+                    isInPrefScreen: false,
+                    warning: Utils.mainContext.tr.ai_credits_insufficient_message(
+                      Utils.numberFormatter(requiredTokens.toDouble(), fractionDigits: 0),
+                      Utils.numberFormatter(availableTokens.toDouble(), fractionDigits: 0),
+                    ),
                   ),
-                ),
-                size: Size(500, 600),
-              );
-            });
-          },
-        );
-        return null;
-      }, (response) => response);
+                  size: Size(500, 600),
+                );
+              });
+            },
+          );
+          return null;
+        },
+        (response) {
+          print('[AgentAction] generateGeneralChat succeeded, response: ${response != null ? "present" : "null"}');
+          return response;
+        },
+      );
 
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
+        print('[AgentAction] AI response received, message length: ${aiMessage.length}');
+        print('[AgentAction] AI response contains summarizeAttachment: ${aiMessage.contains('summarizeAttachment')}');
+        print('[AgentAction] AI response contains 첨부파일: ${aiMessage.contains('첨부파일')}');
+        print('[AgentAction] AI response preview (first 500 chars): ${aiMessage.substring(0, aiMessage.length > 500 ? 500 : aiMessage.length)}');
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
         aiMessage = unescape.convert(aiMessage);
+        print('[AgentAction] After HTML unescape, contains summarizeAttachment: ${aiMessage.contains('summarizeAttachment')}');
 
         // 첫 메시지인 경우 conversation_title 태그에서 제목 추출
         if (isFirstMessage && state.conversationSummary == null && state.actionType == null) {
@@ -727,8 +743,21 @@ class AgentActionController extends _$AgentActionController {
         aiMessage = aiMessage.replaceAll(RegExp(r'&lt;conversation_title&gt;.*?&lt;/conversation_title&gt;', dotAll: true), '');
 
         // MCP 함수 호출 감지 및 실행
+        print('[AgentAction] Parsing function calls from AI message (length: ${aiMessage.length})');
+        print('[AgentAction] User request contains 첨부파일: ${userMessage.contains('첨부파일')}');
+        print('[AgentAction] AI response contains 첨부파일: ${aiMessage.contains('첨부파일')}');
         final executor = McpFunctionExecutor();
         final allFunctionCalls = executor.parseFunctionCalls(aiMessage);
+        print('[AgentAction] Parsed ${allFunctionCalls.length} function calls');
+        if (allFunctionCalls.isNotEmpty) {
+          final functionNames = allFunctionCalls.map((c) => c['function']).toList();
+          print('[AgentAction] Function names: $functionNames');
+          if (functionNames.contains('summarizeAttachment')) {
+            print('[AgentAction] ✓ summarizeAttachment found in parsed calls!');
+          } else {
+            print('[AgentAction] ⚠ summarizeAttachment NOT found in parsed calls');
+          }
+        }
 
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
@@ -776,6 +805,7 @@ class AgentActionController extends _$AgentActionController {
           final results = <Map<String, dynamic>>[];
           final successMessages = <String>[];
           final errorMessages = <String>[];
+          List<PlatformFile>? attachmentFilesFromResults;
 
           // 검색 결과를 저장할 변수들
           var updatedTaggedTasks = taggedTasks;
@@ -1072,6 +1102,18 @@ class AgentActionController extends _$AgentActionController {
 
               results.add(result);
 
+              // summarizeAttachment의 경우 files 추출하지 않음 (요약만 표시)
+              // summarizeAttachment는 요약 텍스트만 제공하므로 파일을 메시지에 첨부하지 않음
+              if (functionName == 'summarizeAttachment') {
+                print('[AgentAction] summarizeAttachment detected - skipping file extraction (summary only)');
+                if (result['success'] == true && result['result'] != null) {
+                  final resultData = result['result'] as Map<String, dynamic>;
+                  final summary = resultData['summary'] as String?;
+                  print('[AgentAction] summarizeAttachment summary value: ${summary != null ? summary : 'null'}');
+                  print('[AgentAction] summarizeAttachment summary length: ${summary?.length ?? 0}');
+                }
+              }
+
               // 검색 함수 결과 처리
               if (result['success'] == true && result['results'] != null) {
                 final searchResults = result['results'] as List<dynamic>?;
@@ -1203,7 +1245,17 @@ class AgentActionController extends _$AgentActionController {
                 }
                 successMessages.add(messageWithId);
               } else if (result['success'] == true) {
-                final successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
+                // summarizeAttachment의 경우 result['result']['summary'] 사용
+                String successMessage;
+                if (functionName == 'summarizeAttachment' && result['result'] != null) {
+                  final resultData = result['result'] as Map<String, dynamic>;
+                  final summary = resultData['summary'] as String?;
+                  print('[AgentAction] summarizeAttachment summary value (in success message): ${summary != null ? summary : 'null'}');
+                  print('[AgentAction] summarizeAttachment summary length (in success message): ${summary?.length ?? 0}');
+                  successMessage = summary ?? result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
+                } else {
+                  successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
+                }
                 final taskId = result['taskId'] as String?;
                 final eventId = result['eventId'] as String?;
 
@@ -1258,8 +1310,16 @@ class AgentActionController extends _$AgentActionController {
             state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
           }
 
-          // AI가 처음 생성한 메시지 사용 (함수 호출 태그 제거된 버전)
-          String resultMessage = aiMessageWithoutFunctionCalls;
+          // successMessages가 있으면 우선 사용 (summarizeAttachment 등의 함수 결과)
+          String resultMessage = '';
+          if (successMessages.isNotEmpty) {
+            resultMessage = successMessages.join('\n\n');
+            print('[AgentAction] Using successMessages for resultMessage: ${resultMessage.length} chars');
+          } else {
+            // AI가 처음 생성한 메시지 사용 (함수 호출 태그 제거된 버전)
+            resultMessage = aiMessageWithoutFunctionCalls;
+            print('[AgentAction] Using aiMessageWithoutFunctionCalls for resultMessage: ${resultMessage.length} chars');
+          }
 
           // 재귀 호출에서 모든 함수 호출이 무시된 경우, AI의 텍스트 응답 사용
           if (isRecursiveCall && results.isEmpty) {
@@ -1349,15 +1409,33 @@ class AgentActionController extends _$AgentActionController {
                 resultMessage = 'An action has been prepared and is waiting for your confirmation. Once you confirm, it will be executed.';
               }
             } else if (errorMessages.isEmpty) {
-              resultMessage = successMessages.isNotEmpty ? successMessages.join('\n\n') : '';
+              // successMessages가 이미 resultMessage에 설정되어 있으면 유지, 아니면 설정
+              if (resultMessage.isEmpty && successMessages.isNotEmpty) {
+                resultMessage = successMessages.join('\n\n');
+              }
             } else {
               resultMessage = errorMessages.join('\n\n');
             }
           }
 
+          print('[AgentAction] resultMessage length: ${resultMessage.length}');
+          print('[AgentAction] resultMessage preview: ${resultMessage.length > 200 ? resultMessage.substring(0, 200) : resultMessage}...');
+          print('[AgentAction] successMessages count: ${successMessages.length}');
+          if (successMessages.isNotEmpty) {
+            print('[AgentAction] successMessages[0] length: ${successMessages[0].length}');
+            print('[AgentAction] successMessages[0] preview: ${successMessages[0].length > 200 ? successMessages[0].substring(0, 200) : successMessages[0]}...');
+          }
+
           // 확인이 필요한 함수 호출은 pendingFunctionCalls에 저장되어 있으므로 태그 추가 불필요
 
-          final assistantMessage = AgentActionMessage(role: 'assistant', content: resultMessage);
+          print('[AgentAction] Creating assistantMessage with attachmentFilesFromResults: ${attachmentFilesFromResults != null ? attachmentFilesFromResults.length : 'null'}');
+          final assistantMessage = AgentActionMessage(
+            role: 'assistant',
+            content: resultMessage,
+            files: attachmentFilesFromResults?.isNotEmpty == true ? attachmentFilesFromResults : null,
+          );
+          print('[AgentAction] assistantMessage created with content length: ${assistantMessage.content.length}');
+          print('[AgentAction] assistantMessage created with files: ${assistantMessage.files != null ? assistantMessage.files!.length : 'null'}');
           final updatedMessagesWithResponse = [...messages, assistantMessage];
 
           // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
@@ -2364,7 +2442,7 @@ class AgentActionController extends _$AgentActionController {
     // 사용자 메시지에서 함수 호출 파싱
     final executor = McpFunctionExecutor();
     final userFunctionCalls = executor.parseFunctionCalls(userMessage);
-    
+
     // 사용자 메시지에서 함수 호출이 있으면 먼저 실행
     if (userFunctionCalls.isNotEmpty) {
       // 함수 호출을 제거한 순수 메시지 추출
@@ -2375,23 +2453,23 @@ class AgentActionController extends _$AgentActionController {
         cleanUserMessage = cleanUserMessage.replaceAll(callJson, '');
       }
       cleanUserMessage = cleanUserMessage.trim();
-      
+
       // 함수 호출이 있으면 함수를 먼저 실행하고 결과를 포함해서 AI에게 전달
       final currentState = state;
       final availableInboxes = currentState.availableInboxes?.isNotEmpty == true ? currentState.availableInboxes : inboxes;
       final me = ref.read(authControllerProvider).value;
       final remainingCredits = me?.userAiCredits ?? 0.0;
-      
+
       // 함수 실행
       final functionResults = <Map<String, dynamic>>[];
       var updatedTaggedTasks = taggedTasks;
       var updatedTaggedEvents = taggedEvents;
       var updatedAvailableInboxes = availableInboxes;
-      
+
       for (final call in userFunctionCalls) {
         final functionName = call['function'] as String? ?? '';
         var functionArgs = Map<String, dynamic>.from(call['arguments'] as Map<String, dynamic>? ?? {});
-        
+
         // 태그된 항목들을 자동으로 파라미터에 추가
         functionArgs = _enrichFunctionArgsWithTaggedItems(
           functionName: functionName,
@@ -2401,10 +2479,10 @@ class AgentActionController extends _$AgentActionController {
           taggedConnections: taggedConnections,
           availableInboxes: updatedAvailableInboxes,
         );
-        
+
         // 크레딧 정보를 함수 인자에 추가
         functionArgs['_remaining_credits'] = remainingCredits;
-        
+
         // 함수 실행
         final tabType = _getTabTypeForFunction(functionName);
         final result = await executor.executeFunction(
@@ -2417,9 +2495,9 @@ class AgentActionController extends _$AgentActionController {
           availableInboxes: updatedAvailableInboxes,
           remainingCredits: remainingCredits,
         );
-        
+
         functionResults.add(result);
-        
+
         // 결과에서 생성된 task/event ID 추출
         if (result['success'] == true && result['result'] != null) {
           final resultData = result['result'] as Map<String, dynamic>?;
@@ -2443,7 +2521,7 @@ class AgentActionController extends _$AgentActionController {
           }
         }
       }
-      
+
       // 함수 실행 결과를 메시지로 변환
       final functionResultsSummary = <String>[];
       for (final result in functionResults) {
@@ -2456,9 +2534,9 @@ class AgentActionController extends _$AgentActionController {
           functionResultsSummary.add('오류: $error');
         }
       }
-      
+
       final functionResultsMessage = functionResultsSummary.isNotEmpty ? functionResultsSummary.join('\n') : '';
-      
+
       // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
       final cleanMessage = cleanUserMessage.isNotEmpty ? cleanUserMessage : userMessage.replaceAll(RegExp(r'<function_call>.*?</function_call>', dotAll: true), '').trim();
       final messageWithTags = _buildMessageWithTaggedItems(
@@ -2469,16 +2547,15 @@ class AgentActionController extends _$AgentActionController {
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
       );
-      
+
       final currentState2 = state;
       final messagesWithFunctionResults = [
         ...currentState2.messages,
         AgentActionMessage(role: 'user', content: messageWithTags, files: files),
-        if (functionResultsMessage.isNotEmpty)
-          AgentActionMessage(role: 'assistant', content: functionResultsMessage, excludeFromHistory: false),
+        if (functionResultsMessage.isNotEmpty) AgentActionMessage(role: 'assistant', content: functionResultsMessage, excludeFromHistory: false),
       ];
       state = state.copyWith(messages: messagesWithFunctionResults, isLoading: true);
-      
+
       // 함수 실행 결과를 포함해서 AI에게 전달
       final inboxesToUse = currentState2.availableInboxes?.isNotEmpty == true ? currentState2.availableInboxes : inboxes;
       await _generateGeneralChat(
@@ -2494,7 +2571,7 @@ class AgentActionController extends _$AgentActionController {
       );
       return;
     }
-    
+
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
     final messageWithTags = _buildMessageWithTaggedItems(
       userMessage: userMessage,
@@ -2869,12 +2946,16 @@ class AgentActionController extends _$AgentActionController {
     List<TaskEntity>? currentTaggedTasks = callsToExecute.isNotEmpty ? (callsToExecute.first['updated_tagged_tasks'] as List<TaskEntity>?) : null;
     List<EventEntity>? currentTaggedEvents = callsToExecute.isNotEmpty ? (callsToExecute.first['updated_tagged_events'] as List<EventEntity>?) : null;
 
+    print('[AgentAction] Executing ${callsToExecute.length} function calls...');
     for (final pendingCall in callsToExecute) {
       // 타입 안전하게 데이터 추출
       final functionName = pendingCall['function_name'] as String?;
       final functionArgs = pendingCall['function_args'] as Map<String, dynamic>?;
 
+      print('[AgentAction] Processing function call: $functionName');
+
       if (functionName == null || functionArgs == null) {
+        print('[AgentAction] Skipping function call: functionName or functionArgs is null');
         continue;
       }
 
@@ -2890,6 +2971,7 @@ class AgentActionController extends _$AgentActionController {
         final tabType = _getTabTypeForFunction(functionName);
 
         // 함수 실행
+        print('[AgentAction] About to execute function: $functionName');
         final result = await executor.executeFunction(
           functionName,
           functionArgs,
@@ -2900,8 +2982,17 @@ class AgentActionController extends _$AgentActionController {
           availableInboxes: updatedAvailableInboxes,
           remainingCredits: remainingCredits,
         );
+        print('[AgentAction] Function $functionName execution completed. Success: ${result['success']}');
+        print('[AgentAction] Result keys: ${result.keys.toList()}');
+        if (functionName == 'summarizeAttachment') {
+          print('[AgentAction] summarizeAttachment result: $result');
+          print('[AgentAction] summarizeAttachment result[\'result\']: ${result['result']}');
+        }
 
         if (result['success'] == true) {
+          print('[AgentAction] Function $functionName executed successfully');
+          print('[AgentAction] result keys: ${result.keys.toList()}');
+          print('[AgentAction] result[\'result\']: ${result['result'] != null ? 'exists (${result['result'].runtimeType})' : 'null'}');
           final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
           final taskId = result['taskId'] as String?;
           final eventId = result['eventId'] as String?;
@@ -2934,14 +3025,25 @@ class AgentActionController extends _$AgentActionController {
             }
           }
 
-          functionResults.add({
+          final functionResult = {
             'function_name': functionName,
             'success': true,
             'message': message,
             if (taskId != null) 'taskId': taskId,
             if (eventId != null) 'eventId': eventId,
             if (projectId != null) 'projectId': projectId,
-          });
+            if (result['result'] != null) 'result': result['result'], // summarizeAttachment의 files 데이터 포함
+          };
+          print('[AgentAction] Adding function result for $functionName with result: ${functionResult.containsKey('result') ? 'exists' : 'missing'}');
+          if (functionResult.containsKey('result') && functionResult['result'] is Map) {
+            final resultData = functionResult['result'] as Map<String, dynamic>;
+            print('[AgentAction] result data keys: ${resultData.keys.toList()}');
+            if (resultData.containsKey('files')) {
+              final files = resultData['files'];
+              print('[AgentAction] files in result: ${files is List ? files.length : 'not a list'}');
+            }
+          }
+          functionResults.add(functionResult);
         } else {
           final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
           functionResults.add({'function_name': functionName, 'success': false, 'error': error});
@@ -2953,18 +3055,49 @@ class AgentActionController extends _$AgentActionController {
 
     // 함수 실행 결과를 AI에게 전달하여 적절한 메시지 생성
     String resultMessage;
+    List<PlatformFile>? attachmentFiles;
 
     // 함수 실행 결과 요약 생성 - 실제 실행된 함수 호출 개수와 결과를 정확히 전달
+    print('[AgentAction] Processing ${functionResults.length} function results...');
     final functionResultsSummary = <String>[];
     for (final result in functionResults) {
       final functionName = result['function_name'] as String? ?? '';
       final success = result['success'] as bool? ?? false;
+      print('[AgentAction] Processing result for $functionName, success: $success');
+      print('[AgentAction] Result keys: ${result.keys.toList()}');
+      print('[AgentAction] Result has \'result\' key: ${result.containsKey('result')}');
 
       if (success) {
         final message = result['message'] as String? ?? '';
         final taskId = result['taskId'] as String?;
         final eventId = result['eventId'] as String?;
         final projectId = result['projectId'] as String?;
+
+        // summarizeAttachment의 경우 files 추출 및 summary 사용
+        if (functionName == 'summarizeAttachment') {
+          print('[AgentAction] Processing summarizeAttachment result...');
+          final resultData = result['result'] as Map<String, dynamic>?;
+          print('[AgentAction] resultData: ${resultData != null ? 'exists' : 'null'}');
+
+          // summary를 메시지에 사용
+          final summary = resultData?['summary'] as String?;
+          print('[AgentAction] summarizeAttachment summary value: ${summary != null ? summary : 'null'}');
+          print('[AgentAction] summarizeAttachment summary length: ${summary?.length ?? 0}');
+          if (summary != null && summary.isNotEmpty) {
+            print('[AgentAction] Using summary from result: $summary');
+            // summary를 메시지로 사용 (기존 message 대신)
+            final summaryMessage = summary;
+            functionResultsSummary.add('$functionName: $summaryMessage');
+          } else {
+            print('[AgentAction] summarizeAttachment summary is null or empty');
+          }
+
+          // summarizeAttachment는 요약만 제공하므로 파일을 첨부하지 않음
+          print('[AgentAction] summarizeAttachment - summary only, no files attached');
+
+          // summarizeAttachment는 이미 처리했으므로 continue
+          continue;
+        }
 
         var summaryMessage = message.isNotEmpty ? message : 'completed successfully';
 
@@ -3024,8 +3157,15 @@ class AgentActionController extends _$AgentActionController {
       final functionResultsPrompt =
           'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo$recentIdsWarning\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "작업 ID: xxx" in Korean.\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
 
-      // 함수 실행 결과를 포함한 메시지로 AI 호출
-      final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt)];
+      // 함수 실행 결과를 포함한 메시지로 AI 호출 (summarizeAttachment의 경우 files 포함)
+      print('[AgentAction] Creating functionResultsMessages with attachmentFiles: ${attachmentFiles != null ? attachmentFiles.length : 'null'}');
+      if (attachmentFiles != null && attachmentFiles.isNotEmpty) {
+        print('[AgentAction] attachmentFiles details:');
+        for (final file in attachmentFiles) {
+          print('[AgentAction]   - ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}');
+        }
+      }
+      final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt, files: attachmentFiles)];
 
       final me = ref.read(authControllerProvider).value;
       final userId = me?.id;
@@ -3180,13 +3320,30 @@ class AgentActionController extends _$AgentActionController {
     // deleteEvent의 경우 함수 실행 전에 추출한 event 정보 사용 (deletedEventsBeforeExecution 또는 캐시에서)
     final cachedDeletedEvents = _deletedEventsCache[messageId] ?? deletedEventsBeforeExecution;
 
+    print('[AgentAction] Creating assistantMessage with attachmentFiles: ${attachmentFiles != null ? attachmentFiles.length : 'null'}');
+    if (attachmentFiles != null && attachmentFiles.isNotEmpty) {
+      print('[AgentAction] attachmentFiles before creating message:');
+      for (final file in attachmentFiles) {
+        print('[AgentAction]   - ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}');
+      }
+    }
+    final filesToInclude = attachmentFiles?.isNotEmpty == true ? attachmentFiles : null;
+    print('[AgentAction] filesToInclude: ${filesToInclude != null ? filesToInclude.length : 'null'}');
     final assistantMessage = AgentActionMessage(
       role: 'assistant',
       content: resultMessage,
       excludeFromHistory: true,
+      files: filesToInclude, // summarizeAttachment에서 추출한 파일 포함
       deletedTasks: cachedDeletedTasks.isNotEmpty ? cachedDeletedTasks : null, // 삭제된 task 정보 포함
       deletedEvents: cachedDeletedEvents.isNotEmpty ? cachedDeletedEvents : null, // 삭제된 event 정보 포함
     );
+    print('[AgentAction] assistantMessage created with files: ${assistantMessage.files != null ? assistantMessage.files!.length : 'null'}');
+    if (assistantMessage.files != null && assistantMessage.files!.isNotEmpty) {
+      print('[AgentAction] assistantMessage.files details:');
+      for (final file in assistantMessage.files!) {
+        print('[AgentAction]   - ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}');
+      }
+    }
     final updatedMessages = [...state.messages, assistantMessage];
 
     // pendingFunctionCalls에서 실행된 항목 제거 (entity block은 유지)

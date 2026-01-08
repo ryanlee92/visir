@@ -1992,7 +1992,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
                               color: isUser ? context.onPrimaryContainer : context.onSurface,
                               fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                              height: 1.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2043,7 +2042,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
                               color: isUser ? context.onPrimaryContainer : context.onSurface,
                               fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                              height: 1.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2097,7 +2095,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
                               color: isUser ? context.onPrimaryContainer : context.onSurface,
                               fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                              height: 1.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2152,7 +2149,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
                               color: isUser ? context.onPrimaryContainer : context.onSurface,
                               fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                              height: 1.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2207,7 +2203,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
                               color: isUser ? context.onPrimaryContainer : context.onSurface,
                               fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                              height: 1.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2541,7 +2536,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  _buildMessageContent(context, message.content, isUser),
+                                                  // content가 비어있어도 파일이 있으면 메시지 표시
+                                                  if (message.content.isNotEmpty) _buildMessageContent(context, message.content, isUser),
                                                   // 파일 첨부 표시
                                                   if (message.files != null && message.files!.isNotEmpty) ...[
                                                     const SizedBox(height: 12),

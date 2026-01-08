@@ -10,6 +10,9 @@ class McpFunctionSchema {
   const McpFunctionSchema({required this.name, required this.description, required this.parameters, this.returnType});
 
   Map<String, dynamic> toJson() {
+    // Get required parameter names (only those with required == true)
+    final requiredParams = parameters.where((p) => p.required == true).map((p) => p.name).toList();
+    
     return {
       'name': name,
       'description': description,
@@ -17,17 +20,62 @@ class McpFunctionSchema {
         'type': 'object',
         'properties': {
           for (final param in parameters)
-            param.name: {
-              'type': param.type,
-              'description': param.description,
-              if (param.enumValues != null) 'enum': param.enumValues,
-              if (param.required != null) 'required': param.required,
-            },
+            param.name: _buildParameterSchema(param),
         },
-        'required': parameters.where((p) => p.required ?? false).map((p) => p.name).toList(),
+        // OpenAI API requires 'required' to be an array of parameter names
+        if (requiredParams.isNotEmpty) 'required': requiredParams,
       },
       if (returnType != null) 'returns': returnType,
     };
+  }
+
+  /// Builds the schema for a single parameter, handling array types with items
+  Map<String, dynamic> _buildParameterSchema(McpFunctionParameter param) {
+    final schema = <String, dynamic>{
+      'type': param.type,
+      'description': param.description,
+    };
+
+    // For array types, OpenAI API requires 'items' property
+    if (param.type == 'array') {
+      // Determine item type from parameter name and description
+      if (param.name == 'reminders') {
+        // Reminders is an array of objects
+        schema['items'] = {
+          'type': 'object',
+          'properties': {
+            'method': {
+              'type': 'string',
+              'enum': ['push', 'email'],
+            },
+            'minutes': {
+              'type': 'number',
+            },
+          },
+          'required': ['method', 'minutes'],
+        };
+      } else if (param.name == 'to' || param.name == 'cc' || param.name == 'bcc') {
+        // Email recipients are arrays of objects
+        schema['items'] = {
+          'type': 'object',
+          'properties': {
+            'email': {'type': 'string'},
+            'name': {'type': 'string'},
+          },
+          'required': ['email'],
+        };
+      } else {
+        // Default: array of strings (for excludedRecurrenceDate, attendees, tags, etc.)
+        schema['items'] = {'type': 'string'};
+      }
+    }
+
+    // Add enum values if present
+    if (param.enumValues != null) {
+      schema['enum'] = param.enumValues;
+    }
+
+    return schema;
   }
 }
 
@@ -786,6 +834,14 @@ class McpFunctionRegistry {
           McpFunctionParameter(name: 'taskId', type: 'string', description: 'Task ID (optional, provide if getting context for a task)', required: false),
           McpFunctionParameter(name: 'eventId', type: 'string', description: 'Event ID (optional, provide if getting context for an event)', required: false),
           McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID (optional, provide if getting context for an inbox item)', required: false),
+        ],
+      ),
+      McpFunctionSchema(
+        name: 'summarizeAttachment',
+        description: '**MANDATORY FUNCTION FOR ATTACHMENT REQUESTS**: When the user asks to read, summarize, analyze, or open attachments/files (e.g., "첨부파일 요약해줘", "첨부파일 열어서", "PDF 읽어서", "attachment summary", "open attachment"), you MUST call this function. It downloads attachments, converts PDFs to images, and extracts text content. The inboxId can be found in the current conversation context (look for "Inbox ID" or inbox items mentioned above).',
+        parameters: [
+          McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID that contains the attachment. Find this in the current context - look for inbox items shown above or use the inboxId from "View Previous Context" section. Format: mail_<type>_<email>_<messageId> or message_<type>_<teamId>_<messageId>', required: true),
+          McpFunctionParameter(name: 'attachmentId', type: 'string', description: 'Attachment ID (optional, if not provided, all attachments will be processed)', required: false),
         ],
       ),
     ];
