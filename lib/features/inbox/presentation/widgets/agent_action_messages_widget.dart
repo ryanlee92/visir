@@ -1441,7 +1441,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                         Flexible(
                           child: Text(
                             title,
-                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14), height: 1.0),
+                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14)),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -1485,7 +1485,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                         Flexible(
                           child: Text(
                             title,
-                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14), height: 1.0),
+                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14)),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -1545,7 +1545,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                         Flexible(
                           child: Text(
                             displayName,
-                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14), height: 1.0),
+                            style: TextStyle(color: isUser ? context.onPrimaryContainer : context.onBackground, fontSize: (baseStyle?.fontSize ?? 14)),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -1627,7 +1627,6 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             style: (baseStyle ?? context.bodyLarge ?? const TextStyle()).copyWith(
                               color: isUser ? context.onPrimaryContainer : context.onSurface,
                               fontSize: ((baseStyle ?? context.bodyLarge)?.fontSize ?? 14),
-                              height: 1.0,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
