@@ -8,6 +8,7 @@ import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // AgentActionType enum (기존 코드와의 호환성을 위해 유지)
@@ -798,11 +799,61 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
 
     // 모바일에서는 가로 스크롤이므로 한 줄만 필요, 데스크톱에서는 여러 줄 가능
     // final maxHeight = tagHeight;
-    final suggestionWidgets = suggestions.map((suggestion) {
+
+    // Helper function to get digit key for index (1-10)
+    LogicalKeyboardKey _getDigitKeyForIndex(int index) {
+      switch (index) {
+        case 0:
+          return LogicalKeyboardKey.digit1;
+        case 1:
+          return LogicalKeyboardKey.digit2;
+        case 2:
+          return LogicalKeyboardKey.digit3;
+        case 3:
+          return LogicalKeyboardKey.digit4;
+        case 4:
+          return LogicalKeyboardKey.digit5;
+        case 5:
+          return LogicalKeyboardKey.digit6;
+        case 6:
+          return LogicalKeyboardKey.digit7;
+        case 7:
+          return LogicalKeyboardKey.digit8;
+        case 8:
+          return LogicalKeyboardKey.digit9;
+        case 9:
+          return LogicalKeyboardKey.digit0;
+        default:
+          return LogicalKeyboardKey.digit1;
+      }
+    }
+
+    final suggestionWidgets = suggestions.asMap().entries.map((entry) {
+      final index = entry.key;
+      final suggestion = entry.value;
+
+      // Create keyboard shortcut for Option + (1-10)
+      final digitKey = _getDigitKeyForIndex(index);
+      final shortcutNumber = index + 1;
+
       if (PlatformX.isMobileView) {
         return VisirButton(
           type: VisirButtonAnimationType.scaleAndOpacity,
           style: VisirButtonStyle(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), backgroundColor: context.surface.withValues(alpha: 0.7)),
+          options: VisirButtonOptions(
+            bypassTextField: true,
+            shortcuts: [
+              VisirButtonKeyboardShortcut(
+                keys: [LogicalKeyboardKey.alt, digitKey],
+                message: '',
+                onTrigger: () {
+                  suggestion.onTap();
+                  Navigator.of(Utils.mainContext).maybePop();
+                  return true;
+                },
+              ),
+            ],
+          ),
           onTap: () {
             suggestion.onTap();
             Navigator.of(Utils.mainContext).maybePop();
@@ -843,6 +894,19 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
             backgroundColor: context.surface.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: context.outline.withValues(alpha: 0.2), width: 1),
+          ),
+          options: VisirButtonOptions(
+            bypassTextField: true,
+            shortcuts: [
+              VisirButtonKeyboardShortcut(
+                keys: [LogicalKeyboardKey.alt, digitKey],
+                message: '',
+                onTrigger: () {
+                  suggestion.onTap();
+                  return true;
+                },
+              ),
+            ],
           ),
           onTap: suggestion.onTap,
           child: Row(
