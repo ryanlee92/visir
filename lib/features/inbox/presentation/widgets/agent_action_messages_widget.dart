@@ -1336,20 +1336,47 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       String processedHtml = finalContent;
 
       if (isUser) {
-        // User messages: Process \u200b@name\u200b format (like agentInputField)
-        // Convert \u200b@name\u200b to special HTML tags for rendering
+        // User messages: Process \u200b@id:name\u200b or \u200b@name\u200b format (like agentInputField)
+        // Convert to special HTML tags for rendering
         final mentionRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
         processedHtml = processedHtml.replaceAllMapped(mentionRegex, (match) {
-          final tagName = match.group(1) ?? '';
-          if (tagName.isEmpty) return match.group(0)!;
+          final tagContent = match.group(1) ?? '';
+          if (tagContent.isEmpty) return match.group(0)!;
 
-          // Find matching entity from taggedItems
+          // Parse tag content: could be "id:name" (new format) or "name" (old format)
+          String? tagId;
+          String tagName;
+          if (tagContent.contains(':')) {
+            final parts = tagContent.split(':');
+            tagId = parts[0];
+            tagName = parts.sublist(1).join(':'); // In case name contains ':'
+          } else {
+            tagName = tagContent;
+          }
+
+          // Find matching entity from taggedItems (try ID first, then name)
           String? matchedKey;
-          for (final key in taggedItems.keys) {
-            final keyName = key.substring(1); // Remove @
-            if (keyName == tagName) {
-              matchedKey = key;
-              break;
+          if (tagId != null) {
+            // Try to find by ID
+            for (final key in taggedItems.keys) {
+              final itemData = taggedItems[key]!;
+              final jsonData = itemData['data'] as Map<String, dynamic>;
+              final itemId = jsonData['id'] as String? ?? jsonData['event_id'] as String?;
+              if (itemId == tagId) {
+                matchedKey = key;
+                break;
+              }
+            }
+          }
+
+          // If not found by ID, try by name
+          if (matchedKey == null) {
+            for (final key in taggedItems.keys) {
+              final keyName = key.substring(1); // Remove @
+              if (keyName == tagName) {
+                matchedKey = key;
+                break;
+              }
             }
           }
 

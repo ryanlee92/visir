@@ -312,22 +312,71 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   }
 
   void _addInboxTag(InboxEntity inbox) {
-    // Add to tagged list
-    if (!messageController.taggedInboxes.any((i) => i.uniqueId == inbox.uniqueId)) {
-      messageController.addTaggedData(inbox: inbox);
+    if (!mounted) {
+      return;
     }
 
-    // Add @tag to text
-    final displayName = inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle;
-    final tagString = '\u200b@${displayName}\u200b ';
-    final currentText = messageController.text;
-    final selection = messageController.selection;
+    // Check if messageController is valid (not disposed)
+    AgentTagController controller;
+    try {
+      controller = messageController;
+      // Try to access properties to check if disposed
+      final _ = controller.text;
+      final _selection = controller.selection;
+      // Use _selection to avoid unused variable warning
+      if (_selection.start < 0) return;
+    } catch (e) {
+      return;
+    }
+
+    // Check if inbox is already tagged
+    final isAlreadyTagged = controller.taggedInboxes.any((i) => i.id == inbox.id);
+    if (isAlreadyTagged) {
+      // Just focus the input field
+      if (mounted) {
+        requestFocus();
+      }
+      return;
+    }
+
+    // Add to tagged list
+    controller.addTaggedData(inbox: inbox);
+
+    // Add @tag to text with type:id format for reliable matching
+    final tagString = '\u200b@inbox:${inbox.id}\u200b ';
+    final currentText = controller.text;
+    final selection = controller.selection;
     final insertPosition = selection.end;
 
-    messageController.text = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
-    messageController.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+    final newText = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
+
+    try {
+      controller.text = newText;
+      controller.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+    } catch (e) {
+      if (e.toString().contains('disposed')) {
+        return;
+      }
+      rethrow;
+    }
+
+    if (!mounted) {
+      return;
+    }
 
     setState(() {});
+
+    // Request focus after a short delay
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (!mounted) {
+        return;
+      }
+      try {
+        requestFocus();
+      } catch (e) {
+        // Ignore
+      }
+    });
   }
 
   void _addTaskTag(TaskEntity task) {
@@ -361,9 +410,8 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     // Add to tagged list
     controller.addTaggedData(task: task);
 
-    // Add @tag to text
-    final displayName = task.title ?? 'Untitled';
-    final tagString = '\u200b@${displayName}\u200b ';
+    // Add @tag to text with type:id format for reliable matching
+    final tagString = '\u200b@task:${task.id}\u200b ';
     final currentText = controller.text;
     final selection = controller.selection;
     final insertPosition = selection.end;
@@ -431,11 +479,8 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   void addEventTag(EventEntity event) {
     if (!mounted) {
-      print('[addEventTag] Widget not mounted, returning');
       return;
     }
-
-    print('[addEventTag] Called with event: ${event.uniqueId}, title: ${event.title}');
 
     // Check if messageController is valid (not disposed)
     AgentTagController controller;
@@ -447,18 +492,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
       // Use _selection to avoid unused variable warning
       if (_selection.start < 0) return;
     } catch (e) {
-      print('[addEventTag] messageController is disposed or invalid: $e');
       return;
     }
-
-    print('[addEventTag] Current text before: "${controller.text}"');
-    print('[addEventTag] Current selection: ${controller.selection}');
-    print('[addEventTag] Tagged events before: ${controller.taggedEvents.length}');
 
     // Check if event is already tagged
     final isAlreadyTagged = controller.taggedEvents.any((e) => e.uniqueId == event.uniqueId);
     if (isAlreadyTagged) {
-      print('[addEventTag] Event already tagged, skipping text insertion');
       // Just focus the input field
       if (mounted) {
         requestFocus();
@@ -469,9 +508,8 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     // Add to tagged list
     controller.addTaggedData(event: event);
 
-    // Add @tag to text
-    final displayName = event.title ?? 'Untitled';
-    final tagString = '\u200b@${displayName}\u200b ';
+    // Add @tag to text with type:id format for reliable matching
+    final tagString = '\u200b@event:${event.eventId}\u200b ';
     final currentText = controller.text;
     final selection = controller.selection;
     final insertPosition = selection.end;
@@ -654,10 +692,31 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
             messageController.updateSelection(TextSelection.collapsed(offset: newCursorPosition), ChangeSource.local);
 
             // Also remove the entity from tagged lists
-            final tagName = tagContent;
-            messageController.taggedTasks.removeWhere((e) => e.title == tagName);
-            messageController.taggedEvents.removeWhere((e) => e.title == tagName);
-            messageController.taggedConnections.removeWhere((e) => e.name == tagName || e.email == tagName);
+            // Check if tagContent contains type:id (format: type:id) or just name (old format)
+            final tagParts = tagContent.split(':');
+            if (tagParts.length >= 2) {
+              // New format with type:id: type:id
+              final tagType = tagParts[0];
+              final tagId = tagParts.sublist(1).join(':'); // In case id contains ':'
+              switch (tagType) {
+                case 'task':
+                  messageController.taggedTasks.removeWhere((e) => e.id == tagId);
+                  break;
+                case 'event':
+                  messageController.taggedEvents.removeWhere((e) => e.eventId == tagId);
+                  break;
+                case 'inbox':
+                  messageController.taggedInboxes.removeWhere((e) => e.id == tagId);
+                  break;
+              }
+            } else {
+              // Old format without type:id: just name
+              final tagName = tagContent;
+              messageController.taggedTasks.removeWhere((e) => e.title == tagName);
+              messageController.taggedEvents.removeWhere((e) => e.title == tagName);
+              messageController.taggedInboxes.removeWhere((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagName);
+            }
+            messageController.taggedConnections.removeWhere((e) => e.name == tagContent || e.email == tagContent);
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
@@ -670,24 +729,56 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     }
 
     // Remove entities from tagged lists if their tags no longer exist in text
-    final RegExp tagRegex = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
-    final currentTagMatches = tagRegex.allMatches(value);
-    final Set<String> existingTagNames = currentTagMatches.map((m) => m.group(1) ?? '').toSet();
+    // Check each entity directly instead of extracting IDs from text
+    // This allows tagging tasks/events from any time period without needing to search for them
 
-    // Remove inboxes that are no longer in text
+    // Extract names from tags without ID format (for backward compatibility)
+    final RegExp tagRegexWithoutId = RegExp(r'\u200b@([^\u200b]*?)\u200b', unicode: true);
+    final currentTagMatchesWithoutId = tagRegexWithoutId.allMatches(value);
+    final Set<String> existingTagNames = currentTagMatchesWithoutId.where((m) => !m.group(0)!.contains(':')).map((m) => m.group(1) ?? '').toSet();
+
+    // Remove inboxes that are no longer in text (check each entity's ID directly)
     messageController.taggedInboxes.removeWhere((inbox) {
+      // Check if this inbox's ID exists in the text with format: \u200b@inbox:id\u200b
+      if (inbox.id.isNotEmpty) {
+        final escapedId = RegExp.escape(inbox.id);
+        final inboxTagPattern = RegExp('\u200b@inbox:$escapedId\u200b', unicode: true);
+        if (inboxTagPattern.hasMatch(value)) {
+          return false; // Keep this inbox - its tag exists in text
+        }
+      }
+      // Fallback to name matching for backward compatibility (old format without type:id)
       final displayName = inbox.suggestion?.decryptedSummary ?? inbox.decryptedTitle;
       return !existingTagNames.contains(displayName);
     });
 
-    // Remove tasks that are no longer in text
+    // Remove tasks that are no longer in text (check each entity's ID directly)
     messageController.taggedTasks.removeWhere((task) {
+      // Check if this task's ID exists in the text with format: \u200b@task:id\u200b
+      if (task.id != null && task.id!.isNotEmpty) {
+        final escapedId = RegExp.escape(task.id!);
+        final taskTagPattern = RegExp('\u200b@task:$escapedId\u200b', unicode: true);
+        if (taskTagPattern.hasMatch(value)) {
+          return false; // Keep this task - its tag exists in text
+        }
+      }
+      // Fallback to name matching for backward compatibility (old format without type:id)
       if (task.title == null) return true;
       return !existingTagNames.contains(task.title);
     });
 
-    // Remove events that are no longer in text
+    // Remove events that are no longer in text (check each entity's ID directly)
     messageController.taggedEvents.removeWhere((event) {
+      // Check if this event's ID exists in the text with format: \u200b@event:id\u200b
+      final eventId = event.eventId;
+      if (eventId.isNotEmpty) {
+        final escapedId = RegExp.escape(eventId);
+        final eventTagPattern = RegExp('\u200b@event:$escapedId\u200b', unicode: true);
+        if (eventTagPattern.hasMatch(value)) {
+          return false; // Keep this event - its tag exists in text
+        }
+      }
+      // Fallback to name matching for backward compatibility (old format without type:id)
       if (event.title == null) return true;
       return !existingTagNames.contains(event.title);
     });
@@ -1293,7 +1384,18 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     final messageFileList = ref.watch(agentFileListControllerProvider(tabType: widget.tabType).select((v) => v));
     uploadable = messageController.text.trim().isNotEmpty || messageFileList.where((e) => (e.ok ?? false)).toList().isNotEmpty;
     final selectedModel = ref.watch(selectedAgentModelProvider).value;
-    final showSuggestedActions = agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null);
+    final hasTaggedTasks = messageController.taggedTasks.isNotEmpty;
+    final hasTaggedEvents = messageController.taggedEvents.isNotEmpty;
+    final hasTaggedInboxes = messageController.taggedInboxes.isNotEmpty;
+    final showSuggestedActions =
+        agentAction.isEmpty &&
+        widget.inboxes != null &&
+        (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null || hasTaggedTasks || hasTaggedEvents || hasTaggedInboxes);
+
+    // 태그된 task나 event를 droppedTask/droppedEvent로 사용
+    final taggedTask = hasTaggedTasks ? messageController.taggedTasks.first : null;
+    final taggedEvent = hasTaggedEvents ? messageController.taggedEvents.first : null;
+    final taggedInbox = hasTaggedInboxes ? messageController.taggedInboxes.first : null;
 
     return KeyboardShortcut(
       bypassTextField: true,
@@ -1325,10 +1427,10 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                         inboxes: widget.inboxes ?? [],
                         upNextTask: widget.upNextTask,
                         upNextEvent: widget.upNextEvent,
-                        droppedInbox: _droppedInbox,
-                        droppedTask: _droppedTask,
-                        droppedEvent: _droppedEvent ?? _droppedTask?.linkedEvent,
-                        hasTaggedItems: messageController.taggedInboxes.isNotEmpty || messageController.taggedTasks.isNotEmpty || messageController.taggedEvents.isNotEmpty,
+                        droppedInbox: _droppedInbox ?? taggedInbox,
+                        droppedTask: _droppedTask ?? taggedTask,
+                        droppedEvent: _droppedEvent ?? taggedTask?.linkedEvent ?? taggedEvent,
+                        hasTaggedItems: hasTaggedInboxes || hasTaggedTasks || hasTaggedEvents,
                         onActionTap: widget.onActionTap,
                         onCustomPrompt: widget.onCustomPrompt,
                       ),
@@ -1426,16 +1528,49 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                   }
 
                                                   final piece = text.substring(match.start, match.end);
-                                                  String tagName = piece.replaceAll('@', '').replaceAll('\u200b', '').trim();
+                                                  // Remove only the first @ and all \u200b characters
+                                                  // Keep @ characters that are part of the ID (e.g., email addresses)
+                                                  String tagContent = piece.replaceAll('\u200b', '').trim();
+                                                  if (tagContent.startsWith('@')) {
+                                                    tagContent = tagContent.substring(1); // Remove only the first @
+                                                  }
 
-                                                  // Find matching entity from tagged entities
-                                                  InboxEntity? targetInbox = taggedInboxes
-                                                      .where((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagName)
-                                                      .firstOrNull;
+                                                  // Parse tag content: could be "type:id" (new format) or "name" (old format)
+                                                  String? tagType;
+                                                  String? tagId;
+                                                  String tagName = '';
+                                                  if (tagContent.contains(':')) {
+                                                    final parts = tagContent.split(':');
+                                                    tagType = parts[0];
+                                                    tagId = parts.sublist(1).join(':'); // In case id contains ':'
+                                                  } else {
+                                                    tagName = tagContent;
+                                                  }
 
-                                                  TaskEntity? targetTask = taggedTasks.where((e) => e.title != null && tagName == e.title).firstOrNull;
+                                                  // Find matching entity from tagged entities based on type:id or name
+                                                  InboxEntity? targetInbox;
+                                                  TaskEntity? targetTask;
+                                                  EventEntity? targetEvent;
 
-                                                  EventEntity? targetEvent = taggedEvents.where((e) => e.title != null && tagName == e.title).firstOrNull;
+                                                  if (tagType != null && tagId != null) {
+                                                    // New format: type:id
+                                                    switch (tagType) {
+                                                      case 'task':
+                                                        targetTask = taggedTasks.where((e) => e.id == tagId).firstOrNull;
+                                                        break;
+                                                      case 'event':
+                                                        targetEvent = taggedEvents.where((e) => e.eventId == tagId).firstOrNull;
+                                                        break;
+                                                      case 'inbox':
+                                                        targetInbox = taggedInboxes.where((e) => e.id == tagId).firstOrNull;
+                                                        break;
+                                                    }
+                                                  } else {
+                                                    // Old format: name only (backward compatibility)
+                                                    targetInbox = taggedInboxes.where((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagName).firstOrNull;
+                                                    targetTask = taggedTasks.where((e) => e.title != null && tagName == e.title).firstOrNull;
+                                                    targetEvent = taggedEvents.where((e) => e.title != null && tagName == e.title).firstOrNull;
+                                                  }
 
                                                   ConnectionEntity? targetConnection = taggedConnections
                                                       .where((e) => (e.name != null && tagName == e.name) || (e.email != null && tagName == e.email))
@@ -1447,8 +1582,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
                                                   if (targetInbox != null) {
                                                     final displayName = targetInbox.suggestion?.decryptedSummary ?? targetInbox.decryptedTitle;
-                                                    final name = '@$displayName';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
 
                                                     // Get inbox provider for avatarUrl and icon
                                                     final inboxProviders = targetInbox.providers;
@@ -1498,11 +1631,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else if (targetProject != null) {
                                                     final displayName = targetProject.name;
-                                                    final name = '@${targetProject.name}';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1548,11 +1679,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else if (targetTask != null) {
                                                     final displayName = targetTask.title!;
-                                                    final name = '@${targetTask.title!}';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1583,11 +1712,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else if (targetEvent != null) {
                                                     final displayName = targetEvent.title!;
-                                                    final name = '@${targetEvent.title!}';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1618,11 +1745,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else if (targetConnection != null) {
                                                     final displayName = targetConnection.name ?? targetConnection.email ?? '';
-                                                    final name = '@$displayName';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1653,11 +1778,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else if (targetChannel != null) {
                                                     final displayName = targetChannel.name ?? '';
-                                                    final name = '@$displayName';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1688,11 +1811,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else if (targetProject != null) {
                                                     final displayName = targetProject.name;
-                                                    final name = '@$displayName';
-                                                    final leftovers = piece.replaceAll(name, '').replaceAll('\u200b', '');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1728,12 +1849,11 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         ),
                                                       ),
                                                     );
-                                                    if (leftovers.isNotEmpty) spans.add(TextSpan(text: leftovers));
+                                                    offset = match.end;
                                                   } else {
                                                     spans.add(TextSpan(text: piece));
+                                                    offset = match.end;
                                                   }
-
-                                                  offset = match.end;
                                                 }
 
                                                 if (offset < text.length) {
@@ -2067,9 +2187,29 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                           messageController.updateSelection(TextSelection.collapsed(offset: newCursorPosition), ChangeSource.local);
 
                                                           // Remove entity from tagged lists
-                                                          messageController.taggedInboxes.removeWhere((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagContent);
-                                                          messageController.taggedTasks.removeWhere((e) => e.title == tagContent);
-                                                          messageController.taggedEvents.removeWhere((e) => e.title == tagContent);
+                                                          // Check if tagContent contains type:id (format: type:id) or just name (old format)
+                                                          final tagParts = tagContent.split(':');
+                                                          if (tagParts.length >= 2) {
+                                                            // New format with type:id: type:id
+                                                            final tagType = tagParts[0];
+                                                            final tagId = tagParts.sublist(1).join(':'); // In case id contains ':'
+                                                            switch (tagType) {
+                                                              case 'task':
+                                                                messageController.taggedTasks.removeWhere((e) => e.id == tagId);
+                                                                break;
+                                                              case 'event':
+                                                                messageController.taggedEvents.removeWhere((e) => e.eventId == tagId);
+                                                                break;
+                                                              case 'inbox':
+                                                                messageController.taggedInboxes.removeWhere((e) => e.id == tagId);
+                                                                break;
+                                                            }
+                                                          } else {
+                                                            // Old format without type:id: just name
+                                                            messageController.taggedTasks.removeWhere((e) => e.title == tagContent);
+                                                            messageController.taggedEvents.removeWhere((e) => e.title == tagContent);
+                                                            messageController.taggedInboxes.removeWhere((e) => (e.suggestion?.decryptedSummary ?? e.decryptedTitle) == tagContent);
+                                                          }
                                                           messageController.taggedConnections.removeWhere((e) => e.name == tagContent || e.email == tagContent);
 
                                                           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -2280,11 +2420,10 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                             inboxes: widget.inboxes ?? [],
                                             upNextTask: widget.upNextTask,
                                             upNextEvent: widget.upNextEvent,
-                                            droppedInbox: _droppedInbox,
-                                            droppedTask: _droppedTask,
-                                            droppedEvent: _droppedEvent ?? _droppedTask?.linkedEvent,
-                                            hasTaggedItems:
-                                                messageController.taggedInboxes.isNotEmpty || messageController.taggedTasks.isNotEmpty || messageController.taggedEvents.isNotEmpty,
+                                            droppedInbox: _droppedInbox ?? taggedInbox,
+                                            droppedTask: _droppedTask ?? taggedTask,
+                                            droppedEvent: _droppedEvent ?? taggedTask?.linkedEvent ?? taggedEvent,
+                                            hasTaggedItems: hasTaggedInboxes || hasTaggedTasks || hasTaggedEvents,
                                             onActionTap: widget.onActionTap,
                                             onCustomPrompt: widget.onCustomPrompt,
                                           ),
@@ -2662,8 +2801,27 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
         break;
     }
 
-    // Then insert tag string (textSpanBuilder will render it as a styled tag)
-    String tagString = '\u200b@${tag.displayName}\u200b ';
+    // Then insert tag string with type:id format (textSpanBuilder will render it as a styled tag)
+    String tagString;
+    switch (tag.type) {
+      case MessageTagEntityType.task:
+        if (tag.task != null && tag.task!.id != null) {
+          tagString = '\u200b@task:${tag.task!.id}\u200b ';
+        } else {
+          tagString = '\u200b@${tag.displayName}\u200b ';
+        }
+        break;
+      case MessageTagEntityType.event:
+        if (tag.event != null && tag.event!.eventId.isNotEmpty) {
+          tagString = '\u200b@event:${tag.event!.eventId}\u200b ';
+        } else {
+          tagString = '\u200b@${tag.displayName}\u200b ';
+        }
+        break;
+      default:
+        tagString = '\u200b@${tag.displayName}\u200b ';
+        break;
+    }
     final textBeforeCursor = messageController.text.substring(0, messageController.value.selection.end);
     int lastIndex = -1;
     // Find the last @ that is not part of an email address
