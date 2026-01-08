@@ -755,275 +755,300 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
             children: [
               ResizableChild(
                 size: ResizableSize.expand(min: 380, flex: 3),
-                child: Column(
-                  children: [
-                    MediaQuery(
-                      data: context.mediaQuery.copyWith(textScaler: TextScaler.linear(1)),
-                      child: IgnorePointer(
-                        child: Container(
-                          height: headerSectionHeight,
-                          padding: headerPadding,
-                          child: Material(
-                            clipBehavior: Clip.none,
-                            color: Colors.transparent,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Stack(
+                      children: [
+                        Utils.buildDropTarget(
+                          onDropEnter: () {
+                            onFileEntered = true;
+                            setState(() {});
+                          },
+                          onDropLeave: () {
+                            onFileEntered = false;
+                            setState(() {});
+                          },
+                          onDrop: (files) {
+                            _agentInputFieldStateKey.currentState?.uploadFiles(files: files);
+                            onFileEntered = false;
+                            setState(() {});
+                          },
+                          child: Positioned.fill(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${context.tr.agentic_home_hi}${userName == null ? '' : userName.split(' ').first}',
-                                        style: context.displayLarge?.textColor(context.onBackground).textBold,
-                                      ),
-                                    ),
-                                    if (weatherData != null)
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(weatherData.temperature.round().toString(), style: context.headlineLarge?.textColor(context.onBackground).appFont(context)),
-                                              HugeIcon(
-                                                icon: weatherData.useFahrenheit ? HugeIcons.solidRoundedFahrenheit : HugeIcons.solidRoundedCelsius,
-                                                size: context.textScaler.scale(context.headlineLarge!.fontSize!),
-                                                color: context.onBackground,
-                                              ),
-                                            ],
-                                          ),
-                                          Text(weatherData.name, style: context.titleSmall?.textColor(context.inverseSurface)),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                                SizedBox(height: 6),
-                                if (!_isSuggestionLoading)
-                                  Text(summaryText, style: context.headlineMedium?.textColor(context.surfaceTint), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                if (_isSuggestionLoading)
-                                  Row(
-                                    children: [
-                                      ShimmerText(
-                                        text: context.tr.inbox_agent_loading_dynamic(fetchDurationString),
-                                        textSize: context.headlineMedium!.fontSize!,
-                                        textFamily: context.headlineMedium?.appFont(context).fontFamily ?? '',
-                                        textColor: context.surfaceTint,
-                                        shiningColor: context.inverseSurface,
-                                        letterspacing: 0,
-                                      ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: cardMargin,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Positioned.fill(
-                              child: ClipRRect(borderRadius: BorderRadius.circular(cardRadius), child: MeshLoadingBackground(doNotAnimate: true)),
-                            ),
-                            IgnorePointer(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: context.background.withValues(alpha: 0.7),
-                                  border: Border.all(color: context.onBackground.withValues(alpha: 0.1), width: 1),
-                                  borderRadius: BorderRadius.circular(cardRadius),
-                                ),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                clipBehavior: Clip.none,
-                                color: Colors.transparent,
-                                child: Stack(
-                                  children: [
-                                    Positioned.fill(
-                                      child: Utils.buildDropTarget(
-                                        onDropEnter: () {
-                                          onFileEntered = true;
-                                          setState(() {});
-                                        },
-                                        onDropLeave: () {
-                                          onFileEntered = false;
-                                          setState(() {});
-                                        },
-                                        onDrop: (files) {
-                                          _agentInputFieldStateKey.currentState?.uploadFiles(files: files);
-                                          onFileEntered = false;
-                                          setState(() {});
-                                        },
+                                MediaQuery(
+                                  data: context.mediaQuery.copyWith(textScaler: TextScaler.linear(1)),
+                                  child: IgnorePointer(
+                                    child: Container(
+                                      height: headerSectionHeight,
+                                      padding: headerPadding,
+                                      child: Material(
+                                        clipBehavior: Clip.none,
+                                        color: Colors.transparent,
                                         child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Expanded(
-                                              child: LayoutBuilder(
-                                                builder: (context, constraints) {
-                                                  return Stack(
-                                                    clipBehavior: Clip.none,
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    '${context.tr.agentic_home_hi}${userName == null ? '' : userName.split(' ').first}',
+                                                    style: context.displayLarge?.textColor(context.onBackground).textBold,
+                                                  ),
+                                                ),
+                                                if (weatherData != null)
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.end,
                                                     children: [
-                                                      Positioned.fill(
-                                                        child: DailySummaryWidget(
-                                                          events: events,
-                                                          tasks: tasks,
-                                                          inboxes: inboxes,
-                                                          selectedProject: _selectedProject,
-                                                          projects: projects,
-                                                          userName: userName,
-                                                          onDragStart: (inbox, task) {
-                                                            if (PlatformX.isDesktopView) {
-                                                              _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
-                                                            } else {
-                                                              _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
-                                                              if (inbox == null) return;
-                                                              widget.onDragStart?.call(inbox);
-                                                            }
-                                                          },
-                                                          onDragUpdate: (inbox, task, offset) {
-                                                            if (PlatformX.isDesktopView) {
-                                                              if (inbox == null) return;
-                                                              _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
-                                                              timeblockDropWidgetKey.currentState?.onInboxDragUpdate(inbox, offset);
-                                                            } else {
-                                                              _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
-                                                              if (inbox == null) return;
-                                                              widget.onDragUpdate?.call(inbox, offset);
-                                                            }
-                                                          },
-                                                          onDragEnd: (inbox, task, offset) {
-                                                            if (PlatformX.isDesktopView) {
-                                                              _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
-                                                              if (inbox == null) return;
-                                                              timeblockDropWidgetKey.currentState?.onInboxDragEnd(inbox, offset);
-                                                            } else {
-                                                              _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
-                                                              if (inbox == null) return;
-                                                              widget.onDragEnd?.call(inbox, offset);
-                                                            }
-                                                          },
-                                                        ),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            weatherData.temperature.round().toString(),
+                                                            style: context.headlineLarge?.textColor(context.onBackground).appFont(context),
+                                                          ),
+                                                          HugeIcon(
+                                                            icon: weatherData.useFahrenheit ? HugeIcons.solidRoundedFahrenheit : HugeIcons.solidRoundedCelsius,
+                                                            size: context.textScaler.scale(context.headlineLarge!.fontSize!),
+                                                            color: context.onBackground,
+                                                          ),
+                                                        ],
                                                       ),
-                                                      Positioned(left: 0, bottom: 0, right: 0, child: AgentActionMessagesWidget(maxHeight: constraints.maxHeight)),
+                                                      Text(weatherData.name, style: context.titleSmall?.textColor(context.inverseSurface)),
                                                     ],
-                                                  );
-                                                },
+                                                  ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 6),
+                                            if (!_isSuggestionLoading)
+                                              Text(summaryText, style: context.headlineMedium?.textColor(context.surfaceTint), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                            if (_isSuggestionLoading)
+                                              Row(
+                                                children: [
+                                                  ShimmerText(
+                                                    text: context.tr.inbox_agent_loading_dynamic(fetchDurationString),
+                                                    textSize: context.headlineMedium!.fontSize!,
+                                                    textFamily: context.headlineMedium?.appFont(context).fontFamily ?? '',
+                                                    textColor: context.surfaceTint,
+                                                    shiningColor: context.inverseSurface,
+                                                    letterspacing: 0,
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            AgentInputField(
-                                              key: _agentInputFieldStateKey,
-                                              fieldKey: _agentInputFieldStateKey,
-                                              messageController: _messageController,
-                                              focusNode: _focusNode,
-                                              onPressEscape: () => true,
-                                              tabType: tabType,
-                                              initialProject: _selectedProject,
-                                              inboxes: filteredInboxes,
-                                              upNextTask: nextItem?.task,
-                                              upNextEvent: nextItem?.event,
-                                              onProjectChanged: (p) {
-                                                setState(() {
-                                                  _selectedProject = p;
-                                                });
-                                              },
-                                              onActionTap: (mcpFunctionName, {inbox, task, event}) {
-                                                final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
-                                                if (actionType != null) {
-                                                  ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
-                                                }
-                                              },
-                                              onCustomPrompt: (title, prompt) {
-                                                final controller = ref.read(agentActionControllerProvider.notifier);
-                                                final message = prompt.isNotEmpty ? prompt : title;
-                                                if (message.isNotEmpty) {
-                                                  controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
-                                                }
-                                              },
-                                            ),
                                           ],
                                         ),
                                       ),
                                     ),
-
-                                    Positioned.fill(
-                                      child: LayoutBuilder(
-                                        builder: (context, constraints) {
-                                          return IgnorePointer(
-                                            child: AnimatedOpacity(
-                                              opacity: onFileEntered ? 1 : 0,
-                                              duration: Duration(milliseconds: 250),
-                                              child: Container(
-                                                decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
-                                                height: constraints.maxHeight,
-                                                width: constraints.maxWidth,
-                                                padding: EdgeInsets.all(16),
-                                                child: DottedBorder(
-                                                  options: RoundedRectDottedBorderOptions(
-                                                    radius: Radius.circular(8),
-                                                    dashPattern: [12, 12],
-                                                    color: context.outline,
-                                                    strokeWidth: 6,
-                                                  ),
-                                                  child: Container(
-                                                    child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                divider: ResizableDivider(thickness: DesktopScaffold.cardPadding, color: Colors.transparent),
-              ),
-              if (PlatformX.isDesktopView)
-                ResizableChild(
-                  size: ResizableSize.expand(min: 320, flex: 1),
-                  child: Builder(
-                    builder: (context) {
-                      final borderRadius = 10.0;
-                      return Container(
-                        margin: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(borderRadius), boxShadow: PopupMenu.popupShadow),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(borderRadius),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: Stack(
-                              children: [
-                                Positioned.fill(child: MeshLoadingBackground(doNotAnimate: true)),
-                                IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: context.background.withValues(alpha: 0.5),
-                                      border: Border.all(color: context.onBackground.withValues(alpha: 0.1), width: 1),
-                                      borderRadius: BorderRadius.circular(borderRadius),
-                                    ),
                                   ),
                                 ),
-                                Positioned.fill(
-                                  child: TimeblockDropWidget(key: timeblockDropWidgetKey, tabType: tabType, transparent: true),
+                                Expanded(
+                                  child: Container(
+                                    margin: cardMargin,
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        Positioned.fill(
+                                          child: ClipRRect(borderRadius: BorderRadius.circular(cardRadius), child: MeshLoadingBackground(doNotAnimate: true)),
+                                        ),
+                                        IgnorePointer(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: context.background.withValues(alpha: 0.7),
+                                              border: Border.all(color: context.onBackground.withValues(alpha: 0.1), width: 1),
+                                              borderRadius: BorderRadius.circular(cardRadius),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: _agentInputFieldHeight,
+                                          left: 0,
+                                          right: 0,
+                                          top: 0,
+                                          child: Material(
+                                            clipBehavior: Clip.none,
+                                            color: Colors.transparent,
+                                            child: DailySummaryWidget(
+                                              events: events,
+                                              tasks: tasks,
+                                              inboxes: inboxes,
+                                              selectedProject: _selectedProject,
+                                              projects: projects,
+                                              userName: userName,
+                                              onDragStart: (inbox, task) {
+                                                if (PlatformX.isDesktopView) {
+                                                  _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                } else {
+                                                  _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                  if (inbox == null) return;
+                                                  widget.onDragStart?.call(inbox);
+                                                }
+                                              },
+                                              onDragUpdate: (inbox, task, offset) {
+                                                if (PlatformX.isDesktopView) {
+                                                  if (inbox == null) return;
+                                                  _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                  timeblockDropWidgetKey.currentState?.onInboxDragUpdate(inbox, offset);
+                                                } else {
+                                                  _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                  if (inbox == null) return;
+                                                  widget.onDragUpdate?.call(inbox, offset);
+                                                }
+                                              },
+                                              onDragEnd: (inbox, task, offset) {
+                                                if (PlatformX.isDesktopView) {
+                                                  _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                  if (inbox == null) return;
+                                                  timeblockDropWidgetKey.currentState?.onInboxDragEnd(inbox, offset);
+                                                } else {
+                                                  _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                  if (inbox == null) return;
+                                                  widget.onDragEnd?.call(inbox, offset);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
+
+                        Positioned(
+                          left: 8,
+                          bottom: _agentInputFieldHeight,
+                          right: 1,
+                          child: AgentActionMessagesWidget(maxHeight: constraints.maxHeight - _agentInputFieldHeight - 8),
+                        ),
+
+                        Positioned(
+                          bottom: 8,
+                          left: 8,
+                          right: 2,
+                          child: NotificationListener<SizeChangedLayoutNotification>(
+                            onNotification: (notification) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                final RenderBox? renderBox = _agentInputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+                                if (renderBox != null) {
+                                  final height = renderBox.size.height;
+                                  if (height != _agentInputFieldHeight) {
+                                    setState(() {
+                                      _agentInputFieldHeight = height;
+                                    });
+                                  }
+                                }
+                              });
+                              return true;
+                            },
+                            child: SizeChangedLayoutNotifier(
+                              child: Container(
+                                key: _agentInputFieldKey,
+                                child: AgentInputField(
+                                  key: _agentInputFieldStateKey,
+                                  fieldKey: _agentInputFieldStateKey,
+                                  messageController: _messageController,
+                                  focusNode: _focusNode,
+                                  onPressEscape: () => true,
+                                  tabType: tabType,
+                                  initialProject: _selectedProject,
+                                  inboxes: filteredInboxes,
+                                  upNextTask: nextItem?.task,
+                                  upNextEvent: nextItem?.event,
+                                  onProjectChanged: (p) {
+                                    setState(() {
+                                      _selectedProject = p;
+                                    });
+                                  },
+                                  onActionTap: (mcpFunctionName, {inbox, task, event}) {
+                                    final actionType = mcpFunctionToAgentActionType(mcpFunctionName);
+                                    if (actionType != null) {
+                                      ref.read(agentActionControllerProvider.notifier).startAction(actionType: actionType, inbox: inbox, task: task, event: event);
+                                    }
+                                  },
+                                  onCustomPrompt: (title, prompt) {
+                                    final controller = ref.read(agentActionControllerProvider.notifier);
+                                    final message = prompt.isNotEmpty ? prompt : title;
+                                    if (message.isNotEmpty) {
+                                      controller.handleMessageWithoutAction(message, inboxes: filteredInboxes);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Positioned(
+                          bottom: 8,
+                          left: 8,
+                          right: 2,
+                          height: constraints.maxHeight - _agentInputFieldHeight - 16,
+                          child: IgnorePointer(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: AnimatedOpacity(
+                                opacity: onFileEntered ? 1 : 0,
+                                duration: Duration(milliseconds: 250),
+                                child: Container(
+                                  decoration: BoxDecoration(color: context.background.withValues(alpha: 0.75)),
+                                  height: constraints.maxHeight,
+                                  width: constraints.maxWidth,
+                                  padding: EdgeInsets.all(16),
+                                  child: DottedBorder(
+                                    options: RoundedRectDottedBorderOptions(radius: Radius.circular(8), dashPattern: [12, 12], color: context.outline, strokeWidth: 6),
+                                    child: Container(
+                                      child: Center(child: Text(context.tr.mail_drop_to_attach, style: context.displayMedium?.textColor(context.inverseSurface))),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
+                divider: ResizableDivider(thickness: DesktopScaffold.cardPadding, color: Colors.transparent),
+              ),
+
+              ResizableChild(
+                size: ResizableSize.expand(min: 320, flex: 1),
+                child: Builder(
+                  builder: (context) {
+                    final borderRadius = 10.0;
+                    return Container(
+                      margin: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(borderRadius), boxShadow: PopupMenu.popupShadow),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(borderRadius),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                          child: Stack(
+                            children: [
+                              Positioned.fill(child: MeshLoadingBackground(doNotAnimate: true)),
+                              IgnorePointer(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: context.background.withValues(alpha: 0.5),
+                                    border: Border.all(color: context.onBackground.withValues(alpha: 0.1), width: 1),
+                                    borderRadius: BorderRadius.circular(borderRadius),
+                                  ),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: TimeblockDropWidget(key: timeblockDropWidgetKey, tabType: tabType, transparent: true),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),

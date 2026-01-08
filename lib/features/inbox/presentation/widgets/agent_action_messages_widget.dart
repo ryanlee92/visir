@@ -2089,324 +2089,331 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
     forceSmallTabbar = !isEmpty;
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      switchInCurve: Curves.easeOut,
-      switchOutCurve: Curves.easeIn,
-      transitionBuilder: (child, animation) {
-        return SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
-          child: SizeTransitionWithoutClip(axis: Axis.vertical, axisAlignment: 1.0, sizeFactor: animation, child: child),
-        );
-      },
-      child: isEmpty
-          ? const SizedBox.shrink(key: ValueKey('empty'))
-          : AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              clipBehavior: Clip.none,
-              child: Container(
-                height: widget.maxHeight,
-                decoration: BoxDecoration(
-                  color: context.background,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 6, offset: Offset(0, 4), spreadRadius: 0)],
-                  border: PlatformX.isMobileView ? null : Border.all(color: context.outline.withValues(alpha: 0.3), width: 1),
-                  borderRadius: borderRadius,
-                ),
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: SelectionArea(
-                    child: Container(
-                      color: context.surface.withValues(alpha: 0.25),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Action title and close button at the top
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (agentAction.actionType != null)
-                                  Expanded(
-                                    child: _buildActionButtonText(context, (
-                                      actionType: agentAction.actionType,
-                                      inbox: agentAction.inbox,
-                                      conversationSummary: agentAction.conversationSummary,
-                                    )),
-                                  )
-                                else if (agentAction.conversationSummary != null && agentAction.conversationSummary!.isNotEmpty)
-                                  Expanded(
-                                    child: Text(
-                                      agentAction.conversationSummary!,
-                                      style: context.titleMedium?.copyWith(color: context.onSurface, fontWeight: FontWeight.bold),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  )
-                                else
-                                  const Spacer(),
-                                const SizedBox(width: 8),
-                                VisirButton(
-                                  type: VisirButtonAnimationType.scaleAndOpacity,
-                                  style: VisirButtonStyle(padding: EdgeInsets.all(4), borderRadius: BorderRadius.circular(6)),
-                                  onTap: () => controller.cancelAction(),
-                                  child: VisirIcon(type: VisirIconType.close, size: 18, color: context.onSurfaceVariant, isSelected: true),
-                                  options: VisirButtonOptions(
-                                    tabType: TabType.home,
-                                    bypassTextField: true,
-                                    shortcuts: [
-                                      VisirButtonKeyboardShortcut(message: context.tr.cancel, keys: [LogicalKeyboardKey.escape]),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                final state = ref.watch(agentActionControllerProvider);
-                                final pendingCalls = state.pendingFunctionCalls ?? [];
-                                final isLoading = state.isLoading;
-                                final writeActions = pendingCalls.where((call) {
-                                  final functionName = call['function_name'] as String? ?? '';
-                                  return _isWriteAction(functionName);
-                                }).toList();
-
-                                final messagesLength = agentAction.messages.length;
-
-                                // Regular message items
-                                if (index == messagesLength) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(top: 6, bottom: 6, left: 0, right: 0),
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: AnimatedTextKit(
-                                            animatedTexts: _getLoadingMessages(context, agentAction.actionType, agentAction.pendingTaskInfo)
-                                                .map(
-                                                  (text) => TypewriterAnimatedText(
-                                                    text,
-                                                    textStyle: context.bodyLarge?.textColor(context.onSurfaceVariant),
-                                                    speed: const Duration(milliseconds: 100),
-                                                  ),
-                                                )
-                                                .toList(),
-                                            repeatForever: true,
-                                            pause: const Duration(milliseconds: 500),
-                                            displayFullTextOnTap: true,
-                                          ),
-                                        ),
+    return Material(
+      color: Colors.transparent,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        transitionBuilder: (child, animation) {
+          return SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+            child: SizeTransitionWithoutClip(axis: Axis.vertical, axisAlignment: 1.0, sizeFactor: animation, child: child),
+          );
+        },
+        child: isEmpty
+            ? const SizedBox.shrink(key: ValueKey('empty'))
+            : AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                clipBehavior: Clip.none,
+                child: Container(
+                  height: widget.maxHeight,
+                  decoration: BoxDecoration(
+                    color: context.background,
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 6, offset: Offset(0, 4), spreadRadius: 0)],
+                    border: PlatformX.isMobileView ? null : Border.all(color: context.outline.withValues(alpha: 1), width: 1),
+                    borderRadius: borderRadius,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: borderRadius,
+                    child: SelectionArea(
+                      child: Container(
+                        color: context.surface.withValues(alpha: 0.25),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Action title and close button at the top
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  if (agentAction.actionType != null)
+                                    Expanded(
+                                      child: _buildActionButtonText(context, (
+                                        actionType: agentAction.actionType,
+                                        inbox: agentAction.inbox,
+                                        conversationSummary: agentAction.conversationSummary,
+                                      )),
+                                    )
+                                  else if (agentAction.conversationSummary != null && agentAction.conversationSummary!.isNotEmpty)
+                                    Expanded(
+                                      child: Text(
+                                        agentAction.conversationSummary!,
+                                        style: context.titleMedium?.copyWith(color: context.onSurface, fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    )
+                                  else
+                                    const Spacer(),
+                                  const SizedBox(width: 8),
+                                  VisirButton(
+                                    type: VisirButtonAnimationType.scaleAndOpacity,
+                                    style: VisirButtonStyle(padding: EdgeInsets.all(4), borderRadius: BorderRadius.circular(6)),
+                                    onTap: () => controller.cancelAction(),
+                                    child: VisirIcon(type: VisirIconType.close, size: 18, color: context.onSurfaceVariant, isSelected: true),
+                                    options: VisirButtonOptions(
+                                      tabType: TabType.home,
+                                      bypassTextField: true,
+                                      shortcuts: [
+                                        VisirButtonKeyboardShortcut(message: context.tr.cancel, keys: [LogicalKeyboardKey.escape]),
                                       ],
                                     ),
-                                  );
-                                }
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView.builder(
+                                controller: _scrollController,
+                                itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  final state = ref.watch(agentActionControllerProvider);
+                                  final pendingCalls = state.pendingFunctionCalls ?? [];
+                                  final isLoading = state.isLoading;
+                                  final writeActions = pendingCalls.where((call) {
+                                    final functionName = call['function_name'] as String? ?? '';
+                                    return _isWriteAction(functionName);
+                                  }).toList();
 
-                                final message = agentAction.messages[index];
-                                final isUser = message.role == 'user';
+                                  final messagesLength = agentAction.messages.length;
 
-                                final isLastMessage = index == agentAction.messages.length - 1;
-
-                                final writeActionsForMessage = <Map<String, dynamic>>[];
-                                final seenActionIds = <String>{};
-                                final seenFunctionSignatures = <String>{};
-                                for (final call in pendingCalls) {
-                                  final functionName = call['function_name'] as String? ?? '';
-                                  final actionId = call['action_id'] as String? ?? '';
-                                  final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
-                                  final messageIndex = call['message_index'] as int?;
-
-                                  // 이 메시지에 속한 write action만 표시
-                                  if (_isWriteAction(functionName) && actionId.isNotEmpty && messageIndex == index) {
-                                    String signature = functionName;
-                                    if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
-                                      final title = functionArgs['title'] as String? ?? '';
-                                      final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
-                                      final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
-                                      signature = '$functionName|$title|$startAt|$endAt';
-                                    }
-
-                                    if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
-                                      seenActionIds.add(actionId);
-                                      seenFunctionSignatures.add(signature);
-                                      writeActionsForMessage.add(call);
-                                    }
-                                  }
-                                }
-
-                                return Container(
-                                  margin: EdgeInsets.only(top: 6, bottom: isLastMessage && writeActionsForMessage.isNotEmpty ? 0 : 6, left: 0, right: 0),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Message content (project tags are now rendered inline via customWidgetBuilder)
-                                      Row(
+                                  // Regular message items
+                                  if (index == messagesLength) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(top: 6, bottom: 6, left: 0, right: 0),
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true), const SizedBox(width: 8)],
+                                          VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true),
+                                          const SizedBox(width: 8),
                                           Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                _buildMessageContent(context, message.content, isUser),
-                                                // 파일 첨부 표시
-                                                if (message.files != null && message.files!.isNotEmpty) ...[
-                                                  const SizedBox(height: 12),
-                                                  Wrap(
-                                                    alignment: WrapAlignment.start,
-                                                    crossAxisAlignment: WrapCrossAlignment.start,
-                                                    spacing: 8,
-                                                    runSpacing: 8,
-                                                    children: message.files!.map((file) {
-                                                      final isImage = file.isImage;
-                                                      final isVideo = file.isVideo;
-                                                      return isImage
-                                                          ? ClipRRect(
-                                                              borderRadius: BorderRadius.circular(8),
-                                                              child: Container(
-                                                                width: 200,
-                                                                height: 200,
-                                                                decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(8)),
-                                                                child: file.bytes != null
-                                                                    ? Image.memory(file.bytes!, fit: BoxFit.cover)
-                                                                    : Center(
-                                                                        child: VisirIcon(type: VisirIconType.caution, size: 24, color: context.surfaceTint),
-                                                                      ),
-                                                              ),
-                                                            )
-                                                          : Container(
-                                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                              decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(8)),
-                                                              child: Row(
-                                                                mainAxisSize: MainAxisSize.min,
-                                                                children: [
-                                                                  VisirIcon(type: isVideo ? VisirIconType.videoCall : VisirIconType.file, size: 16, color: context.outlineVariant),
-                                                                  const SizedBox(width: 8),
-                                                                  Text(file.name, style: context.titleSmall?.textColor(context.outlineVariant), overflow: TextOverflow.ellipsis),
-                                                                ],
-                                                              ),
-                                                            );
-                                                    }).toList(),
-                                                  ),
-                                                ],
-                                              ],
+                                            child: AnimatedTextKit(
+                                              animatedTexts: _getLoadingMessages(context, agentAction.actionType, agentAction.pendingTaskInfo)
+                                                  .map(
+                                                    (text) => TypewriterAnimatedText(
+                                                      text,
+                                                      textStyle: context.bodyLarge?.textColor(context.onSurfaceVariant),
+                                                      speed: const Duration(milliseconds: 100),
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                              repeatForever: true,
+                                              pause: const Duration(milliseconds: 500),
+                                              displayFullTextOnTap: true,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      if (writeActionsForMessage.isNotEmpty) ...[
-                                        const SizedBox(height: 12),
-                                        ...writeActionsForMessage.asMap().entries.map((entry) {
-                                          final index = entry.key;
-                                          final call = entry.value;
-                                          final isLast = index == writeActionsForMessage.length - 1;
-                                          final functionName = call['function_name'] as String? ?? '';
-                                          final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
-                                          final actionId = call['action_id'] as String? ?? '';
-                                          // updateTask인 경우 updated_tagged_tasks에서 task 정보 가져오기
-                                          final updatedTaggedTasks = call['updated_tagged_tasks'] as List<dynamic>?;
+                                    );
+                                  }
 
-                                          if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'deleteTask') {
-                                            return Padding(
-                                              padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                              child: _buildTaskEntityWithConfirm(
-                                                context,
-                                                functionArgs,
-                                                actionId,
-                                                isUser,
-                                                functionName: functionName,
-                                                updatedTaggedTasks: updatedTaggedTasks,
-                                              ),
-                                            );
-                                          } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
-                                            // updateEvent인 경우 updated_tagged_events에서 event 정보 가져오기
-                                            final updatedTaggedEvents = call['updated_tagged_events'] as List<dynamic>?;
-                                            return Padding(
-                                              padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                              child: _buildEventEntityWithConfirm(
-                                                context,
-                                                functionArgs,
-                                                actionId,
-                                                isUser,
-                                                functionName: functionName,
-                                                updatedTaggedEvents: updatedTaggedEvents,
-                                              ),
-                                            );
-                                          } else {
-                                            return Padding(
-                                              padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
-                                              child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
-                                            );
-                                          }
-                                        }),
-                                        // Confirm 버튼을 첫 번째 메시지(또는 task block이 있는 메시지)에만 표시
-                                        // 로딩 중이 아니고 writeActions가 있고, 이 메시지가 마지막 메시지일 때만 표시
-                                        if (writeActions.isNotEmpty && !isLoading && isLastMessage) ...[
-                                          Container(
-                                            margin: const EdgeInsets.only(top: 12, bottom: 12),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                IntrinsicWidth(
-                                                  child: VisirButton(
-                                                    type: VisirButtonAnimationType.scaleAndOpacity,
-                                                    style: VisirButtonStyle(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                      backgroundColor: context.primary,
-                                                      borderRadius: BorderRadius.circular(12),
+                                  final message = agentAction.messages[index];
+                                  final isUser = message.role == 'user';
+
+                                  final isLastMessage = index == agentAction.messages.length - 1;
+
+                                  final writeActionsForMessage = <Map<String, dynamic>>[];
+                                  final seenActionIds = <String>{};
+                                  final seenFunctionSignatures = <String>{};
+                                  for (final call in pendingCalls) {
+                                    final functionName = call['function_name'] as String? ?? '';
+                                    final actionId = call['action_id'] as String? ?? '';
+                                    final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                                    final messageIndex = call['message_index'] as int?;
+
+                                    // 이 메시지에 속한 write action만 표시
+                                    if (_isWriteAction(functionName) && actionId.isNotEmpty && messageIndex == index) {
+                                      String signature = functionName;
+                                      if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'createEvent' || functionName == 'updateEvent') {
+                                        final title = functionArgs['title'] as String? ?? '';
+                                        final startAt = functionArgs['startAt'] as String? ?? functionArgs['start_at'] as String? ?? '';
+                                        final endAt = functionArgs['endAt'] as String? ?? functionArgs['end_at'] as String? ?? '';
+                                        signature = '$functionName|$title|$startAt|$endAt';
+                                      }
+
+                                      if (!seenActionIds.contains(actionId) && !seenFunctionSignatures.contains(signature)) {
+                                        seenActionIds.add(actionId);
+                                        seenFunctionSignatures.add(signature);
+                                        writeActionsForMessage.add(call);
+                                      }
+                                    }
+                                  }
+
+                                  return Container(
+                                    margin: EdgeInsets.only(top: 6, bottom: isLastMessage && writeActionsForMessage.isNotEmpty ? 0 : 6, left: 0, right: 0),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(color: Colors.transparent, borderRadius: BorderRadius.circular(8)),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Message content (project tags are now rendered inline via customWidgetBuilder)
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            if (!isUser) ...[VisirIcon(type: VisirIconType.agent, size: 16, color: context.primary, isSelected: true), const SizedBox(width: 8)],
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  _buildMessageContent(context, message.content, isUser),
+                                                  // 파일 첨부 표시
+                                                  if (message.files != null && message.files!.isNotEmpty) ...[
+                                                    const SizedBox(height: 12),
+                                                    Wrap(
+                                                      alignment: WrapAlignment.start,
+                                                      crossAxisAlignment: WrapCrossAlignment.start,
+                                                      spacing: 8,
+                                                      runSpacing: 8,
+                                                      children: message.files!.map((file) {
+                                                        final isImage = file.isImage;
+                                                        final isVideo = file.isVideo;
+                                                        return isImage
+                                                            ? ClipRRect(
+                                                                borderRadius: BorderRadius.circular(8),
+                                                                child: Container(
+                                                                  width: 200,
+                                                                  height: 200,
+                                                                  decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(8)),
+                                                                  child: file.bytes != null
+                                                                      ? Image.memory(file.bytes!, fit: BoxFit.cover)
+                                                                      : Center(
+                                                                          child: VisirIcon(type: VisirIconType.caution, size: 24, color: context.surfaceTint),
+                                                                        ),
+                                                                ),
+                                                              )
+                                                            : Container(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                                decoration: BoxDecoration(color: context.surfaceVariant, borderRadius: BorderRadius.circular(8)),
+                                                                child: Row(
+                                                                  mainAxisSize: MainAxisSize.min,
+                                                                  children: [
+                                                                    VisirIcon(
+                                                                      type: isVideo ? VisirIconType.videoCall : VisirIconType.file,
+                                                                      size: 16,
+                                                                      color: context.outlineVariant,
+                                                                    ),
+                                                                    const SizedBox(width: 8),
+                                                                    Text(file.name, style: context.titleSmall?.textColor(context.outlineVariant), overflow: TextOverflow.ellipsis),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                      }).toList(),
                                                     ),
-                                                    options: VisirButtonOptions(
-                                                      bypassTextField: true,
-                                                      shortcuts: [
-                                                        VisirButtonKeyboardShortcut(
-                                                          keys: [
-                                                            if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                                            if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                                            LogicalKeyboardKey.enter,
-                                                          ],
-                                                          message: context.tr.confirm,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    onTap: () async {
-                                                      final controller = ref.read(agentActionControllerProvider.notifier);
-                                                      // 모든 write action을 한번에 처리
-                                                      final actionIds = writeActions.map((call) => call['action_id'] as String? ?? '').where((id) => id.isNotEmpty).toList();
-                                                      if (actionIds.isNotEmpty) {
-                                                        await controller.confirmActions(actionIds: actionIds);
-                                                      }
-                                                    },
-                                                    child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
-                                                  ),
-                                                ),
-                                              ],
+                                                  ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
+                                          ],
+                                        ),
+                                        if (writeActionsForMessage.isNotEmpty) ...[
+                                          const SizedBox(height: 12),
+                                          ...writeActionsForMessage.asMap().entries.map((entry) {
+                                            final index = entry.key;
+                                            final call = entry.value;
+                                            final isLast = index == writeActionsForMessage.length - 1;
+                                            final functionName = call['function_name'] as String? ?? '';
+                                            final functionArgs = call['function_args'] as Map<String, dynamic>? ?? {};
+                                            final actionId = call['action_id'] as String? ?? '';
+                                            // updateTask인 경우 updated_tagged_tasks에서 task 정보 가져오기
+                                            final updatedTaggedTasks = call['updated_tagged_tasks'] as List<dynamic>?;
+
+                                            if (functionName == 'createTask' || functionName == 'updateTask' || functionName == 'deleteTask') {
+                                              return Padding(
+                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
+                                                child: _buildTaskEntityWithConfirm(
+                                                  context,
+                                                  functionArgs,
+                                                  actionId,
+                                                  isUser,
+                                                  functionName: functionName,
+                                                  updatedTaggedTasks: updatedTaggedTasks,
+                                                ),
+                                              );
+                                            } else if (functionName == 'createEvent' || functionName == 'updateEvent') {
+                                              // updateEvent인 경우 updated_tagged_events에서 event 정보 가져오기
+                                              final updatedTaggedEvents = call['updated_tagged_events'] as List<dynamic>?;
+                                              return Padding(
+                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
+                                                child: _buildEventEntityWithConfirm(
+                                                  context,
+                                                  functionArgs,
+                                                  actionId,
+                                                  isUser,
+                                                  functionName: functionName,
+                                                  updatedTaggedEvents: updatedTaggedEvents,
+                                                ),
+                                              );
+                                            } else {
+                                              return Padding(
+                                                padding: EdgeInsets.only(bottom: isLast ? 0 : 6),
+                                                child: _buildActionConfirmWidget(context, functionName, functionArgs, actionId, isUser),
+                                              );
+                                            }
+                                          }),
+                                          // Confirm 버튼을 첫 번째 메시지(또는 task block이 있는 메시지)에만 표시
+                                          // 로딩 중이 아니고 writeActions가 있고, 이 메시지가 마지막 메시지일 때만 표시
+                                          if (writeActions.isNotEmpty && !isLoading && isLastMessage) ...[
+                                            Container(
+                                              margin: const EdgeInsets.only(top: 12, bottom: 12),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  IntrinsicWidth(
+                                                    child: VisirButton(
+                                                      type: VisirButtonAnimationType.scaleAndOpacity,
+                                                      style: VisirButtonStyle(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                        backgroundColor: context.primary,
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                      options: VisirButtonOptions(
+                                                        bypassTextField: true,
+                                                        shortcuts: [
+                                                          VisirButtonKeyboardShortcut(
+                                                            keys: [
+                                                              if (PlatformX.isApple) LogicalKeyboardKey.meta,
+                                                              if (!PlatformX.isApple) LogicalKeyboardKey.control,
+                                                              LogicalKeyboardKey.enter,
+                                                            ],
+                                                            message: context.tr.confirm,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      onTap: () async {
+                                                        final controller = ref.read(agentActionControllerProvider.notifier);
+                                                        // 모든 write action을 한번에 처리
+                                                        final actionIds = writeActions.map((call) => call['action_id'] as String? ?? '').where((id) => id.isNotEmpty).toList();
+                                                        if (actionIds.isNotEmpty) {
+                                                          await controller.confirmActions(actionIds: actionIds);
+                                                        }
+                                                      },
+                                                      child: Text(context.tr.confirm, style: context.bodyMedium?.copyWith(color: context.onPrimary)),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ],
                                       ],
-                                    ],
-                                  ),
-                                );
-                              },
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
