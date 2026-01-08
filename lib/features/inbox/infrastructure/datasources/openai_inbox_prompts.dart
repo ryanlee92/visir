@@ -935,6 +935,7 @@ Response:
   static String buildConversationSnippetPrompt({
     required bool hasOnlyEvents,
     required String? eventSnippet,
+    String? taskSnippet,
     required String? descriptionPrompt,
     required String conversationSnippet,
     required String? currentTaskEventDescription,
@@ -944,6 +945,15 @@ Response:
 For calendar events, briefly mention:
 - When similar events occurred most recently
 - What recurrence pattern they follow (if any)
+Keep it concise (1-2 sentences).
+'''
+        : '';
+
+    final taskInfoPrompt = taskSnippet != null && taskSnippet.isNotEmpty
+        ? '''
+For related tasks, briefly mention:
+- When similar tasks were created or completed most recently
+- What patterns or themes they share
 Keep it concise (1-2 sentences).
 '''
         : '';
@@ -969,16 +979,18 @@ Return only the summary text, no additional formatting or explanations.
 ''';
     } else {
       return '''
-You are an expert productivity assistant. Summarize the following conversation thread${eventSnippet != null && eventSnippet.isNotEmpty ? ' and related calendar events' : ''}.
+You are an expert productivity assistant. Summarize the following conversation thread${eventSnippet != null && eventSnippet.isNotEmpty ? ' and related calendar events' : ''}${taskSnippet != null && taskSnippet.isNotEmpty ? ' and related tasks' : ''}.
 
 ## Task
 Provide a brief summary (2-3 sentences) of the key discussion points, decisions made, or main topics covered in this conversation.
 Focus on actionable information, important details, and context that would help the user understand what was discussed.
 $eventInfoPrompt
+$taskInfoPrompt
 $descriptionPrompt
 
 ${currentTaskEventDescription != null ? '## Current Task/Event Description\n$currentTaskEventDescription\n\n' : ''}## Conversation
 $conversationSnippet
+${taskSnippet != null && taskSnippet.isNotEmpty ? '\n\n## Related Tasks\n$taskSnippet' : ''}
 ${eventSnippet != null && eventSnippet.isNotEmpty ? '\n\n## Related Calendar Events\n$eventSnippet' : ''}
 
 ## Output

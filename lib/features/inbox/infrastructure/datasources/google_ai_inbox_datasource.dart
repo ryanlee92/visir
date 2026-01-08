@@ -316,7 +316,7 @@ class GoogleAiInboxDatasource extends InboxDatasource {
         final title = event.title ?? 'Untitled Event';
         final description = event.description ?? '';
         final rrule = event.rrule;
-        final isRecurring = rrule != null && rrule.isNotEmpty;
+        final isRecurring = rrule != null;
 
         eventSnippets.add(
           'Event: $title\nCalendar: $calendarName\nDate: $startDateStr - $endDateStr${isRecurring ? '\nRecurring: Yes' : ''}${description.isNotEmpty ? '\nDescription: $description' : ''}',
@@ -325,19 +325,41 @@ class GoogleAiInboxDatasource extends InboxDatasource {
       eventSnippet = eventSnippets.join('\n\n---\n\n');
     }
 
+    // Process tasks if provided
+    String? taskSnippet;
+    if (taskEntities != null && taskEntities.isNotEmpty) {
+      final taskSnippets = <String>[];
+      for (final task in taskEntities) {
+        final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+        final startDateStr = task.startAt != null ? dateFormat.format(task.startAt!) : (task.startDate != null ? dateFormat.format(task.startDate!) : 'Not scheduled');
+        final endDateStr = task.endAt != null ? dateFormat.format(task.endAt!) : (task.endDate != null ? dateFormat.format(task.endDate!) : 'Not scheduled');
+        final title = task.title ?? 'Untitled Task';
+        final description = task.description ?? '';
+        final status = task.status?.name ?? 'none';
+        final rrule = task.rrule;
+        final isRecurring = rrule != null;
+
+        taskSnippets.add(
+          'Task: $title\nStatus: $status\nDate: $startDateStr - $endDateStr${isRecurring ? '\nRecurring: Yes' : ''}${description.isNotEmpty ? '\nDescription: $description' : ''}',
+        );
+      }
+      taskSnippet = taskSnippets.join('\n\n---\n\n');
+    }
+
     final hasVirtualInbox = inbox.linkedMail == null && inbox.linkedMessage == null && allInboxes.isEmpty;
     final hasOnlyEvents = hasVirtualInbox && (eventSnippet != null && eventSnippet.isNotEmpty);
 
     // Extract current task/event description if available - always include if present
     final currentTaskEventDescription = inbox.description != null && inbox.description!.isNotEmpty ? inbox.description : null;
 
-    if (conversationSnippet.isEmpty && (eventSnippet == null || eventSnippet.isEmpty) && currentTaskEventDescription == null) return null;
+    if (conversationSnippet.isEmpty && (eventSnippet == null || eventSnippet.isEmpty) && (taskSnippet == null || taskSnippet.isEmpty) && currentTaskEventDescription == null) return null;
 
     final descriptionPrompt = OpenAiInboxPrompts.buildDescriptionPrompt(currentTaskEventDescription: currentTaskEventDescription);
 
     final prompt = OpenAiInboxPrompts.buildConversationSnippetPrompt(
       hasOnlyEvents: hasOnlyEvents,
       eventSnippet: eventSnippet,
+      taskSnippet: taskSnippet,
       descriptionPrompt: descriptionPrompt,
       conversationSnippet: conversationSnippet,
       currentTaskEventDescription: currentTaskEventDescription,
