@@ -776,6 +776,7 @@ class InboxRepository {
     String? apiKey,
     String? userId, // 크레딧 체크용
     String? systemPrompt,
+    bool includeTools = true, // OpenAI에서 tools 포함 여부 (기본값: true)
   }) async {
     try {
       final datasource = _getDatasourceForModel(model);
@@ -818,6 +819,7 @@ class InboxRepository {
           model: model,
           apiKey: apiKey,
           systemPrompt: systemPrompt,
+          includeTools: includeTools,
         );
       } else if (datasource is GoogleAiInboxDatasource) {
         result = await datasource.generateGeneralChat(
@@ -831,6 +833,7 @@ class InboxRepository {
           model: model,
           apiKey: apiKey,
           systemPrompt: systemPrompt,
+          includeTools: includeTools,
         );
       } else if (datasource is AnthropicAiInboxDatasource) {
         result = await datasource.generateGeneralChat(
@@ -844,6 +847,7 @@ class InboxRepository {
           model: model,
           apiKey: apiKey,
           systemPrompt: systemPrompt,
+          includeTools: includeTools,
         );
       }
 

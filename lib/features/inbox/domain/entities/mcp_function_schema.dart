@@ -858,4 +858,28 @@ class McpFunctionRegistry {
   static List<Map<String, dynamic>> getOpenAiFunctions() {
     return getAllFunctions().map((f) => f.toJson()).toList();
   }
+
+  /// Returns function schemas in Google AI (Gemini) function calling format.
+  static List<Map<String, dynamic>> getGoogleAiFunctions() {
+    return getAllFunctions().map((f) {
+      final json = f.toJson();
+      return {
+        'name': json['name'],
+        'description': json['description'],
+        'parameters': json['parameters'],
+      };
+    }).toList();
+  }
+
+  /// Returns function schemas in Anthropic Claude function calling format.
+  static List<Map<String, dynamic>> getAnthropicFunctions() {
+    return getAllFunctions().map((f) {
+      final json = f.toJson();
+      return {
+        'name': json['name'],
+        'description': json['description'],
+        'input_schema': json['parameters'],
+      };
+    }).toList();
+  }
 }

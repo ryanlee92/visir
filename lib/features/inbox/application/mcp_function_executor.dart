@@ -44,6 +44,7 @@ import 'package:Visir/features/common/domain/entities/connection_entity.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/agent_model_entity.dart';
+import 'package:Visir/features/common/domain/entities/ai_provider_entity.dart';
 import 'package:Visir/features/inbox/application/inbox_agent_list_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_config_controller.dart';
 import 'package:Visir/features/inbox/application/inbox_controller.dart';
@@ -5754,22 +5755,20 @@ class McpFunctionExecutor {
     if (attachmentFiles.containsKey(inboxId)) {
       final files = attachmentFiles[inboxId]!;
       print('[Attachment] Extracted ${files.length} files for inbox $inboxId');
-      
+
       // Convert PlatformFile list to the format expected by OpenAI API (same as agent_input_field)
       print('[Attachment] Converting ${files.length} files to fileData format...');
       final fileData = files.map((file) {
         final bytesEncoded = file.bytes != null ? base64Encode(file.bytes!) : null;
-        print('[Attachment]   - Converting file: ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}, encoded: ${bytesEncoded != null ? bytesEncoded.length : 'null'}');
-        return {
-          'name': file.name,
-          'bytes': bytesEncoded,
-          'size': file.size,
-        };
+        print(
+          '[Attachment]   - Converting file: ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}, encoded: ${bytesEncoded != null ? bytesEncoded.length : 'null'}',
+        );
+        return {'name': file.name, 'bytes': bytesEncoded, 'size': file.size};
       }).toList();
-      
+
       print('[Attachment] Created fileData with ${fileData.length} items');
       print('[Attachment] Calling AI to generate summary from files...');
-      
+
       // AI에게 파일을 보내서 요약 생성
       try {
         final repository = ref.read(inboxRepositoryProvider);
@@ -5783,18 +5782,25 @@ class McpFunctionExecutor {
           final apiKeys = ref.read(aiApiKeysProvider);
           apiKey = apiKeys[selectedModel.provider.name];
         } else {
-          apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
+          // 모델에 맞는 API 키 가져오기
+          switch (selectedModel.provider) {
+            case AiProvider.openai:
+              apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
+              break;
+            case AiProvider.google:
+              apiKey = googleAiKey.isNotEmpty ? googleAiKey : null;
+              break;
+            case AiProvider.anthropic:
+              apiKey = anthropicApiKey.isNotEmpty ? anthropicApiKey : null;
+              break;
+          }
         }
-        
+
         // 파일과 함께 요약 요청
         final conversationHistory = [
-          {
-            'role': 'user',
-            'content': '이 첨부파일의 내용을 요약해주세요. 주요 내용, 금액, 날짜, 중요한 정보를 포함해서 한국어로 간단명료하게 설명해주세요.',
-            'files': fileData,
-          }
+          {'role': 'user', 'content': '이 첨부파일의 내용을 요약해주세요. 주요 내용, 금액, 날짜, 중요한 정보를 포함해서 한국어로 간단명료하게 설명해주세요.', 'files': fileData},
         ];
-        
+
         final summaryResponse = await repository.generateGeneralChat(
           userMessage: '이 첨부파일의 내용을 요약해주세요. 주요 내용, 금액, 날짜, 중요한 정보를 포함해서 한국어로 간단명료하게 설명해주세요.',
           conversationHistory: conversationHistory,
@@ -5806,17 +5812,22 @@ class McpFunctionExecutor {
           model: selectedModel.modelName,
           apiKey: apiKey,
           userId: userId,
-          systemPrompt: 'You are a helpful assistant. Analyze the attached file(s) and provide a clear, concise summary in Korean. Include key information such as amounts, dates, important details, and main content.\n\nCRITICAL: DO NOT call any functions. Only provide a text summary of the file content. DO NOT return function calls or JSON arrays. Only return plain text summary in Korean.',
+          systemPrompt:
+              'You are a helpful assistant. Analyze the attached file(s) and provide a clear, concise summary in Korean. Include key information such as amounts, dates, important details, and main content.\n\nCRITICAL: DO NOT call any functions. Only provide a text summary of the file content. DO NOT return function calls or JSON arrays. Only return plain text summary in Korean.',
+          includeTools: false, // summarizeAttachment에서는 tools 사용하지 않음
         );
-        
+
         final summaryResult = summaryResponse.fold((failure) => null, (response) => response);
         var summary = summaryResult?['message'] as String? ?? '첨부파일을 다운로드하고 이미지로 변환했습니다.';
-        
+
         // 함수 호출 부분 제거 (AI가 함수 호출을 반환한 경우)
         print('[Attachment] Raw AI response: $summary');
-        final functionCallRegex = RegExp(r'\[\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\}(?:\s*,\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\})*\s*\]', dotAll: true);
+        final functionCallRegex = RegExp(
+          r'\[\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\}(?:\s*,\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\})*\s*\]',
+          dotAll: true,
+        );
         summary = summary.replaceAll(functionCallRegex, '').trim();
-        
+
         // JSON 배열 형식 제거
         try {
           final jsonArrayRegex = RegExp(r'\[(?:\s*\{[^}]*\}(?:\s*,\s*\{[^}]*\})*)?\s*\]', dotAll: true);
@@ -5844,25 +5855,22 @@ class McpFunctionExecutor {
         } catch (e) {
           // Continue with cleaned summary
         }
-        
+
         // 함수 호출 태그 제거
         summary = summary.replaceAll(RegExp(r'<function_call[^>]*>.*?</function_call>', dotAll: true), '').trim();
-        
+
         // 빈 문자열이면 기본 메시지 사용
         if (summary.isEmpty) {
           summary = '첨부파일을 다운로드하고 이미지로 변환했습니다.';
         }
-        
+
         print('[Attachment] AI generated summary value (cleaned): $summary');
         print('[Attachment] AI generated summary length: ${summary.length}');
         print('[Attachment] AI generated summary preview: ${summary.substring(0, summary.length > 100 ? 100 : summary.length)}...');
-        
+
         return {
           'success': true,
-          'result': {
-            'summary': summary,
-            'files': fileData,
-          },
+          'result': {'summary': summary, 'files': fileData},
           'message': 'Attachment content extracted and summarized successfully',
         };
       } catch (e) {
@@ -5870,10 +5878,7 @@ class McpFunctionExecutor {
         // AI 요약 실패 시 기본 메시지 사용
         return {
           'success': true,
-          'result': {
-            'summary': '첨부파일을 다운로드하고 이미지로 변환했습니다.',
-            'files': fileData,
-          },
+          'result': {'summary': '첨부파일을 다운로드하고 이미지로 변환했습니다.', 'files': fileData},
           'message': 'Attachment content extracted successfully',
         };
       }
@@ -5921,7 +5926,13 @@ class McpFunctionExecutor {
             }
 
             if (mailEntity == null) {
-              final threadResult = await mailRepository.fetchThreads(oauth: oauth, type: mailType, threadId: mail.threadId, email: mail.hostMail, labelId: CommonMailLabels.inbox.id);
+              final threadResult = await mailRepository.fetchThreads(
+                oauth: oauth,
+                type: mailType,
+                threadId: mail.threadId,
+                email: mail.hostMail,
+                labelId: CommonMailLabels.inbox.id,
+              );
               mailEntity = threadResult.fold((failure) => null, (threadMails) => threadMails.firstWhereOrNull((m) => m.id == mail.messageId));
             }
 
@@ -5966,7 +5977,7 @@ class McpFunctionExecutor {
 
                   final fileName = attachment.name ?? 'unknown';
                   print('[Attachment] Processing file: $fileName (${bytes.length} bytes)');
-                  
+
                   // Convert PDF to images or add as-is for other files
                   final convertedFiles = await _convertAttachmentToFiles(bytes, fileName);
                   files.addAll(convertedFiles);
@@ -6004,15 +6015,17 @@ class McpFunctionExecutor {
                   if (downloadUrl == null || downloadUrl.isEmpty) continue;
 
                   try {
-                    final fileBytes = await proxyCall(
-                      url: downloadUrl,
-                      method: 'GET',
-                      body: null,
-                      oauth: oauth,
-                      headers: oauth.authorizationHeaders ?? {},
-                      files: null,
-                      responseType: ResponseType.bytes,
-                    ) as Uint8List?;
+                    final fileBytes =
+                        await proxyCall(
+                              url: downloadUrl,
+                              method: 'GET',
+                              body: null,
+                              oauth: oauth,
+                              headers: oauth.authorizationHeaders ?? {},
+                              files: null,
+                              responseType: ResponseType.bytes,
+                            )
+                            as Uint8List?;
 
                     if (fileBytes != null) {
                       final fileName = file.name ?? 'unknown';
@@ -6062,21 +6075,21 @@ class McpFunctionExecutor {
           for (int i = 1; i <= maxPages; i++) {
             try {
               final page = await pdfDocument.getPage(i);
-              
+
               // PDF 페이지 크기 확인 (포인트 단위)
               final pageWidth = page.width;
               final pageHeight = page.height;
               print('[Attachment] PDF page $i size: ${pageWidth}x${pageHeight} points');
-              
+
               // 고해상도로 렌더링 (OpenAI Vision API 권장: 최소 512x512, 최적 1024x1024)
               // PDF 포인트를 픽셀로 변환 (72 DPI 기준, 3배 해상도 = 216 DPI로 충분히 높은 해상도)
               // 최소 1024px 너비로 스케일링하여 텍스트가 선명하게 보이도록 함
               final scaleFactor = (1024.0 / pageWidth).clamp(2.0, 4.0); // 최소 2배, 최대 4배
               final targetWidth = (pageWidth * scaleFactor);
               final targetHeight = (pageHeight * scaleFactor);
-              
+
               print('[Attachment] Rendering PDF page $i at ${targetWidth.toInt()}x${targetHeight.toInt()} pixels (scale: ${scaleFactor.toStringAsFixed(2)}x)');
-              
+
               final pageImage = await page.render(
                 width: targetWidth,
                 height: targetHeight,
@@ -6086,11 +6099,7 @@ class McpFunctionExecutor {
 
               final imageBytes = pageImage?.bytes;
               if (imageBytes != null && imageBytes.isNotEmpty) {
-                files.add(PlatformFile(
-                  name: '${fileName}_page_$i.png',
-                  size: imageBytes.length,
-                  bytes: imageBytes,
-                ));
+                files.add(PlatformFile(name: '${fileName}_page_$i.png', size: imageBytes.length, bytes: imageBytes));
                 print('[Attachment] Converted PDF page $i to PNG (${imageBytes.length} bytes, ${targetWidth}x${targetHeight}px)');
               } else {
                 print('[Attachment] Failed to render PDF page $i - no image bytes');
@@ -6110,19 +6119,11 @@ class McpFunctionExecutor {
       }
       // Image files - add as-is
       else if (lowerName.endsWith('.png') || lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.gif') || lowerName.endsWith('.webp')) {
-        files.add(PlatformFile(
-          name: fileName,
-          size: bytes.length,
-          bytes: bytes,
-        ));
+        files.add(PlatformFile(name: fileName, size: bytes.length, bytes: bytes));
       }
       // Text files - add as-is
       else if (lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerName.endsWith('.csv')) {
-        files.add(PlatformFile(
-          name: fileName,
-          size: bytes.length,
-          bytes: bytes,
-        ));
+        files.add(PlatformFile(name: fileName, size: bytes.length, bytes: bytes));
       }
     } catch (e) {
       print('[Attachment] Error converting attachment to files: $e');
@@ -6336,7 +6337,7 @@ class McpFunctionExecutor {
     final lowerName = fileName.toLowerCase();
 
     final contentItems = <Map<String, dynamic>>[];
-    
+
     try {
       // PDF files - convert to images
       if (lowerName.endsWith('.pdf')) {
@@ -6384,27 +6385,18 @@ class McpFunctionExecutor {
 
           // Add note if PDF has more than 10 pages
           if (pageCount > 10) {
-            contentItems.add({
-              'type': 'text',
-              'text': '\n[참고: PDF 파일이 $pageCount 페이지입니다. 처음 10페이지만 이미지로 변환했습니다.]',
-            });
+            contentItems.add({'type': 'text', 'text': '\n[참고: PDF 파일이 $pageCount 페이지입니다. 처음 10페이지만 이미지로 변환했습니다.]'});
           }
 
           if (contentItems.isEmpty) {
             print('[Attachment] No images generated from PDF');
-            contentItems.add({
-              'type': 'text',
-              'text': '[PDF 파일 첨부됨: $fileName - 이미지로 변환할 수 없습니다]',
-            });
+            contentItems.add({'type': 'text', 'text': '[PDF 파일 첨부됨: $fileName - 이미지로 변환할 수 없습니다]'});
           } else {
             print('[Attachment] Generated ${contentItems.length} content items from PDF');
           }
         } catch (e) {
           print('[Attachment] Error converting PDF to images: $e');
-          contentItems.add({
-            'type': 'text',
-            'text': '[PDF 파일 첨부됨: $fileName - 파일을 이미지로 변환하는 중 오류가 발생했습니다: $e]',
-          });
+          contentItems.add({'type': 'text', 'text': '[PDF 파일 첨부됨: $fileName - 파일을 이미지로 변환하는 중 오류가 발생했습니다: $e]'});
         }
       }
       // Text files
@@ -6423,10 +6415,10 @@ class McpFunctionExecutor {
         final mimeType = lowerName.endsWith('.png')
             ? 'image/png'
             : lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg')
-                ? 'image/jpeg'
-                : lowerName.endsWith('.gif')
-                    ? 'image/gif'
-                    : 'image/webp';
+            ? 'image/jpeg'
+            : lowerName.endsWith('.gif')
+            ? 'image/gif'
+            : 'image/webp';
         final imageBase64 = base64Encode(bytes);
         contentItems.add({
           'type': 'image_url',
@@ -6437,7 +6429,7 @@ class McpFunctionExecutor {
     } catch (e) {
       print('[Attachment] Error extracting content: $e');
     }
-    
+
     return contentItems;
   }
 }

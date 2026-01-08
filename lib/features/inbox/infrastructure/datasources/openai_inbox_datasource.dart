@@ -1857,6 +1857,7 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
     required String model,
     String? apiKey,
     String? systemPrompt,
+    bool includeTools = true, // tools 포함 여부 (기본값: true)
   }) async {
     try {
       // API 키가 제공되지 않으면 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
@@ -2018,17 +2019,22 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         'function': f,
       }).toList();
 
-      // Call OpenAI API with tools
-      final requestBody = {
+      // Call OpenAI API with tools (includeTools가 true일 때만)
+      final requestBody = <String, dynamic>{
         'model': model,
         'messages': messages,
         'temperature': 0.7,
-        'tools': tools,
-        'tool_choice': 'auto', // Let AI decide when to use tools
       };
       
+      if (includeTools) {
+        requestBody['tools'] = tools;
+        requestBody['tool_choice'] = 'auto'; // Let AI decide when to use tools
+        print('[OpenAI] Tools count: ${tools.length}');
+      } else {
+        print('[OpenAI] Skipping tools for generateGeneralChat (includeTools=false)');
+      }
+      
       print('[OpenAI] API request body keys: ${requestBody.keys}');
-      print('[OpenAI] Tools count: ${tools.length}');
       
       print('[OpenAI] Sending API request...');
       final response = await http.post(

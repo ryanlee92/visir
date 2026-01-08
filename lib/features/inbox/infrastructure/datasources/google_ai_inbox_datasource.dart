@@ -10,6 +10,7 @@ import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_fetch_list_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
 import 'package:Visir/features/inbox/infrastructure/datasources/openai_inbox_prompts.dart';
+import 'package:Visir/features/inbox/domain/entities/mcp_function_schema.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
@@ -1065,6 +1066,7 @@ class GoogleAiInboxDatasource extends InboxDatasource {
     required String model,
     String? apiKey,
     String? systemPrompt,
+    bool includeTools = true, // Google AI에서 function calling 포함 여부 (기본값: true)
   }) async {
     if (apiKey == null || apiKey.isEmpty) {
       return null;
@@ -1231,7 +1233,7 @@ class GoogleAiInboxDatasource extends InboxDatasource {
 
       final endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey';
 
-      final body = {
+      final body = <String, dynamic>{
         'contents': contents,
         'systemInstruction': {
           'parts': [
@@ -1240,6 +1242,19 @@ class GoogleAiInboxDatasource extends InboxDatasource {
         },
         'generationConfig': {'temperature': 0.7},
       };
+
+      // Add function declarations if includeTools is true
+      if (includeTools) {
+        final functions = McpFunctionRegistry.getGoogleAiFunctions();
+        print('[GoogleAI] Adding ${functions.length} functions to API call');
+        body['tools'] = [
+          {
+            'function_declarations': functions,
+          },
+        ];
+      } else {
+        print('[GoogleAI] Skipping tools for generateGeneralChat (includeTools=false)');
+      }
 
       final response = await http.post(Uri.parse(endpoint), headers: {'Content-Type': 'application/json'}, body: jsonEncode(body));
 
@@ -1261,16 +1276,49 @@ class GoogleAiInboxDatasource extends InboxDatasource {
           };
         }
 
-        // Extract text content
+        // Extract text content and function calls
         final candidates = decoded['candidates'] as List<dynamic>?;
         if (candidates != null && candidates.isNotEmpty) {
-          final content = candidates[0]['content'] as Map<String, dynamic>?;
+          final candidate = candidates[0] as Map<String, dynamic>?;
+          final content = candidate?['content'] as Map<String, dynamic>?;
           if (content != null) {
             final parts = content['parts'] as List<dynamic>?;
             if (parts != null && parts.isNotEmpty) {
-              final text = parts[0]['text'] as String?;
-              if (text != null) {
-                final result = <String, dynamic>{'message': text.trim()};
+              String? text;
+              final functionCalls = <Map<String, dynamic>>[];
+
+              for (final part in parts) {
+                final partMap = part as Map<String, dynamic>?;
+                if (partMap != null) {
+                  if (partMap['text'] != null) {
+                    text = partMap['text'] as String?;
+                  } else if (partMap['functionCall'] != null) {
+                    final functionCall = partMap['functionCall'] as Map<String, dynamic>?;
+                    if (functionCall != null) {
+                      final functionName = functionCall['name'] as String?;
+                      final args = functionCall['args'] as Map<String, dynamic>?;
+                      if (functionName != null && args != null) {
+                        functionCalls.add({
+                          'function': functionName,
+                          'arguments': args,
+                        });
+                      }
+                    }
+                  }
+                }
+              }
+
+              String finalContent = text?.trim() ?? '';
+              
+              // Convert Google AI function calls to our format
+              if (functionCalls.isNotEmpty) {
+                final functionCallsJson = jsonEncode(functionCalls);
+                finalContent = '$finalContent\n\n$functionCallsJson';
+                print('[GoogleAI] Added ${functionCalls.length} function calls to content');
+              }
+
+              if (finalContent.isNotEmpty) {
+                final result = <String, dynamic>{'message': finalContent};
                 if (tokenUsage != null) {
                   result['_token_usage'] = tokenUsage;
                 }

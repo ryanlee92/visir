@@ -10,6 +10,7 @@ import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_fetch_list_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_suggestion_entity.dart';
 import 'package:Visir/features/inbox/infrastructure/datasources/openai_inbox_prompts.dart';
+import 'package:Visir/features/inbox/domain/entities/mcp_function_schema.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
 import 'package:Visir/features/task/domain/entities/task_entity.dart';
@@ -892,6 +893,7 @@ class AnthropicAiInboxDatasource extends InboxDatasource {
     required String model,
     String? apiKey,
     String? systemPrompt,
+    bool includeTools = true, // Anthropic에서 tools 포함 여부 (기본값: true)
   }) async {
     if (apiKey == null || apiKey.isEmpty) {
       return null;
@@ -1048,7 +1050,21 @@ class AnthropicAiInboxDatasource extends InboxDatasource {
 
       const endpoint = 'https://api.anthropic.com/v1/messages';
 
-      final body = <String, dynamic>{'model': model, 'max_tokens': 4096, 'messages': messages, 'system': systemMessage};
+      final body = <String, dynamic>{
+        'model': model,
+        'max_tokens': 4096,
+        'messages': messages,
+        'system': systemMessage,
+      };
+
+      // Add tools if includeTools is true
+      if (includeTools) {
+        final functions = McpFunctionRegistry.getAnthropicFunctions();
+        print('[Anthropic] Adding ${functions.length} functions to API call');
+        body['tools'] = functions;
+      } else {
+        print('[Anthropic] Skipping tools for generateGeneralChat (includeTools=false)');
+      }
 
       final response = await http.post(
         Uri.parse(endpoint),
@@ -1074,19 +1090,46 @@ class AnthropicAiInboxDatasource extends InboxDatasource {
           };
         }
 
-        // Extract text content
+        // Extract text content and tool use
         final content = decoded['content'] as List<dynamic>?;
         if (content != null && content.isNotEmpty) {
-          final textContent = content[0] as Map<String, dynamic>?;
-          if (textContent != null && textContent['type'] == 'text') {
-            final text = textContent['text'] as String?;
-            if (text != null) {
-              final result = <String, dynamic>{'message': text.trim()};
-              if (tokenUsage != null) {
-                result['_token_usage'] = tokenUsage;
+          String? text;
+          final functionCalls = <Map<String, dynamic>>[];
+
+          for (final item in content) {
+            final itemMap = item as Map<String, dynamic>?;
+            if (itemMap != null) {
+              if (itemMap['type'] == 'text') {
+                text = itemMap['text'] as String?;
+              } else if (itemMap['type'] == 'tool_use') {
+                final toolUse = itemMap as Map<String, dynamic>;
+                final functionName = toolUse['name'] as String?;
+                final input = toolUse['input'] as Map<String, dynamic>?;
+                if (functionName != null && input != null) {
+                  functionCalls.add({
+                    'function': functionName,
+                    'arguments': input,
+                  });
+                }
               }
-              return result;
             }
+          }
+
+          String finalContent = text?.trim() ?? '';
+          
+          // Convert Anthropic tool use to our format
+          if (functionCalls.isNotEmpty) {
+            final functionCallsJson = jsonEncode(functionCalls);
+            finalContent = '$finalContent\n\n$functionCallsJson';
+            print('[Anthropic] Added ${functionCalls.length} function calls to content');
+          }
+
+          if (finalContent.isNotEmpty) {
+            final result = <String, dynamic>{'message': finalContent};
+            if (tokenUsage != null) {
+              result['_token_usage'] = tokenUsage;
+            }
+            return result;
           }
         }
       }
