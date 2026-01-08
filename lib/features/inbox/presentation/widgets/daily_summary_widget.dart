@@ -853,7 +853,6 @@ class DailySummaryWidget extends ConsumerWidget {
             padding: const EdgeInsets.all(8),
             backgroundColor: context.surface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
-            margin: const EdgeInsets.only(bottom: 8),
           ),
           backgroundColor: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? null : Colors.transparent,
           hideShadow: item.inbox?.linkedMail != null || item.inbox?.linkedMessage != null ? false : true,
@@ -1055,36 +1054,31 @@ class DailySummaryWidget extends ConsumerWidget {
     if (isMobileView) {
       return Padding(
         padding: EdgeInsets.symmetric(vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [if (items.isEmpty) Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant)) else ...columnChild],
-        ),
+        child: items.isEmpty
+            ? Center(child: Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant)))
+            : ListView.separated(
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) => columnChild[index],
+                separatorBuilder: (context, index) => SizedBox(height: 8),
+                itemCount: columnChild.length,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                // hitTestBehavior: HitTestBehavior.deferToChild,
+              ),
       );
     }
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 12),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (items.isEmpty)
-                    Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant))
-                  else
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: columnChild),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
+        return items.isEmpty
+            ? Center(child: Text(emptyMessage, style: context.bodyMedium?.textColor(context.onSurfaceVariant)))
+            : ListView.separated(
+                itemBuilder: (context, index) => columnChild[index],
+                separatorBuilder: (context, index) => SizedBox(height: 8),
+                itemCount: columnChild.length,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                // hitTestBehavior: HitTestBehavior.deferToChild,
+              );
       },
     );
   }
