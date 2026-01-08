@@ -20,8 +20,12 @@ import 'package:Visir/features/common/presentation/widgets/selection_widget.dart
 import 'package:Visir/features/common/presentation/widgets/showcase_wrapper.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
+import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
+import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/presentation/widgets/simple_task_or_event_switcher_widget.dart';
+import 'package:Visir/features/time_saved/actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,6 +91,51 @@ class _MessageActionOptionsState extends ConsumerState<MessageActionOptions> wit
   bool get isDarkMode => context.isDarkMode;
 
   MessageMemberEntity get sender => widget.members.firstWhere((e) => e.id == widget.message.userId);
+
+  void startChat() {
+    final channels = ref.read(chatChannelListControllerProvider.select((v) => v[widget.channel.teamId]?.channels ?? []));
+    
+    // Create InboxEntity from MessageEntity
+    final inboxConfig = InboxConfigEntity(
+      inboxUniqueId: InboxEntity.getInboxIdFromChat(widget.message),
+      userId: ref.read(authControllerProvider).requireValue.id,
+      dateTime: widget.message.createdAt ?? DateTime.now(),
+    );
+    
+    final inbox = InboxEntity.fromChat(
+      widget.message,
+      inboxConfig,
+      widget.channel,
+      sender,
+      channels,
+      widget.members,
+      widget.groups,
+    );
+
+    // Navigate to home tab
+    Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+    tabNotifier.value = TabType.home;
+    UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+
+    // Add tag to AgentInputField after navigation - retry multiple times
+    void tryAddTag({int retryCount = 0}) {
+      final agentInputFieldState = AgentInputField.of(Utils.mainContext);
+      if (agentInputFieldState != null) {
+        agentInputFieldState.addInboxTag(inbox);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          agentInputFieldState.requestFocus();
+        });
+      } else if (retryCount < 10) {
+        Future.delayed(Duration(milliseconds: 100 * (retryCount + 1)), () {
+          tryAddTag(retryCount: retryCount + 1);
+        });
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tryAddTag();
+    });
+  }
 
   bool keepFocus = false;
   String currentPopupKey = '';
@@ -279,6 +328,29 @@ class _MessageActionOptionsState extends ConsumerState<MessageActionOptions> wit
                   child: VisirIcon(type: VisirIconType.task, size: 16, isSelected: true),
                 );
               },
+            ),
+            VisirButton(
+              type: VisirButtonAnimationType.scaleAndOpacity,
+              style: VisirButtonStyle(
+                borderRadius: BorderRadius.circular(4),
+                padding: EdgeInsets.all(6),
+              ),
+              options: VisirButtonOptions(
+                tabType: widget.tabType,
+                bypassTextField: true,
+                shortcuts: [
+                  VisirButtonKeyboardShortcut(
+                    keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                    message: '',
+                    onTrigger: () {
+                      startChat();
+                      return true;
+                    },
+                  ),
+                ],
+              ),
+              onTap: startChat,
+              child: VisirIcon(type: VisirIconType.at, size: 16, isSelected: true),
             ),
             if (widget.message.isMyMessage(channel: widget.channel))
               PopupMenu(

@@ -33,9 +33,14 @@ import 'package:Visir/features/common/presentation/widgets/proxy_network_image.d
 import 'package:Visir/features/common/presentation/widgets/showcase_wrapper.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
+import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/common/provider.dart' hide TextScaler;
+import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
+import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/inbox/presentation/widgets/inbox_draggable.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
+import 'package:Visir/features/time_saved/actions.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/presentation/widgets/mobile_task_or_event_switcher_widget.dart';
 import 'package:emoji_extension/emoji_extension.dart' hide Color;
@@ -678,6 +683,57 @@ class _MessageWidgetState extends ConsumerState<MessageWidget> with SingleTicker
                 );
               },
             ),
+          ),
+          BottomDialogOption(
+            icon: VisirIconType.at,
+            title: 'Start Chat',
+            onTap: () {
+              final channels = ref.read(chatChannelListControllerProvider.select((v) => v[widget.channel.teamId]?.channels ?? []));
+              final sender = widget.members.firstWhereOrNull((e) => e.id == widget.message.userId);
+              if (sender == null) return;
+              
+              // Create InboxEntity from MessageEntity
+              final inboxConfig = InboxConfigEntity(
+                inboxUniqueId: InboxEntity.getInboxIdFromChat(widget.message),
+                userId: ref.read(authControllerProvider).requireValue.id,
+                dateTime: widget.message.createdAt ?? DateTime.now(),
+              );
+              
+              final inbox = InboxEntity.fromChat(
+                widget.message,
+                inboxConfig,
+                widget.channel,
+                sender,
+                channels,
+                widget.members,
+                widget.groups,
+              );
+
+              // Navigate to home tab
+              Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+              tabNotifier.value = TabType.home;
+              UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+              Navigator.of(Utils.mainContext).maybePop();
+
+              // Add tag to AgentInputField after navigation - retry multiple times
+              void tryAddTag({int retryCount = 0}) {
+                final agentInputFieldState = AgentInputField.of(Utils.mainContext);
+                if (agentInputFieldState != null) {
+                  agentInputFieldState.addInboxTag(inbox);
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    agentInputFieldState.requestFocus();
+                  });
+                } else if (retryCount < 10) {
+                  Future.delayed(Duration(milliseconds: 100 * (retryCount + 1)), () {
+                    tryAddTag(retryCount: retryCount + 1);
+                  });
+                }
+              }
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                tryAddTag();
+              });
+            },
           ),
           BottomDialogOption(
             icon: VisirIconType.copy,

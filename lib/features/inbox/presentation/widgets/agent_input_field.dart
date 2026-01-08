@@ -467,6 +467,16 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     }
   }
 
+  void addInboxTag(InboxEntity inbox) {
+    if (!mounted) {
+      return;
+    }
+    _addInboxTag(inbox);
+    if (!mounted) {
+      return;
+    }
+  }
+
   void addTaskTag(TaskEntity task) {
     if (!mounted) {
       return;

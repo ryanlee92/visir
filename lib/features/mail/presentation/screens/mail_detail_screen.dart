@@ -24,6 +24,8 @@ import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/presentation/widgets/tutorial/feature_tutorial_widget.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
+import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/mail/actions.dart';
 import 'package:Visir/features/mail/application/mail_list_controller.dart';
 import 'package:Visir/features/mail/application/mail_thread_list_controller.dart';
@@ -296,6 +298,46 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
     } else {
       MailAction.trash(mails: threads?.where((e) => !e.isTrash).toList() ?? [], tabType: tabType);
     }
+  }
+
+  void startChat() {
+    final list = threads ?? [];
+    if (list.isEmpty) return;
+
+    final anchorMail = list.first;
+    
+    // Create InboxEntity from MailEntity
+    final inboxConfig = widget.inboxConfig ?? InboxConfigEntity(
+      inboxUniqueId: InboxEntity.getInboxIdFromMail(anchorMail),
+      userId: ref.read(authControllerProvider).requireValue.id,
+      dateTime: anchorMail.date ?? DateTime.now(),
+    );
+    
+    final inbox = InboxEntity.fromMail(anchorMail, inboxConfig);
+
+    // Navigate to home tab
+    Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+    tabNotifier.value = TabType.home;
+    UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+
+    // Add tag to AgentInputField after navigation - retry multiple times
+    void tryAddTag({int retryCount = 0}) {
+      final agentInputFieldState = AgentInputField.of(Utils.mainContext);
+      if (agentInputFieldState != null) {
+        agentInputFieldState.addInboxTag(inbox);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          agentInputFieldState.requestFocus();
+        });
+      } else if (retryCount < 10) {
+        Future.delayed(Duration(milliseconds: 100 * (retryCount + 1)), () {
+          tryAddTag(retryCount: retryCount + 1);
+        });
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tryAddTag();
+    });
   }
 
   Future<void> toggleArchive() async {
@@ -639,6 +681,22 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
                                   ),
                                 ),
                                 options: VisirButtonOptions(tabType: widget.tabType, message: context.tr.mail_detail_tooltip_task),
+                              ),
+                            if (isMobileView)
+                              VisirAppBarButton(
+                                icon: VisirIconType.at,
+                                onTap: startChat,
+                                options: VisirButtonOptions(
+                                  tabType: widget.tabType,
+                                  shortcuts: [
+                                    VisirButtonKeyboardShortcut(
+                                      keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                                      prevOnKeyDown: widget.onKeyDown,
+                                      prevOnKeyRepeat: widget.onKeyRepeat,
+                                      message: '',
+                                    ),
+                                  ],
+                                ),
                               )
                             else
                               VisirAppBarButton(
@@ -689,6 +747,22 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
                                       prevOnKeyDown: widget.onKeyDown,
                                       prevOnKeyRepeat: widget.onKeyRepeat,
                                       message: context.tr.mail_detail_tooltip_task,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (!isMobileView)
+                              VisirAppBarButton(
+                                icon: VisirIconType.at,
+                                onTap: startChat,
+                                options: VisirButtonOptions(
+                                  tabType: widget.tabType,
+                                  shortcuts: [
+                                    VisirButtonKeyboardShortcut(
+                                      keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                                      prevOnKeyDown: widget.onKeyDown,
+                                      prevOnKeyRepeat: widget.onKeyRepeat,
+                                      message: '',
                                     ),
                                   ],
                                 ),
