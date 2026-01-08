@@ -15,7 +15,6 @@ import 'package:Visir/features/chat/domain/entities/message_emoji_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_group_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_member_entity.dart';
-import 'package:Visir/features/chat/domain/entities/message_tag_entity.dart';
 import 'package:Visir/features/chat/domain/entities/state/chat_fetch_result_entity.dart';
 import 'package:Visir/features/chat/presentation/widgets/chat_input/message_input_field.dart';
 import 'package:Visir/features/chat/presentation/widgets/chat_widget/message_widget.dart';
@@ -38,8 +37,6 @@ import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cached_network_image_platform_interface/cached_network_image_platform_interface.dart' show ImageRenderMethodForWeb;
 import 'package:collection/collection.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -110,12 +107,10 @@ class ChatThreadScreen extends ConsumerStatefulWidget {
 
 class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   ValueNotifier<double> inputAreaHeightNotifier = ValueNotifier(0);
-  ValueNotifier<String> currentTagIdNotifier = ValueNotifier('');
   ValueNotifier<bool> isCurrentNotifier = ValueNotifier(true);
 
   ScrollController? scrollController;
   ListController listController = ListController();
-  ScrollController tagListScrollController = ScrollController();
   FocusNode textFormFieldfocusNode = FocusNode();
 
   double get inputAreaDefaultHeight => 62;
@@ -123,10 +118,6 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   late MessageChannelEntity _channel;
 
   MessageEntity get _parent => widget.parentMessage;
-
-  final List<MessageTagEntity> tagList = [];
-
-  String tagSearchWord = '';
 
   bool get isMobileView => PlatformX.isMobileView;
 
@@ -180,10 +171,6 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
 
     replyController = CustomTagController(channels: channels, channel: _channel);
     replyController.addListener(onTextChanged);
-    isCurrentNotifier.addListener(() {
-      if (!isCurrentNotifier.value) return;
-      currentTagIdNotifier.value = '';
-    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showLoadingOnMobile();
@@ -212,7 +199,6 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
     widget.onClose?.call();
     replyController.dispose();
     inputAreaHeightNotifier.dispose();
-    currentTagIdNotifier.dispose();
     isCurrentNotifier.dispose();
     listController.dispose();
 
@@ -283,185 +269,13 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
     setState(() {});
   }
 
-  Offset? caretOffset;
   void onTextChanged() {
-    final value = replyController.text.trim();
-
-    refreshTagSearchResult();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (value.isEmpty) {
-        replyController.tagListVisible = false;
-      } else if (((value.length == 1 || replyController.selection.start == 1) && value[0] == '@' && (value.length < 2 || value[1] == ' '))) {
-        caretOffset = messageInputFieldKey.currentState?.getCaretOffset();
-        replyController.tagListVisible = true;
-      } else if ((value.length > 1 &&
-          replyController.selection.start > 1 &&
-          value.length >= replyController.selection.start &&
-          (value.substring(replyController.selection.start - 2, replyController.selection.start) == ' @' ||
-              value.substring(replyController.selection.start - 2, replyController.selection.start) == '\n@'))) {
-        caretOffset = messageInputFieldKey.currentState?.getCaretOffset();
-        replyController.tagListVisible = true;
-      }
-
-      if (replyController.tagListVisible) {
-        currentTagIdNotifier.value = tagList.firstOrNull?.id ?? '';
-      }
-
-      setState(() {});
-    });
+    // Tag handling is now done in MessageInputField
   }
 
   void clearMessage() {
     replyController.clear();
     ref.read(chatDraftControllerProvider(teamId: _channel.teamId, channelId: _channel.id, threadId: widget.parentMessage.id).notifier).setDraft(null);
-  }
-
-  Future<void> refreshTagSearchResult() async {
-    tagList.clear();
-
-    final broadcastChannelTag = MessageTagEntity(type: MessageTagEntityType.broadcastChannel);
-    final broadcastHereTag = MessageTagEntity(type: MessageTagEntityType.broadcastHere);
-
-    if (replyController.value.selection.end > 1) {
-      int? searchFromIndex = replyController.text.substring(0, replyController.value.selection.end).lastIndexOf('@') + 1;
-      if (searchFromIndex >= 0) {
-        tagSearchWord = replyController.text.substring(searchFromIndex, replyController.value.selection.end);
-      } else {
-        tagSearchWord = '';
-      }
-    } else {
-      tagSearchWord = '';
-    }
-
-    if (widget.channel.isChannel) {
-      if (broadcastChannelTag.id?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false) {
-        tagList.add(broadcastChannelTag);
-      }
-      if (broadcastHereTag.id?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false) {
-        tagList.add(broadcastHereTag);
-      }
-    }
-
-    final pref = ref.read(localPrefControllerProvider).value;
-    if (pref == null) return;
-
-    final matchedMembersContain = ref
-        .read(chatChannelListControllerProvider.select((v) => v[teamId]?.members ?? []))
-        .where((e) => (e.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false))
-        .toList();
-    final matchedMemberGroupsContain = ref
-        .read(chatChannelListControllerProvider.select((v) => v[teamId]?.groups ?? []))
-        .where((e) => (e.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false))
-        .toList();
-
-    final matchedChannelsContain = ref
-        .read(chatChannelListControllerProvider.select((v) => v[teamId]?.availableChannels ?? []))
-        .where((e) => (e.name?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false))
-        .toList();
-
-    if (widget.channel.isChannel) {
-      if (broadcastChannelTag.id?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false) {
-        tagList.add(broadcastChannelTag);
-      }
-      if (broadcastHereTag.id?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false) {
-        tagList.add(broadcastHereTag);
-      }
-    }
-
-    matchedMembersContain.forEach((e) {
-      if (tagList.firstWhereOrNull((t) => t.id == e.id && t.type == MessageTagEntityType.member) == null) {
-        tagList.add(MessageTagEntity(type: MessageTagEntityType.member, member: e));
-      }
-    });
-    matchedMemberGroupsContain.forEach((e) {
-      if (tagList.firstWhereOrNull((t) => t.id == e.id && t.type == MessageTagEntityType.memberGroup) == null) {
-        tagList.add(MessageTagEntity(type: MessageTagEntityType.memberGroup, memberGroup: e));
-      }
-    });
-    matchedChannelsContain.forEach((e) {
-      if (tagList.firstWhereOrNull((t) => t.id == e.id && t.type == MessageTagEntityType.channel) == null) {
-        tagList.add(MessageTagEntity(type: MessageTagEntityType.channel, channel: e));
-      }
-    });
-
-    tagList.sort((a, b) {
-      final aStartsWith = a.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false;
-      final bStartsWith = b.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false;
-      if (aStartsWith && !bStartsWith) return -1;
-      if (!aStartsWith && bStartsWith) return 1;
-      return 0;
-    });
-  }
-
-  void highlightPreviousTag() {
-    int index = tagList.indexWhere((e) => e.id == currentTagIdNotifier.value);
-    if (index > -1) {
-      int previousIndex = index == 0 ? tagList.length - 1 : index - 1;
-      currentTagIdNotifier.value = tagList[previousIndex].id ?? '';
-
-      final tagWidgetKey = tagList[previousIndex].globalObjectKey;
-      if (tagWidgetKey.currentContext?.findRenderObject() != null) {
-        tagListScrollController.position.ensureVisible(
-          tagWidgetKey.currentContext!.findRenderObject()!,
-          duration: const Duration(milliseconds: 200),
-          alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart,
-        );
-      } else if (previousIndex == tagList.length - 1) {
-        tagListScrollController.jumpTo(tagListScrollController.position.maxScrollExtent);
-      }
-    }
-  }
-
-  void highlightNextTag() {
-    int index = tagList.indexWhere((e) => e.id == currentTagIdNotifier.value);
-    if (index > -1) {
-      int nextIndex = index == tagList.length - 1 ? 0 : index + 1;
-      currentTagIdNotifier.value = tagList[nextIndex].id ?? '';
-
-      final tagWidgetKey = tagList[nextIndex].globalObjectKey;
-      if (tagWidgetKey.currentContext?.findRenderObject() != null) {
-        tagListScrollController.position.ensureVisible(
-          tagWidgetKey.currentContext!.findRenderObject()!,
-          duration: const Duration(milliseconds: 200),
-          alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
-        );
-      } else if (nextIndex == 0) {
-        tagListScrollController.jumpTo(0.0);
-      }
-    }
-  }
-
-  void enterTag() {
-    int index = tagList.indexWhere((e) => e.id == currentTagIdNotifier.value);
-    final tag = tagList[index];
-    String tagString = '\u200b${tag.type == MessageTagEntityType.channel ? '#' : '@'}${tag.displayName}\u200b ';
-    final lastIndex = replyController.text.substring(0, replyController.value.selection.end).lastIndexOf('@');
-    replyController.text = replyController.text.replaceRange(lastIndex, replyController.value.selection.end, tagString);
-    messageInputFieldKey.currentState?.requestFocus();
-    replyController.updateSelection(TextSelection.collapsed(offset: lastIndex + tagString.length), ChangeSource.local);
-    replyController.tagListVisible = false;
-
-    switch (tag.type) {
-      case MessageTagEntityType.member:
-        replyController.addTaggedData(member: tag.member);
-        break;
-      case MessageTagEntityType.memberGroup:
-        replyController.addTaggedData(group: tag.memberGroup);
-        break;
-      case MessageTagEntityType.channel:
-        replyController.addTaggedData(channel: tag.channel);
-        break;
-      case MessageTagEntityType.broadcastChannel:
-      case MessageTagEntityType.broadcastHere:
-      case MessageTagEntityType.task:
-      case MessageTagEntityType.event:
-      case MessageTagEntityType.connection:
-      case MessageTagEntityType.project:
-        break;
-    }
-
-    setState(() {});
   }
 
   void checkPayloadThenAction() {
@@ -968,17 +782,10 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                                   members: members,
                                                   groups: groups,
                                                   emojis: emojis,
-                                                  highlightNextTag: highlightNextTag,
-                                                  highlightPreviousTag: highlightPreviousTag,
-                                                  enterTag: enterTag,
                                                   isThread: true,
                                                   isEdit: replyController.editingMessageId != null,
                                                   onPressEscape: () {
-                                                    if (replyController.tagListVisible) {
-                                                      replyController.tagListVisible = false;
-                                                      setState(() {});
-                                                      return true;
-                                                    } else if (replyController.editingMessageId != null) {
+                                                    if (replyController.editingMessageId != null) {
                                                       clearMessage();
                                                       return true;
                                                     }
@@ -990,116 +797,6 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
                                           ),
                                         ),
                                 ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: (isMobileView ? context.viewInset.bottom : 0) + (caretOffset?.dy ?? 0) + 32,
-                              left: 42.0 + (caretOffset?.dx ?? 0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Visibility(
-                                    visible: replyController.tagListVisible && tagList.isNotEmpty,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 8, right: 16),
-                                      child: TapRegion(
-                                        onTapOutside: (tap) {
-                                          replyController.tagListVisible = false;
-                                          setState(() {});
-                                        },
-                                        behavior: HitTestBehavior.opaque,
-                                        child: Container(
-                                          width: 200,
-                                          constraints: BoxConstraints(maxHeight: 240),
-                                          decoration: BoxDecoration(
-                                            color: context.surface,
-                                            borderRadius: BorderRadius.circular(6),
-                                            boxShadow: [BoxShadow(color: Color(0x3F000000), blurRadius: 12, offset: Offset(0, 4), spreadRadius: 0)],
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(6),
-                                            child: SuperListView.builder(
-                                              controller: tagListScrollController,
-                                              shrinkWrap: true,
-                                              itemCount: tagList.length,
-                                              itemBuilder: (context, index) {
-                                                MessageTagEntity tag = tagList[index];
-                                                bool isFirst = index == 0;
-                                                bool isLast = index == tagList.length - 1;
-
-                                                return Padding(
-                                                  key: tagList[index].globalObjectKey,
-                                                  padding: EdgeInsets.only(top: isFirst ? 6 : 0, bottom: isLast ? 6 : 0),
-                                                  child: GestureDetector(
-                                                    onTapDown: (details) {
-                                                      currentTagIdNotifier.value = tag.id ?? '';
-                                                    },
-                                                    onTapUp: (details) {
-                                                      enterTag();
-                                                    },
-                                                    onLongPressDown: (details) {
-                                                      currentTagIdNotifier.value = tag.id ?? '';
-                                                    },
-                                                    onLongPressUp: () {
-                                                      enterTag();
-                                                    },
-                                                    child: MouseRegion(
-                                                      cursor: SystemMouseCursors.click,
-                                                      onEnter: (event) {
-                                                        currentTagIdNotifier.value = tag.id ?? '';
-                                                      },
-                                                      child: ValueListenableBuilder<String>(
-                                                        valueListenable: currentTagIdNotifier,
-                                                        builder: (context, value, child) {
-                                                          bool isHovering = value == tag.id;
-
-                                                          return Container(
-                                                            height: 36,
-                                                            padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                                                            color: isHovering ? context.outlineVariant.withValues(alpha: 0.1) : Colors.transparent,
-                                                            child: Row(
-                                                              children: [
-                                                                Container(
-                                                                  width: 24,
-                                                                  height: 24,
-                                                                  decoration: ShapeDecoration(
-                                                                    image: tag.type == MessageTagEntityType.member
-                                                                        ? DecorationImage(
-                                                                            image: CachedNetworkImageProvider(
-                                                                              proxyUrl(tag.profileImageSmall ?? ''),
-                                                                              imageRenderMethodForWeb: ImageRenderMethodForWeb.HttpGet,
-                                                                            ),
-                                                                            fit: BoxFit.fill,
-                                                                          )
-                                                                        : null,
-                                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                                                  ),
-                                                                  child: tag.iconData == null ? null : VisirIcon(type: tag.iconData!, size: 16),
-                                                                ),
-                                                                const SizedBox(width: 8),
-                                                                Expanded(
-                                                                  child: Text(
-                                                                    tag.formattedName ?? '',
-                                                                    style: context.titleSmall?.textColor(context.outlineVariant),
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
                             Positioned.fill(
