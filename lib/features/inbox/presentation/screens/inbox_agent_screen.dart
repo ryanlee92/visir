@@ -81,7 +81,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
 
   double _agentInputFieldHeight = 0;
   final GlobalKey _agentInputFieldKey = GlobalKey();
-  final GlobalKey<AgentInputFieldState> _agentInputFieldStateKey = GlobalKey<AgentInputFieldState>();
   RefreshController _refreshController = RefreshController();
 
   bool onFileEntered = false;
@@ -98,21 +97,31 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
 
   @override
   void initState() {
+    print('[InboxAgentScreen] initState() called');
+    print('[InboxAgentScreen] Stack trace:');
+    print(StackTrace.current);
     resizableController.addListener(() {
       setState(() {});
     });
+    print('[InboxAgentScreen] Creating new AgentTagController');
     _messageController = AgentTagController();
     _focusNode = FocusNode();
     super.initState();
+    print('[InboxAgentScreen] initState() completed');
   }
 
   @override
   void dispose() {
+    print('[InboxAgentScreen] dispose() called');
+    print('[InboxAgentScreen] Stack trace:');
+    print(StackTrace.current);
     resizableController.dispose();
+    print('[InboxAgentScreen] Disposing _messageController');
     _messageController?.dispose();
     _focusNode?.dispose();
     _refreshController.dispose();
     super.dispose();
+    print('[InboxAgentScreen] dispose() completed');
   }
 
   /// MCP 함수를 직접 실행하는 헬퍼 함수
@@ -544,7 +553,7 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
           setState(() {});
         },
         onDrop: (files) {
-          _agentInputFieldStateKey.currentState?.uploadFiles(files: files);
+          AgentInputField.of(Utils.mainContext)?.uploadFiles(files: files);
           onFileEntered = false;
           setState(() {});
         },
@@ -692,17 +701,17 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                 projects: projects,
                                 userName: userName,
                                 onDragStart: (inbox, task) {
-                                  _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                  AgentInputField.of(Utils.mainContext)?.handleDragStart(inbox, task, Offset.zero);
                                   if (inbox == null) return;
                                   widget.onDragStart?.call(inbox);
                                 },
                                 onDragUpdate: (inbox, task, offset) {
-                                  _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                  AgentInputField.of(Utils.mainContext)?.handleDragUpdate(inbox, task, offset);
                                   if (inbox == null) return;
                                   widget.onDragUpdate?.call(inbox, offset);
                                 },
                                 onDragEnd: (inbox, task, offset) {
-                                  _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                  AgentInputField.of(Utils.mainContext)?.handleDragEnd(inbox, task, offset);
                                   if (inbox == null) return;
                                   widget.onDragEnd?.call(inbox, offset);
                                 },
@@ -765,8 +774,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                               key: _agentInputFieldKey,
                               padding: EdgeInsets.only(bottom: max(MediaQuery.of(context).viewInsets.bottom / ref.read(zoomRatioProvider) + 8, tabMargin + 8)),
                               child: AgentInputField(
-                                key: _agentInputFieldStateKey,
-                                fieldKey: _agentInputFieldStateKey,
                                 messageController: _messageController,
                                 focusNode: _focusNode,
                                 onPressEscape: () => true,
@@ -890,7 +897,7 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                         .copyWith(messages: updatedMessages, isLoading: true);
 
                                     // input 비우기
-                                    _agentInputFieldStateKey.currentState?.clearMessage();
+                                    AgentInputField.of(Utils.mainContext)?.clearMessage();
 
                                     // MCP 함수 직접 실행
                                     _executeMcpFunctionDirectly(
@@ -1015,7 +1022,7 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                               setState(() {});
                             },
                             onDrop: (files) {
-                              _agentInputFieldStateKey.currentState?.uploadFiles(files: files);
+                              AgentInputField.of(Utils.mainContext)?.uploadFiles(files: files);
                               onFileEntered = false;
                               setState(() {});
                             },
@@ -1121,9 +1128,9 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                                 userName: userName,
                                                 onDragStart: (inbox, task) {
                                                   if (PlatformX.isDesktopView) {
-                                                    _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                    AgentInputField.of(Utils.mainContext)?.handleDragStart(inbox, task, Offset.zero);
                                                   } else {
-                                                    _agentInputFieldStateKey.currentState?.handleDragStart(inbox, task, Offset.zero);
+                                                    AgentInputField.of(Utils.mainContext)?.handleDragStart(inbox, task, Offset.zero);
                                                     if (inbox == null) return;
                                                     widget.onDragStart?.call(inbox);
                                                   }
@@ -1131,21 +1138,21 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                                 onDragUpdate: (inbox, task, offset) {
                                                   if (PlatformX.isDesktopView) {
                                                     if (inbox == null) return;
-                                                    _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                    AgentInputField.of(Utils.mainContext)?.handleDragUpdate(inbox, task, offset);
                                                     timeblockDropWidgetKey.currentState?.onInboxDragUpdate(inbox, offset);
                                                   } else {
-                                                    _agentInputFieldStateKey.currentState?.handleDragUpdate(inbox, task, offset);
+                                                    AgentInputField.of(Utils.mainContext)?.handleDragUpdate(inbox, task, offset);
                                                     if (inbox == null) return;
                                                     widget.onDragUpdate?.call(inbox, offset);
                                                   }
                                                 },
                                                 onDragEnd: (inbox, task, offset) {
                                                   if (PlatformX.isDesktopView) {
-                                                    _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                    AgentInputField.of(Utils.mainContext)?.handleDragEnd(inbox, task, offset);
                                                     if (inbox == null) return;
                                                     timeblockDropWidgetKey.currentState?.onInboxDragEnd(inbox, offset);
                                                   } else {
-                                                    _agentInputFieldStateKey.currentState?.handleDragEnd(inbox, task, offset);
+                                                    AgentInputField.of(Utils.mainContext)?.handleDragEnd(inbox, task, offset);
                                                     if (inbox == null) return;
                                                     widget.onDragEnd?.call(inbox, offset);
                                                   }
@@ -1192,8 +1199,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                 child: Container(
                                   key: _agentInputFieldKey,
                                   child: AgentInputField(
-                                    key: _agentInputFieldStateKey,
-                                    fieldKey: _agentInputFieldStateKey,
                                     messageController: _messageController,
                                     focusNode: _focusNode,
                                     onPressEscape: () => true,
@@ -1328,7 +1333,7 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                                           ref.read(agentActionControllerProvider.notifier).state = currentState.copyWith(messages: updatedMessages, isLoading: true);
 
                                           // input 비우기
-                                          _agentInputFieldStateKey.currentState?.clearMessage();
+                                          AgentInputField.of(Utils.mainContext)?.clearMessage();
 
                                           // MCP 함수 직접 실행
                                           _executeMcpFunctionDirectly(

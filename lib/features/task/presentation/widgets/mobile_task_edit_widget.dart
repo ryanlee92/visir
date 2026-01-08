@@ -17,6 +17,7 @@ import 'package:Visir/features/calendar/presentation/widgets/calendar_simple_cre
 import 'package:Visir/features/calendar/providers.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
@@ -29,6 +30,7 @@ import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/presentation/widgets/mobile_linked_message_mail_section.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
 import 'package:Visir/features/task/actions.dart';
 import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
@@ -379,6 +381,81 @@ class _MobileTaskEditWidgetState extends ConsumerState<MobileTaskEditWidget> {
     }
   }
 
+  void startChat() {
+    print('[startChat] MobileTaskEditWidget: startChat called');
+    // Get current task - only tag if task exists
+    TaskEntity? currentTask = widget.task;
+    print('[startChat] MobileTaskEditWidget: widget.task = ${widget.task?.id}');
+    if (currentTask == null) {
+      print('[startChat] MobileTaskEditWidget: currentTask is null, returning');
+      return;
+    }
+
+    print('[startChat] MobileTaskEditWidget: currentTask = ${currentTask.id}, title = ${currentTask.title}');
+    print('[startChat] MobileTaskEditWidget: Navigating to home tab');
+
+    // Navigate to home tab
+    Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+    tabNotifier.value = TabType.home;
+    UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+
+    print('[startChat] MobileTaskEditWidget: Tab switched, waiting for postFrameCallback');
+
+    // Add tag to AgentInputField after navigation - retry multiple times
+    void tryAddTag({int retryCount = 0}) {
+      // Find AgentInputFieldState from widget tree
+      AgentInputFieldState? agentInputFieldState;
+      try {
+        agentInputFieldState = AgentInputField.of(Utils.mainContext);
+        print('[startChat] MobileTaskEditWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
+      } catch (e) {
+        print('[startChat] MobileTaskEditWidget: Error finding via widget tree: $e');
+      }
+      
+      // Check if state is valid and mounted
+      if (agentInputFieldState != null && agentInputFieldState.mounted) {
+        // Check if messageController is still valid (not disposed)
+        try {
+          // Try to access messageController to check if it's disposed
+          final controller = agentInputFieldState.messageController;
+          final _ = controller.text; // This will throw if disposed
+          
+          print('[startChat] MobileTaskEditWidget: Adding tag for task ${currentTask.id}');
+          agentInputFieldState.addTaskTag(currentTask);
+          agentInputFieldState.requestFocus();
+          print('[startChat] MobileTaskEditWidget: Tag added and focus requested');
+        } catch (e) {
+          print('[startChat] MobileTaskEditWidget: messageController is disposed or invalid: $e');
+          if (retryCount < 5) {
+            print('[startChat] MobileTaskEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+            Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                tryAddTag(retryCount: retryCount + 1);
+              });
+            });
+          } else {
+            print('[startChat] MobileTaskEditWidget: Failed after 5 retries - controller disposed');
+          }
+        }
+      } else if (retryCount < 5) {
+        print('[startChat] MobileTaskEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+        Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            tryAddTag(retryCount: retryCount + 1);
+          });
+        });
+      } else {
+        print('[startChat] MobileTaskEditWidget: Failed after 5 retries');
+      }
+    }
+
+    Future.delayed(Duration(milliseconds: 300), () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        tryAddTag();
+      });
+    });
+  }
+
   Widget bodyDivider() => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16),
     child: Divider(height: 1, thickness: 1, color: context.surface),
@@ -435,6 +512,18 @@ class _MobileTaskEditWidgetState extends ConsumerState<MobileTaskEditWidget> {
                     ),
                   if (widget.task != null && !isFromInboxDrag) VisirAppBarButton(onTap: title?.isNotEmpty == true ? copy : null, icon: VisirIconType.copy),
                   if (widget.eventTaskSwitcher != null) VisirAppBarButton(child: widget.eventTaskSwitcher!, isContainer: true),
+                  VisirAppBarButton(
+                    onTap: widget.task != null ? startChat : null,
+                    options: VisirButtonOptions(
+                      shortcuts: [
+                        VisirButtonKeyboardShortcut(
+                          message: 'Start chat',
+                          keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                        ),
+                      ],
+                    ),
+                    child: VisirIcon(type: VisirIconType.at, color: context.onInverseSurface, size: 16, isSelected: true),
+                  ),
                   VisirAppBarButton(onTap: isSavable ? save : null, icon: VisirIconType.check),
                 ],
               ),

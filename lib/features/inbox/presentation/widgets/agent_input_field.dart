@@ -1,7 +1,6 @@
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/dependency/contextmenu/src/ContextMenuArea.dart';
 import 'package:Visir/features/common/presentation/widgets/keyboard_shortcut.dart';
-import 'package:desktop_drop/desktop_drop.dart';
 import 'package:Visir/features/chat/application/chat_channel_list_controller.dart';
 import 'package:Visir/features/chat/domain/entities/message_channel_entity.dart';
 import 'package:Visir/features/chat/domain/entities/message_emoji_entity.dart';
@@ -19,6 +18,7 @@ import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/features/preference/application/connection_list_controller.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
+import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
@@ -102,7 +102,67 @@ class AgentInputField extends ConsumerStatefulWidget {
   ConsumerState<AgentInputField> createState() => AgentInputFieldState();
 
   static AgentInputFieldState? of(BuildContext context) {
-    return context.findAncestorStateOfType<AgentInputFieldState>();
+    // Try Constants first (most reliable)
+    if (Constants.currentAgentInputFieldState != null && Constants.currentAgentInputFieldState!.mounted) {
+      return Constants.currentAgentInputFieldState;
+    }
+
+    // Try InheritedWidget
+    final inherited = _AgentInputFieldInherited.of(context);
+    if (inherited != null && inherited.state != null && inherited.state!.mounted) {
+      return inherited.state;
+    }
+
+    // Try findAncestorStateOfType
+    final state = context.findAncestorStateOfType<AgentInputFieldState>();
+    if (state != null) return state;
+
+    // Try Utils.mainContext as fallback
+    try {
+      if (Utils.mainContext.mounted) {
+        final inheritedFromMain = _AgentInputFieldInherited.of(Utils.mainContext);
+        if (inheritedFromMain != null && inheritedFromMain.state != null && inheritedFromMain.state!.mounted) {
+          return inheritedFromMain.state;
+        }
+        final mainState = Utils.mainContext.findAncestorStateOfType<AgentInputFieldState>();
+        if (mainState != null) return mainState;
+      }
+    } catch (e) {
+      // Ignore
+    }
+
+    // Try mobile tab contexts
+    try {
+      final tabContext = Utils.mobileTabContexts[TabType.home];
+      if (tabContext != null && tabContext.mounted) {
+        final inheritedFromTab = _AgentInputFieldInherited.of(tabContext);
+        if (inheritedFromTab != null && inheritedFromTab.state != null && inheritedFromTab.state!.mounted) {
+          return inheritedFromTab.state;
+        }
+        final tabState = tabContext.findAncestorStateOfType<AgentInputFieldState>();
+        if (tabState != null) return tabState;
+      }
+    } catch (e) {
+      // Ignore
+    }
+
+    return null;
+  }
+}
+
+/// InheritedWidget to provide AgentInputFieldState to descendants
+class _AgentInputFieldInherited extends InheritedWidget {
+  final AgentInputFieldState? state;
+
+  const _AgentInputFieldInherited({required this.state, required super.child});
+
+  static _AgentInputFieldInherited? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_AgentInputFieldInherited>();
+  }
+
+  @override
+  bool updateShouldNotify(_AgentInputFieldInherited oldWidget) {
+    return oldWidget.state != state;
   }
 }
 
@@ -271,32 +331,226 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   }
 
   void _addTaskTag(TaskEntity task) {
-    // Add to tagged list
-    if (!messageController.taggedTasks.any((t) => t.id == task.id)) {
-      messageController.addTaggedData(task: task);
+    print('[_addTaskTag] Called with task: ${task.id}, title: ${task.title}');
+
+    if (!mounted) {
+      print('[_addTaskTag] Widget not mounted, returning');
+      return;
     }
+
+    // Check if messageController is valid (not disposed)
+    AgentTagController controller;
+    try {
+      controller = messageController;
+      // Try to access properties to check if disposed
+      final _ = controller.text;
+      final _selection = controller.selection;
+      // Use _selection to avoid unused variable warning
+      if (_selection.start < 0) return;
+    } catch (e) {
+      print('[_addTaskTag] messageController is disposed or invalid: $e');
+      return;
+    }
+
+    print('[_addTaskTag] Current text before: "${controller.text}"');
+    print('[_addTaskTag] Current text length: ${controller.text.length}');
+    print('[_addTaskTag] Current selection: ${controller.selection}');
+    print('[_addTaskTag] Tagged tasks before: ${controller.taggedTasks.length}');
+
+    // Check if task is already tagged
+    final isAlreadyTagged = controller.taggedTasks.any((t) => t.id == task.id);
+    if (isAlreadyTagged) {
+      print('[_addTaskTag] Task already tagged, skipping text insertion');
+      // Just focus the input field
+      if (mounted) {
+        requestFocus();
+      }
+      return;
+    }
+
+    // Add to tagged list
+    controller.addTaggedData(task: task);
+    print('[_addTaskTag] Task added to taggedTasks');
 
     // Add @tag to text
     final displayName = task.title ?? 'Untitled';
     final tagString = '\u200b@${displayName}\u200b ';
-    final currentText = messageController.text;
-    final selection = messageController.selection;
+    final currentText = controller.text;
+    final selection = controller.selection;
     final insertPosition = selection.end;
 
-    messageController.text = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
-    messageController.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+    print('[_addTaskTag] Inserting tag string "$tagString" at position $insertPosition');
+    print('[_addTaskTag] Text before insert: "${currentText.substring(0, insertPosition)}"');
+    print('[_addTaskTag] Text after insert: "${currentText.substring(insertPosition)}"');
+
+    final newText = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
+    print('[_addTaskTag] New text: "$newText"');
+    print('[_addTaskTag] New text length: ${newText.length}');
+
+    try {
+      controller.text = newText;
+      controller.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+
+      print('[_addTaskTag] Current text after: "${controller.text}"');
+      print('[_addTaskTag] Current text length after: ${controller.text.length}');
+      print('[_addTaskTag] New selection: ${controller.selection}');
+      print('[_addTaskTag] Document length: ${controller.document.length}');
+      print('[_addTaskTag] Document toPlainText: "${controller.document.toPlainText()}"');
+    } catch (e) {
+      print('[_addTaskTag] Error updating messageController: $e');
+      if (e.toString().contains('disposed')) {
+        print('[_addTaskTag] Controller was disposed, returning');
+        return;
+      }
+      rethrow;
+    }
+
+    if (!mounted) {
+      print('[_addTaskTag] Widget not mounted, skipping setState');
+      return;
+    }
 
     setState(() {});
+    print('[_addTaskTag] setState called, mounted: $mounted');
+
+    // Request focus after a short delay
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (!mounted) {
+        print('[_addTaskTag] Widget not mounted, skipping requestFocus');
+        return;
+      }
+      try {
+        requestFocus();
+      } catch (e) {
+        print('[_addTaskTag] Error requesting focus: $e');
+      }
+    });
   }
 
   void requestFocus() {
-    if (isDummy) return;
-    if (PlatformX.isMobileView) {
-      widget.messageController!.skipRequestKeyboard = false;
-    }
-    widget.focusNode!.requestFocus();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    if (isDummy || !mounted) return;
+    try {
+      if (PlatformX.isMobileView) {
+        widget.messageController!.skipRequestKeyboard = false;
+      }
       widget.focusNode!.requestFocus();
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (!mounted) return;
+        try {
+          widget.focusNode!.requestFocus();
+        } catch (e) {
+          print('[requestFocus] Error in postFrameCallback: $e');
+        }
+      });
+    } catch (e) {
+      print('[requestFocus] Error requesting focus: $e');
+    }
+  }
+
+  void addTaskTag(TaskEntity task) {
+    if (!mounted) {
+      print('[addTaskTag] Widget not mounted, returning');
+      return;
+    }
+    print('[addTaskTag] Called with task: ${task.id}, title: ${task.title}');
+    print('[addTaskTag] Current text before: "${messageController.text}"');
+    print('[addTaskTag] Current selection: ${messageController.selection}');
+    print('[addTaskTag] Tagged tasks before: ${messageController.taggedTasks.length}');
+    _addTaskTag(task);
+    if (!mounted) {
+      print('[addTaskTag] Widget not mounted after _addTaskTag, returning');
+      return;
+    }
+    print('[addTaskTag] Current text after: "${messageController.text}"');
+    print('[addTaskTag] Tagged tasks after: ${messageController.taggedTasks.length}');
+    print('[addTaskTag] Document length: ${messageController.document.length}');
+  }
+
+  void addEventTag(EventEntity event) {
+    if (!mounted) {
+      print('[addEventTag] Widget not mounted, returning');
+      return;
+    }
+
+    print('[addEventTag] Called with event: ${event.uniqueId}, title: ${event.title}');
+
+    // Check if messageController is valid (not disposed)
+    AgentTagController controller;
+    try {
+      controller = messageController;
+      // Try to access properties to check if disposed
+      final _ = controller.text;
+      final _selection = controller.selection;
+      // Use _selection to avoid unused variable warning
+      if (_selection.start < 0) return;
+    } catch (e) {
+      print('[addEventTag] messageController is disposed or invalid: $e');
+      return;
+    }
+
+    print('[addEventTag] Current text before: "${controller.text}"');
+    print('[addEventTag] Current selection: ${controller.selection}');
+    print('[addEventTag] Tagged events before: ${controller.taggedEvents.length}');
+
+    // Check if event is already tagged
+    final isAlreadyTagged = controller.taggedEvents.any((e) => e.uniqueId == event.uniqueId);
+    if (isAlreadyTagged) {
+      print('[addEventTag] Event already tagged, skipping text insertion');
+      // Just focus the input field
+      if (mounted) {
+        requestFocus();
+      }
+      return;
+    }
+
+    // Add to tagged list
+    controller.addTaggedData(event: event);
+    print('[addEventTag] Event added to taggedEvents');
+
+    // Add @tag to text
+    final displayName = event.title ?? 'Untitled';
+    final tagString = '\u200b@${displayName}\u200b ';
+    final currentText = controller.text;
+    final selection = controller.selection;
+    final insertPosition = selection.end;
+
+    print('[addEventTag] Inserting tag string "$tagString" at position $insertPosition');
+
+    try {
+      controller.text = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
+      controller.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
+
+      print('[addEventTag] Current text after: "${controller.text}"');
+      print('[addEventTag] Tagged events after: ${controller.taggedEvents.length}');
+      print('[addEventTag] Document length: ${controller.document.length}');
+    } catch (e) {
+      print('[addEventTag] Error updating messageController: $e');
+      if (e.toString().contains('disposed')) {
+        print('[addEventTag] Controller was disposed, returning');
+        return;
+      }
+      rethrow;
+    }
+
+    if (!mounted) {
+      print('[addEventTag] Widget not mounted, skipping setState');
+      return;
+    }
+
+    setState(() {});
+    print('[addEventTag] setState called');
+
+    // Request focus after a short delay
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (!mounted) {
+        print('[addEventTag] Widget not mounted, skipping requestFocus');
+        return;
+      }
+      try {
+        requestFocus();
+      } catch (e) {
+        print('[addEventTag] Error requesting focus: $e');
+      }
     });
   }
 
@@ -346,11 +600,26 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   @override
   void initState() {
+    print('[AgentInputFieldState] initState() called');
+    print('[AgentInputFieldState] messageController: ${widget.messageController != null ? "provided" : "null"}');
+    print('[AgentInputFieldState] fieldKey: ${widget.fieldKey != null ? "provided" : "null"}');
+    print('[AgentInputFieldState] Stack trace:');
+    print(StackTrace.current);
     super.initState();
     contextProject = widget.initialProject;
     widget.messageController?.addListener(onChangeContent);
     tabNotifier.addListener(onTabChanged);
     refreshTagSearchResult();
+
+    // Register this state in Constants for global access
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Constants.currentAgentInputFieldState = this;
+        print('[AgentInputFieldState] Registered in Constants');
+      }
+    });
+
+    print('[AgentInputFieldState] initState() completed');
   }
 
   @override
@@ -372,14 +641,22 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   @override
   void dispose() {
-    if (isDummy) return;
+    print('[AgentInputFieldState] dispose() called');
+    print('[AgentInputFieldState] Stack trace:');
+    print(StackTrace.current);
+    if (isDummy) {
+      print('[AgentInputFieldState] isDummy=true, returning early');
+      return;
+    }
     tagListOverlayEntry?.remove();
     tagListOverlayEntry?.dispose();
     tagListOverlayEntry = null;
     tabNotifier.removeListener(onTabChanged);
+    print('[AgentInputFieldState] Removing listener from messageController');
     widget.messageController!.removeListener(onChangeContent);
     currentTagIdNotifier.dispose();
     super.dispose();
+    print('[AgentInputFieldState] dispose() completed');
   }
 
   void onChangeContent() {
@@ -1057,6 +1334,10 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   @override
   Widget build(BuildContext context) {
+    return _AgentInputFieldInherited(state: this, child: _buildAgentInputField(context));
+  }
+
+  Widget _buildAgentInputField(BuildContext context) {
     final projects = ref.watch(projectListControllerProvider);
     final agentAction = ref.watch(agentActionControllerProvider);
     final theme = ref.watch(themeSwitchProvider);

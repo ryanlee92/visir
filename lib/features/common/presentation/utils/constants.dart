@@ -7,6 +7,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/color_extens
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/inbox/presentation/screens/inbox_list_screen.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/domain/entities/project_entity.dart';
@@ -19,6 +20,8 @@ class Constants {
   static GlobalKey<MainCalendarWidgetState> inboxCalendarScreenKey = GlobalKey();
   static GlobalKey<InboxListScreenState> inboxListScreenKey = GlobalKey();
   static GlobalKey<TimeSavedButtonState> timeSavedButtonKey = GlobalKey();
+  static GlobalKey<AgentInputFieldState> agentInputFieldStateKey = GlobalKey<AgentInputFieldState>();
+  static AgentInputFieldState? currentAgentInputFieldState;
 
   static int desktopTitleBarHeight = 40;
   static int chatScreenBreakPoint = 520;

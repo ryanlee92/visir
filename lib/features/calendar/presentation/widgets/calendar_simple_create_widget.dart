@@ -40,6 +40,7 @@ import 'package:Visir/features/common/presentation/widgets/showcase_wrapper.dart
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/inbox/presentation/widgets/simple_linked_message_mail_section.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/preference/application/connection_list_controller.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
@@ -192,29 +193,10 @@ extension ReminderOptionTypeX on ReminderOptionType {
   }
 }
 
-enum CalendarTaskEditSourceType {
-  drag,
-  doubleClick,
-  fab,
-  message,
-  mail,
-  addTaskTop,
-  addTaskOnDate,
-  inboxDrag,
-  inboxSuggestion,
-  editOriginal,
-  commandBarEdit,
-  commandBarDetail,
-}
+enum CalendarTaskEditSourceType { drag, doubleClick, fab, message, mail, addTaskTop, addTaskOnDate, inboxDrag, inboxSuggestion, editOriginal, commandBarEdit, commandBarDetail }
 
 extension CalendarTaskEditSourceTypeX on CalendarTaskEditSourceType {
-  String getAnalyticsEventTitle({
-    required TabType tabType,
-    required bool isEvent,
-    required bool isLinkedWithMessages,
-    required bool isLinkedWithMails,
-    required bool isChannel,
-  }) {
+  String getAnalyticsEventTitle({required TabType tabType, required bool isEvent, required bool isLinkedWithMessages, required bool isLinkedWithMails, required bool isChannel}) {
     switch (this) {
       case CalendarTaskEditSourceType.drag:
         if (tabType == TabType.calendar) return 'calendar_drag_${isEvent ? 'event' : 'task'}';
@@ -451,11 +433,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
     endDate =
         widget.event?.endDate ??
         widget.endDate ??
-        startDate.add(
-          isAllDay
-              ? Duration(days: 1)
-              : Duration(minutes: (widget.tabType == TabType.home ? user.userDefaultDurationInMinutes : user.defaultDurationInMinutes) ?? 60),
-        );
+        startDate.add(isAllDay ? Duration(days: 1) : Duration(minutes: (widget.tabType == TabType.home ? user.userDefaultDurationInMinutes : user.defaultDurationInMinutes) ?? 60));
 
     final newStartDate = widget.selectedDate;
     final newEndDate = widget.selectedDate.add(Duration(minutes: endDate.difference(startDate).inMinutes));
@@ -483,20 +461,13 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
     final lastUsedCalendarIds = ref.read(lastUsedCalendarIdProvider);
 
     calendars = calendarMap.values.expand((e) => e).toList()
-      ..removeWhere(
-        (c) =>
-            c.modifiable != true || calendarHide.contains(c.uniqueId) == true && c.uniqueId != (user.userDefaultCalendarId ?? lastUsedCalendarIds.firstOrNull),
-      )
+      ..removeWhere((c) => c.modifiable != true || calendarHide.contains(c.uniqueId) == true && c.uniqueId != (user.userDefaultCalendarId ?? lastUsedCalendarIds.firstOrNull))
       ..unique((element) => element.uniqueId);
 
     calendar =
         widget.event?.calendar ??
         (calendars
-                .where(
-                  (e) =>
-                      e.uniqueId ==
-                      ((widget.tabType == TabType.home ? user.userDefaultCalendarId : user.userDefaultCalendarId) ?? lastUsedCalendarIds.firstOrNull),
-                )
+                .where((e) => e.uniqueId == ((widget.tabType == TabType.home ? user.userDefaultCalendarId : user.userDefaultCalendarId) ?? lastUsedCalendarIds.firstOrNull))
                 .toList()
                 .firstOrNull ??
             calendars.firstOrNull);
@@ -530,9 +501,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
     savedStartDate = widget.savedStartDate ?? (isAllDay ? DateTime(now.year, now.month, now.day, now.hour, (now.minute ~/ 15 + 1) * 15) : startDate);
     savedEndDate =
         widget.savedEndDate ??
-        (isAllDay
-            ? DateTime(now.year, now.month, now.day, now.hour, (now.minute ~/ 15 + 1) * 15).add(Duration(minutes: user.userTaskDefaultDurationInMinutes))
-            : endDate);
+        (isAllDay ? DateTime(now.year, now.month, now.day, now.hour, (now.minute ~/ 15 + 1) * 15).add(Duration(minutes: user.userTaskDefaultDurationInMinutes)) : endDate);
 
     isEdited = widget.isEdited ?? false;
 
@@ -575,10 +544,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
 
     if (event is KeyDownEvent) {
       final logicalKeyPressed = ServicesBinding.instance.keyboard.logicalKeysPressed.toList();
-      if (descriptionFocusNode.hasFocus &&
-          logicalKeyPressed.length == 2 &&
-          logicalKeyPressed.isShiftPressed &&
-          logicalKeyPressed.contains(LogicalKeyboardKey.enter)) {
+      if (descriptionFocusNode.hasFocus && logicalKeyPressed.length == 2 && logicalKeyPressed.isShiftPressed && logicalKeyPressed.contains(LogicalKeyboardKey.enter)) {
         // Shift + Enter 입력 시 줄바꿈을 처리
         final text = descriptionController.text;
         final selection = descriptionController.selection;
@@ -652,6 +618,81 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
     Navigator.of(Utils.mainContext).maybePop();
   }
 
+  void startChat() {
+    print('[startChat] CalendarSimpleCreateWidget: startChat called');
+    // Get current event - only tag if event exists
+    EventEntity? currentEvent = widget.event;
+    print('[startChat] CalendarSimpleCreateWidget: widget.event = ${widget.event?.uniqueId}');
+    if (currentEvent == null) {
+      print('[startChat] CalendarSimpleCreateWidget: currentEvent is null, returning');
+      return;
+    }
+
+    print('[startChat] CalendarSimpleCreateWidget: currentEvent = ${currentEvent.uniqueId}, title = ${currentEvent.title}');
+    print('[startChat] CalendarSimpleCreateWidget: Navigating to home tab');
+
+    // Navigate to home tab
+    Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+    tabNotifier.value = TabType.home;
+    UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+
+    print('[startChat] CalendarSimpleCreateWidget: Tab switched, waiting for postFrameCallback');
+
+    // Add tag to AgentInputField after navigation - retry multiple times
+    void tryAddTag({int retryCount = 0}) {
+      // Find AgentInputFieldState from widget tree
+      AgentInputFieldState? agentInputFieldState;
+      try {
+        agentInputFieldState = AgentInputField.of(Utils.mainContext);
+        print('[startChat] CalendarSimpleCreateWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
+      } catch (e) {
+        print('[startChat] CalendarSimpleCreateWidget: Error finding via widget tree: $e');
+      }
+
+      // Check if state is valid and mounted
+      if (agentInputFieldState != null && agentInputFieldState.mounted) {
+        // Check if messageController is still valid (not disposed)
+        try {
+          // Try to access messageController to check if it's disposed
+          final controller = agentInputFieldState.messageController;
+          final _ = controller.text; // This will throw if disposed
+
+          print('[startChat] CalendarSimpleCreateWidget: Adding tag for event ${currentEvent.uniqueId}');
+          agentInputFieldState.addEventTag(currentEvent);
+          agentInputFieldState.requestFocus();
+          print('[startChat] CalendarSimpleCreateWidget: Tag added and focus requested');
+        } catch (e) {
+          print('[startChat] CalendarSimpleCreateWidget: messageController is disposed or invalid: $e');
+          if (retryCount < 5) {
+            print('[startChat] CalendarSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+            Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                tryAddTag(retryCount: retryCount + 1);
+              });
+            });
+          } else {
+            print('[startChat] CalendarSimpleCreateWidget: Failed after 5 retries - controller disposed');
+          }
+        }
+      } else if (retryCount < 5) {
+        print('[startChat] CalendarSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+        Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            tryAddTag(retryCount: retryCount + 1);
+          });
+        });
+      } else {
+        print('[startChat] CalendarSimpleCreateWidget: Failed after 5 retries');
+      }
+    }
+
+    Future.delayed(Duration(milliseconds: 300), () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        tryAddTag();
+      });
+    });
+  }
+
   void setStartDateTime(DateTime dateTime) {
     isEdited = true;
     final diff = endDate.difference(startDate);
@@ -683,9 +724,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
 
       endDate = dateTime;
       if (startDate.compareTo(dateTime) > 0) {
-        startDate = dateTime.subtract(
-          Duration(minutes: (widget.tabType == TabType.home ? user.userDefaultDurationInMinutes : user.defaultDurationInMinutes) ?? 60),
-        );
+        startDate = dateTime.subtract(Duration(minutes: (widget.tabType == TabType.home ? user.userDefaultDurationInMinutes : user.defaultDurationInMinutes) ?? 60));
       }
 
       savedStartDate = startDate;
@@ -701,12 +740,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
     if (widget.event == null) return;
     if (isRequest) {
       Navigator.of(Utils.mainContext).popUntil((route) => route.isFirst);
-      await CalendarAction.responseCalendarInvitation(
-        status: EventAttendeeResponseStatus.declined,
-        event: widget.event!,
-        context: context,
-        tabType: widget.tabType,
-      );
+      await CalendarAction.responseCalendarInvitation(status: EventAttendeeResponseStatus.declined, event: widget.event!, context: context, tabType: widget.tabType);
     } else {
       Navigator.of(Utils.mainContext).maybePop();
       await CalendarAction.editCalendarEvent(
@@ -920,10 +954,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
           borderRadius: BorderRadius.circular(4),
           border: rruleL10n == null || rrule == null ? Border.all(color: context.surfaceVariant, width: 1) : null,
           backgroundColor: rruleL10n == null || rrule == null ? Colors.transparent : context.primary,
-          padding: EdgeInsets.symmetric(
-            horizontal: 6 + (rruleL10n == null || rrule == null ? 0 : 1),
-            vertical: 4 + (rruleL10n == null || rrule == null ? 0 : 1),
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 6 + (rruleL10n == null || rrule == null ? 0 : 1), vertical: 4 + (rruleL10n == null || rrule == null ? 0 : 1)),
         ),
         child: Text(
           maxLines: 1,
@@ -1137,11 +1168,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                             shortcuts: [
                               VisirButtonKeyboardShortcut(
                                 message: context.tr.task_action_duplicate,
-                                keys: [
-                                  LogicalKeyboardKey.keyD,
-                                  if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                  if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                ],
+                                keys: [LogicalKeyboardKey.keyD, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                               ),
                             ],
                           ),
@@ -1157,17 +1184,9 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                             shortcuts: [
                               VisirButtonKeyboardShortcut(
                                 message: context.tr.task_action_delete,
-                                keys: [
-                                  LogicalKeyboardKey.backspace,
-                                  if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                  if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                ],
+                                keys: [LogicalKeyboardKey.backspace, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                                 subkeys: [
-                                  [
-                                    LogicalKeyboardKey.delete,
-                                    if (PlatformX.isApple) LogicalKeyboardKey.meta,
-                                    if (!PlatformX.isApple) LogicalKeyboardKey.control,
-                                  ],
+                                  [LogicalKeyboardKey.delete, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
                                 ],
                                 onTrigger: () {
                                   if (isFocused) return false;
@@ -1202,6 +1221,22 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                           onTap: Navigator.of(Utils.mainContext).maybePop,
                           child: VisirIcon(type: VisirIconType.check, size: 14, isSelected: true),
                         ),
+                      VisirButton(
+                        type: VisirButtonAnimationType.scaleAndOpacity,
+                        style: VisirButtonStyle(width: 24, height: 24, borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(right: 4)),
+                        options: VisirButtonOptions(
+                          tabType: widget.tabType,
+                          bypassTextField: true,
+                          shortcuts: [
+                            VisirButtonKeyboardShortcut(
+                              message: 'Start chat',
+                              keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                            ),
+                          ],
+                        ),
+                        onTap: startChat,
+                        child: VisirIcon(type: VisirIconType.at, color: context.onInverseSurface, size: 14, isSelected: true),
+                      ),
                       if (isModifiable && !isRequest)
                         VisirButton(
                           type: VisirButtonAnimationType.scaleAndOpacity,
@@ -1510,33 +1545,13 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                                         child: Row(
                                                           children: [
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.accepted)
-                                                              VisirIcon(
-                                                                type: VisirIconType.checkWithCircle,
-                                                                size: 12,
-                                                                color: context.errorContainer,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.checkWithCircle, size: 12, color: context.errorContainer, isSelected: true),
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.tentative)
-                                                              VisirIcon(
-                                                                type: VisirIconType.helpWithCircle,
-                                                                size: 12,
-                                                                color: context.secondaryContainer,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.helpWithCircle, size: 12, color: context.secondaryContainer, isSelected: true),
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.declined)
-                                                              VisirIcon(
-                                                                type: VisirIconType.closeWithCircle,
-                                                                size: 12,
-                                                                color: context.error,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.closeWithCircle, size: 12, color: context.error, isSelected: true),
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.needsAction)
-                                                              VisirIcon(
-                                                                type: VisirIconType.unknownWithCircle,
-                                                                size: 12,
-                                                                color: context.onBackground,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.unknownWithCircle, size: 12, color: context.onBackground, isSelected: true),
                                                             if (attendee[index].responseStatus != null) SizedBox(width: 4),
                                                             Expanded(
                                                               child: Padding(
@@ -1584,12 +1599,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
-                                                        Text(
-                                                          data.email!,
-                                                          style: context.bodyMedium!.textColor(context.shadow),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
-                                                        ),
+                                                        Text(data.email!, style: context.bodyMedium!.textColor(context.shadow), maxLines: 1, overflow: TextOverflow.ellipsis),
                                                         if (data.displayName != null && data.displayName!.isNotEmpty)
                                                           Padding(
                                                             padding: const EdgeInsets.only(top: 4.0),
@@ -1628,9 +1638,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                                         .read(connectionListControllerProvider.notifier)
                                                         .search(provider: oauth.uniqueId, query: query);
 
-                                                    emailConnections.removeWhere(
-                                                      (p) => attendee.map((e) => e.email ?? '').toSet().intersection(([p.email]).toSet()).isNotEmpty,
-                                                    );
+                                                    emailConnections.removeWhere((p) => attendee.map((e) => e.email ?? '').toSet().intersection(([p.email]).toSet()).isNotEmpty);
                                                     emailConnections.forEach((p) {
                                                       final email = p.email;
                                                       final name = p.name;
@@ -1761,9 +1769,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                                 (conferenceLink ?? '').replaceFirst('https://', '').replaceFirst('http://', ''),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: isHover
-                                                    ? context.bodyLarge?.textColor(context.primary).textUnderline
-                                                    : context.bodyLarge?.textColor(context.primary),
+                                                style: isHover ? context.bodyLarge?.textColor(context.primary).textUnderline : context.bodyLarge?.textColor(context.primary),
                                               ),
                                             ),
                                           ),
@@ -1859,19 +1865,11 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                               Container(
                                                 width: 16,
                                                 height: 16,
-                                                decoration: BoxDecoration(
-                                                  color: ColorX.fromHex(calendar.backgroundColor),
-                                                  borderRadius: BorderRadius.circular(4),
-                                                ),
+                                                decoration: BoxDecoration(color: ColorX.fromHex(calendar.backgroundColor), borderRadius: BorderRadius.circular(4)),
                                               ),
                                               SizedBox(width: 12),
                                               Expanded(
-                                                child: Text(
-                                                  calendar.name,
-                                                  style: context.bodyMedium!.textColor(context.shadow),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
+                                                child: Text(calendar.name, style: context.bodyMedium!.textColor(context.shadow), maxLines: 1, overflow: TextOverflow.ellipsis),
                                               ),
                                               SizedBox(width: 12),
                                             ],
@@ -1899,12 +1897,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                           Flexible(
                                             child: Container(
                                               constraints: BoxConstraints(maxWidth: 120),
-                                              child: Text(
-                                                calendar!.name,
-                                                style: context.bodyMedium?.textColor(context.shadow),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
+                                              child: Text(calendar!.name, style: context.bodyMedium?.textColor(context.shadow), maxLines: 1, overflow: TextOverflow.ellipsis),
                                             ),
                                           ),
                                         ],
@@ -1960,11 +1953,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                         border: Border.all(color: context.surfaceVariant, width: 1),
                                         padding: EdgeInsets.all(5),
                                       ),
-                                      options: VisirButtonOptions(
-                                        tabType: widget.tabType,
-                                        message: context.tr.add_reminder,
-                                        tooltipLocation: bottomButtonTooltipLocation,
-                                      ),
+                                      options: VisirButtonOptions(tabType: widget.tabType, message: context.tr.add_reminder, tooltipLocation: bottomButtonTooltipLocation),
                                       child: VisirIcon(type: VisirIconType.notification, size: 16, isSelected: true),
                                     ),
                                   if (isOwned
@@ -1981,11 +1970,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                         margin: EdgeInsets.only(left: 6),
                                         padding: EdgeInsets.all(5),
                                       ),
-                                      options: VisirButtonOptions(
-                                        tabType: widget.tabType,
-                                        message: context.tr.add_conference,
-                                        tooltipLocation: bottomButtonTooltipLocation,
-                                      ),
+                                      options: VisirButtonOptions(tabType: widget.tabType, message: context.tr.add_conference, tooltipLocation: bottomButtonTooltipLocation),
                                       onTap: () {
                                         isEdited = true;
                                         if (conferenceLink == null) {
@@ -2022,11 +2007,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                             children: [
                               Expanded(child: Text(context.tr.going_question, style: context.bodyLarge?.textColor(context.outlineVariant))),
                               SizedBox(width: 24),
-                              ...[
-                                  EventAttendeeResponseStatus.accepted,
-                                  EventAttendeeResponseStatus.declined,
-                                  EventAttendeeResponseStatus.tentative,
-                                ].map<Widget>((e) {
+                              ...[EventAttendeeResponseStatus.accepted, EventAttendeeResponseStatus.declined, EventAttendeeResponseStatus.tentative].map<Widget>((e) {
                                   final myStatus = attendee.firstWhere((e) => e.email == calendar?.email).responseStatus;
                                   return Expanded(
                                     child: VisirButton(
@@ -2045,12 +2026,7 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
                                         if (widget.event == null) return;
                                         loadingState = e;
                                         setState(() {});
-                                        await CalendarAction.responseCalendarInvitation(
-                                          status: e,
-                                          event: widget.event!,
-                                          context: context,
-                                          tabType: widget.tabType,
-                                        );
+                                        await CalendarAction.responseCalendarInvitation(status: e, event: widget.event!, context: context, tabType: widget.tabType);
                                         loadingState = null;
                                         setState(() {});
                                         Navigator.of(Utils.mainContext).popUntil((route) => route.isFirst);

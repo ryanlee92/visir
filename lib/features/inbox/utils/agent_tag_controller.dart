@@ -44,7 +44,14 @@ class AgentTagController extends QuillController {
   set editingMessageId(String? value) {
     if (value == _editingMessageId) return;
     _editingMessageId = value;
-    notifyListeners();
+    try {
+      notifyListeners();
+    } catch (e) {
+      // Controller may be disposed, ignore
+      if (!e.toString().contains('disposed')) {
+        rethrow;
+      }
+    }
   }
 
   String? get editingMessageId => _editingMessageId;
@@ -64,7 +71,14 @@ class AgentTagController extends QuillController {
     document = Document.fromJson([
       {'insert': textWithNewline},
     ]);
-    notifyListeners();
+    try {
+      notifyListeners();
+    } catch (e) {
+      // Controller may be disposed, ignore
+      if (!e.toString().contains('disposed')) {
+        rethrow;
+      }
+    }
   }
 
   TextEditingValue get value => TextEditingValue(text: text, selection: selection);
@@ -73,11 +87,30 @@ class AgentTagController extends QuillController {
     document = Document.fromJson([
       {'insert': value.text},
     ]);
-    updateSelection(value.selection, ChangeSource.local);
-    notifyListeners();
+    try {
+      updateSelection(value.selection, ChangeSource.local);
+      notifyListeners();
+    } catch (e) {
+      // Controller may be disposed, ignore
+      if (!e.toString().contains('disposed')) {
+        rethrow;
+      }
+    }
   }
 
   bool get isMobileView => PlatformX.isMobileView;
+
+  @override
+  void updateSelection(TextSelection newSelection, ChangeSource source) {
+    try {
+      super.updateSelection(newSelection, source);
+    } catch (e) {
+      // Controller may be disposed, ignore
+      if (!e.toString().contains('disposed')) {
+        rethrow;
+      }
+    }
+  }
 
   void addTaggedData({TaskEntity? task, EventEntity? event, InboxEntity? inbox, ConnectionEntity? connection, MessageChannelEntity? channel, ProjectEntity? project}) {
     if (task != null) taggedTasks.add(task);
@@ -103,7 +136,23 @@ class AgentTagController extends QuillController {
   void setData({required String html, required String? editingMessageId}) {
     document = Document.fromJson(html_to_delta.HtmlToDelta().convert(html, transformTableAsEmbed: false).toJson());
     this.editingMessageId = editingMessageId;
-    notifyListeners();
+    try {
+      notifyListeners();
+    } catch (e) {
+      // Controller may be disposed, ignore
+      if (!e.toString().contains('disposed')) {
+        rethrow;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    print('[AgentTagController] dispose() called');
+    print('[AgentTagController] Stack trace:');
+    print(StackTrace.current);
+    super.dispose();
+    print('[AgentTagController] dispose() completed');
   }
 }
 

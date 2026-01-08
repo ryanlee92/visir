@@ -28,6 +28,7 @@ import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/color_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/presentation/widgets/collapse_text_field.dart';
@@ -40,6 +41,7 @@ import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/presentation/widgets/mobile_linked_message_mail_section.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/preference/application/connection_list_controller.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
@@ -296,6 +298,81 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
     if (widget.onCalendarChanged != null) {
       widget.onCalendarChanged!(calendar);
     }
+  }
+
+  void startChat() {
+    print('[startChat] MobileCalendarEditWidget: startChat called');
+    // Get current event - only tag if event exists
+    EventEntity? currentEvent = widget.event;
+    print('[startChat] MobileCalendarEditWidget: widget.event = ${widget.event?.uniqueId}');
+    if (currentEvent == null) {
+      print('[startChat] MobileCalendarEditWidget: currentEvent is null, returning');
+      return;
+    }
+
+    print('[startChat] MobileCalendarEditWidget: currentEvent = ${currentEvent.uniqueId}, title = ${currentEvent.title}');
+    print('[startChat] MobileCalendarEditWidget: Navigating to home tab');
+
+    // Navigate to home tab
+    Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+    tabNotifier.value = TabType.home;
+    UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+
+    print('[startChat] MobileCalendarEditWidget: Tab switched, waiting for postFrameCallback');
+
+    // Add tag to AgentInputField after navigation - retry multiple times
+    void tryAddTag({int retryCount = 0}) {
+      // Find AgentInputFieldState from widget tree
+      AgentInputFieldState? agentInputFieldState;
+      try {
+        agentInputFieldState = AgentInputField.of(Utils.mainContext);
+        print('[startChat] MobileCalendarEditWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
+      } catch (e) {
+        print('[startChat] MobileCalendarEditWidget: Error finding via widget tree: $e');
+      }
+      
+      // Check if state is valid and mounted
+      if (agentInputFieldState != null && agentInputFieldState.mounted) {
+        // Check if messageController is still valid (not disposed)
+        try {
+          // Try to access messageController to check if it's disposed
+          final controller = agentInputFieldState.messageController;
+          final _ = controller.text; // This will throw if disposed
+          
+          print('[startChat] MobileCalendarEditWidget: Adding tag for event ${currentEvent.uniqueId}');
+          agentInputFieldState.addEventTag(currentEvent);
+          agentInputFieldState.requestFocus();
+          print('[startChat] MobileCalendarEditWidget: Tag added and focus requested');
+        } catch (e) {
+          print('[startChat] MobileCalendarEditWidget: messageController is disposed or invalid: $e');
+          if (retryCount < 5) {
+            print('[startChat] MobileCalendarEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+            Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                tryAddTag(retryCount: retryCount + 1);
+              });
+            });
+          } else {
+            print('[startChat] MobileCalendarEditWidget: Failed after 5 retries - controller disposed');
+          }
+        }
+      } else if (retryCount < 5) {
+        print('[startChat] MobileCalendarEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+        Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            tryAddTag(retryCount: retryCount + 1);
+          });
+        });
+      } else {
+        print('[startChat] MobileCalendarEditWidget: Failed after 5 retries');
+      }
+    }
+
+    Future.delayed(Duration(milliseconds: 300), () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        tryAddTag();
+      });
+    });
   }
 
   void setStartDateTime(DateTime dateTime) {
@@ -847,6 +924,18 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                       },
                       icon: VisirIconType.copy,
                     ),
+                  VisirAppBarButton(
+                    onTap: widget.event != null ? startChat : null,
+                    options: VisirButtonOptions(
+                      shortcuts: [
+                        VisirButtonKeyboardShortcut(
+                          message: 'Start chat',
+                          keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                        ),
+                      ],
+                    ),
+                    child: VisirIcon(type: VisirIconType.at, color: context.onInverseSurface, size: 16, isSelected: true),
+                  ),
                   if (isModifiable) VisirAppBarButton(onTap: isSavable == true ? save : null, icon: VisirIconType.check),
                 ],
               ),

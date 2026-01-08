@@ -28,6 +28,7 @@ import 'package:Visir/features/common/presentation/widgets/showcase_wrapper.dart
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/inbox/presentation/widgets/simple_linked_message_mail_section.dart';
+import 'package:Visir/features/inbox/presentation/widgets/agent_input_field.dart';
 import 'package:Visir/features/preference/domain/entities/local_pref_entity.dart';
 import 'package:Visir/features/task/actions.dart';
 import 'package:Visir/features/task/application/calendar_task_list_controller.dart';
@@ -449,6 +450,99 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
     Navigator.maybeOf(Utils.mainContext)?.maybePop();
   }
 
+  void startChat() {
+    print('[startChat] TaskSimpleCreateWidget: startChat called');
+    // Get current task
+    TaskEntity? currentTask = widget.task;
+    print('[startChat] TaskSimpleCreateWidget: widget.task = ${widget.task?.id}, title = $title');
+    if (currentTask == null && title?.isNotEmpty == true) {
+      print('[startChat] TaskSimpleCreateWidget: Creating temporary task');
+      // Create a temporary task entity for tagging
+      final user = ref.read(authControllerProvider).requireValue;
+      currentTask = TaskEntity(
+        id: taskId,
+        ownerId: user.id,
+        title: title,
+        description: descriptionController.value.text,
+        startAt: widget.forceUnscheduled == true ? null : startDate,
+        endAt: widget.forceUnscheduled == true ? null : endDate.add(Duration(days: isAllDay ? 1 : 0)),
+        isAllDay: widget.forceUnscheduled == true ? null : isAllDay,
+        projectId: project.uniqueId,
+        createdAt: DateTime.now(),
+        status: TaskStatus.none,
+      );
+    }
+
+    if (currentTask == null) {
+      print('[startChat] TaskSimpleCreateWidget: currentTask is null, returning');
+      return;
+    }
+
+    print('[startChat] TaskSimpleCreateWidget: currentTask = ${currentTask.id}, title = ${currentTask.title}');
+    print('[startChat] TaskSimpleCreateWidget: Navigating to home tab');
+
+    // Navigate to home tab
+    Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
+    tabNotifier.value = TabType.home;
+    UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
+
+    print('[startChat] TaskSimpleCreateWidget: Tab switched, waiting for postFrameCallback');
+
+    // Add tag to AgentInputField after navigation - retry multiple times
+    void tryAddTag({int retryCount = 0}) {
+      // Find AgentInputFieldState from widget tree
+      AgentInputFieldState? agentInputFieldState;
+      try {
+        agentInputFieldState = AgentInputField.of(Utils.mainContext);
+        print('[startChat] TaskSimpleCreateWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
+      } catch (e) {
+        print('[startChat] TaskSimpleCreateWidget: Error finding via widget tree: $e');
+      }
+      
+      // Check if state is valid and mounted
+      if (agentInputFieldState != null && agentInputFieldState.mounted && currentTask != null) {
+        // Check if messageController is still valid (not disposed)
+        try {
+          // Try to access messageController to check if it's disposed
+          final controller = agentInputFieldState.messageController;
+          final _ = controller.text; // This will throw if disposed
+          
+          print('[startChat] TaskSimpleCreateWidget: Adding tag for task ${currentTask.id}');
+          agentInputFieldState.addTaskTag(currentTask);
+          agentInputFieldState.requestFocus();
+          print('[startChat] TaskSimpleCreateWidget: Tag added and focus requested');
+        } catch (e) {
+          print('[startChat] TaskSimpleCreateWidget: messageController is disposed or invalid: $e');
+          if (retryCount < 5) {
+            print('[startChat] TaskSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+            Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                tryAddTag(retryCount: retryCount + 1);
+              });
+            });
+          } else {
+            print('[startChat] TaskSimpleCreateWidget: Failed after 5 retries - controller disposed');
+          }
+        }
+      } else if (retryCount < 5) {
+        print('[startChat] TaskSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
+        Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            tryAddTag(retryCount: retryCount + 1);
+          });
+        });
+      } else {
+        print('[startChat] TaskSimpleCreateWidget: Failed after 5 retries');
+      }
+    }
+
+    Future.delayed(Duration(milliseconds: 300), () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        tryAddTag();
+      });
+    });
+  }
+
   void updateProject(ProjectEntity project) {
     isEdited = true;
     this.project = project;
@@ -565,6 +659,22 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
                       ),
                       onTap: () => Navigator.maybeOf(Utils.mainContext)?.maybePop(),
                       child: VisirIcon(type: VisirIconType.check, color: context.onInverseSurface, size: 14, isSelected: true),
+                    ),
+                    VisirButton(
+                      type: VisirButtonAnimationType.scaleAndOpacity,
+                      style: VisirButtonStyle(width: 24, height: 24, borderRadius: BorderRadius.circular(4), margin: EdgeInsets.only(right: 4)),
+                      options: VisirButtonOptions(
+                        tabType: widget.tabType,
+                        bypassTextField: true,
+                        shortcuts: [
+                          VisirButtonKeyboardShortcut(
+                            message: 'Start chat',
+                            keys: [LogicalKeyboardKey.keyL, if (PlatformX.isApple) LogicalKeyboardKey.meta, if (!PlatformX.isApple) LogicalKeyboardKey.control],
+                          ),
+                        ],
+                      ),
+                      onTap: startChat,
+                      child: VisirIcon(type: VisirIconType.at, color: context.onInverseSurface, size: 14, isSelected: true),
                     ),
                     VisirButton(
                       type: VisirButtonAnimationType.scaleAndOpacity,

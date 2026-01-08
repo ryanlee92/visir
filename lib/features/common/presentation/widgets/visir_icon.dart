@@ -151,6 +151,7 @@ enum VisirIconType {
   google,
   apple,
   bookmark,
+  at,
 }
 
 extension VisirIconTypeX on VisirIconType {
@@ -454,6 +455,8 @@ extension VisirIconTypeX on VisirIconType {
         return HugeIcons.strokeRoundedApple;
       case VisirIconType.bookmark:
         return isSelected ? HugeIcons.solidRoundedBookBookmark02 : HugeIcons.strokeRoundedBookBookmark02;
+      case VisirIconType.at:
+        return isSelected ? HugeIcons.solidRoundedAt : HugeIcons.strokeRoundedAt;
     }
   }
 }
