@@ -2824,11 +2824,8 @@ class McpFunctionExecutor {
     final eventId = args['eventId'] as String?;
     final inboxId = args['inboxId'] as String?;
 
-    print('[getPreviousContext] Called with args: taskId=$taskId, eventId=$eventId, inboxId=$inboxId');
-
     // At least one ID must be provided
     if ((taskId == null || taskId.isEmpty) && (eventId == null || eventId.isEmpty) && (inboxId == null || inboxId.isEmpty)) {
-      print('[getPreviousContext] Error: At least one of taskId, eventId, or inboxId is required');
       return {'success': false, 'error': 'At least one of taskId, eventId, or inboxId is required'};
     }
 
@@ -2839,53 +2836,35 @@ class McpFunctionExecutor {
 
       // If inboxId is provided, try to find linked task or event
       if (inboxId != null && inboxId.isNotEmpty) {
-        print('[getPreviousContext] Looking up inbox with id: $inboxId');
         final inboxList = ref.read(inboxControllerProvider);
         inbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
 
         if (inbox != null) {
-          print(
-            '[getPreviousContext] Found inbox: ${inbox.id}, linkedTask: ${inbox.linkedTask != null ? 'exists (${inbox.linkedTask!.tasks.length} tasks)' : 'null'}, linkedMail: ${inbox.linkedMail != null ? 'exists' : 'null'}, linkedMessage: ${inbox.linkedMessage != null ? 'exists' : 'null'}',
-          );
-
           // First, try to find linked task
           if (inbox.linkedTask != null && inbox.linkedTask!.tasks.isNotEmpty) {
             effectiveTaskId = inbox.linkedTask!.tasks.first.id;
-            print('[getPreviousContext] Using linked taskId: $effectiveTaskId');
             // Check if the linked task has a linkedEvent
             final linkedTask = inbox.linkedTask!.tasks.first;
             if (linkedTask.linkedEvent != null) {
               effectiveEventId = linkedTask.linkedEvent!.eventId;
-              print('[getPreviousContext] Using linked eventId from task: $effectiveEventId');
             }
-          } else {
-            print('[getPreviousContext] Inbox has no linked task, will use inbox directly');
           }
-        } else {
-          print('[getPreviousContext] Warning: Inbox not found with id: $inboxId');
         }
       }
 
       // If we have taskId or eventId, use the provider (which handles search and generation)
       if (effectiveTaskId != null || effectiveEventId != null) {
-        print('[getPreviousContext] Fetching summary with taskId=$effectiveTaskId, eventId=$effectiveEventId');
-
         // Get conversation summary using inboxConversationSummaryProvider
         final summaryAsync = ref.read(inboxConversationSummaryProvider(effectiveTaskId, effectiveEventId));
         final summary = await summaryAsync.when(
           data: (value) => Future.value(value),
           loading: () => Future.value(null),
           error: (error, stackTrace) {
-            print('[getPreviousContext] Error from provider: $error');
-            print('[getPreviousContext] StackTrace: $stackTrace');
             return Future.value(null);
           },
         );
 
-        print('[getPreviousContext] Summary result: ${summary != null && summary.isNotEmpty ? 'Found (length: ${summary.length})' : 'Empty or null'}');
-
         if (summary == null || summary.isEmpty) {
-          print('[getPreviousContext] Returning empty context message');
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
@@ -2893,7 +2872,6 @@ class McpFunctionExecutor {
           };
         }
 
-        print('[getPreviousContext] Successfully retrieved context (length: ${summary.length})');
         return {
           'success': true,
           'result': {'summary': summary},
@@ -2902,7 +2880,6 @@ class McpFunctionExecutor {
       } else if (inbox != null) {
         // If only inboxId is provided and no linked task/event, use inbox directly
         // This follows the same logic as inboxConversationSummaryController
-        print('[getPreviousContext] Using inbox directly for summary generation');
 
         // Import the private function logic by calling it through a provider
         // Since we can't call private functions, we'll use the repository directly
@@ -2912,8 +2889,6 @@ class McpFunctionExecutor {
         // Extract linkedMail/linkedMessage from inbox
         final linkedMail = inbox.linkedMail;
         final linkedMessage = inbox.linkedMessage;
-
-        print('[getPreviousContext] Inbox has linkedMail: ${linkedMail != null}, linkedMessage: ${linkedMessage != null}');
 
         // Extract search keywords from inbox title/description
         final keywordsResult = await repository.extractSearchKeywords(
@@ -2926,15 +2901,12 @@ class McpFunctionExecutor {
 
         final keywords = keywordsResult.fold((failure) => null, (keywords) => keywords);
         if (keywords == null || keywords.isEmpty) {
-          print('[getPreviousContext] No keywords extracted, returning empty');
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
             'message': '이전 컨텍스트가 없습니다.',
           };
         }
-
-        print('[getPreviousContext] Extracted keywords: $keywords');
 
         // Get all integrated OAuth accounts
         final mailOAuths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
@@ -2950,7 +2922,6 @@ class McpFunctionExecutor {
           final threadKey = '${linkedMail.threadId}_${linkedMail.hostMail}';
           if (!processedThreadIds.contains(threadKey)) {
             processedThreadIds.add(threadKey);
-            print('[getPreviousContext] Processing linkedMail thread: $threadKey');
 
             final mailRepository = ref.watch(mailRepositoryProvider);
             final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
@@ -2967,7 +2938,7 @@ class McpFunctionExecutor {
 
               await threadResult.fold(
                 (failure) async {
-                  print('[getPreviousContext] Failed to fetch mail thread: $failure');
+                  // Failed to fetch thread
                 },
                 (threadMails) async {
                   final date = ref.read(inboxListDateProvider);
@@ -2977,7 +2948,6 @@ class McpFunctionExecutor {
                     final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
                     searchResults.add(InboxEntity.fromMail(mail, config));
                   }
-                  print('[getPreviousContext] Added ${threadMails.length} mails from thread');
                 },
               );
             }
@@ -2988,7 +2958,6 @@ class McpFunctionExecutor {
 
           if (!processedThreadIds.contains(threadKey)) {
             processedThreadIds.add(threadKey);
-            print('[getPreviousContext] Processing linkedMessage thread: $threadKey');
 
             final chatRepository = ref.watch(chatRepositoryProvider);
             final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
@@ -3003,7 +2972,7 @@ class McpFunctionExecutor {
 
                 await threadResult.fold(
                   (failure) async {
-                    print('[getPreviousContext] Failed to fetch message thread: $failure');
+                    // Failed to fetch thread replies
                   },
                   (threadData) async {
                     final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
@@ -3021,7 +2990,6 @@ class McpFunctionExecutor {
                         searchResults.add(InboxEntity.fromChat(message, config, msgChannel, member, _channels, _members, _groups));
                       }
                     }
-                    print('[getPreviousContext] Added ${threadData.messages.length} messages from thread');
                   },
                 );
               }
@@ -3033,7 +3001,6 @@ class McpFunctionExecutor {
         // This is a simplified version - full implementation would include all search logic
         // For now, if we have linkedMail/linkedMessage, we use those; otherwise search
         if (searchResults.isEmpty && keywords.isNotEmpty) {
-          print('[getPreviousContext] Performing search with keywords: $keywords');
           // Note: Full search implementation would be here, but for now we'll use the inbox itself
           // The full implementation would search mail, chat, and calendar similar to _searchAndGenerateContext
         }
@@ -3042,15 +3009,12 @@ class McpFunctionExecutor {
         searchResults = searchResults.take(20).toList();
 
         if (searchResults.isEmpty) {
-          print('[getPreviousContext] No search results found');
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
             'message': '이전 컨텍스트가 없습니다.',
           };
         }
-
-        print('[getPreviousContext] Found ${searchResults.length} search results, generating summary');
 
         // Create virtual inbox from inbox or search results
         InboxEntity? baseInbox;
@@ -3075,7 +3039,6 @@ class McpFunctionExecutor {
         final summary = summaryResult.fold((failure) => null, (summary) => summary);
 
         if (summary == null || summary.isEmpty) {
-          print('[getPreviousContext] Summary generation returned empty');
           return {
             'success': true,
             'result': {'summary': 'No previous context available'},
@@ -3083,14 +3046,12 @@ class McpFunctionExecutor {
           };
         }
 
-        print('[getPreviousContext] Successfully generated context (length: ${summary.length})');
         return {
           'success': true,
           'result': {'summary': summary},
           'message': '이전 컨텍스트를 가져왔습니다.',
         };
       } else {
-        print('[getPreviousContext] No valid taskId, eventId, or inboxId provided');
         return {
           'success': true,
           'result': {'summary': 'No previous context available'},
@@ -3098,8 +3059,6 @@ class McpFunctionExecutor {
         };
       }
     } catch (e, stackTrace) {
-      print('[getPreviousContext] Error: $e');
-      print('[getPreviousContext] StackTrace: $stackTrace');
       return {'success': false, 'error': 'Failed to get previous context: ${e.toString()}'};
     }
   }

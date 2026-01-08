@@ -129,8 +129,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
     required List<InboxEntity> filteredInboxes,
   }) async {
     try {
-      print('[executeMcpFunctionDirectly] Executing function: $mcpFunctionName');
-
       final executor = McpFunctionExecutor();
       Map<String, dynamic> functionArgs = {};
 
@@ -148,8 +146,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
       // 조합 액션 처리
       if (mcpFunctionName == 'markDoneAndReply' && task != null) {
         // markDoneAndReply는 두 개의 함수를 순차 호출
-        print('[executeMcpFunctionDirectly] Executing markDoneAndReply: toggleTaskStatus + reply');
-
         // 첫 번째: toggleTaskStatus
         final toggleResult = await executor.executeFunction(
           'toggleTaskStatus',
@@ -159,7 +155,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
           availableEvents: taggedEvents,
           availableInboxes: filteredInboxes,
         );
-        print('[executeMcpFunctionDirectly] toggleTaskStatus result: $toggleResult');
 
         // 두 번째: replyMail 또는 replyMessage
         String replyFunction = task.linkedMails.isNotEmpty ? 'replyMail' : (task.linkedMessages.isNotEmpty ? 'replyMessage' : '');
@@ -175,7 +170,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
             availableEvents: taggedEvents,
             availableInboxes: filteredInboxes,
           );
-          print('[executeMcpFunctionDirectly] $replyFunction result: $replyResult');
 
           // 결과 메시지 추가
           final resultMessage = toggleResult['success'] == true && replyResult['success'] == true ? (replyResult['message'] as String? ?? '완료되었습니다.') : '오류가 발생했습니다.';
@@ -194,12 +188,9 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
         return;
       } else if (mcpFunctionName == 'convertBraindumpToTask' && task != null) {
         // convertBraindumpToTask는 updateTask로 status를 none으로 변경
-        print('[executeMcpFunctionDirectly] Executing convertBraindumpToTask: updateTask');
         functionArgs = {'taskId': task.id, 'status': 'none'};
         mcpFunctionName = 'updateTask';
       }
-
-      print('[executeMcpFunctionDirectly] Executing function: $mcpFunctionName with args: $functionArgs');
 
       // MCP 함수 실행
       final result = await executor.executeFunction(
@@ -210,8 +201,6 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
         availableEvents: taggedEvents,
         availableInboxes: filteredInboxes,
       );
-
-      print('[executeMcpFunctionDirectly] Function result: $result');
 
       // 결과 메시지 추가
       String resultMessage;
@@ -229,31 +218,14 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
         resultMessage = result['error'] as String? ?? '오류가 발생했습니다.';
       }
 
-      print('[executeMcpFunctionDirectly] Result message: $resultMessage');
-      print('[executeMcpFunctionDirectly] Result message length: ${resultMessage.length}');
-
       // State 업데이트를 위해 notifier를 통해 업데이트
       final notifier = ref.read(agentActionControllerProvider.notifier);
       final currentState = ref.read(agentActionControllerProvider);
-      print('[executeMcpFunctionDirectly] Current messages count: ${currentState.messages.length}');
-
       final updatedMessages = [...currentState.messages, AgentActionMessage(role: 'assistant', content: resultMessage)];
-      print('[executeMcpFunctionDirectly] Updated messages count: ${updatedMessages.length}');
 
       // State를 직접 업데이트 (동기적으로)
       notifier.state = currentState.copyWith(messages: updatedMessages, isLoading: false);
-
-      // 업데이트 확인
-      final updatedState = ref.read(agentActionControllerProvider);
-      print('[executeMcpFunctionDirectly] After update messages count: ${updatedState.messages.length}');
-      if (updatedState.messages.isNotEmpty) {
-        final lastMessage = updatedState.messages.last.content;
-        print('[executeMcpFunctionDirectly] Last message content: ${lastMessage.length > 100 ? lastMessage.substring(0, 100) : lastMessage}...');
-      }
-    } catch (e, stackTrace) {
-      print('[executeMcpFunctionDirectly] Error: $e');
-      print('[executeMcpFunctionDirectly] StackTrace: $stackTrace');
-
+    } catch (e) {
       final currentState = ref.read(agentActionControllerProvider);
       final updatedMessages = [...currentState.messages, AgentActionMessage(role: 'assistant', content: '오류가 발생했습니다: ${e.toString()}')];
       ref.read(agentActionControllerProvider.notifier).state = currentState.copyWith(messages: updatedMessages, isLoading: false);
