@@ -210,13 +210,9 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
     isAllDayInitial = isAllDay;
 
     final now = DateTime.now();
-    startDate =
-        widget.initialStartDate ?? widget.startDate ?? widget.event?.startDate ?? DateTime(now.year, now.month, now.day, now.hour, (now.minute ~/ 15 + 1) * 15);
+    startDate = widget.initialStartDate ?? widget.startDate ?? widget.event?.startDate ?? DateTime(now.year, now.month, now.day, now.hour, (now.minute ~/ 15 + 1) * 15);
     endDate =
-        widget.initialEndDate ??
-        widget.endDate ??
-        widget.event?.endDate ??
-        startDate.add(isAllDay ? Duration(days: 1) : Duration(minutes: user.defaultDurationInMinutes ?? 60));
+        widget.initialEndDate ?? widget.endDate ?? widget.event?.endDate ?? startDate.add(isAllDay ? Duration(days: 1) : Duration(minutes: user.defaultDurationInMinutes ?? 60));
 
     conferenceLink = widget.event?.conferenceLink;
 
@@ -250,19 +246,13 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
     final calendarHide = ref.read(calendarHideProvider(widget.tabType));
     final lastUsedCalendarIds = ref.read(lastUsedCalendarIdProvider);
     calendars = calendarMap.values.expand((e) => e).toList()
-      ..removeWhere(
-        (c) =>
-            c.modifiable != true || calendarHide.contains(c.uniqueId) == true && c.uniqueId != (user.userDefaultCalendarId ?? lastUsedCalendarIds.firstOrNull),
-      )
+      ..removeWhere((c) => c.modifiable != true || calendarHide.contains(c.uniqueId) == true && c.uniqueId != (user.userDefaultCalendarId ?? lastUsedCalendarIds.firstOrNull))
       ..unique((element) => element.uniqueId);
 
     calendar =
         widget.initialCalendar ??
         widget.event?.calendar ??
-        (calendars
-                .where((e) => e.uniqueId == (widget.event?.calendarUniqueId ?? user.userDefaultCalendarId ?? lastUsedCalendarIds.firstOrNull))
-                .toList()
-                .firstOrNull ??
+        (calendars.where((e) => e.uniqueId == (widget.event?.calendarUniqueId ?? user.userDefaultCalendarId ?? lastUsedCalendarIds.firstOrNull)).toList().firstOrNull ??
             calendars.firstOrNull);
 
     if (calendar != null) {
@@ -301,24 +291,16 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
   }
 
   void startChat() {
-    print('[startChat] MobileCalendarEditWidget: startChat called');
     // Get current event - only tag if event exists
     EventEntity? currentEvent = widget.event;
-    print('[startChat] MobileCalendarEditWidget: widget.event = ${widget.event?.uniqueId}');
     if (currentEvent == null) {
-      print('[startChat] MobileCalendarEditWidget: currentEvent is null, returning');
       return;
     }
-
-    print('[startChat] MobileCalendarEditWidget: currentEvent = ${currentEvent.uniqueId}, title = ${currentEvent.title}');
-    print('[startChat] MobileCalendarEditWidget: Navigating to home tab');
 
     // Navigate to home tab
     Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
     tabNotifier.value = TabType.home;
     UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
-
-    print('[startChat] MobileCalendarEditWidget: Tab switched, waiting for postFrameCallback');
 
     // Add tag to AgentInputField after navigation - retry multiple times
     void tryAddTag({int retryCount = 0}) {
@@ -326,11 +308,10 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
       AgentInputFieldState? agentInputFieldState;
       try {
         agentInputFieldState = AgentInputField.of(Utils.mainContext);
-        print('[startChat] MobileCalendarEditWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
       } catch (e) {
-        print('[startChat] MobileCalendarEditWidget: Error finding via widget tree: $e');
+        // Ignore
       }
-      
+
       // Check if state is valid and mounted
       if (agentInputFieldState != null && agentInputFieldState.mounted) {
         // Check if messageController is still valid (not disposed)
@@ -338,33 +319,24 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
           // Try to access messageController to check if it's disposed
           final controller = agentInputFieldState.messageController;
           final _ = controller.text; // This will throw if disposed
-          
-          print('[startChat] MobileCalendarEditWidget: Adding tag for event ${currentEvent.uniqueId}');
+
           agentInputFieldState.addEventTag(currentEvent);
           agentInputFieldState.requestFocus();
-          print('[startChat] MobileCalendarEditWidget: Tag added and focus requested');
         } catch (e) {
-          print('[startChat] MobileCalendarEditWidget: messageController is disposed or invalid: $e');
           if (retryCount < 5) {
-            print('[startChat] MobileCalendarEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
             Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 tryAddTag(retryCount: retryCount + 1);
               });
             });
-          } else {
-            print('[startChat] MobileCalendarEditWidget: Failed after 5 retries - controller disposed');
           }
         }
       } else if (retryCount < 5) {
-        print('[startChat] MobileCalendarEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
         Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             tryAddTag(retryCount: retryCount + 1);
           });
         });
-      } else {
-        print('[startChat] MobileCalendarEditWidget: Failed after 5 retries');
       }
     }
 
@@ -404,9 +376,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
 
       endDate = dateTime;
       if (startDate.isAfter(dateTime)) {
-        startDate = dateTime.subtract(
-          Duration(minutes: (widget.tabType == TabType.home ? user.userDefaultDurationInMinutes : user.defaultDurationInMinutes) ?? 60),
-        );
+        startDate = dateTime.subtract(Duration(minutes: (widget.tabType == TabType.home ? user.userDefaultDurationInMinutes : user.defaultDurationInMinutes) ?? 60));
       }
 
       savedStartDate = startDate;
@@ -693,11 +663,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                         backgroundColor: context.surfaceVariant,
                         onDateChanged: setStartDateTime,
                       ),
-                      style: VisirButtonStyle(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-                        backgroundColor: context.surface,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      style: VisirButtonStyle(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9), backgroundColor: context.surface, borderRadius: BorderRadius.circular(8)),
                       child: Text(EventEntity.getDateForEditSimple(startDate), style: context.titleSmall?.textColor(context.outlineVariant)),
                     ),
                     if (!isAllDay)
@@ -709,12 +675,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                         forcePopup: true,
                         location: PopupMenuLocation.bottom,
                         type: ContextMenuActionType.tap,
-                        popup: OmniDateTimePicker(
-                          type: OmniDateTimePickerType.time,
-                          initialDate: startDate,
-                          onDateChanged: setStartDateTime,
-                          minutesInterval: 5,
-                        ),
+                        popup: OmniDateTimePicker(type: OmniDateTimePickerType.time, initialDate: startDate, onDateChanged: setStartDateTime, minutesInterval: 5),
                         style: VisirButtonStyle(
                           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
                           backgroundColor: context.surface,
@@ -732,12 +693,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                         forcePopup: true,
                         location: PopupMenuLocation.bottom,
                         type: ContextMenuActionType.tap,
-                        popup: OmniDateTimePicker(
-                          type: OmniDateTimePickerType.date,
-                          initialDate: endDate,
-                          backgroundColor: context.surface,
-                          onDateChanged: setEndDateTime,
-                        ),
+                        popup: OmniDateTimePicker(type: OmniDateTimePickerType.date, initialDate: endDate, backgroundColor: context.surface, onDateChanged: setEndDateTime),
                         style: VisirButtonStyle(
                           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
                           backgroundColor: context.surface,
@@ -761,12 +717,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                             Container(
                               margin: EdgeInsets.only(bottom: 8),
                               decoration: BoxDecoration(color: context.surface, borderRadius: BorderRadius.circular(12)),
-                              child: OmniDateTimePicker(
-                                type: OmniDateTimePickerType.time,
-                                initialDate: endDate,
-                                onDateChanged: setEndDateTime,
-                                minutesInterval: 5,
-                              ),
+                              child: OmniDateTimePicker(type: OmniDateTimePickerType.time, initialDate: endDate, onDateChanged: setEndDateTime, minutesInterval: 5),
                             ),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12),
@@ -1118,10 +1069,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                                           Container(
                                                             width: 16,
                                                             height: 16,
-                                                            decoration: BoxDecoration(
-                                                              color: ColorX.fromHex(calendar.backgroundColor),
-                                                              borderRadius: BorderRadius.circular(4),
-                                                            ),
+                                                            decoration: BoxDecoration(color: ColorX.fromHex(calendar.backgroundColor), borderRadius: BorderRadius.circular(4)),
                                                           ),
                                                           SizedBox(width: 10),
                                                           Expanded(
@@ -1176,14 +1124,9 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                                           margin: EdgeInsets.symmetric(horizontal: 4),
                                                           alignment: Alignment.centerLeft,
                                                           height: 36,
-                                                          backgroundColor: e.uniqueId == calendar!.uniqueId
-                                                              ? ColorX.fromHex(e.backgroundColor)
-                                                              : Colors.transparent,
+                                                          backgroundColor: e.uniqueId == calendar!.uniqueId ? ColorX.fromHex(e.backgroundColor) : Colors.transparent,
                                                           borderRadius: BorderRadius.circular(borderRaidus),
-                                                          border: Border.all(
-                                                            color: e.uniqueId == calendar!.uniqueId ? Colors.transparent : context.surface,
-                                                            width: 1,
-                                                          ),
+                                                          border: Border.all(color: e.uniqueId == calendar!.uniqueId ? Colors.transparent : context.surface, width: 1),
                                                           padding: EdgeInsets.symmetric(horizontal: 8),
                                                         ),
                                                         onTap: () => updateCalendar(e),
@@ -1270,10 +1213,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                               ),
                                             if (attendeeExpanded || attendee.length <= 5)
                                               Padding(
-                                                padding: EdgeInsets.only(
-                                                  top: attendee.length > 5 ? 0 : (attendee.isEmpty ? 8 : 10),
-                                                  bottom: attendee.isEmpty ? 8 : 10,
-                                                ),
+                                                padding: EdgeInsets.only(top: attendee.length > 5 ? 0 : (attendee.isEmpty ? 8 : 10), bottom: attendee.isEmpty ? 8 : 10),
                                                 child: TagEditor<EventAttendeeEntity>(
                                                   enabled: isModifiable,
                                                   offset: 10,
@@ -1311,33 +1251,13 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                                         child: Row(
                                                           children: [
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.accepted)
-                                                              VisirIcon(
-                                                                type: VisirIconType.checkWithCircle,
-                                                                size: 14,
-                                                                color: context.errorContainer,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.checkWithCircle, size: 14, color: context.errorContainer, isSelected: true),
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.tentative)
-                                                              VisirIcon(
-                                                                type: VisirIconType.helpWithCircle,
-                                                                size: 14,
-                                                                color: context.secondaryContainer,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.helpWithCircle, size: 14, color: context.secondaryContainer, isSelected: true),
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.declined)
-                                                              VisirIcon(
-                                                                type: VisirIconType.closeWithCircle,
-                                                                size: 14,
-                                                                color: context.error,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.closeWithCircle, size: 14, color: context.error, isSelected: true),
                                                             if (attendee[index].responseStatus == EventAttendeeResponseStatus.needsAction)
-                                                              VisirIcon(
-                                                                type: VisirIconType.unknownWithCircle,
-                                                                size: 14,
-                                                                color: context.onBackground,
-                                                                isSelected: true,
-                                                              ),
+                                                              VisirIcon(type: VisirIconType.unknownWithCircle, size: 14, color: context.onBackground, isSelected: true),
                                                             if (attendee[index].responseStatus != null) SizedBox(width: 6),
                                                             Expanded(
                                                               child: Padding(
@@ -1426,9 +1346,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                                         .read(connectionListControllerProvider.notifier)
                                                         .search(provider: oauth.uniqueId, query: query);
 
-                                                    emailConnections.removeWhere(
-                                                      (p) => attendee.map((e) => e.email ?? '').toSet().intersection(([p.email]).toSet()).isNotEmpty,
-                                                    );
+                                                    emailConnections.removeWhere((p) => attendee.map((e) => e.email ?? '').toSet().intersection(([p.email]).toSet()).isNotEmpty);
                                                     emailConnections.forEach((p) {
                                                       final email = p.email;
                                                       final name = p.name;
@@ -1689,9 +1607,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                                   SizedBox(width: 10),
                                                   Text(
                                                     context.tr.conference,
-                                                    style: context.titleSmall?.textColor(
-                                                      conferenceLink != null ? context.onPrimary : VisirIcon.disabledColor(context),
-                                                    ),
+                                                    style: context.titleSmall?.textColor(conferenceLink != null ? context.onPrimary : VisirIcon.disabledColor(context)),
                                                   ),
                                                 ],
                                               ),
@@ -1746,9 +1662,7 @@ class _CalendarEditState extends ConsumerState<MobileCalendarEditWidget> {
                                   ? CustomCircularLoadingIndicator(size: 20, color: e.getForegroundColor(context))
                                   : Text(
                                       e.getTitle(context),
-                                      style: context.titleSmall
-                                          ?.copyWith(color: e == myStatus ? context.onTertiary : context.onBackground.withValues(alpha: 0.5))
-                                          .appFont(context),
+                                      style: context.titleSmall?.copyWith(color: e == myStatus ? context.onTertiary : context.onBackground.withValues(alpha: 0.5)).appFont(context),
                                     ),
                             ),
                           );

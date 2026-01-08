@@ -331,10 +331,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   }
 
   void _addTaskTag(TaskEntity task) {
-    print('[_addTaskTag] Called with task: ${task.id}, title: ${task.title}');
-
     if (!mounted) {
-      print('[_addTaskTag] Widget not mounted, returning');
       return;
     }
 
@@ -348,19 +345,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
       // Use _selection to avoid unused variable warning
       if (_selection.start < 0) return;
     } catch (e) {
-      print('[_addTaskTag] messageController is disposed or invalid: $e');
       return;
     }
-
-    print('[_addTaskTag] Current text before: "${controller.text}"');
-    print('[_addTaskTag] Current text length: ${controller.text.length}');
-    print('[_addTaskTag] Current selection: ${controller.selection}');
-    print('[_addTaskTag] Tagged tasks before: ${controller.taggedTasks.length}');
 
     // Check if task is already tagged
     final isAlreadyTagged = controller.taggedTasks.any((t) => t.id == task.id);
     if (isAlreadyTagged) {
-      print('[_addTaskTag] Task already tagged, skipping text insertion');
       // Just focus the input field
       if (mounted) {
         requestFocus();
@@ -370,7 +360,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
     // Add to tagged list
     controller.addTaggedData(task: task);
-    print('[_addTaskTag] Task added to taggedTasks');
 
     // Add @tag to text
     final displayName = task.title ?? 'Untitled';
@@ -379,50 +368,33 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     final selection = controller.selection;
     final insertPosition = selection.end;
 
-    print('[_addTaskTag] Inserting tag string "$tagString" at position $insertPosition');
-    print('[_addTaskTag] Text before insert: "${currentText.substring(0, insertPosition)}"');
-    print('[_addTaskTag] Text after insert: "${currentText.substring(insertPosition)}"');
-
     final newText = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
-    print('[_addTaskTag] New text: "$newText"');
-    print('[_addTaskTag] New text length: ${newText.length}');
 
     try {
       controller.text = newText;
       controller.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
-
-      print('[_addTaskTag] Current text after: "${controller.text}"');
-      print('[_addTaskTag] Current text length after: ${controller.text.length}');
-      print('[_addTaskTag] New selection: ${controller.selection}');
-      print('[_addTaskTag] Document length: ${controller.document.length}');
-      print('[_addTaskTag] Document toPlainText: "${controller.document.toPlainText()}"');
     } catch (e) {
-      print('[_addTaskTag] Error updating messageController: $e');
       if (e.toString().contains('disposed')) {
-        print('[_addTaskTag] Controller was disposed, returning');
         return;
       }
       rethrow;
     }
 
     if (!mounted) {
-      print('[_addTaskTag] Widget not mounted, skipping setState');
       return;
     }
 
     setState(() {});
-    print('[_addTaskTag] setState called, mounted: $mounted');
 
     // Request focus after a short delay
     Future.delayed(Duration(milliseconds: 100), () {
       if (!mounted) {
-        print('[_addTaskTag] Widget not mounted, skipping requestFocus');
         return;
       }
       try {
         requestFocus();
       } catch (e) {
-        print('[_addTaskTag] Error requesting focus: $e');
+        // Ignore
       }
     });
   }
@@ -439,31 +411,22 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
         try {
           widget.focusNode!.requestFocus();
         } catch (e) {
-          print('[requestFocus] Error in postFrameCallback: $e');
+          // Ignore
         }
       });
     } catch (e) {
-      print('[requestFocus] Error requesting focus: $e');
+      // Ignore
     }
   }
 
   void addTaskTag(TaskEntity task) {
     if (!mounted) {
-      print('[addTaskTag] Widget not mounted, returning');
       return;
     }
-    print('[addTaskTag] Called with task: ${task.id}, title: ${task.title}');
-    print('[addTaskTag] Current text before: "${messageController.text}"');
-    print('[addTaskTag] Current selection: ${messageController.selection}');
-    print('[addTaskTag] Tagged tasks before: ${messageController.taggedTasks.length}');
     _addTaskTag(task);
     if (!mounted) {
-      print('[addTaskTag] Widget not mounted after _addTaskTag, returning');
       return;
     }
-    print('[addTaskTag] Current text after: "${messageController.text}"');
-    print('[addTaskTag] Tagged tasks after: ${messageController.taggedTasks.length}');
-    print('[addTaskTag] Document length: ${messageController.document.length}');
   }
 
   void addEventTag(EventEntity event) {
@@ -505,7 +468,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
     // Add to tagged list
     controller.addTaggedData(event: event);
-    print('[addEventTag] Event added to taggedEvents');
 
     // Add @tag to text
     final displayName = event.title ?? 'Untitled';
@@ -514,42 +476,31 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     final selection = controller.selection;
     final insertPosition = selection.end;
 
-    print('[addEventTag] Inserting tag string "$tagString" at position $insertPosition');
-
     try {
       controller.text = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
       controller.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
-
-      print('[addEventTag] Current text after: "${controller.text}"');
-      print('[addEventTag] Tagged events after: ${controller.taggedEvents.length}');
-      print('[addEventTag] Document length: ${controller.document.length}');
     } catch (e) {
-      print('[addEventTag] Error updating messageController: $e');
       if (e.toString().contains('disposed')) {
-        print('[addEventTag] Controller was disposed, returning');
         return;
       }
       rethrow;
     }
 
     if (!mounted) {
-      print('[addEventTag] Widget not mounted, skipping setState');
       return;
     }
 
     setState(() {});
-    print('[addEventTag] setState called');
 
     // Request focus after a short delay
     Future.delayed(Duration(milliseconds: 100), () {
       if (!mounted) {
-        print('[addEventTag] Widget not mounted, skipping requestFocus');
         return;
       }
       try {
         requestFocus();
       } catch (e) {
-        print('[addEventTag] Error requesting focus: $e');
+        // Ignore
       }
     });
   }
@@ -600,11 +551,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   @override
   void initState() {
-    print('[AgentInputFieldState] initState() called');
-    print('[AgentInputFieldState] messageController: ${widget.messageController != null ? "provided" : "null"}');
-    print('[AgentInputFieldState] fieldKey: ${widget.fieldKey != null ? "provided" : "null"}');
-    print('[AgentInputFieldState] Stack trace:');
-    print(StackTrace.current);
     super.initState();
     contextProject = widget.initialProject;
     widget.messageController?.addListener(onChangeContent);
@@ -615,11 +561,8 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         Constants.currentAgentInputFieldState = this;
-        print('[AgentInputFieldState] Registered in Constants');
       }
     });
-
-    print('[AgentInputFieldState] initState() completed');
   }
 
   @override
@@ -641,22 +584,22 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
   @override
   void dispose() {
-    print('[AgentInputFieldState] dispose() called');
-    print('[AgentInputFieldState] Stack trace:');
-    print(StackTrace.current);
     if (isDummy) {
-      print('[AgentInputFieldState] isDummy=true, returning early');
       return;
     }
     tagListOverlayEntry?.remove();
     tagListOverlayEntry?.dispose();
     tagListOverlayEntry = null;
     tabNotifier.removeListener(onTabChanged);
-    print('[AgentInputFieldState] Removing listener from messageController');
     widget.messageController!.removeListener(onChangeContent);
     currentTagIdNotifier.dispose();
+
+    // Unregister from Constants
+    if (Constants.currentAgentInputFieldState == this) {
+      Constants.currentAgentInputFieldState = null;
+    }
+
     super.dispose();
-    print('[AgentInputFieldState] dispose() completed');
   }
 
   void onChangeContent() {

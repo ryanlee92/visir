@@ -97,31 +97,21 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
 
   @override
   void initState() {
-    print('[InboxAgentScreen] initState() called');
-    print('[InboxAgentScreen] Stack trace:');
-    print(StackTrace.current);
     resizableController.addListener(() {
       setState(() {});
     });
-    print('[InboxAgentScreen] Creating new AgentTagController');
     _messageController = AgentTagController();
     _focusNode = FocusNode();
     super.initState();
-    print('[InboxAgentScreen] initState() completed');
   }
 
   @override
   void dispose() {
-    print('[InboxAgentScreen] dispose() called');
-    print('[InboxAgentScreen] Stack trace:');
-    print(StackTrace.current);
     resizableController.dispose();
-    print('[InboxAgentScreen] Disposing _messageController');
     _messageController?.dispose();
     _focusNode?.dispose();
     _refreshController.dispose();
     super.dispose();
-    print('[InboxAgentScreen] dispose() completed');
   }
 
   /// MCP 함수를 직접 실행하는 헬퍼 함수

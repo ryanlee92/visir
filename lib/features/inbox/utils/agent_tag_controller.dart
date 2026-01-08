@@ -148,11 +148,7 @@ class AgentTagController extends QuillController {
 
   @override
   void dispose() {
-    print('[AgentTagController] dispose() called');
-    print('[AgentTagController] Stack trace:');
-    print(StackTrace.current);
     super.dispose();
-    print('[AgentTagController] dispose() completed');
   }
 }
 

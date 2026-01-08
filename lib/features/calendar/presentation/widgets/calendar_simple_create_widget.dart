@@ -619,24 +619,16 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
   }
 
   void startChat() {
-    print('[startChat] CalendarSimpleCreateWidget: startChat called');
     // Get current event - only tag if event exists
     EventEntity? currentEvent = widget.event;
-    print('[startChat] CalendarSimpleCreateWidget: widget.event = ${widget.event?.uniqueId}');
     if (currentEvent == null) {
-      print('[startChat] CalendarSimpleCreateWidget: currentEvent is null, returning');
       return;
     }
-
-    print('[startChat] CalendarSimpleCreateWidget: currentEvent = ${currentEvent.uniqueId}, title = ${currentEvent.title}');
-    print('[startChat] CalendarSimpleCreateWidget: Navigating to home tab');
 
     // Navigate to home tab
     Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
     tabNotifier.value = TabType.home;
     UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
-
-    print('[startChat] CalendarSimpleCreateWidget: Tab switched, waiting for postFrameCallback');
 
     // Add tag to AgentInputField after navigation - retry multiple times
     void tryAddTag({int retryCount = 0}) {
@@ -644,9 +636,8 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
       AgentInputFieldState? agentInputFieldState;
       try {
         agentInputFieldState = AgentInputField.of(Utils.mainContext);
-        print('[startChat] CalendarSimpleCreateWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
       } catch (e) {
-        print('[startChat] CalendarSimpleCreateWidget: Error finding via widget tree: $e');
+        // Ignore
       }
 
       // Check if state is valid and mounted
@@ -657,32 +648,23 @@ class CalenderSimpleCreateWidgetState extends ConsumerState<CalenderSimpleCreate
           final controller = agentInputFieldState.messageController;
           final _ = controller.text; // This will throw if disposed
 
-          print('[startChat] CalendarSimpleCreateWidget: Adding tag for event ${currentEvent.uniqueId}');
           agentInputFieldState.addEventTag(currentEvent);
           agentInputFieldState.requestFocus();
-          print('[startChat] CalendarSimpleCreateWidget: Tag added and focus requested');
         } catch (e) {
-          print('[startChat] CalendarSimpleCreateWidget: messageController is disposed or invalid: $e');
           if (retryCount < 5) {
-            print('[startChat] CalendarSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
             Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 tryAddTag(retryCount: retryCount + 1);
               });
             });
-          } else {
-            print('[startChat] CalendarSimpleCreateWidget: Failed after 5 retries - controller disposed');
           }
         }
       } else if (retryCount < 5) {
-        print('[startChat] CalendarSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
         Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             tryAddTag(retryCount: retryCount + 1);
           });
         });
-      } else {
-        print('[startChat] CalendarSimpleCreateWidget: Failed after 5 retries');
       }
     }
 

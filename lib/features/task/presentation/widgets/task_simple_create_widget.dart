@@ -451,12 +451,9 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
   }
 
   void startChat() {
-    print('[startChat] TaskSimpleCreateWidget: startChat called');
     // Get current task
     TaskEntity? currentTask = widget.task;
-    print('[startChat] TaskSimpleCreateWidget: widget.task = ${widget.task?.id}, title = $title');
     if (currentTask == null && title?.isNotEmpty == true) {
-      print('[startChat] TaskSimpleCreateWidget: Creating temporary task');
       // Create a temporary task entity for tagging
       final user = ref.read(authControllerProvider).requireValue;
       currentTask = TaskEntity(
@@ -474,19 +471,13 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
     }
 
     if (currentTask == null) {
-      print('[startChat] TaskSimpleCreateWidget: currentTask is null, returning');
       return;
     }
-
-    print('[startChat] TaskSimpleCreateWidget: currentTask = ${currentTask.id}, title = ${currentTask.title}');
-    print('[startChat] TaskSimpleCreateWidget: Navigating to home tab');
 
     // Navigate to home tab
     Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
     tabNotifier.value = TabType.home;
     UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
-
-    print('[startChat] TaskSimpleCreateWidget: Tab switched, waiting for postFrameCallback');
 
     // Add tag to AgentInputField after navigation - retry multiple times
     void tryAddTag({int retryCount = 0}) {
@@ -494,9 +485,8 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
       AgentInputFieldState? agentInputFieldState;
       try {
         agentInputFieldState = AgentInputField.of(Utils.mainContext);
-        print('[startChat] TaskSimpleCreateWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
       } catch (e) {
-        print('[startChat] TaskSimpleCreateWidget: Error finding via widget tree: $e');
+        // Ignore
       }
       
       // Check if state is valid and mounted
@@ -507,32 +497,23 @@ class TaskSimpleCreateWidgetState extends ConsumerState<TaskSimpleCreateWidget> 
           final controller = agentInputFieldState.messageController;
           final _ = controller.text; // This will throw if disposed
           
-          print('[startChat] TaskSimpleCreateWidget: Adding tag for task ${currentTask.id}');
           agentInputFieldState.addTaskTag(currentTask);
           agentInputFieldState.requestFocus();
-          print('[startChat] TaskSimpleCreateWidget: Tag added and focus requested');
         } catch (e) {
-          print('[startChat] TaskSimpleCreateWidget: messageController is disposed or invalid: $e');
           if (retryCount < 5) {
-            print('[startChat] TaskSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
             Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 tryAddTag(retryCount: retryCount + 1);
               });
             });
-          } else {
-            print('[startChat] TaskSimpleCreateWidget: Failed after 5 retries - controller disposed');
           }
         }
       } else if (retryCount < 5) {
-        print('[startChat] TaskSimpleCreateWidget: Retrying in ${(retryCount + 1) * 200}ms...');
         Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             tryAddTag(retryCount: retryCount + 1);
           });
         });
-      } else {
-        print('[startChat] TaskSimpleCreateWidget: Failed after 5 retries');
       }
     }
 

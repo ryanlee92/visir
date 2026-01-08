@@ -382,24 +382,16 @@ class _MobileTaskEditWidgetState extends ConsumerState<MobileTaskEditWidget> {
   }
 
   void startChat() {
-    print('[startChat] MobileTaskEditWidget: startChat called');
     // Get current task - only tag if task exists
     TaskEntity? currentTask = widget.task;
-    print('[startChat] MobileTaskEditWidget: widget.task = ${widget.task?.id}');
     if (currentTask == null) {
-      print('[startChat] MobileTaskEditWidget: currentTask is null, returning');
       return;
     }
-
-    print('[startChat] MobileTaskEditWidget: currentTask = ${currentTask.id}, title = ${currentTask.title}');
-    print('[startChat] MobileTaskEditWidget: Navigating to home tab');
 
     // Navigate to home tab
     Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
     tabNotifier.value = TabType.home;
     UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
-
-    print('[startChat] MobileTaskEditWidget: Tab switched, waiting for postFrameCallback');
 
     // Add tag to AgentInputField after navigation - retry multiple times
     void tryAddTag({int retryCount = 0}) {
@@ -407,9 +399,8 @@ class _MobileTaskEditWidgetState extends ConsumerState<MobileTaskEditWidget> {
       AgentInputFieldState? agentInputFieldState;
       try {
         agentInputFieldState = AgentInputField.of(Utils.mainContext);
-        print('[startChat] MobileTaskEditWidget: Try $retryCount - agentInputFieldState = ${agentInputFieldState != null ? "found" : "null"}');
       } catch (e) {
-        print('[startChat] MobileTaskEditWidget: Error finding via widget tree: $e');
+        // Ignore
       }
       
       // Check if state is valid and mounted
@@ -420,32 +411,23 @@ class _MobileTaskEditWidgetState extends ConsumerState<MobileTaskEditWidget> {
           final controller = agentInputFieldState.messageController;
           final _ = controller.text; // This will throw if disposed
           
-          print('[startChat] MobileTaskEditWidget: Adding tag for task ${currentTask.id}');
           agentInputFieldState.addTaskTag(currentTask);
           agentInputFieldState.requestFocus();
-          print('[startChat] MobileTaskEditWidget: Tag added and focus requested');
         } catch (e) {
-          print('[startChat] MobileTaskEditWidget: messageController is disposed or invalid: $e');
           if (retryCount < 5) {
-            print('[startChat] MobileTaskEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
             Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 tryAddTag(retryCount: retryCount + 1);
               });
             });
-          } else {
-            print('[startChat] MobileTaskEditWidget: Failed after 5 retries - controller disposed');
           }
         }
       } else if (retryCount < 5) {
-        print('[startChat] MobileTaskEditWidget: Retrying in ${(retryCount + 1) * 200}ms...');
         Future.delayed(Duration(milliseconds: (retryCount + 1) * 200), () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             tryAddTag(retryCount: retryCount + 1);
           });
         });
-      } else {
-        print('[startChat] MobileTaskEditWidget: Failed after 5 retries');
       }
     }
 
