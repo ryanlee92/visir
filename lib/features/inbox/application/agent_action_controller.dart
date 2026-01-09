@@ -3885,7 +3885,6 @@ class AgentActionController extends _$AgentActionController {
 
   /// 챗 히스토리를 저장합니다 (로컬 + Supabase).
   Future<void> _saveChatHistory({List<ProjectEntity>? taggedProjects}) async {
-    print('saveChatHistory111');
     // 메시지가 비어있으면 저장하지 않음
     if (state.messages.isEmpty) {
       return;
@@ -3922,7 +3921,6 @@ class AgentActionController extends _$AgentActionController {
     }
 
     try {
-      print('saveChatHistory: $history');
       await _historyRepository.saveChatHistory(userId: me.id, history: history);
     } catch (e) {
       // Supabase 저장 실패는 무시
