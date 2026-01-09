@@ -398,11 +398,6 @@ class AgentActionController extends _$AgentActionController {
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
     String? searchContext, // 검색 결과 context
   }) async {
-    print('[AgentAction] _generateGeneralChat called');
-    print('[AgentAction] userMessage: ${userMessage.substring(0, userMessage.length > 100 ? 100 : userMessage.length)}');
-    print('[AgentAction] conversationSummary: ${state.conversationSummary}');
-    print('[AgentAction] isRecursiveCall: $isRecursiveCall');
-
     // 파일 정보를 메시지에 추가 (인박스 첨부 파일 포함)
     String enhancedUserMessage = userMessage;
 
@@ -615,11 +610,8 @@ class AgentActionController extends _$AgentActionController {
 
       // conversationSummary가 없으면 항상 제목 생성 요청 추가
       if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
-        print('[AgentAction] conversationSummary is null/empty, adding conversation_title requirement to systemPrompt');
         systemPrompt +=
             '\n\n## CRITICAL REQUIREMENT - CONVERSATION TITLE:\nYou MUST ALWAYS start your response with a conversation title in EXACTLY this format:\n<conversation_title>Your title here (max 30 characters)</conversation_title>\n\nThis is MANDATORY. Your response MUST begin with <conversation_title>...</conversation_title> before any other content. Do NOT skip this. Do NOT forget this. This is the FIRST thing you must write in every response when conversationSummary is not set.';
-      } else {
-        print('[AgentAction] conversationSummary already exists: ${state.conversationSummary}');
       }
 
       // 일반적인 AI 응답 생성 (MCP 함수 호출 지원)
@@ -661,14 +653,8 @@ class AgentActionController extends _$AgentActionController {
 
       // conversationSummary가 없으면 user message에도 conversation_title 요청 추가
       if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
-        print('[AgentAction] Adding conversation_title request to user message');
         enhancedUserMessage = '[IMPORTANT: Please start your response with <conversation_title>Title (max 30 chars)</conversation_title>]\n\n$enhancedUserMessage';
       }
-
-      print(
-        '[AgentAction] Calling generateGeneralChat with userMessage: ${enhancedUserMessage.substring(0, enhancedUserMessage.length > 100 ? 100 : enhancedUserMessage.length)}...',
-      );
-      print('[AgentAction] User message contains 첨부파일: ${enhancedUserMessage.contains('첨부파일')}');
       final response = await _repository.generateGeneralChat(
         userMessage: enhancedUserMessage,
         conversationHistory: filteredHistory,
@@ -685,7 +671,6 @@ class AgentActionController extends _$AgentActionController {
 
       final aiResponse = response.fold(
         (failure) {
-          print('[AgentAction] generateGeneralChat failed: $failure');
           // 크레딧 부족 예외 처리
           failure.whenOrNull(
             insufficientCredits: (_, required, available) {
@@ -711,29 +696,19 @@ class AgentActionController extends _$AgentActionController {
           return null;
         },
         (response) {
-          print('[AgentAction] generateGeneralChat succeeded, response: ${response != null ? "present" : "null"}');
           return response;
         },
       );
 
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
-        print('[AgentAction] AI response received, message length: ${aiMessage.length}');
-        print('[AgentAction] AI response contains summarizeAttachment: ${aiMessage.contains('summarizeAttachment')}');
-        print('[AgentAction] AI response contains 첨부파일: ${aiMessage.contains('첨부파일')}');
-        print('[AgentAction] AI response preview (first 500 chars): ${aiMessage.substring(0, aiMessage.length > 500 ? 500 : aiMessage.length)}');
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
         aiMessage = unescape.convert(aiMessage);
-        print('[AgentAction] After HTML unescape, contains summarizeAttachment: ${aiMessage.contains('summarizeAttachment')}');
 
         // conversationSummary가 없으면 항상 conversation_title 태그에서 제목 추출 시도
         if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
-          print('[AgentAction] Attempting to extract conversation_title from AI response');
-          print('[AgentAction] AI message length: ${aiMessage.length}');
-          print('[AgentAction] AI message first 200 chars: ${aiMessage.substring(0, aiMessage.length > 200 ? 200 : aiMessage.length)}');
-
           // conversation_title 태그에서 제목 추출
           final conversationTitleRegex = RegExp(r'<conversation_title>(.*?)</conversation_title>', dotAll: true);
           final escapedTitleRegex = RegExp(r'&lt;conversation_title&gt;(.*?)&lt;/conversation_title&gt;', dotAll: true);
@@ -742,15 +717,10 @@ class AgentActionController extends _$AgentActionController {
           final titleMatch = conversationTitleRegex.firstMatch(aiMessage);
           if (titleMatch != null) {
             extractedTitle = titleMatch.group(1)?.trim();
-            print('[AgentAction] Found conversation_title tag: $extractedTitle');
           } else {
-            print('[AgentAction] No conversation_title tag found, checking escaped version');
             final escapedMatch = escapedTitleRegex.firstMatch(aiMessage);
             if (escapedMatch != null) {
               extractedTitle = escapedMatch.group(1)?.trim();
-              print('[AgentAction] Found escaped conversation_title tag: $extractedTitle');
-            } else {
-              print('[AgentAction] No conversation_title tag found in any format');
             }
           }
 
@@ -759,25 +729,17 @@ class AgentActionController extends _$AgentActionController {
             String cleanedTitle = _cleanTitleFromTags(extractedTitle);
             // 최대 50자로 제한
             String finalTitle = cleanedTitle.length > 50 ? '${cleanedTitle.substring(0, 47)}...' : cleanedTitle;
-            print('[AgentAction] Setting conversationSummary from extracted title: $finalTitle');
             state = state.copyWith(conversationSummary: finalTitle);
           } else {
             // conversation_title이 없으면 AI 응답의 처음 부분을 제목으로 사용
-            print('[AgentAction] No conversation_title found, using first line as fallback');
             final firstLine = aiMessage.split('\n').first.trim();
-            print('[AgentAction] First line: $firstLine');
             if (firstLine.isNotEmpty && !firstLine.contains('conversation_title')) {
               // 태그 제거 및 실제 title 추출
               String cleanedTitle = _cleanTitleFromTags(firstLine);
               String finalTitle = cleanedTitle.length > 50 ? '${cleanedTitle.substring(0, 47)}...' : cleanedTitle;
-              print('[AgentAction] Setting conversationSummary from first line: $finalTitle');
               state = state.copyWith(conversationSummary: finalTitle);
-            } else {
-              print('[AgentAction] First line is empty or contains conversation_title, not setting conversationSummary');
             }
           }
-        } else {
-          print('[AgentAction] conversationSummary already exists: ${state.conversationSummary}, skipping extraction');
         }
 
         // conversation_title 태그를 제거 (제목 추출 후)
@@ -785,21 +747,8 @@ class AgentActionController extends _$AgentActionController {
         aiMessage = aiMessage.replaceAll(RegExp(r'&lt;conversation_title&gt;.*?&lt;/conversation_title&gt;', dotAll: true), '');
 
         // MCP 함수 호출 감지 및 실행
-        print('[AgentAction] Parsing function calls from AI message (length: ${aiMessage.length})');
-        print('[AgentAction] User request contains 첨부파일: ${userMessage.contains('첨부파일')}');
-        print('[AgentAction] AI response contains 첨부파일: ${aiMessage.contains('첨부파일')}');
         final executor = McpFunctionExecutor();
         final allFunctionCalls = executor.parseFunctionCalls(aiMessage);
-        print('[AgentAction] Parsed ${allFunctionCalls.length} function calls');
-        if (allFunctionCalls.isNotEmpty) {
-          final functionNames = allFunctionCalls.map((c) => c['function']).toList();
-          print('[AgentAction] Function names: $functionNames');
-          if (functionNames.contains('summarizeAttachment')) {
-            print('[AgentAction] ✓ summarizeAttachment found in parsed calls!');
-          } else {
-            print('[AgentAction] ⚠ summarizeAttachment NOT found in parsed calls');
-          }
-        }
 
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
@@ -1184,13 +1133,7 @@ class AgentActionController extends _$AgentActionController {
               // summarizeAttachment의 경우 files 추출하지 않음 (요약만 표시)
               // summarizeAttachment는 요약 텍스트만 제공하므로 파일을 메시지에 첨부하지 않음
               if (functionName == 'summarizeAttachment') {
-                print('[AgentAction] summarizeAttachment detected - skipping file extraction (summary only)');
-                if (result['success'] == true && result['result'] != null) {
-                  final resultData = result['result'] as Map<String, dynamic>;
-                  final summary = resultData['summary'] as String?;
-                  print('[AgentAction] summarizeAttachment summary value: ${summary != null ? summary : 'null'}');
-                  print('[AgentAction] summarizeAttachment summary length: ${summary?.length ?? 0}');
-                }
+                // summarizeAttachment는 요약만 제공하므로 파일을 메시지에 첨부하지 않음
               }
 
               // 검색 함수 결과 처리
@@ -1329,8 +1272,6 @@ class AgentActionController extends _$AgentActionController {
                 if (functionName == 'summarizeAttachment' && result['result'] != null) {
                   final resultData = result['result'] as Map<String, dynamic>;
                   final summary = resultData['summary'] as String?;
-                  print('[AgentAction] summarizeAttachment summary value (in success message): ${summary != null ? summary : 'null'}');
-                  print('[AgentAction] summarizeAttachment summary length (in success message): ${summary?.length ?? 0}');
                   successMessage = summary ?? result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
                 } else {
                   successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
@@ -1393,11 +1334,9 @@ class AgentActionController extends _$AgentActionController {
           String resultMessage = '';
           if (successMessages.isNotEmpty) {
             resultMessage = successMessages.join('\n\n');
-            print('[AgentAction] Using successMessages for resultMessage: ${resultMessage.length} chars');
           } else {
             // AI가 처음 생성한 메시지 사용 (함수 호출 태그 제거된 버전)
             resultMessage = aiMessageWithoutFunctionCalls;
-            print('[AgentAction] Using aiMessageWithoutFunctionCalls for resultMessage: ${resultMessage.length} chars');
           }
 
           // 함수 호출 JSON 배열만 있고 자연어 응답이 없는 경우 처리
@@ -1406,11 +1345,9 @@ class AgentActionController extends _$AgentActionController {
             // 재귀 호출에서 모든 함수 호출이 무시된 경우, 원본 AI 메시지 사용
             if (isRecursiveCall && results.isEmpty) {
               resultMessage = aiMessage;
-              print('[AgentAction] Recursive call with no results, using original aiMessage');
             } else if (!isRecursiveCall && functionCalls.isNotEmpty) {
               // 함수 실행 후 자연어 응답이 없는 경우, 함수 실행 결과를 사용
               // 이 경우는 일반 함수 처리 부분에서 재귀 호출이 이루어져야 함
-              print('[AgentAction] Function calls executed but no natural language response');
               // 함수 실행 결과가 있으면 사용, 없으면 기본 메시지
               if (results.isNotEmpty) {
                 final successResults = results.where((r) => r['success'] == true).toList();
@@ -1531,24 +1468,13 @@ class AgentActionController extends _$AgentActionController {
             }
           }
 
-          print('[AgentAction] resultMessage length: ${resultMessage.length}');
-          print('[AgentAction] resultMessage preview: ${resultMessage.length > 200 ? resultMessage.substring(0, 200) : resultMessage}...');
-          print('[AgentAction] successMessages count: ${successMessages.length}');
-          if (successMessages.isNotEmpty) {
-            print('[AgentAction] successMessages[0] length: ${successMessages[0].length}');
-            print('[AgentAction] successMessages[0] preview: ${successMessages[0].length > 200 ? successMessages[0].substring(0, 200) : successMessages[0]}...');
-          }
-
           // 확인이 필요한 함수 호출은 pendingFunctionCalls에 저장되어 있으므로 태그 추가 불필요
 
-          print('[AgentAction] Creating assistantMessage with attachmentFilesFromResults: ${attachmentFilesFromResults != null ? attachmentFilesFromResults.length : 'null'}');
           final assistantMessage = AgentActionMessage(
             role: 'assistant',
             content: resultMessage,
             files: attachmentFilesFromResults?.isNotEmpty == true ? attachmentFilesFromResults : null,
           );
-          print('[AgentAction] assistantMessage created with content length: ${assistantMessage.content.length}');
-          print('[AgentAction] assistantMessage created with files: ${assistantMessage.files != null ? assistantMessage.files!.length : 'null'}');
           final updatedMessagesWithResponse = [...messages, assistantMessage];
 
           // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
@@ -3240,16 +3166,12 @@ class AgentActionController extends _$AgentActionController {
     List<TaskEntity>? currentTaggedTasks = callsToExecute.isNotEmpty ? (callsToExecute.first['updated_tagged_tasks'] as List<TaskEntity>?) : null;
     List<EventEntity>? currentTaggedEvents = callsToExecute.isNotEmpty ? (callsToExecute.first['updated_tagged_events'] as List<EventEntity>?) : null;
 
-    print('[AgentAction] Executing ${callsToExecute.length} function calls...');
     for (final pendingCall in callsToExecute) {
       // 타입 안전하게 데이터 추출
       final functionName = pendingCall['function_name'] as String?;
       final functionArgs = pendingCall['function_args'] as Map<String, dynamic>?;
 
-      print('[AgentAction] Processing function call: $functionName');
-
       if (functionName == null || functionArgs == null) {
-        print('[AgentAction] Skipping function call: functionName or functionArgs is null');
         continue;
       }
 
@@ -3265,7 +3187,6 @@ class AgentActionController extends _$AgentActionController {
         final tabType = _getTabTypeForFunction(functionName);
 
         // 함수 실행
-        print('[AgentAction] About to execute function: $functionName');
         final result = await executor.executeFunction(
           functionName,
           functionArgs,
@@ -3276,17 +3197,8 @@ class AgentActionController extends _$AgentActionController {
           availableInboxes: updatedAvailableInboxes,
           remainingCredits: remainingCredits,
         );
-        print('[AgentAction] Function $functionName execution completed. Success: ${result['success']}');
-        print('[AgentAction] Result keys: ${result.keys.toList()}');
-        if (functionName == 'summarizeAttachment') {
-          print('[AgentAction] summarizeAttachment result: $result');
-          print('[AgentAction] summarizeAttachment result[\'result\']: ${result['result']}');
-        }
 
         if (result['success'] == true) {
-          print('[AgentAction] Function $functionName executed successfully');
-          print('[AgentAction] result keys: ${result.keys.toList()}');
-          print('[AgentAction] result[\'result\']: ${result['result'] != null ? 'exists (${result['result'].runtimeType})' : 'null'}');
           final message = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
           final taskId = result['taskId'] as String?;
           final eventId = result['eventId'] as String?;
@@ -3328,15 +3240,6 @@ class AgentActionController extends _$AgentActionController {
             if (projectId != null) 'projectId': projectId,
             if (result['result'] != null) 'result': result['result'], // summarizeAttachment의 files 데이터 포함
           };
-          print('[AgentAction] Adding function result for $functionName with result: ${functionResult.containsKey('result') ? 'exists' : 'missing'}');
-          if (functionResult.containsKey('result') && functionResult['result'] is Map) {
-            final resultData = functionResult['result'] as Map<String, dynamic>;
-            print('[AgentAction] result data keys: ${resultData.keys.toList()}');
-            if (resultData.containsKey('files')) {
-              final files = resultData['files'];
-              print('[AgentAction] files in result: ${files is List ? files.length : 'not a list'}');
-            }
-          }
           functionResults.add(functionResult);
         } else {
           final error = result['error'] as String? ?? Utils.mainContext.tr.agent_action_error_occurred_during_execution;
@@ -3352,14 +3255,10 @@ class AgentActionController extends _$AgentActionController {
     List<PlatformFile>? attachmentFiles;
 
     // 함수 실행 결과 요약 생성 - 실제 실행된 함수 호출 개수와 결과를 정확히 전달
-    print('[AgentAction] Processing ${functionResults.length} function results...');
     final functionResultsSummary = <String>[];
     for (final result in functionResults) {
       final functionName = result['function_name'] as String? ?? '';
       final success = result['success'] as bool? ?? false;
-      print('[AgentAction] Processing result for $functionName, success: $success');
-      print('[AgentAction] Result keys: ${result.keys.toList()}');
-      print('[AgentAction] Result has \'result\' key: ${result.containsKey('result')}');
 
       if (success) {
         final message = result['message'] as String? ?? '';
@@ -3369,25 +3268,17 @@ class AgentActionController extends _$AgentActionController {
 
         // summarizeAttachment의 경우 files 추출 및 summary 사용
         if (functionName == 'summarizeAttachment') {
-          print('[AgentAction] Processing summarizeAttachment result...');
           final resultData = result['result'] as Map<String, dynamic>?;
-          print('[AgentAction] resultData: ${resultData != null ? 'exists' : 'null'}');
 
           // summary를 메시지에 사용
           final summary = resultData?['summary'] as String?;
-          print('[AgentAction] summarizeAttachment summary value: ${summary != null ? summary : 'null'}');
-          print('[AgentAction] summarizeAttachment summary length: ${summary?.length ?? 0}');
           if (summary != null && summary.isNotEmpty) {
-            print('[AgentAction] Using summary from result: $summary');
             // summary를 메시지로 사용 (기존 message 대신)
             final summaryMessage = summary;
             functionResultsSummary.add('$functionName: $summaryMessage');
-          } else {
-            print('[AgentAction] summarizeAttachment summary is null or empty');
           }
 
           // summarizeAttachment는 요약만 제공하므로 파일을 첨부하지 않음
-          print('[AgentAction] summarizeAttachment - summary only, no files attached');
 
           // summarizeAttachment는 이미 처리했으므로 continue
           continue;
@@ -3452,13 +3343,6 @@ class AgentActionController extends _$AgentActionController {
           'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo$recentIdsWarning\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "작업 ID: xxx" in Korean.\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
 
       // 함수 실행 결과를 포함한 메시지로 AI 호출 (summarizeAttachment의 경우 files 포함)
-      print('[AgentAction] Creating functionResultsMessages with attachmentFiles: ${attachmentFiles != null ? attachmentFiles.length : 'null'}');
-      if (attachmentFiles != null && attachmentFiles.isNotEmpty) {
-        print('[AgentAction] attachmentFiles details:');
-        for (final file in attachmentFiles) {
-          print('[AgentAction]   - ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}');
-        }
-      }
       final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt, files: attachmentFiles)];
 
       final me = ref.read(authControllerProvider).value;
@@ -3614,15 +3498,7 @@ class AgentActionController extends _$AgentActionController {
     // deleteEvent의 경우 함수 실행 전에 추출한 event 정보 사용 (deletedEventsBeforeExecution 또는 캐시에서)
     final cachedDeletedEvents = _deletedEventsCache[messageId] ?? deletedEventsBeforeExecution;
 
-    print('[AgentAction] Creating assistantMessage with attachmentFiles: ${attachmentFiles != null ? attachmentFiles.length : 'null'}');
-    if (attachmentFiles != null && attachmentFiles.isNotEmpty) {
-      print('[AgentAction] attachmentFiles before creating message:');
-      for (final file in attachmentFiles) {
-        print('[AgentAction]   - ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}');
-      }
-    }
     final filesToInclude = attachmentFiles?.isNotEmpty == true ? attachmentFiles : null;
-    print('[AgentAction] filesToInclude: ${filesToInclude != null ? filesToInclude.length : 'null'}');
     final assistantMessage = AgentActionMessage(
       role: 'assistant',
       content: resultMessage,
@@ -3631,13 +3507,6 @@ class AgentActionController extends _$AgentActionController {
       deletedTasks: cachedDeletedTasks.isNotEmpty ? cachedDeletedTasks : null, // 삭제된 task 정보 포함
       deletedEvents: cachedDeletedEvents.isNotEmpty ? cachedDeletedEvents : null, // 삭제된 event 정보 포함
     );
-    print('[AgentAction] assistantMessage created with files: ${assistantMessage.files != null ? assistantMessage.files!.length : 'null'}');
-    if (assistantMessage.files != null && assistantMessage.files!.isNotEmpty) {
-      print('[AgentAction] assistantMessage.files details:');
-      for (final file in assistantMessage.files!) {
-        print('[AgentAction]   - ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}');
-      }
-    }
     final updatedMessages = [...state.messages, assistantMessage];
 
     // pendingFunctionCalls에서 실행된 항목 제거 (entity block은 유지)
@@ -3801,6 +3670,193 @@ class AgentActionController extends _$AgentActionController {
     );
   }
 
+  /// 메시지의 태그를 실제 title로 변환합니다.
+  List<AgentActionMessage> _convertTagsToTitles(List<AgentActionMessage> messages) {
+    return messages.map((message) {
+      String content = message.content;
+
+      // <tagged_task>, <tagged_event>, <tagged_inbox> 태그를 @title 형식으로 변환
+      final taggedTaskRegex = RegExp(r'<tagged_task>(.*?)</tagged_task>', dotAll: true);
+      final taggedEventRegex = RegExp(r'<tagged_event>(.*?)</tagged_event>', dotAll: true);
+      final taggedInboxRegex = RegExp(r'<tagged_inbox>(.*?)</tagged_inbox>', dotAll: true);
+
+      // @task:, @event:, @inbox: 형식을 @title 형식으로 변환
+      final atTaskRegex = RegExp(r'@task:([a-f0-9\-]+)', caseSensitive: false);
+      final atEventRegex = RegExp(r'@event:([a-f0-9\-]+)', caseSensitive: false);
+      final atInboxRegex = RegExp(r'@inbox:([a-z0-9_\-@\.]+)', caseSensitive: false);
+
+      // <tagged_task> 태그 처리
+      for (final match in taggedTaskRegex.allMatches(content).toList().reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            String title = jsonData['title'] as String? ?? '';
+
+            // title이 없으면 id로 찾기
+            if (title.isEmpty) {
+              final id = jsonData['id'] as String?;
+              if (id != null) {
+                try {
+                  final tasks = ref.read(calendarTaskListControllerProvider(tabType: TabType.home)).tasksOnView;
+                  final task = tasks.firstWhereOrNull((t) => t.id == id || t.eventId == id);
+                  title = task?.title ?? '';
+                } catch (e) {
+                  // Task를 찾을 수 없으면 빈 문자열 유지
+                }
+              }
+            }
+
+            if (title.isNotEmpty) {
+              content = content.substring(0, match.start) + '@$title' + content.substring(match.end);
+            } else {
+              // title을 찾을 수 없으면 태그 제거
+              content = content.substring(0, match.start) + content.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // JSON 파싱 실패 시 태그 제거
+          content = content.substring(0, match.start) + content.substring(match.end);
+        }
+      }
+
+      // <tagged_event> 태그 처리
+      for (final match in taggedEventRegex.allMatches(content).toList().reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            String title = jsonData['title'] as String? ?? '';
+
+            // title이 없으면 id로 찾기
+            if (title.isEmpty) {
+              final id = jsonData['id'] as String? ?? jsonData['event_id'] as String?;
+              if (id != null) {
+                try {
+                  final events = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+                  final event = events.firstWhereOrNull((e) => e.eventId == id);
+                  title = event?.title ?? '';
+                } catch (e) {
+                  // Event를 찾을 수 없으면 빈 문자열 유지
+                }
+              }
+            }
+
+            if (title.isNotEmpty) {
+              content = content.substring(0, match.start) + '@$title' + content.substring(match.end);
+            } else {
+              // title을 찾을 수 없으면 태그 제거
+              content = content.substring(0, match.start) + content.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // JSON 파싱 실패 시 태그 제거
+          content = content.substring(0, match.start) + content.substring(match.end);
+        }
+      }
+
+      // <tagged_inbox> 태그 처리
+      for (final match in taggedInboxRegex.allMatches(content).toList().reversed) {
+        try {
+          final jsonText = match.group(1)?.trim() ?? '';
+          if (jsonText.isNotEmpty) {
+            final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+            String title = jsonData['suggestion']?['summary'] as String? ?? jsonData['title'] as String? ?? '';
+
+            // title이 없으면 id로 찾기
+            if (title.isEmpty) {
+              final id = jsonData['id'] as String?;
+              if (id != null) {
+                try {
+                  final inboxList = ref.read(inboxControllerProvider);
+                  final inbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == id);
+                  title = inbox?.decryptedTitle ?? '';
+                } catch (e) {
+                  // Inbox를 찾을 수 없으면 빈 문자열 유지
+                }
+              }
+            }
+
+            if (title.isNotEmpty) {
+              content = content.substring(0, match.start) + '@$title' + content.substring(match.end);
+            } else {
+              // title을 찾을 수 없으면 태그 제거
+              content = content.substring(0, match.start) + content.substring(match.end);
+            }
+          }
+        } catch (e) {
+          // JSON 파싱 실패 시 태그 제거
+          content = content.substring(0, match.start) + content.substring(match.end);
+        }
+      }
+
+      // @task: 형식 처리
+      for (final match in atTaskRegex.allMatches(content).toList().reversed) {
+        final taskId = match.group(1);
+        if (taskId != null) {
+          try {
+            final tasks = ref.read(calendarTaskListControllerProvider(tabType: TabType.home)).tasksOnView;
+            final task = tasks.firstWhereOrNull((t) => t.id == taskId || t.eventId == taskId);
+            final title = task?.title ?? '';
+            if (title.isNotEmpty) {
+              content = content.substring(0, match.start) + '@$title' + content.substring(match.end);
+            } else {
+              // title을 찾을 수 없으면 태그 제거
+              content = content.substring(0, match.start) + content.substring(match.end);
+            }
+          } catch (e) {
+            // Task를 찾을 수 없으면 태그 제거
+            content = content.substring(0, match.start) + content.substring(match.end);
+          }
+        }
+      }
+
+      // @event: 형식 처리
+      for (final match in atEventRegex.allMatches(content).toList().reversed) {
+        final eventId = match.group(1);
+        if (eventId != null) {
+          try {
+            final events = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+            final event = events.firstWhereOrNull((e) => e.eventId == eventId);
+            final title = event?.title ?? '';
+            if (title.isNotEmpty) {
+              content = content.substring(0, match.start) + '@$title' + content.substring(match.end);
+            } else {
+              // title을 찾을 수 없으면 태그 제거
+              content = content.substring(0, match.start) + content.substring(match.end);
+            }
+          } catch (e) {
+            // Event를 찾을 수 없으면 태그 제거
+            content = content.substring(0, match.start) + content.substring(match.end);
+          }
+        }
+      }
+
+      // @inbox: 형식 처리
+      for (final match in atInboxRegex.allMatches(content).toList().reversed) {
+        final inboxId = match.group(1);
+        if (inboxId != null) {
+          try {
+            final inboxList = ref.read(inboxControllerProvider);
+            final inbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
+            final title = inbox?.decryptedTitle ?? '';
+            if (title.isNotEmpty) {
+              content = content.substring(0, match.start) + '@$title' + content.substring(match.end);
+            } else {
+              // title을 찾을 수 없으면 태그 제거
+              content = content.substring(0, match.start) + content.substring(match.end);
+            }
+          } catch (e) {
+            // Inbox를 찾을 수 없으면 태그 제거
+            content = content.substring(0, match.start) + content.substring(match.end);
+          }
+        }
+      }
+
+      return AgentActionMessage(role: message.role, content: content, files: message.files, excludeFromHistory: message.excludeFromHistory);
+    }).toList();
+  }
+
   /// 챗 히스토리를 저장합니다 (로컬 + Supabase).
   Future<void> _saveChatHistory({List<ProjectEntity>? taggedProjects}) async {
     // 메시지가 비어있으면 저장하지 않음
@@ -3819,11 +3875,14 @@ class AgentActionController extends _$AgentActionController {
       return;
     }
 
+    // 태그를 실제 title로 변환한 메시지 생성
+    final convertedMessages = _convertTagsToTitles(state.messages);
+
     final now = DateTime.now();
     final history = AgentChatHistoryEntity(
       id: sessionId,
       projectId: projectId,
-      messages: state.messages,
+      messages: convertedMessages,
       actionType: state.actionType?.name,
       conversationSummary: state.conversationSummary,
       createdAt: now, // createdAt은 항상 현재 시간 (기존 세션의 경우 업데이트만 수행)
