@@ -735,8 +735,10 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
                         right: 0,
                         child: Container(
                           color: context.background,
-                          padding: EdgeInsets.only(bottom: _agentInputFieldHeight),
-                          child: AgentActionMessagesWidget(maxHeight: (context.height / ref.read(zoomRatioProvider) - max(context.padding.top - 8, 20)) - _agentInputFieldHeight),
+                          child: AgentActionMessagesWidget(
+                            maxHeight: (context.height / ref.read(zoomRatioProvider) - max(context.padding.top - 8, 20)),
+                            agentInputFieldHeight: _agentInputFieldHeight,
+                          ),
                         ),
                       ),
                       AnimatedPositioned(
@@ -1161,9 +1163,9 @@ class _InboxAgentScreenState extends ConsumerState<InboxAgentScreen> {
 
                           Positioned(
                             left: 8,
-                            bottom: _agentInputFieldHeight,
+                            bottom: 0,
                             right: 1,
-                            child: AgentActionMessagesWidget(maxHeight: constraints.maxHeight - _agentInputFieldHeight - 8),
+                            child: AgentActionMessagesWidget(maxHeight: constraints.maxHeight - 8, agentInputFieldHeight: _agentInputFieldHeight),
                           ),
 
                           Positioned(

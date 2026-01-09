@@ -44,7 +44,8 @@ import 'package:uuid/uuid.dart';
 
 class AgentActionMessagesWidget extends ConsumerStatefulWidget {
   final double maxHeight;
-  AgentActionMessagesWidget({super.key, this.maxHeight = 600});
+  final double agentInputFieldHeight;
+  AgentActionMessagesWidget({super.key, this.maxHeight = 600, this.agentInputFieldHeight = 0});
 
   @override
   ConsumerState<AgentActionMessagesWidget> createState() => _AgentActionMessagesWidgetState();
@@ -2471,6 +2472,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
+                                padding: EdgeInsets.only(bottom: widget.agentInputFieldHeight),
                                 itemCount: agentAction.messages.length + (agentAction.isLoading ? 1 : 0),
                                 itemBuilder: (context, index) {
                                   final state = ref.watch(agentActionControllerProvider);
