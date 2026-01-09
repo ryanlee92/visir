@@ -915,7 +915,6 @@ class AgentActionController extends _$AgentActionController {
 
                   // 검색 결과를 context로 변환
                   String? currentSearchContext;
-                  print('[AgentAction] Search results: ${searchResults.length} items');
                   if (functionName == 'searchInbox') {
                     currentSearchContext = await _buildInboxContextFromSearchResults(searchResults);
                     // 검색된 inbox를 availableInboxes에 추가
@@ -998,15 +997,8 @@ class AgentActionController extends _$AgentActionController {
                   // 검색 결과를 context에 추가
                   if (currentSearchContext != null && currentSearchContext.isNotEmpty) {
                     searchContext = searchContext == null ? currentSearchContext : '$searchContext\n\n$currentSearchContext';
-                    print('[AgentAction] Search context created: ${currentSearchContext.length} characters');
-                  } else {
-                    print('[AgentAction] Search context is empty');
                   }
-                } else {
-                  print('[AgentAction] Search results are empty');
                 }
-              } else {
-                print('[AgentAction] Search failed or no results: ${result['success']}, ${result['error']}');
               }
             }
 
@@ -1020,7 +1012,6 @@ class AgentActionController extends _$AgentActionController {
 
             // 검색 결과를 context로 추가하여 AI 재호출
             if (searchContext != null && searchContext.isNotEmpty) {
-              print('[AgentAction] Recalling with search context: ${searchContext.length} characters');
               // 검색 결과를 context로 추가하여 재호출
               await _generateGeneralChat(
                 userMessage,
@@ -1037,8 +1028,6 @@ class AgentActionController extends _$AgentActionController {
                 searchContext: searchContext, // 검색 결과 context 전달
               );
               return; // 검색 함수 처리 후 종료
-            } else {
-              print('[AgentAction] No search context, skipping recall');
             }
           }
 
