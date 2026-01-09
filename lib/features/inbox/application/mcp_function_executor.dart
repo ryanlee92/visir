@@ -5500,19 +5500,318 @@ class McpFunctionExecutor {
     }
 
     final attachmentId = args['attachmentId'] as String?;
-    print('[Attachment] Looking for inbox: $inboxId, attachmentId: $attachmentId');
+    print('[Attachment] Parsing inboxId: $inboxId, attachmentId: $attachmentId');
 
-    // Get inbox from available inboxes or search for it
-    final inboxList = ref.read(inboxControllerProvider);
-    print('[Attachment] Total inboxes available: ${inboxList?.inboxes.length ?? 0}');
-    final inbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
-
-    if (inbox == null) {
-      print('[Attachment] Error: Inbox not found. Available inbox IDs: ${inboxList?.inboxes.map((i) => i.id).take(5).toList()}');
-      return {'success': false, 'error': 'Inbox not found'};
+    // Parse inboxId to extract mail/message information
+    // Format: mail_${type}_${hostMail}_${messageId} or message_${type}_${teamId}_${messageId}
+    InboxEntity? inbox;
+    
+    if (inboxId.startsWith('mail_')) {
+      // Parse mail inboxId: mail_${type}_${hostMail}_${messageId}
+      final parts = inboxId.split('_');
+      if (parts.length < 4) {
+        print('[Attachment] Invalid mail inboxId format: $inboxId');
+        return {'success': false, 'error': 'Invalid inboxId format'};
+      }
+      
+      final messageId = parts.last;
+      final typeName = parts[1];
+      final hostMail = parts.sublist(2, parts.length - 1).join('_'); // hostMail may contain underscores
+      
+      print('[Attachment] Parsed mail inboxId - type: $typeName, hostMail: $hostMail, messageId: $messageId');
+      
+      // Find mail type
+      MailEntityType? mailType;
+      if (typeName == 'google') {
+        mailType = MailEntityType.google;
+      } else if (typeName == 'microsoft') {
+        mailType = MailEntityType.microsoft;
+      } else {
+        print('[Attachment] Unknown mail type: $typeName');
+        return {'success': false, 'error': 'Unknown mail type: $typeName'};
+      }
+      
+      // Find OAuth for this email
+      final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+      final oauth = oauths.firstWhereOrNull((o) => o.email == hostMail);
+      
+      if (oauth == null) {
+        print('[Attachment] OAuth not found for email: $hostMail');
+        return {'success': false, 'error': 'Mail account not found for: $hostMail'};
+      }
+      
+      // Fetch mail by messageId
+      final mailRepository = ref.read(mailRepositoryProvider);
+      MailEntity? mailEntity;
+      
+      // Try different approaches based on mail type
+      final datasource = mailRepository.datasources[mailType.datasourceType];
+      if (datasource == null) {
+        print('[Attachment] Datasource not found for mail type: $mailType');
+        return {'success': false, 'error': 'Datasource not found for mail type'};
+      }
+      
+      if (mailType == MailEntityType.google) {
+        // For Gmail, the last part of inboxId might be threadId instead of messageId
+        // Try both: first as messageId, then as threadId
+        try {
+          // First, try as messageId with rfc822msgid query
+          final fetchResult = await datasource.fetchMailLists(
+            oauth: oauth,
+            user: ref.read(authControllerProvider).requireValue,
+            isInbox: false,
+            labelId: null,
+            email: hostMail,
+            q: 'rfc822msgid:$messageId',
+          );
+          
+          final mails = fetchResult.values.expand((e) => e.messages).toList();
+          mailEntity = mails.firstWhereOrNull((m) => m.id == messageId);
+          
+          if (mailEntity == null) {
+            // If rfc822msgid doesn't work, try searching in common labels
+            final labelIdsToTry = [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
+            for (final labelId in labelIdsToTry) {
+              final fetchResult2 = await datasource.fetchMailLists(
+                oauth: oauth,
+                user: ref.read(authControllerProvider).requireValue,
+                isInbox: labelId == CommonMailLabels.inbox.id,
+                labelId: labelId,
+                email: hostMail,
+                q: 'rfc822msgid:$messageId',
+              );
+              final mails2 = fetchResult2.values.expand((e) => e.messages).toList();
+              mailEntity = mails2.firstWhereOrNull((m) => m.id == messageId);
+              if (mailEntity != null) break;
+            }
+          }
+          
+          // If still not found, try as threadId
+          if (mailEntity == null) {
+            print('[Attachment] MessageId search failed, trying as threadId: $messageId');
+            final labelIdsToTry = [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
+            for (final labelId in labelIdsToTry) {
+              final threadResult = await mailRepository.fetchThreads(
+                oauth: oauth,
+                type: mailType,
+                threadId: messageId, // Use as threadId
+                email: hostMail,
+                labelId: labelId,
+              );
+              
+              final threadMails = threadResult.fold((failure) => <MailEntity>[], (mails) => mails);
+              if (threadMails.isNotEmpty) {
+                // Use the first message in the thread
+                mailEntity = threadMails.first;
+                print('[Attachment] Found mail using threadId: ${mailEntity.id}');
+                break;
+              }
+            }
+          }
+        } catch (e) {
+          print('[Attachment] Error searching Gmail: $e');
+        }
+      } else if (mailType == MailEntityType.microsoft) {
+        // For Microsoft, try to get mail from inbox cache first to get threadId
+        // If not in cache, search in common labels
+        try {
+          final inboxList = ref.read(inboxControllerProvider);
+          final cachedInbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
+          if (cachedInbox?.linkedMail != null) {
+            final threadId = cachedInbox!.linkedMail!.threadId;
+            final labelIdsToTry = cachedInbox.linkedMail!.labelIds?.isNotEmpty == true 
+                ? cachedInbox.linkedMail!.labelIds! 
+                : [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
+            
+            for (final labelId in labelIdsToTry) {
+              final threadResult = await mailRepository.fetchThreads(
+                oauth: oauth,
+                type: mailType,
+                threadId: threadId,
+                email: hostMail,
+                labelId: labelId,
+              );
+              mailEntity = threadResult.fold((failure) => null, (threadMails) => threadMails.firstWhereOrNull((m) => m.id == messageId));
+              if (mailEntity != null) break;
+            }
+          }
+          
+          // If still not found, try searching in common labels
+          if (mailEntity == null) {
+            final labelIdsToTry = [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
+            for (final labelId in labelIdsToTry) {
+              final fetchResult = await datasource.fetchMailLists(
+                oauth: oauth,
+                user: ref.read(authControllerProvider).requireValue,
+                isInbox: labelId == CommonMailLabels.inbox.id,
+                labelId: labelId,
+                email: hostMail,
+              );
+              final mails = fetchResult.values.expand((e) => e.messages).toList();
+              mailEntity = mails.firstWhereOrNull((m) => m.id == messageId);
+              if (mailEntity != null) break;
+            }
+          }
+        } catch (e) {
+          print('[Attachment] Error fetching Microsoft mail: $e');
+        }
+      }
+      
+      if (mailEntity == null) {
+        print('[Attachment] Mail not found for messageId: $messageId');
+        return {'success': false, 'error': 'Mail not found for messageId: $messageId'};
+      }
+      
+      // Create inbox entity from mail
+      inbox = InboxEntity(
+        id: inboxId,
+        title: mailEntity.subject ?? '',
+        description: mailEntity.snippet,
+        linkedMail: LinkedMailEntity(
+          hostMail: hostMail,
+          fromName: mailEntity.from?.name ?? mailEntity.from?.email ?? '',
+          messageId: messageId,
+          threadId: mailEntity.threadId ?? '',
+          title: mailEntity.subject ?? '',
+          type: mailType,
+          date: mailEntity.date ?? DateTime.now(),
+          link: null,
+          pageToken: null,
+          labelIds: mailEntity.labelIds,
+          encrypted: false,
+        ),
+      );
+      
+    } else if (inboxId.startsWith('message_')) {
+      // Parse message inboxId: message_${type}_${teamId}_${messageId}
+      final parts = inboxId.split('_');
+      if (parts.length < 4) {
+        print('[Attachment] Invalid message inboxId format: $inboxId');
+        return {'success': false, 'error': 'Invalid inboxId format'};
+      }
+      
+      final messageId = parts.last;
+      final typeName = parts[1];
+      final teamId = parts.sublist(2, parts.length - 1).join('_'); // teamId may contain underscores
+      
+      print('[Attachment] Parsed message inboxId - type: $typeName, teamId: $teamId, messageId: $messageId');
+      
+      // Find message type
+      MessageChannelEntityType? messageType;
+      if (typeName == 'slack') {
+        messageType = MessageChannelEntityType.slack;
+      } else {
+        print('[Attachment] Unknown message type: $typeName');
+        return {'success': false, 'error': 'Unknown message type: $typeName'};
+      }
+      
+      // Find OAuth for this team
+      final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
+      final oauth = oauths.firstWhereOrNull((o) => o.teamId == teamId);
+      
+      if (oauth == null) {
+        print('[Attachment] OAuth not found for teamId: $teamId');
+        return {'success': false, 'error': 'Messenger account not found for team: $teamId'};
+      }
+      
+      // Fetch message
+      final chatRepository = ref.read(chatRepositoryProvider);
+      final me = ref.read(authControllerProvider).value;
+      if (me == null) {
+        return {'success': false, 'error': 'User not authenticated'};
+      }
+      
+      // Get channels for this team
+      final channelMap = ref.read(chatChannelListControllerProvider);
+      final channelList = channelMap[teamId]?.channels ?? [];
+      
+      MessageEntity? messageEntity;
+      
+      // Search through channels to find the message
+      for (final channel in channelList) {
+        try {
+          final result = await chatRepository.fetchMessages(
+            oauth: oauth,
+            channel: channel,
+            targetMessageId: messageId,
+          );
+          
+          messageEntity = result.fold((failure) => null, (fetchResult) => fetchResult.messages.firstWhereOrNull((m) => m.id == messageId));
+          if (messageEntity != null) {
+            print('[Attachment] Found message entity in channel: ${channel.id}');
+            break;
+          }
+        } catch (e) {
+          print('[Attachment] Error searching in channel ${channel.id}: $e');
+        }
+      }
+      
+      if (messageEntity == null) {
+        print('[Attachment] Message not found for messageId: $messageId');
+        return {'success': false, 'error': 'Message not found for messageId: $messageId'};
+      }
+      
+      // Get user name from member
+      final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
+      final userId = messageEntity.userId;
+      final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
+      final userName = member?.displayName ?? userId ?? 'Unknown user';
+      
+      // Get channel info
+      final channelId = messageEntity.channelId;
+      final channel = channelId != null ? channelList.firstWhereOrNull((c) => c.id == channelId) : null;
+      final channelName = channel?.name ?? '';
+      // Check if channel is DM - use cached inbox info if available, otherwise default to false
+      bool isDm = false;
+      final inboxList = ref.read(inboxControllerProvider);
+      final cachedInbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
+      if (cachedInbox?.linkedMessage != null) {
+        isDm = cachedInbox!.linkedMessage!.isDm ?? false;
+      }
+      
+      // Convert MessageChannelEntityType to MessageEntityType
+      MessageEntityType messageEntityType;
+      if (messageType == MessageChannelEntityType.slack) {
+        messageEntityType = MessageEntityType.slack;
+      } else {
+        messageEntityType = MessageEntityType.slack; // Default
+      }
+      
+      // Create inbox entity from message
+      inbox = InboxEntity(
+        id: inboxId,
+        title: userName,
+        description: messageEntity.text,
+        linkedMessage: LinkedMessageEntity(
+          teamId: teamId,
+          channelId: messageEntity.channelId ?? '',
+          userId: messageEntity.userId ?? '',
+          userName: userName,
+          channelName: channelName,
+          messageId: messageId,
+          threadId: messageEntity.threadId ?? messageId,
+          date: messageEntity.createdAt ?? DateTime.now(),
+          type: messageEntityType,
+          link: null,
+          pageToken: null,
+          isDm: isDm,
+          isGroupDm: false,
+          isChannel: !isDm,
+          isUserTagged: false,
+          isMe: false,
+        ),
+      );
+    } else {
+      print('[Attachment] Invalid inboxId format: $inboxId (must start with mail_ or message_)');
+      return {'success': false, 'error': 'Invalid inboxId format'};
     }
 
-    print('[Attachment] Found inbox: ${inbox.id}, linkedMail: ${inbox.linkedMail != null}, linkedMessage: ${inbox.linkedMessage != null}');
+    if (inbox == null) {
+      print('[Attachment] Failed to create inbox entity from inboxId: $inboxId');
+      return {'success': false, 'error': 'Failed to parse inboxId'};
+    }
+
+    print('[Attachment] Created inbox entity: ${inbox.id}, linkedMail: ${inbox.linkedMail != null}, linkedMessage: ${inbox.linkedMessage != null}');
 
     // Extract attachment files (images for PDFs, etc.)
     print('[Attachment] Starting attachment extraction...');

@@ -408,22 +408,8 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
 
     // Task의 경우 (linkedEvent == null인 경우만 task로 인지)
     if (droppedTask != null && droppedTask!.linkedEvent == null) {
-      // status == done인 경우
-      if (droppedTask!.status == TaskStatus.done) {
-        suggestions.add(
-          McpActionSuggestion(
-            mcpFunctionName: 'getPreviousContext',
-            itemName: hasTaggedItems ? null : droppedTask!.title,
-            actionName: _getTitleForMcpFunction(context, 'getPreviousContext'),
-            icon: _getIconForMcpFunction('getPreviousContext'),
-            task: droppedTask,
-            onTap: () => onActionTap?.call('getPreviousContext', task: droppedTask!),
-          ),
-        );
-      }
-
-      // linkedMails 또는 linkedMessages가 있는 경우
-      if (droppedTask!.linkedMails.isNotEmpty || droppedTask!.linkedMessages.isNotEmpty) {
+      // status == done이거나 linkedMails/linkedMessages가 있는 경우 (중복 방지)
+      if (droppedTask!.status == TaskStatus.done || droppedTask!.linkedMails.isNotEmpty || droppedTask!.linkedMessages.isNotEmpty) {
         suggestions.add(
           McpActionSuggestion(
             mcpFunctionName: 'getPreviousContext',

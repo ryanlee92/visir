@@ -1381,9 +1381,22 @@ class AgentActionController extends _$AgentActionController {
               print('[AgentAction] Function calls executed but no natural language response');
               // 함수 실행 결과가 있으면 사용, 없으면 기본 메시지
               if (results.isNotEmpty) {
-                final functionResults = results.map((r) => r['message'] as String? ?? '완료되었습니다.').where((m) => m.isNotEmpty).toList();
-                if (functionResults.isNotEmpty) {
-                  resultMessage = functionResults.join('\n\n');
+                final successResults = results.where((r) => r['success'] == true).toList();
+                final errorResults = results.where((r) => r['success'] == false).toList();
+
+                final successMessages = successResults.map((r) => r['message'] as String? ?? '완료되었습니다.').where((m) => m.isNotEmpty).toList();
+                final errorMessages = errorResults.map((r) => '오류: ${r['error'] as String? ?? '알 수 없는 오류'}').where((m) => m.isNotEmpty).toList();
+
+                final allMessages = <String>[];
+                if (successMessages.isNotEmpty) {
+                  allMessages.addAll(successMessages);
+                }
+                if (errorMessages.isNotEmpty) {
+                  allMessages.addAll(errorMessages);
+                }
+
+                if (allMessages.isNotEmpty) {
+                  resultMessage = allMessages.join('\n\n');
                 } else {
                   resultMessage = '함수가 실행되었습니다.';
                 }
@@ -1628,8 +1641,15 @@ class AgentActionController extends _$AgentActionController {
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
   }) {
+    // 사용자 메시지에서 @task:, @event:, @inbox: 형식의 태그 제거
+    String cleanedMessage = userMessage;
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@task:[a-zA-Z0-9\-_]+'), '');
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@event:[a-zA-Z0-9\-_]+'), '');
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@inbox:[a-zA-Z0-9\-_]+'), '');
+    cleanedMessage = cleanedMessage.trim();
+
     final buffer = StringBuffer();
-    buffer.write(userMessage);
+    buffer.write(cleanedMessage);
 
     // 태그된 항목들을 HTML 태그로 추가
     if (taggedTasks != null && taggedTasks.isNotEmpty) {
@@ -1707,6 +1727,27 @@ class AgentActionController extends _$AgentActionController {
           buffer.writeln('  End: ${task.endAt}');
         }
         buffer.writeln('  Status: ${task.status.name}');
+
+        // linkedMail 또는 linkedMessages가 있으면 inboxId 정보 제공
+        if (task.linkedMails.isNotEmpty) {
+          buffer.writeln('  Linked Mails:');
+          for (final mail in task.linkedMails) {
+            final inboxId = InboxEntity.getInboxIdFromLinkedMail(mail);
+            if (inboxId.isNotEmpty) {
+              buffer.writeln('    - Inbox ID: $inboxId');
+            }
+          }
+        }
+        if (task.linkedMessages.isNotEmpty) {
+          buffer.writeln('  Linked Messages:');
+          for (final message in task.linkedMessages) {
+            final inboxId = InboxEntity.getInboxIdFromLinkedChat(message);
+            if (inboxId.isNotEmpty) {
+              buffer.writeln('    - Inbox ID: $inboxId');
+            }
+          }
+        }
+
         buffer.writeln('');
       }
     }
