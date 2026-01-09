@@ -182,9 +182,7 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
   }
 
   void _showTagListOverlay() {
-    print('##########_showTagListOverlay');
     if (tagList.isEmpty || caretOffset == null) {
-      print('##########_showTagListOverlay hideTagListOverlay');
       _hideTagListOverlay();
       return;
     }
@@ -194,20 +192,15 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     final renderEditor = editorState?.editableTextKey.currentState?.renderEditor;
     final editorContext = editorKey.currentContext;
 
-    print('##########_showTagListOverlay editorContext: $editorContext, renderEditor: $renderEditor');
-
     if (editorContext == null || renderEditor == null) return;
 
     final editorRenderBox = editorContext.findRenderObject() as RenderBox?;
 
-    print('##########_showTagListOverlay editorRenderBox: $editorRenderBox');
     if (editorRenderBox == null) return;
 
     final selection = widget.messageController.selection;
-    print('##########_showTagListOverlay selection: $selection');
-    if (selection.baseOffset == -1) return;
 
-    print('##########_showTagListOverlay selection: $selection');
+    if (selection.baseOffset == -1) return;
 
     // Get caret position in renderEditor's local coordinates
     final caretRect = renderEditor.getLocalRectForCaret(TextPosition(offset: selection.baseOffset));
@@ -228,13 +221,11 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     // If overlay is already showing, just mark it for rebuild to update position
     // This preserves scroll position
     if (tagListOverlayEntry != null) {
-      print('##########_showTagListOverlay selection: $selection');
       // Mark overlay entry for rebuild to update position
       tagListOverlayEntry!.markNeedsBuild();
       return;
     }
 
-    print('##########_showTagListOverlay hideTagListOverlay');
     _hideTagListOverlay();
 
     final overlay = Overlay.of(context);
@@ -252,20 +243,20 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     final html = widget.messageController.html;
     final editingMessageId = widget.messageController.editingMessageId;
 
-    // EasyDebounce.debounce('onChangeContent', const Duration(milliseconds: 300), () {
-    //   ref
-    //       .read(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId).notifier)
-    //       .setDraft(
-    //         ChatDraftEntity(
-    //           id: Uuid().v4(),
-    //           teamId: widget.channel.teamId,
-    //           channelId: widget.channel.id,
-    //           threadId: widget.threadId,
-    //           content: html,
-    //           editingMessageId: editingMessageId,
-    //         ),
-    //       );
-    // });
+    EasyDebounce.debounce('onChangeContent', const Duration(milliseconds: 300), () {
+      ref
+          .read(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId).notifier)
+          .setDraft(
+            ChatDraftEntity(
+              id: Uuid().v4(),
+              teamId: widget.channel.teamId,
+              channelId: widget.channel.id,
+              threadId: widget.threadId,
+              content: html,
+              editingMessageId: editingMessageId,
+            ),
+          );
+    });
 
     // Read latest values from controller instead of using captured values
     final value = widget.messageController.text.trimRight();
@@ -283,9 +274,7 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     await refreshTagSearchResult();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      print('##########checkTagListOverlay ${nextTagVisible} ${tagList.length}');
       if (nextTagVisible && tagList.isNotEmpty) {
-        print('##########showTagListOverlay');
         _showTagListOverlay();
       } else {
         _hideTagListOverlay();
@@ -303,7 +292,10 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
       }
     }
 
-    print('####### tagSearchWord: $tagSearchWord');
+    if (widget.messageController.text == '@\n') {
+      tagSearchWord = '';
+    }
+
     if (tagSearchWord == null) return;
     final broadcastChannelTag = MessageTagEntity(type: MessageTagEntityType.broadcastChannel);
     final broadcastHereTag = MessageTagEntity(type: MessageTagEntityType.broadcastHere);
@@ -348,8 +340,6 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
       if (!aStartsWith && bStartsWith) return 1;
       return 0;
     });
-
-    print('####### tagList: $tagList');
 
     // Only update currentTagIdNotifier if tag list is visible and search word changed
     // If search word is the same, keep the current selection
@@ -578,7 +568,6 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
 
   @override
   Widget build(BuildContext context) {
-    print('##########asdf');
     ref.listen(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId), (previous, next) {
       final draft = next;
       if (draft != null && draft.content.isNotEmpty) {
