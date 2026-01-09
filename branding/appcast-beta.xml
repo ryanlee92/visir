@@ -7,12 +7,12 @@
 		<item>
 			<title>Version 2.0.2</title>
 			<!-- For the macOS item, it is recommended to add 'sparkle:version' and 'sparkle:shortVersionString' to the item node, rather than as part of the enclosure. -->
-			<sparkle:version>1024</sparkle:version>
+			<sparkle:version>1025</sparkle:version>
 			<sparkle:shortVersionString>2.0.2</sparkle:shortVersionString>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
 			<pubDate>Mon, 5 Jan 2026 17:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.zip"
-                sparkle:edSignature="nMeFAZFvLXbOVdf85j4JcUzUhKnKzClmG3PyufPp5mEcdGYpxFvd/Mcegw/B6Z4rma369b9oSRNxCt8oYY2HCg==" length="102510850"
+                sparkle:edSignature="aMheaC6MV+mbbNELLExMls2gu1vsctjIpG+SwaZUbsS4sw+Meq/4pXYVBUWe+feAAk4zKVbw5QHul/UKE0YrAw==" length="102494039"
 				sparkle:os="macos"
 				type="application/octet-stream" />
 		</item>
@@ -22,7 +22,7 @@
 			<pubDate>Mon, 5 Jan 2026 17:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.exe"
                 sparkle:dsaSignature="MDwCHD+GIwWMyibWzw0QkLqPYfjfff/Zqpamcy8oWa4CHGu1BGgAvgaQpTlKUlejWha1stWPqCLhuCEWKQA=" length="0"
-				sparkle:version="2.0.2+1026"
+				sparkle:version="2.0.2+1025"
 				sparkle:os="windows"
 				type="application/octet-stream" />
 		</item>
