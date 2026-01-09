@@ -396,6 +396,7 @@ class AgentActionController extends _$AgentActionController {
     List<InboxEntity>? inboxes,
     List<PlatformFile>? files,
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
+    String? searchContext, // 검색 결과 context
   }) async {
     // 파일 정보를 메시지에 추가 (인박스 첨부 파일 포함)
     String enhancedUserMessage = userMessage;
@@ -482,6 +483,15 @@ class AgentActionController extends _$AgentActionController {
         final requestedNumbers = state.loadedInboxNumbers;
         final summaryOnly = requestedNumbers.isEmpty;
         inboxContext = await _buildInboxContext(inboxes, summaryOnly: summaryOnly, requestedInboxNumbers: requestedNumbers, includeAttachmentInfo: true);
+      }
+
+      // 검색 결과 context가 있으면 inboxContext에 병합
+      if (searchContext != null && searchContext.isNotEmpty) {
+        if (inboxContext != null && inboxContext.isNotEmpty) {
+          inboxContext = '$inboxContext\n\n$searchContext';
+        } else {
+          inboxContext = searchContext;
+        }
       }
 
       // API 키 선택: useUserApiKey가 true이면 사용자 API 키, false이면 환경 변수 API 키
@@ -899,12 +909,13 @@ class AgentActionController extends _$AgentActionController {
                 final searchResults = result['results'] as List<dynamic>?;
                 if (searchResults != null && searchResults.isNotEmpty) {
                   // 검색 결과를 silent 메시지로 추가
-                  final silentMessage = AgentActionMessage(role: 'assistant', content: '[검색 완료: ${searchResults.length}개의 결과를 찾았습니다]', excludeFromHistory: true);
+                  final silentMessage = AgentActionMessage(role: 'assistant', content: '[Search completed: Found ${searchResults.length} results]', excludeFromHistory: true);
                   final updatedMessagesWithSearch = [...messages, silentMessage];
                   state = state.copyWith(messages: updatedMessagesWithSearch);
 
                   // 검색 결과를 context로 변환
                   String? currentSearchContext;
+                  print('[AgentAction] Search results: ${searchResults.length} items');
                   if (functionName == 'searchInbox') {
                     currentSearchContext = await _buildInboxContextFromSearchResults(searchResults);
                     // 검색된 inbox를 availableInboxes에 추가
@@ -987,8 +998,15 @@ class AgentActionController extends _$AgentActionController {
                   // 검색 결과를 context에 추가
                   if (currentSearchContext != null && currentSearchContext.isNotEmpty) {
                     searchContext = searchContext == null ? currentSearchContext : '$searchContext\n\n$currentSearchContext';
+                    print('[AgentAction] Search context created: ${currentSearchContext.length} characters');
+                  } else {
+                    print('[AgentAction] Search context is empty');
                   }
+                } else {
+                  print('[AgentAction] Search results are empty');
                 }
+              } else {
+                print('[AgentAction] Search failed or no results: ${result['success']}, ${result['error']}');
               }
             }
 
@@ -1002,6 +1020,7 @@ class AgentActionController extends _$AgentActionController {
 
             // 검색 결과를 context로 추가하여 AI 재호출
             if (searchContext != null && searchContext.isNotEmpty) {
+              print('[AgentAction] Recalling with search context: ${searchContext.length} characters');
               // 검색 결과를 context로 추가하여 재호출
               await _generateGeneralChat(
                 userMessage,
@@ -1015,13 +1034,22 @@ class AgentActionController extends _$AgentActionController {
                 inboxes: updatedAvailableInboxes,
                 files: files,
                 isRecursiveCall: true, // 재귀 호출 플래그 설정
+                searchContext: searchContext, // 검색 결과 context 전달
               );
               return; // 검색 함수 처리 후 종료
+            } else {
+              print('[AgentAction] No search context, skipping recall');
             }
           }
 
           // 검색 함수가 없거나 재귀 호출인 경우, 일반 함수 처리
-          final functionCallsToProcess = isRecursiveCall ? functionCalls : otherFunctionCalls;
+          // 재귀 호출일 때는 검색 함수를 제외 (이미 context에 결과가 있음)
+          final functionCallsToProcess = isRecursiveCall
+              ? functionCalls.where((call) {
+                  final functionName = call['function'] as String? ?? '';
+                  return functionName != 'searchInbox' && functionName != 'searchTask' && functionName != 'searchCalendarEvent' && functionName != 'getInboxDetails';
+                }).toList()
+              : otherFunctionCalls;
 
           if (functionCallsToProcess.isEmpty) {
             // 검색 함수만 있었고 이미 처리되었으므로 종료
@@ -1910,31 +1938,43 @@ class AgentActionController extends _$AgentActionController {
   /// 검색 결과로부터 인박스 컨텍스트를 생성합니다.
   Future<String> _buildInboxContextFromSearchResults(List<dynamic> searchResults) async {
     final buffer = StringBuffer();
-    buffer.writeln('## 검색된 인박스 항목');
+    buffer.writeln('## Searched Inbox Items');
     buffer.writeln('');
     buffer.writeln('**CRITICAL: When creating tasks from these inbox items, you MUST use the exact "Inbox ID" shown below. Do NOT use item numbers or any other identifiers.**');
     buffer.writeln('');
 
     int itemIndex = 1;
-    for (final result in searchResults.take(10)) {
+    for (final result in searchResults.take(20)) {
       if (result is Map<String, dynamic>) {
+        final inboxId = result['id'] as String?;
+        if (inboxId == null) continue;
+
         final title = result['title'] as String? ?? '';
         final description = result['description'] as String? ?? '';
         final sender = result['sender'] as String? ?? '';
-        final inboxId = result['id'] as String?;
+        final inboxDatetime = result['inboxDatetime'] as String?;
+        final sourceType = result['sourceType'] as String? ?? '';
 
-        if (inboxId != null) {
-          buffer.writeln('### 항목 $itemIndex');
-          buffer.writeln('- **Inbox ID (USE THIS EXACT ID)**: `$inboxId`');
-          if (title.isNotEmpty) buffer.writeln('- Title: $title');
-          if (sender.isNotEmpty) buffer.writeln('- Sender: $sender');
-          if (description.isNotEmpty) {
-            final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
-            buffer.writeln('- Description: $desc');
+        buffer.writeln('### Item $itemIndex');
+        buffer.writeln('- **Inbox ID (USE THIS EXACT ID)**: `$inboxId`');
+        if (title.isNotEmpty) buffer.writeln('- **Title**: $title');
+        if (sender.isNotEmpty) buffer.writeln('- **Sender**: $sender');
+        if (sourceType.isNotEmpty) buffer.writeln('- **Source Type**: $sourceType');
+        if (inboxDatetime != null) {
+          try {
+            final dateTime = DateTime.parse(inboxDatetime);
+            buffer.writeln('- **Date/Time**: ${dateTime.toLocal().toString()}');
+          } catch (e) {
+            buffer.writeln('- **Date/Time**: $inboxDatetime');
           }
-          buffer.writeln('');
-          itemIndex++;
         }
+        if (description.isNotEmpty) {
+          // description 전체를 포함 (200자 제한 제거)
+          buffer.writeln('- **Description**:');
+          buffer.writeln('  $description');
+        }
+        buffer.writeln('');
+        itemIndex++;
       }
     }
 
@@ -1945,54 +1985,122 @@ class AgentActionController extends _$AgentActionController {
     return buffer.toString();
   }
 
-  /// 검색 결과로부터 태스크 컨텍스트를 생성합니다.
+  /// Builds task context from search results.
   String _buildTaskContextFromSearchResults(List<dynamic> searchResults) {
     final buffer = StringBuffer();
-    buffer.writeln('## 검색된 태스크');
+    buffer.writeln('## Searched Tasks');
+    buffer.writeln('');
 
-    for (final result in searchResults.take(10)) {
+    int itemIndex = 1;
+    for (final result in searchResults.take(20)) {
       if (result is Map<String, dynamic>) {
         final taskId = result['id'] as String?;
+        if (taskId == null) continue;
+
         final title = result['title'] as String? ?? '';
         final description = result['description'] as String? ?? '';
         final status = result['status'] as String? ?? '';
+        final projectId = result['projectId'] as String?;
+        final startAt = result['startAt'] as String?;
+        final endAt = result['endAt'] as String?;
+        final isAllDay = result['isAllDay'] as bool? ?? false;
 
-        if (taskId != null) {
-          buffer.writeln('- Task ID: $taskId');
-          if (title.isNotEmpty) buffer.writeln('  Title: $title');
-          if (description.isNotEmpty) {
-            final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
-            buffer.writeln('  Description: $desc');
-          }
-          if (status.isNotEmpty) buffer.writeln('  Status: $status');
-          buffer.writeln('');
+        buffer.writeln('### Task $itemIndex');
+        buffer.writeln('- **Task ID**: `$taskId`');
+        if (title.isNotEmpty) buffer.writeln('- **Title**: $title');
+        if (status.isNotEmpty) buffer.writeln('- **Status**: $status');
+        if (projectId != null && projectId.isNotEmpty) {
+          buffer.writeln('- **Project ID**: $projectId');
         }
+        if (startAt != null) {
+          try {
+            final dateTime = DateTime.parse(startAt);
+            buffer.writeln('- **Start At**: ${dateTime.toLocal().toString()}');
+          } catch (e) {
+            buffer.writeln('- **Start At**: $startAt');
+          }
+        }
+        if (endAt != null) {
+          try {
+            final dateTime = DateTime.parse(endAt);
+            buffer.writeln('- **End At**: ${dateTime.toLocal().toString()}');
+          } catch (e) {
+            buffer.writeln('- **End At**: $endAt');
+          }
+        }
+        buffer.writeln('- **Is All Day**: $isAllDay');
+        if (description.isNotEmpty) {
+          // description 전체를 포함 (200자 제한 제거)
+          buffer.writeln('- **Description**:');
+          buffer.writeln('  $description');
+        }
+        buffer.writeln('');
+        itemIndex++;
       }
     }
 
     return buffer.toString();
   }
 
-  /// 검색 결과로부터 이벤트 컨텍스트를 생성합니다.
+  /// Builds event context from search results.
   String _buildEventContextFromSearchResults(List<dynamic> searchResults) {
     final buffer = StringBuffer();
-    buffer.writeln('## 검색된 이벤트');
+    buffer.writeln('## Searched Events');
+    buffer.writeln('');
 
-    for (final result in searchResults.take(10)) {
+    int itemIndex = 1;
+    for (final result in searchResults.take(20)) {
       if (result is Map<String, dynamic>) {
-        final eventId = result['id'] as String? ?? result['uniqueId'] as String?;
+        final eventId = result['id'] as String?;
+        final uniqueId = result['uniqueId'] as String?;
+        if (eventId == null && uniqueId == null) continue;
+
         final title = result['title'] as String? ?? '';
         final description = result['description'] as String? ?? '';
+        final startDate = result['startDate'] as String?;
+        final endDate = result['endDate'] as String?;
+        final isAllDay = result['isAllDay'] as bool? ?? false;
+        final location = result['location'] as String?;
+        final calendarId = result['calendarId'] as String?;
+        final calendarName = result['calendarName'] as String?;
 
-        if (eventId != null) {
-          buffer.writeln('- Event ID: $eventId');
-          if (title.isNotEmpty) buffer.writeln('  Title: $title');
-          if (description.isNotEmpty) {
-            final desc = description.length > 200 ? '${description.substring(0, 200)}...' : description;
-            buffer.writeln('  Description: $desc');
-          }
-          buffer.writeln('');
+        buffer.writeln('### Event $itemIndex');
+        if (eventId != null) buffer.writeln('- **Event ID**: `$eventId`');
+        if (uniqueId != null) buffer.writeln('- **Unique ID**: `$uniqueId`');
+        if (title.isNotEmpty) buffer.writeln('- **Title**: $title');
+        if (calendarName != null && calendarName.isNotEmpty) {
+          buffer.writeln('- **Calendar Name**: $calendarName');
         }
+        if (calendarId != null && calendarId.isNotEmpty) {
+          buffer.writeln('- **Calendar ID**: $calendarId');
+        }
+        if (startDate != null) {
+          try {
+            final dateTime = DateTime.parse(startDate);
+            buffer.writeln('- **Start Date**: ${dateTime.toLocal().toString()}');
+          } catch (e) {
+            buffer.writeln('- **Start Date**: $startDate');
+          }
+        }
+        if (endDate != null) {
+          try {
+            final dateTime = DateTime.parse(endDate);
+            buffer.writeln('- **End Date**: ${dateTime.toLocal().toString()}');
+          } catch (e) {
+            buffer.writeln('- **End Date**: $endDate');
+          }
+        }
+        buffer.writeln('- **Is All Day**: $isAllDay');
+        if (location != null && location.isNotEmpty) {
+          buffer.writeln('- **Location**: $location');
+        }
+        if (description.isNotEmpty) {
+          // description 전체를 포함 (200자 제한 제거)
+          buffer.writeln('- **Description**:');
+          buffer.writeln('  $description');
+        }
+        buffer.writeln('');
+        itemIndex++;
       }
     }
 
