@@ -2,6 +2,7 @@ import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/widgets/selection_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
@@ -385,8 +386,9 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
   final bool hasTaggedItems;
   final Function(String mcpFunctionName, {InboxEntity? inbox, TaskEntity? task, EventEntity? event})? onActionTap;
   final Function(String title, String prompt)? onCustomPrompt;
+  bool isRow;
 
-  const AgentActionSuggestionsWidget({
+  AgentActionSuggestionsWidget({
     super.key,
     required this.inboxes,
     this.upNextTask,
@@ -397,6 +399,7 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
     this.hasTaggedItems = false,
     this.onActionTap,
     this.onCustomPrompt,
+    this.isRow = true,
   });
 
   /// 드롭된 아이템의 속성에 따라 suggested action을 생성합니다.
@@ -794,6 +797,25 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    if (!isRow) {
+      return SelectionWidget(
+        onSelect: (selection) {
+          selection.onTap();
+          Navigator.of(Utils.mainContext).maybePop();
+        },
+        items: suggestions,
+        getTitleSpan: (suggestion) => TextSpan(
+          children: [
+            TextSpan(text: suggestion.actionName, style: context.bodyMedium?.textColor(context.onSurface).textBold),
+            if (suggestion.itemName != null) ...[
+              TextSpan(text: '\n', style: context.bodyMedium?.textColor(context.onSurface)),
+              TextSpan(text: suggestion.itemName ?? '', style: context.bodySmall?.textColor(context.onSurface)),
+            ],
+          ],
+        ),
+      );
+    }
+
     // 태그 높이 계산 (padding + icon + text + spacing)
     // const tagHeight = 6.0 + 6.0 + 12.0 + 6.0; // vertical padding + icon height + text height + spacing
 
@@ -834,57 +856,6 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
 
       // Create keyboard shortcut for Option + (1-10)
       final digitKey = _getDigitKeyForIndex(index);
-      final shortcutNumber = index + 1;
-
-      if (PlatformX.isMobileView) {
-        return VisirButton(
-          type: VisirButtonAnimationType.scaleAndOpacity,
-          style: VisirButtonStyle(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), backgroundColor: context.surface.withValues(alpha: 0.7)),
-          options: VisirButtonOptions(
-            bypassTextField: true,
-            shortcuts: [
-              VisirButtonKeyboardShortcut(
-                keys: [LogicalKeyboardKey.alt, digitKey],
-                message: '',
-                onTrigger: () {
-                  suggestion.onTap();
-                  Navigator.of(Utils.mainContext).maybePop();
-                  return true;
-                },
-              ),
-            ],
-          ),
-          onTap: () {
-            suggestion.onTap();
-            Navigator.of(Utils.mainContext).maybePop();
-          },
-          child: Row(
-            children: [
-              VisirIcon(type: suggestion.icon, size: 16, color: context.onSurface, isSelected: true),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text.rich(
-                      TextSpan(text: suggestion.actionName, style: context.titleMedium?.textColor(context.onSurface).appFont(context).textBold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    if (suggestion.itemName != null)
-                      Text.rich(
-                        TextSpan(text: suggestion.itemName, style: context.bodyLarge?.textColor(context.onSurface)),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      }
 
       return IntrinsicWidth(
         child: VisirButton(
@@ -934,15 +905,6 @@ class AgentActionSuggestionsWidget extends ConsumerWidget {
         ),
       );
     }).toList();
-
-    if (PlatformX.isMobileView) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6.0),
-        child: Column(
-          children: [...suggestionWidgets.map((widget) => Padding(padding: const EdgeInsets.only(bottom: 6), child: widget))],
-        ),
-      );
-    }
 
     return Container(
       padding: const EdgeInsets.only(top: 8),

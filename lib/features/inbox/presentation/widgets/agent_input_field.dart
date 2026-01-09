@@ -1394,13 +1394,12 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     final messageFileList = ref.watch(agentFileListControllerProvider(tabType: widget.tabType).select((v) => v));
     uploadable = messageController.text.trim().isNotEmpty || messageFileList.where((e) => (e.ok ?? false)).toList().isNotEmpty;
     final selectedModel = ref.watch(selectedAgentModelProvider).value;
-    final hasTaggedTasks = messageController.taggedTasks.isNotEmpty;
-    final hasTaggedEvents = messageController.taggedEvents.isNotEmpty;
-    final hasTaggedInboxes = messageController.taggedInboxes.isNotEmpty;
+    final hasTaggedTasks = messageController.taggedTasks.length == 1;
+    final hasTaggedEvents = messageController.taggedEvents.length == 1;
+    final hasTaggedInboxes = messageController.taggedInboxes.length == 1;
+    final hasExactlyOneTagged = [hasTaggedTasks, hasTaggedEvents, hasTaggedInboxes].where((e) => e).length == 1;
     final showSuggestedActions =
-        agentAction.isEmpty &&
-        widget.inboxes != null &&
-        (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null || hasTaggedTasks || hasTaggedEvents || hasTaggedInboxes);
+        agentAction.isEmpty && widget.inboxes != null && (widget.inboxes!.isNotEmpty || widget.upNextTask != null || widget.upNextEvent != null || hasExactlyOneTagged);
 
     // 태그된 task나 event를 droppedTask/droppedEvent로 사용
     final taggedTask = hasTaggedTasks ? messageController.taggedTasks.first : null;
@@ -1432,7 +1431,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (PlatformX.isDesktopView && showSuggestedActions)
+                    if ((PlatformX.isDesktopView || hasExactlyOneTagged) && showSuggestedActions)
                       AgentActionSuggestionsWidget(
                         inboxes: widget.inboxes ?? [],
                         upNextTask: widget.upNextTask,
@@ -2410,7 +2409,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                           Expanded(
                             child: Row(
                               children: [
-                                if (PlatformX.isMobileView && showSuggestedActions)
+                                if ((PlatformX.isMobileView && !hasExactlyOneTagged) && showSuggestedActions)
                                   IntrinsicWidth(
                                     child: Builder(
                                       builder: (context) {
@@ -2427,6 +2426,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                             doNotConvertCase: true,
                                           ),
                                           popup: AgentActionSuggestionsWidget(
+                                            isRow: false,
                                             inboxes: widget.inboxes ?? [],
                                             upNextTask: widget.upNextTask,
                                             upNextEvent: widget.upNextEvent,
