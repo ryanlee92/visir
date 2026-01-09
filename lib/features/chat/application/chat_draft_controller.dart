@@ -9,6 +9,7 @@ import 'package:Visir/features/common/provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'chat_draft_controller.g.dart';
 
@@ -71,7 +72,7 @@ class ChatDraftControllerInternal extends _$ChatDraftControllerInternal {
         options: Utils.storageOptions,
       ).future;
     }
-    return state.value;
+    return state.value ?? ChatDraftEntity(id: Uuid().v4(), teamId: teamId, channelId: channelId, threadId: threadId, content: '', editingMessageId: null);
   }
 
   void setDraft(ChatDraftEntity? draft) {

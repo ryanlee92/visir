@@ -243,21 +243,18 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     final html = widget.messageController.html;
     final editingMessageId = widget.messageController.editingMessageId;
 
-    EasyDebounce.debounce('onChangeContent', const Duration(milliseconds: 300), () {
-      ref
-          .read(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId).notifier)
-          .setDraft(
-            ChatDraftEntity(
-              id: Uuid().v4(),
-              teamId: widget.channel.teamId,
-              channelId: widget.channel.id,
-              threadId: widget.threadId,
-              content: html,
-              editingMessageId: editingMessageId,
-            ),
-          );
-    });
-
+    ref
+        .read(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId).notifier)
+        .setDraft(
+          ChatDraftEntity(
+            id: Uuid().v4(),
+            teamId: widget.channel.teamId,
+            channelId: widget.channel.id,
+            threadId: widget.threadId,
+            content: html,
+            editingMessageId: editingMessageId,
+          ),
+        );
     // Read latest values from controller instead of using captured values
     final value = widget.messageController.text.trimRight();
 
@@ -565,15 +562,17 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
   }
 
   bool uploadable = false;
+  bool draftLoaded = false;
 
   @override
   Widget build(BuildContext context) {
     ref.listen(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId), (previous, next) {
       final draft = next;
-      if (draft != null && draft.content.isNotEmpty) {
+      if (draft != null && draft.content.isNotEmpty && !draftLoaded) {
         widget.messageController.setData(html: draft.content, editingMessageId: draft.editingMessageId);
         widget.messageController.updateSelection(TextSelection.collapsed(offset: draft.content.length), ChangeSource.local);
       }
+      if (next != null && !draftLoaded) draftLoaded = true;
     });
 
     final messageFileList = ref.watch(chatFileListControllerProvider(tabType: widget.tabType, isThread: widget.isThread).select((v) => v));
