@@ -17,12 +17,7 @@ import 'package:super_clipboard/super_clipboard.dart';
 import 'package:uuid/uuid.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
-Future<void> pasteFileFromClipboard({
-  required CustomTagController controller,
-  required bool isReply,
-  required TabType tabType,
-  required MessageChannelEntity channel,
-}) async {
+Future<void> pasteFileFromClipboard({required CustomTagController controller, required bool isReply, required TabType tabType, required MessageChannelEntity channel}) async {
   final clipboard = SystemClipboard.instance;
   if (clipboard == null) return;
 
@@ -48,9 +43,7 @@ Future<void> pasteFileFromClipboard({
       }
 
       final platformFile = PlatformFile(name: fileName, size: bytes.lengthInBytes, bytes: bytes, identifier: fileName);
-      await Utils.ref
-          .read(chatFileListControllerProvider(tabType: tabType, isThread: isReply).notifier)
-          .getFileUploadUrl(type: channel.type, file: platformFile);
+      await Utils.ref.read(chatFileListControllerProvider(tabType: tabType, isThread: isReply).notifier).getFileUploadUrl(type: channel.type, file: platformFile);
     });
   }
 }
@@ -60,7 +53,6 @@ class CustomTagController extends QuillController {
   MessageChannelEntity? channel;
 
   MessageMemberEntity? me;
-  bool _tagListVisible = false;
   String? _editingMessageId;
 
   List<MessageMemberEntity> taggedMembers = [];
@@ -79,13 +71,6 @@ class CustomTagController extends QuillController {
       ) {
     // addListener(_handleTextChange);
   }
-
-  set tagListVisible(bool value) {
-    _tagListVisible = value;
-    // notifyListeners();
-  }
-
-  bool get tagListVisible => _tagListVisible;
 
   set editingMessageId(String? value) {
     if (value == _editingMessageId) return;

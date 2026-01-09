@@ -625,13 +625,13 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
   bool isLoadingMore = false;
 
   bool doEmptyTapAction({bool? checkTag}) {
-    if (messageController.tagListVisible) {
-      if (checkTag == true) {
-        messageController.tagListVisible = false;
-        setState(() {});
-      }
-      return true;
-    }
+    // if (messageController.tagListVisible) {
+    //   if (checkTag == true) {
+    //     messageController.tagListVisible = false;
+    //     setState(() {});
+    //   }
+    //   return true;
+    // }
 
     if (messageFocusNode.hasFocus) {
       messageFocusNode.unfocus();

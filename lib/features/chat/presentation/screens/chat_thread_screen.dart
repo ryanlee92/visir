@@ -318,14 +318,14 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   }
 
   bool doEmptyTapAction({bool? checkTag}) {
-    if (replyController.tagListVisible) {
-      if (checkTag == true) {
-        replyController.tagListVisible = false;
-        setState(() {});
-      }
+    // if (replyController.tagListVisible) {
+    //   if (checkTag == true) {
+    //     replyController.tagListVisible = false;
+    //     setState(() {});
+    //   }
 
-      return true;
-    }
+    //   return true;
+    // }
 
     if (textFormFieldfocusNode.hasFocus) {
       textFormFieldfocusNode.unfocus();

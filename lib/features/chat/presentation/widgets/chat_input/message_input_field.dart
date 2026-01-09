@@ -24,6 +24,7 @@ import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_image_platform_interface/cached_network_image_platform_interface.dart' show ImageRenderMethodForWeb;
 import 'package:collection/collection.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -81,7 +82,7 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
   bool get isFromInbox => widget.isFromInbox;
 
   CustomTagController get messageController => widget.messageController;
-  bool get tagListVisible => widget.messageController.tagListVisible;
+  bool get tagListVisible => tagListOverlayEntry != null;
 
   VoidCallback? toggleBold;
   VoidCallback? toggleItalic;
@@ -99,8 +100,6 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
   ValueNotifier<String> currentTagIdNotifier = ValueNotifier('');
   ScrollController tagListScrollController = ScrollController();
   final List<MessageTagEntity> tagList = [];
-  String tagSearchWord = '';
-  String? previousTagSearchWord; // Track previous search word to avoid unnecessary rebuilds
   OverlayEntry? tagListOverlayEntry;
 
   GlobalKey<QuillEditorState> editorKey = GlobalKey<QuillEditorState>();
@@ -183,7 +182,9 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
   }
 
   void _showTagListOverlay() {
+    print('##########_showTagListOverlay');
     if (tagList.isEmpty || caretOffset == null) {
+      print('##########_showTagListOverlay hideTagListOverlay');
       _hideTagListOverlay();
       return;
     }
@@ -193,13 +194,20 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     final renderEditor = editorState?.editableTextKey.currentState?.renderEditor;
     final editorContext = editorKey.currentContext;
 
+    print('##########_showTagListOverlay editorContext: $editorContext, renderEditor: $renderEditor');
+
     if (editorContext == null || renderEditor == null) return;
 
     final editorRenderBox = editorContext.findRenderObject() as RenderBox?;
+
+    print('##########_showTagListOverlay editorRenderBox: $editorRenderBox');
     if (editorRenderBox == null) return;
 
     final selection = widget.messageController.selection;
+    print('##########_showTagListOverlay selection: $selection');
     if (selection.baseOffset == -1) return;
+
+    print('##########_showTagListOverlay selection: $selection');
 
     // Get caret position in renderEditor's local coordinates
     final caretRect = renderEditor.getLocalRectForCaret(TextPosition(offset: selection.baseOffset));
@@ -220,16 +228,17 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     // If overlay is already showing, just mark it for rebuild to update position
     // This preserves scroll position
     if (tagListOverlayEntry != null) {
+      print('##########_showTagListOverlay selection: $selection');
       // Mark overlay entry for rebuild to update position
       tagListOverlayEntry!.markNeedsBuild();
       return;
     }
 
+    print('##########_showTagListOverlay hideTagListOverlay');
     _hideTagListOverlay();
 
     final overlay = Overlay.of(context);
     tagListOverlayEntry = OverlayEntry(builder: (context) => _buildTagListOverlay(caretGlobalPosition!));
-
     overlay.insert(tagListOverlayEntry!);
   }
 
@@ -239,92 +248,73 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     tagListOverlayEntry = null;
   }
 
-  void onChangeContent() {
+  void onChangeContent() async {
     final html = widget.messageController.html;
     final editingMessageId = widget.messageController.editingMessageId;
-    ref
-        .read(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId).notifier)
-        .setDraft(
-          ChatDraftEntity(
-            id: Uuid().v4(),
-            teamId: widget.channel.teamId,
-            channelId: widget.channel.id,
-            threadId: widget.threadId,
-            content: html,
-            editingMessageId: editingMessageId,
-          ),
-        );
 
-    // Handle tag search
+    // EasyDebounce.debounce('onChangeContent', const Duration(milliseconds: 300), () {
+    //   ref
+    //       .read(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId).notifier)
+    //       .setDraft(
+    //         ChatDraftEntity(
+    //           id: Uuid().v4(),
+    //           teamId: widget.channel.teamId,
+    //           channelId: widget.channel.id,
+    //           threadId: widget.threadId,
+    //           content: html,
+    //           editingMessageId: editingMessageId,
+    //         ),
+    //       );
+    // });
+
+    // Read latest values from controller instead of using captured values
     final value = widget.messageController.text.trimRight();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
+    bool nextTagVisible = false;
 
-      final prevTagVisible = widget.messageController.tagListVisible;
+    if (value.isEmpty) {
+      nextTagVisible = false;
+    } else {
+      caretOffset = getCaretOffset();
+      nextTagVisible = true;
+    }
 
-      if (value.isEmpty) {
-        widget.messageController.tagListVisible = false;
-      } else if (((value.length == 1 || widget.messageController.selection.start == 1) && value[0] == '@' && (value.length < 2 || value[1] == ' '))) {
-        caretOffset = getCaretOffset();
-        widget.messageController.tagListVisible = true;
-      } else if ((value.length > 1 &&
-          widget.messageController.selection.start > 1 &&
-          value.length >= widget.messageController.selection.start &&
-          (value.substring(widget.messageController.selection.start - 2, widget.messageController.selection.start) == ' @' ||
-              value.substring(widget.messageController.selection.start - 2, widget.messageController.selection.start) == '\n@'))) {
-        caretOffset = getCaretOffset();
-        widget.messageController.tagListVisible = true;
-      }
+    // Refresh tag search result
+    await refreshTagSearchResult();
 
-      // Refresh tag search result
-      await refreshTagSearchResult();
-
-      if (prevTagVisible != widget.messageController.tagListVisible) {
-        if (widget.messageController.tagListVisible && tagList.isNotEmpty) {
-          _showTagListOverlay();
-        } else {
-          _hideTagListOverlay();
-        }
-        setState(() {});
-      } else if (widget.messageController.tagListVisible && tagList.isNotEmpty) {
-        // Update overlay position if tag list is already visible
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      print('##########checkTagListOverlay ${nextTagVisible} ${tagList.length}');
+      if (nextTagVisible && tagList.isNotEmpty) {
+        print('##########showTagListOverlay');
         _showTagListOverlay();
-      } else if (!widget.messageController.tagListVisible || tagList.isEmpty) {
+      } else {
         _hideTagListOverlay();
       }
     });
   }
 
   Future<void> refreshTagSearchResult() async {
-    // Calculate new search word
-    String newTagSearchWord = '';
+    tagList.clear();
+    String? tagSearchWord;
     if (widget.messageController.value.selection.end > 1) {
       int? searchFromIndex = widget.messageController.text.substring(0, widget.messageController.value.selection.end).lastIndexOf('@') + 1;
       if (searchFromIndex >= 0) {
-        newTagSearchWord = widget.messageController.text.substring(searchFromIndex, widget.messageController.value.selection.end);
+        tagSearchWord = widget.messageController.text.substring(searchFromIndex, widget.messageController.value.selection.end);
       }
     }
 
-    // If search word hasn't changed, don't rebuild the tag list
-    if (previousTagSearchWord == newTagSearchWord) {
-      return;
-    }
-
-    previousTagSearchWord = newTagSearchWord;
-    tagSearchWord = newTagSearchWord;
-    tagList.clear();
-
+    print('####### tagSearchWord: $tagSearchWord');
+    if (tagSearchWord == null) return;
     final broadcastChannelTag = MessageTagEntity(type: MessageTagEntityType.broadcastChannel);
     final broadcastHereTag = MessageTagEntity(type: MessageTagEntityType.broadcastHere);
 
     final pref = ref.read(localPrefControllerProvider).value;
     if (pref == null) return;
 
-    final matchedMembersContain = members.where((e) => (e.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false)).toList();
-    final matchedMemberGroupsContain = groups.where((e) => (e.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false)).toList();
+    final matchedMembersContain = members.where((e) => (e.displayName?.toLowerCase().startsWith(tagSearchWord!.toLowerCase()) ?? false)).toList();
+    final matchedMemberGroupsContain = groups.where((e) => (e.displayName?.toLowerCase().startsWith(tagSearchWord!.toLowerCase()) ?? false)).toList();
 
-    final matchedChannelsContain = channels.where((e) => (e.name?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false)).toList();
+    final matchedChannelsContain = channels.where((e) => (e.name?.toLowerCase().startsWith(tagSearchWord!.toLowerCase()) ?? false)).toList();
 
     if (widget.channel.isChannel) {
       if (broadcastChannelTag.id?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false) {
@@ -352,25 +342,25 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     });
 
     tagList.sort((a, b) {
-      final aStartsWith = a.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false;
-      final bStartsWith = b.displayName?.toLowerCase().startsWith(tagSearchWord.toLowerCase()) ?? false;
+      final aStartsWith = a.displayName?.toLowerCase().startsWith(tagSearchWord!.toLowerCase()) ?? false;
+      final bStartsWith = b.displayName?.toLowerCase().startsWith(tagSearchWord!.toLowerCase()) ?? false;
       if (aStartsWith && !bStartsWith) return -1;
       if (!aStartsWith && bStartsWith) return 1;
       return 0;
     });
 
+    print('####### tagList: $tagList');
+
     // Only update currentTagIdNotifier if tag list is visible and search word changed
     // If search word is the same, keep the current selection
-    if (widget.messageController.tagListVisible) {
-      // Check if the currently selected tag still exists in the new list
-      final currentSelectedId = currentTagIdNotifier.value;
-      final stillExists = tagList.any((tag) => tag.id == currentSelectedId);
 
-      if (!stillExists) {
-        // Current selection no longer exists, select first item
-        currentTagIdNotifier.value = tagList.firstOrNull?.id ?? '';
-      }
-      // If stillExists, keep the current selection (don't update)
+    // Check if the currently selected tag still exists in the new list
+    final currentSelectedId = currentTagIdNotifier.value;
+    final stillExists = tagList.any((tag) => tag.id == currentSelectedId);
+
+    if (!stillExists) {
+      // Current selection no longer exists, select first item
+      currentTagIdNotifier.value = tagList.firstOrNull?.id ?? '';
     }
   }
 
@@ -418,10 +408,17 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
     final tag = tagList[index];
     String tagString = '\u200b${tag.type == MessageTagEntityType.channel ? '#' : '@'}${tag.displayName}\u200b ';
     final lastIndex = widget.messageController.text.substring(0, widget.messageController.value.selection.end).lastIndexOf('@');
+
+    // Invalidate any pending onChangeContent callbacks BEFORE changing text
+    // This prevents stale callbacks from processing the tag input
+
+    // Reset tag search state to prevent stale values BEFORE changing text
+
+    // Now change the text - this will trigger onChangeContent with the new callback ID
     widget.messageController.text = (widget.messageController.text).replaceRange(lastIndex, widget.messageController.value.selection.end, tagString);
     requestFocus();
     widget.messageController.updateSelection(TextSelection.collapsed(offset: lastIndex + tagString.length), ChangeSource.local);
-    widget.messageController.tagListVisible = false;
+
     _hideTagListOverlay();
 
     switch (tag.type) {
@@ -443,7 +440,6 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
         break;
     }
 
-    setState(() {});
     return true; // Return true to indicate tag was entered successfully
   }
 
@@ -582,6 +578,7 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
 
   @override
   Widget build(BuildContext context) {
+    print('##########asdf');
     ref.listen(chatDraftControllerProvider(teamId: widget.channel.teamId, channelId: widget.channel.id, threadId: widget.threadId), (previous, next) {
       final draft = next;
       if (draft != null && draft.content.isNotEmpty) {
@@ -1500,9 +1497,7 @@ class MessageInputFieldState extends ConsumerState<MessageInputField> {
       left: overlayX,
       child: TapRegion(
         onTapOutside: (tap) {
-          widget.messageController.tagListVisible = false;
           _hideTagListOverlay();
-          setState(() {});
         },
         behavior: HitTestBehavior.opaque,
         child: Material(
