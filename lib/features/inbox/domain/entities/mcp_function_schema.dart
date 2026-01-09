@@ -12,16 +12,13 @@ class McpFunctionSchema {
   Map<String, dynamic> toJson() {
     // Get required parameter names (only those with required == true)
     final requiredParams = parameters.where((p) => p.required == true).map((p) => p.name).toList();
-    
+
     return {
       'name': name,
       'description': description,
       'parameters': {
         'type': 'object',
-        'properties': {
-          for (final param in parameters)
-            param.name: _buildParameterSchema(param),
-        },
+        'properties': {for (final param in parameters) param.name: _buildParameterSchema(param)},
         // OpenAI API requires 'required' to be an array of parameter names
         if (requiredParams.isNotEmpty) 'required': requiredParams,
       },
@@ -31,10 +28,7 @@ class McpFunctionSchema {
 
   /// Builds the schema for a single parameter, handling array types with items
   Map<String, dynamic> _buildParameterSchema(McpFunctionParameter param) {
-    final schema = <String, dynamic>{
-      'type': param.type,
-      'description': param.description,
-    };
+    final schema = <String, dynamic>{'type': param.type, 'description': param.description};
 
     // For array types, OpenAI API requires 'items' property
     if (param.type == 'array') {
@@ -48,9 +42,7 @@ class McpFunctionSchema {
               'type': 'string',
               'enum': ['push', 'email'],
             },
-            'minutes': {
-              'type': 'number',
-            },
+            'minutes': {'type': 'number'},
           },
           'required': ['method', 'minutes'],
         };
@@ -248,19 +240,6 @@ class McpFunctionRegistry {
         description: 'Duplicates an event.',
         parameters: [McpFunctionParameter(name: 'eventId', type: 'string', description: 'Event ID', required: true)],
       ),
-      McpFunctionSchema(name: 'getTodayTasks', description: 'Gets tasks scheduled for today.', parameters: []),
-      McpFunctionSchema(name: 'getTodayEvents', description: 'Gets events scheduled for today.', parameters: []),
-      McpFunctionSchema(
-        name: 'getUpcomingTasks',
-        description: 'Gets upcoming tasks.',
-        parameters: [McpFunctionParameter(name: 'limit', type: 'number', description: 'Maximum number of results (optional, default: 10)', required: false)],
-      ),
-      McpFunctionSchema(
-        name: 'getUpcomingEvents',
-        description: 'Gets upcoming events.',
-        parameters: [McpFunctionParameter(name: 'limit', type: 'number', description: 'Maximum number of results (optional, default: 10)', required: false)],
-      ),
-      McpFunctionSchema(name: 'getOverdueTasks', description: 'Gets overdue tasks.', parameters: []),
       McpFunctionSchema(
         name: 'removeReminder',
         description: 'Removes reminders from a task or event.',
@@ -363,16 +342,35 @@ class McpFunctionRegistry {
       ),
       McpFunctionSchema(
         name: 'optimizeSchedule',
-        description: 'Optimizes the schedule for a task or event by finding the best available time slot.',
+        description:
+            'Optimizes the schedule for a task or event by finding the best available time slot. **IMPORTANT**: Before calling this function, you MUST first call searchTask or searchCalendarEvent to get the task/event list with their current time information in the context. This function needs to know the current schedule to find optimal time slots.',
         parameters: [
-          McpFunctionParameter(name: 'taskId', type: 'string', description: 'Task ID (either taskId or eventId is required)'),
-          McpFunctionParameter(name: 'eventId', type: 'string', description: 'Event ID (either taskId or eventId is required)'),
+          McpFunctionParameter(
+            name: 'taskId',
+            type: 'string',
+            description: 'Task ID (either taskId or eventId is required). Must be found in the context from a previous searchTask call.',
+            required: false,
+          ),
+          McpFunctionParameter(
+            name: 'eventId',
+            type: 'string',
+            description: 'Event ID (either taskId or eventId is required). Must be found in the context from a previous searchCalendarEvent call.',
+            required: false,
+          ),
         ],
       ),
       McpFunctionSchema(
         name: 'reschedule',
-        description: 'Reschedules multiple tasks to today with optimal time slots.',
-        parameters: [McpFunctionParameter(name: 'taskIds', type: 'array', description: 'List of task IDs to reschedule', required: true)],
+        description:
+            'Reschedules multiple tasks to today with optimal time slots. **IMPORTANT**: Before calling this function, you MUST first call searchTask to get the task list with their current time information in the context. This function needs to know the current schedule and task durations to find optimal time slots.',
+        parameters: [
+          McpFunctionParameter(
+            name: 'taskIds',
+            type: 'array',
+            description: 'List of task IDs to reschedule. Must be found in the context from a previous searchTask call.',
+            required: true,
+          ),
+        ],
       ),
 
       // Project Actions
@@ -733,12 +731,6 @@ class McpFunctionRegistry {
         ],
       ),
       McpFunctionSchema(name: 'getCalendarList', description: 'Gets a list of available calendars.', parameters: []),
-      McpFunctionSchema(name: 'getUnscheduledTasks', description: 'Gets a list of unscheduled tasks.', parameters: []),
-      McpFunctionSchema(
-        name: 'getCompletedTasks',
-        description: 'Gets a list of completed tasks.',
-        parameters: [McpFunctionParameter(name: 'limit', type: 'number', description: 'Maximum number of results (optional)')],
-      ),
       McpFunctionSchema(
         name: 'getInboxDetails',
         description: 'Gets detailed information about an inbox item.',
@@ -829,7 +821,8 @@ class McpFunctionRegistry {
       ),
       McpFunctionSchema(
         name: 'getPreviousContext',
-        description: 'Gets the conversation summary (previous context) for a task, event, or inbox item. Uses AI to generate a summary of related conversations, emails, and messages.',
+        description:
+            'Gets the conversation summary (previous context) for a task, event, or inbox item. Uses AI to generate a summary of related conversations, emails, and messages.',
         parameters: [
           McpFunctionParameter(name: 'taskId', type: 'string', description: 'Task ID (optional, provide if getting context for a task)', required: false),
           McpFunctionParameter(name: 'eventId', type: 'string', description: 'Event ID (optional, provide if getting context for an event)', required: false),
@@ -838,9 +831,16 @@ class McpFunctionRegistry {
       ),
       McpFunctionSchema(
         name: 'summarizeAttachment',
-        description: '**MANDATORY FUNCTION FOR ATTACHMENT REQUESTS**: When the user asks to read, summarize, analyze, or open attachments/files (e.g., "첨부파일 요약해줘", "첨부파일 열어서", "PDF 읽어서", "attachment summary", "open attachment"), you MUST call this function. It downloads attachments, converts PDFs to images, and extracts text content. The inboxId can be found in the current conversation context (look for "Inbox ID" or inbox items mentioned above).',
+        description:
+            '**MANDATORY FUNCTION FOR ATTACHMENT REQUESTS**: When the user asks to read, summarize, analyze, or open attachments/files (e.g., "첨부파일 요약해줘", "첨부파일 열어서", "PDF 읽어서", "attachment summary", "open attachment"), you MUST call this function. It downloads attachments, converts PDFs to images, and extracts text content. The inboxId can be found in the current conversation context (look for "Inbox ID" or inbox items mentioned above).',
         parameters: [
-          McpFunctionParameter(name: 'inboxId', type: 'string', description: 'Inbox ID that contains the attachment. Find this in the current context - look for inbox items shown above or use the inboxId from "View Previous Context" section. Format: mail_<type>_<email>_<messageId> or message_<type>_<teamId>_<messageId>', required: true),
+          McpFunctionParameter(
+            name: 'inboxId',
+            type: 'string',
+            description:
+                'Inbox ID that contains the attachment. Find this in the current context - look for inbox items shown above or use the inboxId from "View Previous Context" section. Format: mail_<type>_<email>_<messageId> or message_<type>_<teamId>_<messageId>',
+            required: true,
+          ),
           McpFunctionParameter(name: 'attachmentId', type: 'string', description: 'Attachment ID (optional, if not provided, all attachments will be processed)', required: false),
         ],
       ),
@@ -863,11 +863,7 @@ class McpFunctionRegistry {
   static List<Map<String, dynamic>> getGoogleAiFunctions() {
     return getAllFunctions().map((f) {
       final json = f.toJson();
-      return {
-        'name': json['name'],
-        'description': json['description'],
-        'parameters': json['parameters'],
-      };
+      return {'name': json['name'], 'description': json['description'], 'parameters': json['parameters']};
     }).toList();
   }
 
@@ -875,11 +871,7 @@ class McpFunctionRegistry {
   static List<Map<String, dynamic>> getAnthropicFunctions() {
     return getAllFunctions().map((f) {
       final json = f.toJson();
-      return {
-        'name': json['name'],
-        'description': json['description'],
-        'input_schema': json['parameters'],
-      };
+      return {'name': json['name'], 'description': json['description'], 'input_schema': json['parameters']};
     }).toList();
   }
 }

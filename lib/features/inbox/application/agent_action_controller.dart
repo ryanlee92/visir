@@ -792,6 +792,35 @@ class AgentActionController extends _$AgentActionController {
         aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(RegExp(r'<function_call[^>]*>.*?</function_call>', dotAll: true), '');
         // </function_call> 단독 태그 제거
         aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(RegExp(r'</function_call>', dotAll: true), '');
+        // JSON 배열 형식의 함수 호출 제거: [{"function": "...", "arguments": {...}}, ...]
+        try {
+          final arrayStart = aiMessageWithoutFunctionCalls.indexOf('[');
+          final arrayEnd = aiMessageWithoutFunctionCalls.lastIndexOf(']');
+          if (arrayStart != -1 && arrayEnd != -1 && arrayEnd > arrayStart) {
+            final arrayStr = aiMessageWithoutFunctionCalls.substring(arrayStart, arrayEnd + 1);
+            try {
+              final parsed = jsonDecode(arrayStr) as List<dynamic>?;
+              if (parsed != null && parsed.isNotEmpty) {
+                // 함수 호출 배열인지 확인
+                bool isFunctionCallArray = true;
+                for (final item in parsed) {
+                  if (item is! Map<String, dynamic> || !item.containsKey('function') || !item.containsKey('arguments')) {
+                    isFunctionCallArray = false;
+                    break;
+                  }
+                }
+                if (isFunctionCallArray) {
+                  // 함수 호출 배열이면 제거
+                  aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.replaceAll(arrayStr, '').trim();
+                }
+              }
+            } catch (e) {
+              // JSON 파싱 실패는 무시
+            }
+          }
+        } catch (e) {
+          // 배열 찾기 실패는 무시
+        }
         // 앞뒤 공백 제거
         aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.trim();
 
@@ -1014,7 +1043,8 @@ class AgentActionController extends _$AgentActionController {
 
                 // 재귀 호출에서 검색 함수는 무시 (이미 context에 결과가 있음)
                 if (isRecursiveCall) {
-                  final isSearchFunction = functionName == 'searchInbox' || functionName == 'searchTask' || functionName == 'searchCalendarEvent';
+                  final isSearchFunction =
+                      functionName == 'searchInbox' || functionName == 'searchTask' || functionName == 'searchCalendarEvent' || functionName == 'getInboxDetails';
                   if (isSearchFunction) {
                     return null; // 검색 함수는 무시
                   }
@@ -1321,10 +1351,31 @@ class AgentActionController extends _$AgentActionController {
             print('[AgentAction] Using aiMessageWithoutFunctionCalls for resultMessage: ${resultMessage.length} chars');
           }
 
-          // 재귀 호출에서 모든 함수 호출이 무시된 경우, AI의 텍스트 응답 사용
-          if (isRecursiveCall && results.isEmpty) {
-            if (resultMessage.trim().isEmpty) {
+          // 함수 호출 JSON 배열만 있고 자연어 응답이 없는 경우 처리
+          // aiMessageWithoutFunctionCalls가 비어있거나 JSON 배열 형식인 경우
+          if (resultMessage.trim().isEmpty || (resultMessage.trim().startsWith('[') && resultMessage.trim().endsWith(']'))) {
+            // 재귀 호출에서 모든 함수 호출이 무시된 경우, 원본 AI 메시지 사용
+            if (isRecursiveCall && results.isEmpty) {
               resultMessage = aiMessage;
+              print('[AgentAction] Recursive call with no results, using original aiMessage');
+            } else if (!isRecursiveCall && functionCalls.isNotEmpty) {
+              // 함수 실행 후 자연어 응답이 없는 경우, 함수 실행 결과를 사용
+              // 이 경우는 일반 함수 처리 부분에서 재귀 호출이 이루어져야 함
+              print('[AgentAction] Function calls executed but no natural language response');
+              // 함수 실행 결과가 있으면 사용, 없으면 기본 메시지
+              if (results.isNotEmpty) {
+                final functionResults = results.map((r) => r['message'] as String? ?? '완료되었습니다.').where((m) => m.isNotEmpty).toList();
+                if (functionResults.isNotEmpty) {
+                  resultMessage = functionResults.join('\n\n');
+                } else {
+                  resultMessage = '함수가 실행되었습니다.';
+                }
+              } else {
+                resultMessage = '함수가 실행되었습니다.';
+              }
+            } else {
+              // 그 외의 경우 기본 메시지 사용
+              resultMessage = '함수가 실행되었습니다.';
             }
           }
 
@@ -2646,11 +2697,6 @@ class AgentActionController extends _$AgentActionController {
         functionName.startsWith('setReminder') ||
         functionName.startsWith('setRecurrence') ||
         functionName.startsWith('duplicateTask') ||
-        functionName.startsWith('getTodayTasks') ||
-        functionName.startsWith('getUpcomingTasks') ||
-        functionName.startsWith('getOverdueTasks') ||
-        functionName.startsWith('getUnscheduledTasks') ||
-        functionName.startsWith('getCompletedTasks') ||
         functionName.startsWith('removeReminder') ||
         functionName.startsWith('removeRecurrence') ||
         functionName.startsWith('listTasks') ||
@@ -2670,8 +2716,6 @@ class AgentActionController extends _$AgentActionController {
         functionName.startsWith('optimizeSchedule') ||
         functionName.startsWith('reschedule') ||
         functionName.startsWith('duplicateEvent') ||
-        functionName.startsWith('getTodayEvents') ||
-        functionName.startsWith('getUpcomingEvents') ||
         functionName.startsWith('listEvents') ||
         functionName.startsWith('getEvent') ||
         functionName.startsWith('moveEvent') ||
