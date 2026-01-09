@@ -398,6 +398,11 @@ class AgentActionController extends _$AgentActionController {
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
     String? searchContext, // 검색 결과 context
   }) async {
+    print('[AgentAction] _generateGeneralChat called');
+    print('[AgentAction] userMessage: ${userMessage.substring(0, userMessage.length > 100 ? 100 : userMessage.length)}');
+    print('[AgentAction] conversationSummary: ${state.conversationSummary}');
+    print('[AgentAction] isRecursiveCall: $isRecursiveCall');
+
     // 파일 정보를 메시지에 추가 (인박스 첨부 파일 포함)
     String enhancedUserMessage = userMessage;
 
@@ -452,9 +457,6 @@ class AgentActionController extends _$AgentActionController {
     state = state.copyWith(messages: messages, isLoading: true);
 
     try {
-      // 첫 메시지인지 확인 (user 메시지 1개만 있는 경우)
-      final isFirstMessage = messages.length == 1 && messages.first.role == 'user';
-
       // 초기 context는 제공하지 않음 - AI가 필요한 context를 감지하여 검색 함수 호출
       // Project context는 제공하지 않음 (계획에 따라 초기 context 제거)
       String projectContext = '';
@@ -611,10 +613,13 @@ class AgentActionController extends _$AgentActionController {
         systemPrompt += contextInfo;
       }
 
-      // 첫 메시지이고 conversationSummary가 없으면 제목 생성 요청 추가
-      if (isFirstMessage && state.conversationSummary == null && state.actionType == null) {
+      // conversationSummary가 없으면 항상 제목 생성 요청 추가
+      if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
+        print('[AgentAction] conversationSummary is null/empty, adding conversation_title requirement to systemPrompt');
         systemPrompt +=
-            '\n\n## Important: This is the first message in the conversation. Please include a conversation title at the very beginning of your response in the following format:\n<conversation_title>Title here (max 30 characters)</conversation_title>\nThen provide your normal response.';
+            '\n\n## CRITICAL REQUIREMENT - CONVERSATION TITLE:\nYou MUST ALWAYS start your response with a conversation title in EXACTLY this format:\n<conversation_title>Your title here (max 30 characters)</conversation_title>\n\nThis is MANDATORY. Your response MUST begin with <conversation_title>...</conversation_title> before any other content. Do NOT skip this. Do NOT forget this. This is the FIRST thing you must write in every response when conversationSummary is not set.';
+      } else {
+        print('[AgentAction] conversationSummary already exists: ${state.conversationSummary}');
       }
 
       // 일반적인 AI 응답 생성 (MCP 함수 호출 지원)
@@ -652,6 +657,12 @@ class AgentActionController extends _$AgentActionController {
           }
         }
         enhancedUserMessage = enhancedUserMessage + contextSuffix;
+      }
+
+      // conversationSummary가 없으면 user message에도 conversation_title 요청 추가
+      if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
+        print('[AgentAction] Adding conversation_title request to user message');
+        enhancedUserMessage = '[IMPORTANT: Please start your response with <conversation_title>Title (max 30 chars)</conversation_title>]\n\n$enhancedUserMessage';
       }
 
       print(
@@ -717,8 +728,12 @@ class AgentActionController extends _$AgentActionController {
         aiMessage = unescape.convert(aiMessage);
         print('[AgentAction] After HTML unescape, contains summarizeAttachment: ${aiMessage.contains('summarizeAttachment')}');
 
-        // 첫 메시지인 경우 conversation_title 태그에서 제목 추출
-        if (isFirstMessage && state.conversationSummary == null && state.actionType == null) {
+        // conversationSummary가 없으면 항상 conversation_title 태그에서 제목 추출 시도
+        if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
+          print('[AgentAction] Attempting to extract conversation_title from AI response');
+          print('[AgentAction] AI message length: ${aiMessage.length}');
+          print('[AgentAction] AI message first 200 chars: ${aiMessage.substring(0, aiMessage.length > 200 ? 200 : aiMessage.length)}');
+
           // conversation_title 태그에서 제목 추출
           final conversationTitleRegex = RegExp(r'<conversation_title>(.*?)</conversation_title>', dotAll: true);
           final escapedTitleRegex = RegExp(r'&lt;conversation_title&gt;(.*?)&lt;/conversation_title&gt;', dotAll: true);
@@ -727,25 +742,42 @@ class AgentActionController extends _$AgentActionController {
           final titleMatch = conversationTitleRegex.firstMatch(aiMessage);
           if (titleMatch != null) {
             extractedTitle = titleMatch.group(1)?.trim();
+            print('[AgentAction] Found conversation_title tag: $extractedTitle');
           } else {
+            print('[AgentAction] No conversation_title tag found, checking escaped version');
             final escapedMatch = escapedTitleRegex.firstMatch(aiMessage);
             if (escapedMatch != null) {
               extractedTitle = escapedMatch.group(1)?.trim();
+              print('[AgentAction] Found escaped conversation_title tag: $extractedTitle');
+            } else {
+              print('[AgentAction] No conversation_title tag found in any format');
             }
           }
 
           if (extractedTitle != null && extractedTitle.isNotEmpty) {
+            // 태그 제거 및 실제 title 추출
+            String cleanedTitle = _cleanTitleFromTags(extractedTitle);
             // 최대 50자로 제한
-            String finalTitle = extractedTitle.length > 50 ? '${extractedTitle.substring(0, 47)}...' : extractedTitle;
+            String finalTitle = cleanedTitle.length > 50 ? '${cleanedTitle.substring(0, 47)}...' : cleanedTitle;
+            print('[AgentAction] Setting conversationSummary from extracted title: $finalTitle');
             state = state.copyWith(conversationSummary: finalTitle);
           } else {
             // conversation_title이 없으면 AI 응답의 처음 부분을 제목으로 사용
+            print('[AgentAction] No conversation_title found, using first line as fallback');
             final firstLine = aiMessage.split('\n').first.trim();
+            print('[AgentAction] First line: $firstLine');
             if (firstLine.isNotEmpty && !firstLine.contains('conversation_title')) {
-              String finalTitle = firstLine.length > 50 ? '${firstLine.substring(0, 47)}...' : firstLine;
+              // 태그 제거 및 실제 title 추출
+              String cleanedTitle = _cleanTitleFromTags(firstLine);
+              String finalTitle = cleanedTitle.length > 50 ? '${cleanedTitle.substring(0, 47)}...' : cleanedTitle;
+              print('[AgentAction] Setting conversationSummary from first line: $finalTitle');
               state = state.copyWith(conversationSummary: finalTitle);
+            } else {
+              print('[AgentAction] First line is empty or contains conversation_title, not setting conversationSummary');
             }
           }
+        } else {
+          print('[AgentAction] conversationSummary already exists: ${state.conversationSummary}, skipping extraction');
         }
 
         // conversation_title 태그를 제거 (제목 추출 후)
@@ -1630,6 +1662,86 @@ class AgentActionController extends _$AgentActionController {
       }
       state = state.copyWith(messages: messages, isLoading: false);
     }
+  }
+
+  /// 태그를 제거하고 실제 title만 추출합니다.
+  String _cleanTitleFromTags(String title) {
+    String cleaned = title;
+
+    // <tagged_task>, <tagged_event>, <tagged_inbox> 태그 제거 및 title 추출
+    final taggedTaskRegex = RegExp(r'<tagged_task>(.*?)</tagged_task>', dotAll: true);
+    final taggedEventRegex = RegExp(r'<tagged_event>(.*?)</tagged_event>', dotAll: true);
+    final taggedInboxRegex = RegExp(r'<tagged_inbox>(.*?)</tagged_inbox>', dotAll: true);
+
+    // @task:, @event:, @inbox: 형식 제거
+    cleaned = cleaned.replaceAll(RegExp(r'@task:[a-zA-Z0-9\-_]+'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'@event:[a-zA-Z0-9\-_]+'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'@inbox:[a-zA-Z0-9\-_@\.]+'), '');
+
+    // 태그된 항목의 title 추출하여 추가
+    final List<String> extractedTitles = [];
+
+    for (final match in taggedTaskRegex.allMatches(cleaned)) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final taskTitle = jsonData['title'] as String? ?? '';
+          if (taskTitle.isNotEmpty) {
+            extractedTitles.add(taskTitle);
+          }
+        }
+      } catch (e) {
+        // JSON 파싱 실패 시 무시
+      }
+    }
+
+    for (final match in taggedEventRegex.allMatches(cleaned)) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final eventTitle = jsonData['title'] as String? ?? '';
+          if (eventTitle.isNotEmpty) {
+            extractedTitles.add(eventTitle);
+          }
+        }
+      } catch (e) {
+        // JSON 파싱 실패 시 무시
+      }
+    }
+
+    for (final match in taggedInboxRegex.allMatches(cleaned)) {
+      try {
+        final jsonText = match.group(1)?.trim() ?? '';
+        if (jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final inboxTitle = jsonData['suggestion']?['summary'] as String? ?? jsonData['title'] as String? ?? '';
+          if (inboxTitle.isNotEmpty) {
+            extractedTitles.add(inboxTitle);
+          }
+        }
+      } catch (e) {
+        // JSON 파싱 실패 시 무시
+      }
+    }
+
+    // 태그 제거
+    cleaned = cleaned.replaceAll(taggedTaskRegex, '');
+    cleaned = cleaned.replaceAll(taggedEventRegex, '');
+    cleaned = cleaned.replaceAll(taggedInboxRegex, '');
+
+    // 추출된 title들을 추가
+    if (extractedTitles.isNotEmpty) {
+      cleaned = cleaned.trim();
+      if (cleaned.isNotEmpty) {
+        cleaned = '$cleaned ${extractedTitles.join(' ')}';
+      } else {
+        cleaned = extractedTitles.join(' ');
+      }
+    }
+
+    return cleaned.trim();
   }
 
   /// 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함합니다.
