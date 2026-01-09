@@ -247,7 +247,7 @@ class AgentActionController extends _$AgentActionController {
     final sessionId = const Uuid().v4();
 
     // Set state with actionType first
-    state = state.copyWith(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
+    await _updateState(actionType: actionType, inbox: inbox, task: task, event: event, isLoading: false, sessionId: sessionId);
 
     // 각 actionType에 맞는 첫 메시지 생성
     String autoMessage = '';
@@ -339,7 +339,7 @@ class AgentActionController extends _$AgentActionController {
 
     // 사용자 메시지 추가 (기존 대화 흐름 유지)
     final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: messageWithTags, files: files)];
-    state = state.copyWith(messages: updatedMessages, isLoading: true);
+    await _updateState(messages: updatedMessages, isLoading: true, taggedProjects: taggedProjects);
 
     try {
       // MCP 함수 호출을 통한 일반적인 AI 챗 진행
@@ -356,7 +356,7 @@ class AgentActionController extends _$AgentActionController {
         files: files,
       );
     } catch (e) {
-      state = state.copyWith(messages: updatedMessages, isLoading: false);
+      await _updateState(messages: updatedMessages, isLoading: false, taggedProjects: taggedProjects);
     }
   }
 
@@ -368,18 +368,18 @@ class AgentActionController extends _$AgentActionController {
     if ((actionType == AgentActionType.createTask || actionType == AgentActionType.createEvent) && inboxes != null && inboxes.isNotEmpty) {
       // 제공된 inbox 번호들을 loadedInboxNumbers에 추가하여 전체 내용이 포함되도록 함
       final inboxNumbers = {for (int i = 0; i < inboxes.length; i++) i + 1};
-      state = state.copyWith(loadedInboxNumbers: {...state.loadedInboxNumbers, ...inboxNumbers});
+      await _updateState(loadedInboxNumbers: {...state.loadedInboxNumbers, ...inboxNumbers});
     }
 
     // 사용자 메시지로 추가 (자동 메시지)
     final updatedMessages = [...state.messages, AgentActionMessage(role: 'user', content: autoMessage)];
-    state = state.copyWith(messages: updatedMessages, isLoading: true);
+    await _updateState(messages: updatedMessages, isLoading: true);
 
     try {
       // generalChat으로 처리
       await _generateGeneralChat(autoMessage, updatedMessages: updatedMessages, inboxes: inboxes);
     } catch (e) {
-      state = state.copyWith(messages: updatedMessages, isLoading: false);
+      await _updateState(messages: updatedMessages, isLoading: false);
     }
   }
 
@@ -449,7 +449,7 @@ class AgentActionController extends _$AgentActionController {
     // 사용자가 명시적으로 요청하거나 AI가 <need_more_action> 태그를 사용할 때만 처리
 
     // state.messages를 항상 업데이트하여 _saveChatHistory가 최신 메시지를 사용하도록 함
-    state = state.copyWith(messages: messages, isLoading: true);
+    await _updateState(messages: messages, isLoading: true);
 
     try {
       // 초기 context는 제공하지 않음 - AI가 필요한 context를 감지하여 검색 함수 호출
@@ -546,7 +546,7 @@ class AgentActionController extends _$AgentActionController {
             );
           });
           // 메시지 전송 중단
-          state = state.copyWith(isLoading: false);
+          await _updateState(isLoading: false);
           return;
         }
       }
@@ -729,7 +729,7 @@ class AgentActionController extends _$AgentActionController {
             String cleanedTitle = _cleanTitleFromTags(extractedTitle);
             // 최대 50자로 제한
             String finalTitle = cleanedTitle.length > 50 ? '${cleanedTitle.substring(0, 47)}...' : cleanedTitle;
-            state = state.copyWith(conversationSummary: finalTitle);
+            await _updateState(conversationSummary: finalTitle);
           } else {
             // conversation_title이 없으면 AI 응답의 처음 부분을 제목으로 사용
             final firstLine = aiMessage.split('\n').first.trim();
@@ -737,7 +737,7 @@ class AgentActionController extends _$AgentActionController {
               // 태그 제거 및 실제 title 추출
               String cleanedTitle = _cleanTitleFromTags(firstLine);
               String finalTitle = cleanedTitle.length > 50 ? '${cleanedTitle.substring(0, 47)}...' : cleanedTitle;
-              state = state.copyWith(conversationSummary: finalTitle);
+              await _updateState(conversationSummary: finalTitle);
             }
           }
         }
@@ -892,7 +892,7 @@ class AgentActionController extends _$AgentActionController {
                   // 검색 결과를 silent 메시지로 추가
                   final silentMessage = AgentActionMessage(role: 'assistant', content: '[Search completed: Found ${searchResults.length} results]', excludeFromHistory: true);
                   final updatedMessagesWithSearch = [...messages, silentMessage];
-                  state = state.copyWith(messages: updatedMessagesWithSearch);
+                  await _updateState(messages: updatedMessagesWithSearch);
 
                   // 검색 결과를 context로 변환
                   String? currentSearchContext;
@@ -988,7 +988,7 @@ class AgentActionController extends _$AgentActionController {
                 updatedTaggedTasks != taggedTasks ||
                 updatedTaggedEvents != taggedEvents ||
                 updatedAvailableInboxes != state.availableInboxes) {
-              state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
+              await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
             }
 
             // 검색 결과를 context로 추가하여 AI 재호출
@@ -1090,7 +1090,7 @@ class AgentActionController extends _$AgentActionController {
                     'remaining_credits': remainingCredits,
                   });
 
-                  state = state.copyWith(pendingFunctionCalls: pendingCalls);
+                  await _updateState(pendingFunctionCalls: pendingCalls);
 
                   // 확인이 필요한 함수는 null 반환 (나중에 처리)
                   return null;
@@ -1327,7 +1327,7 @@ class AgentActionController extends _$AgentActionController {
               updatedTaggedTasks != taggedTasks ||
               updatedTaggedEvents != taggedEvents ||
               updatedAvailableInboxes != state.availableInboxes) {
-            state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
+            await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
           }
 
           // successMessages가 있으면 우선 사용 (summarizeAttachment 등의 함수 결과)
@@ -1479,7 +1479,7 @@ class AgentActionController extends _$AgentActionController {
 
           // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
           if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
-            state = state.copyWith(loadedInboxNumbers: updatedLoadedInboxNumbers);
+            await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, taggedProjects: taggedProjects);
           }
 
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
@@ -1495,14 +1495,11 @@ class AgentActionController extends _$AgentActionController {
                     updatedMessagesWithResponse[2].role == 'assistant'
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
-            state = state.copyWith(messages: finalMessages, isLoading: false);
+            await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
             return;
           }
 
-          state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
-
-          // 히스토리 저장
-          _saveChatHistory(taggedProjects: taggedProjects);
+          await _updateState(messages: updatedMessagesWithResponse, isLoading: false, taggedProjects: taggedProjects);
         } else {
           // 일반 응답
           final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
@@ -1547,19 +1544,14 @@ class AgentActionController extends _$AgentActionController {
                     updatedMessagesWithResponse[2].role == 'assistant'
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
-            state = state.copyWith(messages: finalMessages, isLoading: false);
+            await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
             return;
           }
 
-          state = state.copyWith(messages: updatedMessagesWithResponse, isLoading: false);
-
-          // 히스토리 저장
-          _saveChatHistory(taggedProjects: taggedProjects);
+          await _updateState(messages: updatedMessagesWithResponse, isLoading: false, taggedProjects: taggedProjects);
         }
       } else {
-        state = state.copyWith(messages: messages, isLoading: false);
-        // 히스토리 저장
-        _saveChatHistory(taggedProjects: taggedProjects);
+        await _updateState(messages: messages, isLoading: false, taggedProjects: taggedProjects);
       }
     } catch (e) {
       // 크레딧 부족 예외 처리
@@ -1586,7 +1578,7 @@ class AgentActionController extends _$AgentActionController {
           },
         );
       }
-      state = state.copyWith(messages: messages, isLoading: false);
+      await _updateState(messages: messages, isLoading: false);
     }
   }
 
@@ -2735,14 +2727,14 @@ class AgentActionController extends _$AgentActionController {
               final recentTaskIds = List<String>.from(currentState.recentTaskIds);
               if (!recentTaskIds.contains(taskId)) {
                 recentTaskIds.add(taskId);
-                state = state.copyWith(recentTaskIds: recentTaskIds);
+                await _updateState(recentTaskIds: recentTaskIds);
               }
             }
             if (eventId != null) {
               final recentEventIds = List<String>.from(currentState.recentEventIds);
               if (!recentEventIds.contains(eventId)) {
                 recentEventIds.add(eventId);
-                state = state.copyWith(recentEventIds: recentEventIds);
+                await _updateState(recentEventIds: recentEventIds);
               }
             }
           }
@@ -2781,7 +2773,7 @@ class AgentActionController extends _$AgentActionController {
         AgentActionMessage(role: 'user', content: messageWithTags, files: files),
         if (functionResultsMessage.isNotEmpty) AgentActionMessage(role: 'assistant', content: functionResultsMessage, excludeFromHistory: false),
       ];
-      state = state.copyWith(messages: messagesWithFunctionResults, isLoading: true);
+      await _updateState(messages: messagesWithFunctionResults, isLoading: true);
 
       // 함수 실행 결과를 포함해서 AI에게 전달
       final inboxesToUse = currentState2.availableInboxes?.isNotEmpty == true ? currentState2.availableInboxes : inboxes;
@@ -2813,10 +2805,7 @@ class AgentActionController extends _$AgentActionController {
     // IMPORTANT: 최신 state를 다시 읽어서 recentTaskIds/recentEventIds가 반영되었는지 확인
     final currentState = state;
     final updatedMessages = [...currentState.messages, AgentActionMessage(role: 'user', content: messageWithTags, files: files)];
-    state = state.copyWith(messages: updatedMessages, isLoading: true);
-
-    // 사용자 메시지 추가 후 히스토리 저장
-    _saveChatHistory(taggedProjects: taggedProjects);
+    await _updateState(messages: updatedMessages, isLoading: true, taggedProjects: taggedProjects);
 
     try {
       // MCP 함수 호출을 통한 일반적인 AI 챗 진행
@@ -2836,15 +2825,14 @@ class AgentActionController extends _$AgentActionController {
         files: files,
       );
     } catch (e) {
-      state = state.copyWith(
+      await _updateState(
         messages: [
           ...updatedMessages,
           AgentActionMessage(role: 'assistant', content: Utils.mainContext.tr.agent_action_error_occurred),
         ],
         isLoading: false,
+        taggedProjects: taggedProjects,
       );
-      // 에러 메시지 추가 후 히스토리 저장
-      _saveChatHistory(taggedProjects: taggedProjects);
     }
   }
 
@@ -2971,7 +2959,7 @@ class AgentActionController extends _$AgentActionController {
     // 유저가 confirm 메시지를 보낸 것처럼 처리 (AI에게는 보내지 않음)
     final confirmMessage = AgentActionMessage(role: 'user', content: Utils.mainContext.tr.confirm);
     final updatedMessages = [...state.messages, confirmMessage];
-    state = state.copyWith(messages: updatedMessages);
+    await _updateState(messages: updatedMessages);
 
     // 함수 실행
     await confirmActions(actionIds: [actionId]);
@@ -3154,7 +3142,7 @@ class AgentActionController extends _$AgentActionController {
     }
 
     // 로딩 상태 시작 - entity block은 유지하고 로딩 메시지만 표시
-    state = state.copyWith(isLoading: true);
+    await _updateState(isLoading: true);
 
     final executor = McpFunctionExecutor();
     // 각 함수 호출의 결과를 직접 추적
@@ -3515,37 +3503,34 @@ class AgentActionController extends _$AgentActionController {
       return callActionId == null || !actionIds.contains(callActionId);
     }).toList();
 
-    state = state.copyWith(
+    await _updateState(
       messages: updatedMessages,
       pendingFunctionCalls: updatedPendingCalls.isEmpty ? null : updatedPendingCalls,
       isLoading: false,
       recentTaskIds: updatedTaskIds,
       recentEventIds: updatedEventIds,
     );
-
-    // 히스토리 저장 (함수 실행 결과 메시지는 excludeFromHistory 플래그로 인해 conversation history에서 제외됨)
-    _saveChatHistory();
   }
 
   /// 액션 선택 상태를 토글합니다.
-  void toggleActionSelection(String actionId) {
+  Future<void> toggleActionSelection(String actionId) async {
     final selectedIds = Set<String>.from(state.selectedActionIds);
     if (selectedIds.contains(actionId)) {
       selectedIds.remove(actionId);
     } else {
       selectedIds.add(actionId);
     }
-    state = state.copyWith(selectedActionIds: selectedIds);
+    await _updateState(selectedActionIds: selectedIds);
   }
 
   /// 모든 액션을 선택하거나 선택 해제합니다.
-  void toggleAllActionsSelection(bool selectAll) {
+  Future<void> toggleAllActionsSelection(bool selectAll) async {
     final pendingCalls = state.pendingFunctionCalls ?? [];
     if (selectAll) {
       final allActionIds = pendingCalls.map((call) => call['action_id'] as String?).whereType<String>().toSet();
-      state = state.copyWith(selectedActionIds: allActionIds);
+      await _updateState(selectedActionIds: allActionIds);
     } else {
-      state = state.copyWith(selectedActionIds: {});
+      await _updateState(selectedActionIds: {});
     }
   }
 
@@ -3658,7 +3643,7 @@ class AgentActionController extends _$AgentActionController {
     // TODO: event ID를 저장하고 복원하는 로직 추가 필요
 
     // State 복원
-    state = state.copyWith(
+    await _updateState(
       sessionId: sessionId,
       actionType: actionType,
       inbox: inbox,
@@ -3857,8 +3842,50 @@ class AgentActionController extends _$AgentActionController {
     }).toList();
   }
 
+  /// State를 업데이트하고 히스토리를 저장합니다.
+  Future<void> _updateState({
+    AgentActionType? actionType,
+    InboxEntity? inbox,
+    TaskEntity? task,
+    EventEntity? event,
+    List<AgentActionMessage>? messages,
+    bool? isLoading,
+    Map<String, dynamic>? pendingTaskInfo,
+    String? conversationSummary,
+    String? sessionId,
+    Set<int>? loadedInboxNumbers,
+    List<Map<String, dynamic>>? pendingFunctionCalls,
+    Set<String>? selectedActionIds,
+    List<String>? recentTaskIds,
+    List<String>? recentEventIds,
+    List<InboxEntity>? availableInboxes,
+    List<ProjectEntity>? taggedProjects,
+  }) async {
+    state = state.copyWith(
+      actionType: actionType,
+      inbox: inbox,
+      task: task,
+      event: event,
+      messages: messages,
+      isLoading: isLoading,
+      pendingTaskInfo: pendingTaskInfo,
+      conversationSummary: conversationSummary,
+      sessionId: sessionId,
+      loadedInboxNumbers: loadedInboxNumbers,
+      pendingFunctionCalls: pendingFunctionCalls,
+      selectedActionIds: selectedActionIds,
+      recentTaskIds: recentTaskIds,
+      recentEventIds: recentEventIds,
+      availableInboxes: availableInboxes,
+    );
+
+    // State 업데이트 후 항상 히스토리 저장 시도
+    await _saveChatHistory(taggedProjects: taggedProjects);
+  }
+
   /// 챗 히스토리를 저장합니다 (로컬 + Supabase).
   Future<void> _saveChatHistory({List<ProjectEntity>? taggedProjects}) async {
+    print('saveChatHistory111');
     // 메시지가 비어있으면 저장하지 않음
     if (state.messages.isEmpty) {
       return;
@@ -3894,17 +3921,8 @@ class AgentActionController extends _$AgentActionController {
       state = state.copyWith(sessionId: sessionId);
     }
 
-    // 로컬 저장 (Riverpod persist) - 평문으로 저장
     try {
-      final storage = await ref.read(storageProvider.future);
-      final key = 'agent_chat_history:$sessionId';
-      await storage.write(key, jsonEncode(history.toJson(local: true)), StorageOptions(destroyKey: me.id)); // 로컬은 평문
-    } catch (e) {
-      // 로컬 저장 실패는 무시
-    }
-
-    // Supabase 저장 (비동기, 실패해도 계속 진행)
-    try {
+      print('saveChatHistory: $history');
       await _historyRepository.saveChatHistory(userId: me.id, history: history);
     } catch (e) {
       // Supabase 저장 실패는 무시

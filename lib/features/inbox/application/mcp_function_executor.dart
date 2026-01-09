@@ -131,9 +131,6 @@ class McpFunctionExecutor {
   /// - 여러 개의 function_call 태그
   /// - 여러 개의 JSON 블록
   List<Map<String, dynamic>> parseFunctionCalls(String aiResponse) {
-    print('[FunctionCall] parseFunctionCalls called, response length: ${aiResponse.length}');
-    print('[FunctionCall] Checking for summarizeAttachment in response: ${aiResponse.contains('summarizeAttachment')}');
-    print('[FunctionCall] Checking for 첨부파일 in response: ${aiResponse.contains('첨부파일')}');
     final results = <Map<String, dynamic>>[];
 
     try {
@@ -159,15 +156,9 @@ class McpFunctionExecutor {
                   functionCall['can_parallelize'] = searchFunctions.contains(functionName);
                 }
                 results.add(functionCall);
-                print('[FunctionCall] Found function call: ${functionCall['function']}');
-                if (functionCall['function'] == 'summarizeAttachment') {
-                  print('[FunctionCall] ✓ summarizeAttachment found in array format!');
-                  print('[FunctionCall] Arguments: ${functionCall['arguments']}');
-                }
               }
             }
             if (results.isNotEmpty) {
-              print('[FunctionCall] Returning ${results.length} function calls from array format');
               return results;
             }
 
@@ -227,19 +218,12 @@ class McpFunctionExecutor {
             final searchFunctions = {'searchInbox', 'searchTask', 'searchCalendarEvent'};
             functionCall['can_parallelize'] = searchFunctions.contains(functionName);
             results.add(functionCall);
-            print('[FunctionCall] Found function call in custom tag: $functionName');
-            if (functionName == 'summarizeAttachment') {
-              print('[FunctionCall] ✓ summarizeAttachment found in custom tag format!');
-              print('[FunctionCall] Arguments: ${functionCall['arguments']}');
-            }
           } catch (e) {
-            print('[FunctionCall] Failed to parse custom tag: $e');
             // 개별 파싱 실패는 무시하고 계속 진행
           }
         }
       }
       if (results.isNotEmpty) {
-        print('[FunctionCall] Returning ${results.length} function calls from custom tag format');
         return results;
       }
 
@@ -260,20 +244,13 @@ class McpFunctionExecutor {
                 functionCall['can_parallelize'] = searchFunctions.contains(functionName);
               }
               results.add(functionCall);
-              print('[FunctionCall] Found function call in JSON block: ${functionCall['function']}');
-              if (functionCall['function'] == 'summarizeAttachment') {
-                print('[FunctionCall] ✓ summarizeAttachment found in JSON block format!');
-                print('[FunctionCall] Arguments: ${functionCall['arguments']}');
-              }
             }
           } catch (e) {
-            print('[FunctionCall] Failed to parse JSON block: $e');
             // 개별 파싱 실패는 무시하고 계속 진행
           }
         }
       }
       if (results.isNotEmpty) {
-        print('[FunctionCall] Returning ${results.length} function calls from JSON block format');
         return results;
       }
 
@@ -306,31 +283,13 @@ class McpFunctionExecutor {
               functionCall['can_parallelize'] = searchFunctions.contains(functionName);
             }
             results.add(functionCall);
-            print('[FunctionCall] Found function call in single format: $functionName');
-            if (functionName == 'summarizeAttachment') {
-              print('[FunctionCall] ✓ summarizeAttachment found in single format!');
-              print('[FunctionCall] Arguments: ${functionCall['arguments']}');
-            }
           } catch (e) {
-            print('[FunctionCall] Failed to parse single format: $e');
             // 개별 파싱 실패는 무시하고 계속 진행
           }
         }
       }
     } catch (e) {
-      print('[FunctionCall] Error parsing function calls: $e');
       // 파싱 실패
-    }
-
-    print('[FunctionCall] Total function calls parsed: ${results.length}');
-    if (results.isEmpty) {
-      print('[FunctionCall] ⚠ No function calls found in AI response');
-    } else {
-      final functionNames = results.map((r) => r['function']).toList();
-      print('[FunctionCall] Parsed functions: $functionNames');
-      if (!functionNames.contains('summarizeAttachment')) {
-        print('[FunctionCall] ⚠ summarizeAttachment NOT found in parsed functions');
-      }
     }
 
     return results;
@@ -347,11 +306,6 @@ class McpFunctionExecutor {
     List<InboxEntity>? availableInboxes,
     double? remainingCredits,
   }) async {
-    print('[FunctionCall] executeFunction called: $functionName');
-    print('[FunctionCall] Arguments: $arguments');
-    if (functionName == 'summarizeAttachment') {
-      print('[FunctionCall] ✓ Executing summarizeAttachment function');
-    }
     try {
       switch (functionName) {
         // Task Actions
@@ -392,18 +346,7 @@ class McpFunctionExecutor {
         case 'getPreviousContext':
           return await _executeGetPreviousContext(arguments, tabType: tabType);
         case 'summarizeAttachment':
-          print('[FunctionCall] Switching to summarizeAttachment case');
-          final summarizeResult = await _executeSummarizeAttachment(arguments, tabType: tabType);
-          print('[FunctionCall] summarizeAttachment returned: success=${summarizeResult['success']}, has result=${summarizeResult.containsKey('result')}');
-          if (summarizeResult.containsKey('result') && summarizeResult['result'] is Map) {
-            final resultData = summarizeResult['result'] as Map<String, dynamic>;
-            print('[FunctionCall] summarizeAttachment result data keys: ${resultData.keys.toList()}');
-            if (resultData.containsKey('files')) {
-              final files = resultData['files'];
-              print('[FunctionCall] summarizeAttachment files: ${files is List ? files.length : 'not a list'}');
-            }
-          }
-          return summarizeResult;
+          return await _executeSummarizeAttachment(arguments, tabType: tabType);
         case 'listInboxes':
           return await _executeListInboxes(arguments, tabType: tabType);
 
@@ -2505,7 +2448,6 @@ class McpFunctionExecutor {
     }
   }
 
-
   Future<Map<String, dynamic>> _executeRemoveReminder(
     Map<String, dynamic> args, {
     required TabType tabType,
@@ -3113,9 +3055,6 @@ class McpFunctionExecutor {
         }
         allInboxesForSummary.addAll(searchResults);
 
-        print(
-          '[Attachment] Calling fetchConversationSummary with ${allInboxesForSummary.length} inboxes (virtualInbox included: ${virtualInbox.linkedMail != null || virtualInbox.linkedMessage != null})',
-        );
         final summaryResult = await repository.fetchConversationSummary(
           inbox: virtualInbox,
           allInboxes: allInboxesForSummary,
@@ -5492,34 +5431,28 @@ class McpFunctionExecutor {
 
   /// Summarizes attachments for a specific inbox
   Future<Map<String, dynamic>> _executeSummarizeAttachment(Map<String, dynamic> args, {required TabType tabType}) async {
-    print('[Attachment] summarizeAttachment called with args: $args');
     final inboxId = args['inboxId'] as String?;
     if (inboxId == null || inboxId.isEmpty) {
-      print('[Attachment] Error: inboxId is required');
       return {'success': false, 'error': 'inboxId is required'};
     }
 
     final attachmentId = args['attachmentId'] as String?;
-    print('[Attachment] Parsing inboxId: $inboxId, attachmentId: $attachmentId');
 
     // Parse inboxId to extract mail/message information
     // Format: mail_${type}_${hostMail}_${messageId} or message_${type}_${teamId}_${messageId}
     InboxEntity? inbox;
-    
+
     if (inboxId.startsWith('mail_')) {
       // Parse mail inboxId: mail_${type}_${hostMail}_${messageId}
       final parts = inboxId.split('_');
       if (parts.length < 4) {
-        print('[Attachment] Invalid mail inboxId format: $inboxId');
         return {'success': false, 'error': 'Invalid inboxId format'};
       }
-      
+
       final messageId = parts.last;
       final typeName = parts[1];
       final hostMail = parts.sublist(2, parts.length - 1).join('_'); // hostMail may contain underscores
-      
-      print('[Attachment] Parsed mail inboxId - type: $typeName, hostMail: $hostMail, messageId: $messageId');
-      
+
       // Find mail type
       MailEntityType? mailType;
       if (typeName == 'google') {
@@ -5527,30 +5460,27 @@ class McpFunctionExecutor {
       } else if (typeName == 'microsoft') {
         mailType = MailEntityType.microsoft;
       } else {
-        print('[Attachment] Unknown mail type: $typeName');
         return {'success': false, 'error': 'Unknown mail type: $typeName'};
       }
-      
+
       // Find OAuth for this email
       final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
       final oauth = oauths.firstWhereOrNull((o) => o.email == hostMail);
-      
+
       if (oauth == null) {
-        print('[Attachment] OAuth not found for email: $hostMail');
         return {'success': false, 'error': 'Mail account not found for: $hostMail'};
       }
-      
+
       // Fetch mail by messageId
       final mailRepository = ref.read(mailRepositoryProvider);
       MailEntity? mailEntity;
-      
+
       // Try different approaches based on mail type
       final datasource = mailRepository.datasources[mailType.datasourceType];
       if (datasource == null) {
-        print('[Attachment] Datasource not found for mail type: $mailType');
         return {'success': false, 'error': 'Datasource not found for mail type'};
       }
-      
+
       if (mailType == MailEntityType.google) {
         // For Gmail, the last part of inboxId might be threadId instead of messageId
         // Try both: first as messageId, then as threadId
@@ -5564,10 +5494,10 @@ class McpFunctionExecutor {
             email: hostMail,
             q: 'rfc822msgid:$messageId',
           );
-          
+
           final mails = fetchResult.values.expand((e) => e.messages).toList();
           mailEntity = mails.firstWhereOrNull((m) => m.id == messageId);
-          
+
           if (mailEntity == null) {
             // If rfc822msgid doesn't work, try searching in common labels
             final labelIdsToTry = [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
@@ -5585,10 +5515,9 @@ class McpFunctionExecutor {
               if (mailEntity != null) break;
             }
           }
-          
+
           // If still not found, try as threadId
           if (mailEntity == null) {
-            print('[Attachment] MessageId search failed, trying as threadId: $messageId');
             final labelIdsToTry = [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
             for (final labelId in labelIdsToTry) {
               final threadResult = await mailRepository.fetchThreads(
@@ -5598,18 +5527,17 @@ class McpFunctionExecutor {
                 email: hostMail,
                 labelId: labelId,
               );
-              
+
               final threadMails = threadResult.fold((failure) => <MailEntity>[], (mails) => mails);
               if (threadMails.isNotEmpty) {
                 // Use the first message in the thread
                 mailEntity = threadMails.first;
-                print('[Attachment] Found mail using threadId: ${mailEntity.id}');
                 break;
               }
             }
           }
         } catch (e) {
-          print('[Attachment] Error searching Gmail: $e');
+          // Error searching Gmail
         }
       } else if (mailType == MailEntityType.microsoft) {
         // For Microsoft, try to get mail from inbox cache first to get threadId
@@ -5619,23 +5547,17 @@ class McpFunctionExecutor {
           final cachedInbox = inboxList?.inboxes.firstWhereOrNull((i) => i.id == inboxId);
           if (cachedInbox?.linkedMail != null) {
             final threadId = cachedInbox!.linkedMail!.threadId;
-            final labelIdsToTry = cachedInbox.linkedMail!.labelIds?.isNotEmpty == true 
-                ? cachedInbox.linkedMail!.labelIds! 
+            final labelIdsToTry = cachedInbox.linkedMail!.labelIds?.isNotEmpty == true
+                ? cachedInbox.linkedMail!.labelIds!
                 : [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
-            
+
             for (final labelId in labelIdsToTry) {
-              final threadResult = await mailRepository.fetchThreads(
-                oauth: oauth,
-                type: mailType,
-                threadId: threadId,
-                email: hostMail,
-                labelId: labelId,
-              );
+              final threadResult = await mailRepository.fetchThreads(oauth: oauth, type: mailType, threadId: threadId, email: hostMail, labelId: labelId);
               mailEntity = threadResult.fold((failure) => null, (threadMails) => threadMails.firstWhereOrNull((m) => m.id == messageId));
               if (mailEntity != null) break;
             }
           }
-          
+
           // If still not found, try searching in common labels
           if (mailEntity == null) {
             final labelIdsToTry = [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
@@ -5653,15 +5575,14 @@ class McpFunctionExecutor {
             }
           }
         } catch (e) {
-          print('[Attachment] Error fetching Microsoft mail: $e');
+          // Error fetching Microsoft mail
         }
       }
-      
+
       if (mailEntity == null) {
-        print('[Attachment] Mail not found for messageId: $messageId');
         return {'success': false, 'error': 'Mail not found for messageId: $messageId'};
       }
-      
+
       // Create inbox entity from mail
       inbox = InboxEntity(
         id: inboxId,
@@ -5681,82 +5602,70 @@ class McpFunctionExecutor {
           encrypted: false,
         ),
       );
-      
     } else if (inboxId.startsWith('message_')) {
       // Parse message inboxId: message_${type}_${teamId}_${messageId}
       final parts = inboxId.split('_');
       if (parts.length < 4) {
-        print('[Attachment] Invalid message inboxId format: $inboxId');
         return {'success': false, 'error': 'Invalid inboxId format'};
       }
-      
+
       final messageId = parts.last;
       final typeName = parts[1];
       final teamId = parts.sublist(2, parts.length - 1).join('_'); // teamId may contain underscores
-      
-      print('[Attachment] Parsed message inboxId - type: $typeName, teamId: $teamId, messageId: $messageId');
-      
+
       // Find message type
       MessageChannelEntityType? messageType;
       if (typeName == 'slack') {
         messageType = MessageChannelEntityType.slack;
       } else {
-        print('[Attachment] Unknown message type: $typeName');
         return {'success': false, 'error': 'Unknown message type: $typeName'};
       }
-      
+
       // Find OAuth for this team
       final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.messengerOAuths)) ?? [];
       final oauth = oauths.firstWhereOrNull((o) => o.teamId == teamId);
-      
+
       if (oauth == null) {
-        print('[Attachment] OAuth not found for teamId: $teamId');
         return {'success': false, 'error': 'Messenger account not found for team: $teamId'};
       }
-      
+
       // Fetch message
       final chatRepository = ref.read(chatRepositoryProvider);
       final me = ref.read(authControllerProvider).value;
       if (me == null) {
         return {'success': false, 'error': 'User not authenticated'};
       }
-      
+
       // Get channels for this team
       final channelMap = ref.read(chatChannelListControllerProvider);
       final channelList = channelMap[teamId]?.channels ?? [];
-      
+
       MessageEntity? messageEntity;
-      
+
       // Search through channels to find the message
       for (final channel in channelList) {
         try {
-          final result = await chatRepository.fetchMessages(
-            oauth: oauth,
-            channel: channel,
-            targetMessageId: messageId,
-          );
-          
+          final result = await chatRepository.fetchMessages(oauth: oauth, channel: channel, targetMessageId: messageId);
+
           messageEntity = result.fold((failure) => null, (fetchResult) => fetchResult.messages.firstWhereOrNull((m) => m.id == messageId));
           if (messageEntity != null) {
-            print('[Attachment] Found message entity in channel: ${channel.id}');
             break;
           }
         } catch (e) {
-          print('[Attachment] Error searching in channel ${channel.id}: $e');
+          // Error searching in channel
         }
       }
-      
+
       if (messageEntity == null) {
-        print('[Attachment] Message not found for messageId: $messageId');
         return {'success': false, 'error': 'Message not found for messageId: $messageId'};
       }
-      
+
       // Get user name from member
       final members = ref.read(chatMemberListControllerProvider(tabType: tabType)).members;
       final userId = messageEntity.userId;
       final member = userId != null ? members.firstWhereOrNull((m) => m.id == userId) : null;
       final userName = member?.displayName ?? userId ?? 'Unknown user';
-      
+
       // Get channel info
       final channelId = messageEntity.channelId;
       final channel = channelId != null ? channelList.firstWhereOrNull((c) => c.id == channelId) : null;
@@ -5768,7 +5677,7 @@ class McpFunctionExecutor {
       if (cachedInbox?.linkedMessage != null) {
         isDm = cachedInbox!.linkedMessage!.isDm ?? false;
       }
-      
+
       // Convert MessageChannelEntityType to MessageEntityType
       MessageEntityType messageEntityType;
       if (messageType == MessageChannelEntityType.slack) {
@@ -5776,7 +5685,7 @@ class McpFunctionExecutor {
       } else {
         messageEntityType = MessageEntityType.slack; // Default
       }
-      
+
       // Create inbox entity from message
       inbox = InboxEntity(
         id: inboxId,
@@ -5802,37 +5711,24 @@ class McpFunctionExecutor {
         ),
       );
     } else {
-      print('[Attachment] Invalid inboxId format: $inboxId (must start with mail_ or message_)');
       return {'success': false, 'error': 'Invalid inboxId format'};
     }
 
     if (inbox == null) {
-      print('[Attachment] Failed to create inbox entity from inboxId: $inboxId');
       return {'success': false, 'error': 'Failed to parse inboxId'};
     }
 
-    print('[Attachment] Created inbox entity: ${inbox.id}, linkedMail: ${inbox.linkedMail != null}, linkedMessage: ${inbox.linkedMessage != null}');
-
     // Extract attachment files (images for PDFs, etc.)
-    print('[Attachment] Starting attachment extraction...');
     final attachmentFiles = await _extractAttachmentFiles([inbox], tabType: tabType, attachmentId: attachmentId);
 
     if (attachmentFiles.containsKey(inboxId)) {
       final files = attachmentFiles[inboxId]!;
-      print('[Attachment] Extracted ${files.length} files for inbox $inboxId');
 
       // Convert PlatformFile list to the format expected by OpenAI API (same as agent_input_field)
-      print('[Attachment] Converting ${files.length} files to fileData format...');
       final fileData = files.map((file) {
         final bytesEncoded = file.bytes != null ? base64Encode(file.bytes!) : null;
-        print(
-          '[Attachment]   - Converting file: ${file.name}, size: ${file.size}, bytes: ${file.bytes != null ? file.bytes!.length : 'null'}, encoded: ${bytesEncoded != null ? bytesEncoded.length : 'null'}',
-        );
         return {'name': file.name, 'bytes': bytesEncoded, 'size': file.size};
       }).toList();
-
-      print('[Attachment] Created fileData with ${fileData.length} items');
-      print('[Attachment] Calling AI to generate summary from files...');
 
       // AI에게 파일을 보내서 요약 생성
       try {
@@ -5886,7 +5782,6 @@ class McpFunctionExecutor {
         var summary = summaryResult?['message'] as String? ?? '첨부파일을 다운로드하고 이미지로 변환했습니다.';
 
         // 함수 호출 부분 제거 (AI가 함수 호출을 반환한 경우)
-        print('[Attachment] Raw AI response: $summary');
         final functionCallRegex = RegExp(
           r'\[\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\}(?:\s*,\s*\{[^}]*"function"\s*:\s*"[^"]+"[^}]*"arguments"\s*:\s*\{[^}]*\}[^}]*\})*\s*\]',
           dotAll: true,
@@ -5929,17 +5824,12 @@ class McpFunctionExecutor {
           summary = '첨부파일을 다운로드하고 이미지로 변환했습니다.';
         }
 
-        print('[Attachment] AI generated summary value (cleaned): $summary');
-        print('[Attachment] AI generated summary length: ${summary.length}');
-        print('[Attachment] AI generated summary preview: ${summary.substring(0, summary.length > 100 ? 100 : summary.length)}...');
-
         return {
           'success': true,
           'result': {'summary': summary, 'files': fileData},
           'message': 'Attachment content extracted and summarized successfully',
         };
       } catch (e) {
-        print('[Attachment] Error generating summary: $e');
         // AI 요약 실패 시 기본 메시지 사용
         return {
           'success': true,
@@ -5948,7 +5838,6 @@ class McpFunctionExecutor {
         };
       }
     } else {
-      print('[Attachment] No files found for inbox $inboxId');
       return {
         'success': true,
         'result': {'summary': 'No attachments found or no content extracted'},
@@ -5960,17 +5849,14 @@ class McpFunctionExecutor {
   /// Downloads attachments and converts them to PlatformFile format
   /// PDFs are converted to PNG images (one per page)
   Future<Map<String, List<PlatformFile>>> _extractAttachmentFiles(List<InboxEntity> inboxes, {TabType tabType = TabType.home, String? attachmentId}) async {
-    print('[Attachment] _extractAttachmentFiles called for ${inboxes.length} inbox(es)');
     final Map<String, List<PlatformFile>> attachmentFiles = {};
 
     for (final inbox in inboxes) {
-      print('[Attachment] Processing inbox: ${inbox.id}');
       final files = <PlatformFile>[];
 
       try {
         // Process mail attachments
         if (inbox.linkedMail != null) {
-          print('[Attachment] Processing mail attachments for inbox: ${inbox.id}');
           final mailRepository = ref.read(mailRepositoryProvider);
           final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
           final oauth = oauths.firstWhereOrNull((o) => o.email == inbox.linkedMail!.hostMail);
@@ -6002,38 +5888,32 @@ class McpFunctionExecutor {
             }
 
             if (mailEntity == null) {
-              print('[Attachment] Mail entity not found for inbox: ${inbox.id}');
               continue;
             }
 
             final attachments = mailEntity.getAttachments();
-            print('[Attachment] Found ${attachments.length} attachments for inbox: ${inbox.id}');
             if (attachments.isEmpty) continue;
 
             var filteredAttachments = attachments;
             if (attachmentId != null && attachmentId.isNotEmpty) {
               filteredAttachments = attachments.where((a) => a.id == attachmentId).toList();
               if (filteredAttachments.isEmpty) {
-                print('[Attachment] Attachment $attachmentId not found');
                 continue;
               }
             }
 
             final attachmentIds = filteredAttachments.map((a) => a.id).whereType<String>().toList();
-            print('[Attachment] Downloading ${attachmentIds.length} attachments...');
             final fetchResult = await mailRepository.fetchAttachments(email: mail.hostMail, messageId: mail.messageId, oauth: oauth, attachmentIds: attachmentIds);
 
             await fetchResult.fold(
               (failure) async {
-                print('[Attachment] Failed to fetch attachments: ${failure.toString()}');
+                // Failed to fetch attachments
               },
               (attachmentData) async {
-                print('[Attachment] Successfully downloaded ${attachmentData.length} attachments');
                 for (final entry in attachmentData.entries) {
                   final attachmentId = entry.key;
                   final bytes = entry.value;
                   if (bytes == null) {
-                    print('[Attachment] Attachment $attachmentId has no bytes');
                     continue;
                   }
 
@@ -6041,7 +5921,6 @@ class McpFunctionExecutor {
                   if (attachment == null) continue;
 
                   final fileName = attachment.name ?? 'unknown';
-                  print('[Attachment] Processing file: $fileName (${bytes.length} bytes)');
 
                   // Convert PDF to images or add as-is for other files
                   final convertedFiles = await _convertAttachmentToFiles(bytes, fileName);
@@ -6070,7 +5949,6 @@ class McpFunctionExecutor {
                 if (attachmentId != null && attachmentId.isNotEmpty) {
                   messageFiles = messageFiles.where((f) => f.id == attachmentId).toList();
                   if (messageFiles.isEmpty) {
-                    print('[Attachment] Attachment $attachmentId not found in message files');
                     continue;
                   }
                 }
@@ -6098,7 +5976,6 @@ class McpFunctionExecutor {
                       files.addAll(convertedFiles);
                     }
                   } catch (e) {
-                    print('[Attachment] Error downloading message attachment: $e');
                     continue;
                   }
                 }
@@ -6107,19 +5984,14 @@ class McpFunctionExecutor {
           }
         }
       } catch (e) {
-        print('[Attachment] Error processing attachments for inbox ${inbox.id}: $e');
         continue;
       }
 
       if (files.isNotEmpty) {
         attachmentFiles[inbox.id] = files;
-        print('[Attachment] Added ${files.length} files for inbox: ${inbox.id}');
-      } else {
-        print('[Attachment] No files extracted for inbox: ${inbox.id}');
       }
     }
 
-    print('[Attachment] Total inboxes with files: ${attachmentFiles.length}');
     return attachmentFiles;
   }
 
@@ -6144,7 +6016,6 @@ class McpFunctionExecutor {
               // PDF 페이지 크기 확인 (포인트 단위)
               final pageWidth = page.width;
               final pageHeight = page.height;
-              print('[Attachment] PDF page $i size: ${pageWidth}x${pageHeight} points');
 
               // 고해상도로 렌더링 (OpenAI Vision API 권장: 최소 512x512, 최적 1024x1024)
               // PDF 포인트를 픽셀로 변환 (72 DPI 기준, 3배 해상도 = 216 DPI로 충분히 높은 해상도)
@@ -6152,8 +6023,6 @@ class McpFunctionExecutor {
               final scaleFactor = (1024.0 / pageWidth).clamp(2.0, 4.0); // 최소 2배, 최대 4배
               final targetWidth = (pageWidth * scaleFactor);
               final targetHeight = (pageHeight * scaleFactor);
-
-              print('[Attachment] Rendering PDF page $i at ${targetWidth.toInt()}x${targetHeight.toInt()} pixels (scale: ${scaleFactor.toStringAsFixed(2)}x)');
 
               final pageImage = await page.render(
                 width: targetWidth,
@@ -6165,21 +6034,17 @@ class McpFunctionExecutor {
               final imageBytes = pageImage?.bytes;
               if (imageBytes != null && imageBytes.isNotEmpty) {
                 files.add(PlatformFile(name: '${fileName}_page_$i.png', size: imageBytes.length, bytes: imageBytes));
-                print('[Attachment] Converted PDF page $i to PNG (${imageBytes.length} bytes, ${targetWidth}x${targetHeight}px)');
-              } else {
-                print('[Attachment] Failed to render PDF page $i - no image bytes');
               }
 
               page.close();
             } catch (e) {
-              print('[Attachment] Error converting PDF page $i: $e');
               continue;
             }
           }
 
           pdfDocument.close();
         } catch (e) {
-          print('[Attachment] Error converting PDF to images: $e');
+          // Error converting PDF to images
         }
       }
       // Image files - add as-is
@@ -6191,7 +6056,7 @@ class McpFunctionExecutor {
         files.add(PlatformFile(name: fileName, size: bytes.length, bytes: bytes));
       }
     } catch (e) {
-      print('[Attachment] Error converting attachment to files: $e');
+      // Error converting attachment to files
     }
 
     return files;
@@ -6200,17 +6065,14 @@ class McpFunctionExecutor {
   /// Downloads attachments from inboxes and extracts content as images/text
   /// Returns a map of inbox ID to attachment content array (OpenAI message format)
   Future<Map<String, List<Map<String, dynamic>>>> _extractAttachmentTexts(List<InboxEntity> inboxes, {TabType tabType = TabType.home, String? attachmentId}) async {
-    print('[Attachment] _extractAttachmentTexts called for ${inboxes.length} inbox(es)');
     final Map<String, List<Map<String, dynamic>>> attachmentContents = {};
 
     for (final inbox in inboxes) {
-      print('[Attachment] Processing inbox: ${inbox.id}');
       final contentArray = <Map<String, dynamic>>[];
 
       try {
         // Process mail attachments
         if (inbox.linkedMail != null) {
-          print('[Attachment] Processing mail attachments for inbox: ${inbox.id}');
           final mailRepository = ref.read(mailRepositoryProvider);
           final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
           final oauth = oauths.firstWhereOrNull((o) => o.email == inbox.linkedMail!.hostMail);
@@ -6252,12 +6114,10 @@ class McpFunctionExecutor {
             }
 
             if (mailEntity == null) {
-              print('[Attachment] Mail entity not found for inbox: ${inbox.id}, messageId: ${mail.messageId}');
               continue;
             }
 
             final attachments = mailEntity.getAttachments();
-            print('[Attachment] Found ${attachments.length} attachments for inbox: ${inbox.id}');
             if (attachments.isEmpty) continue;
 
             // Filter by attachmentId if provided
@@ -6265,46 +6125,37 @@ class McpFunctionExecutor {
             if (attachmentId != null && attachmentId.isNotEmpty) {
               filteredAttachments = attachments.where((a) => a.id == attachmentId).toList();
               if (filteredAttachments.isEmpty) {
-                print('[Attachment] Attachment $attachmentId not found');
                 continue;
               }
             }
 
             final attachmentIds = filteredAttachments.map((a) => a.id).whereType<String>().toList();
-            print('[Attachment] Downloading ${attachmentIds.length} attachments...');
             final fetchResult = await mailRepository.fetchAttachments(email: mail.hostMail, messageId: mail.messageId, oauth: oauth, attachmentIds: attachmentIds);
 
             await fetchResult.fold(
               (failure) async {
-                print('[Attachment] Failed to fetch attachments: ${failure.toString()}');
+                // Failed to fetch attachments
               },
               (attachmentData) async {
-                print('[Attachment] Successfully downloaded ${attachmentData.length} attachments');
                 for (final entry in attachmentData.entries) {
                   final attachmentId = entry.key;
                   final bytes = entry.value;
                   if (bytes == null) {
-                    print('[Attachment] Attachment $attachmentId has no bytes');
                     continue;
                   }
 
                   final attachment = attachments.firstWhereOrNull((a) => a.id == attachmentId);
                   if (attachment == null) {
-                    print('[Attachment] Attachment $attachmentId not found in attachment list');
                     continue;
                   }
 
                   final fileName = attachment.name ?? 'unknown';
-                  print('[Attachment] Extracting content from: $fileName (${bytes.length} bytes)');
                   final contentItems = await _extractContentFromBytes(bytes, fileName);
                   if (contentItems.isNotEmpty) {
-                    print('[Attachment] Extracted ${contentItems.length} content items from $fileName');
                     // Add file name as text
                     contentArray.add({'type': 'text', 'text': 'Attachment "$fileName":'});
                     // Add content items (images or text)
                     contentArray.addAll(contentItems);
-                  } else {
-                    print('[Attachment] No content extracted from $fileName (may be unsupported format)');
                   }
                 }
               },
@@ -6336,7 +6187,6 @@ class McpFunctionExecutor {
                 if (attachmentId != null && attachmentId.isNotEmpty) {
                   files = files.where((f) => f.id == attachmentId).toList();
                   if (files.isEmpty) {
-                    print('[Attachment] Attachment $attachmentId not found in message files');
                     continue;
                   }
                 }
@@ -6386,13 +6236,9 @@ class McpFunctionExecutor {
 
       if (contentArray.isNotEmpty) {
         attachmentContents[inbox.id] = contentArray;
-        print('[Attachment] Added ${contentArray.length} content items for inbox: ${inbox.id}');
-      } else {
-        print('[Attachment] No content extracted for inbox: ${inbox.id}');
       }
     }
 
-    print('[Attachment] Total inboxes with attachments: ${attachmentContents.length}');
     return attachmentContents;
   }
 
@@ -6432,16 +6278,11 @@ class McpFunctionExecutor {
                   'type': 'image_url',
                   'image_url': {'url': 'data:image/png;base64,$imageBase64'},
                 });
-                print('[Attachment] Converted PDF page $i to image (${imageBytes.length} bytes, base64: ${imageBase64.length} chars)');
-              } else {
-                print('[Attachment] PDF page $i rendered but no image bytes');
               }
 
               // Close page (memory management)
               page.close();
             } catch (e, stackTrace) {
-              print('[Attachment] Error converting PDF page $i to image: $e');
-              print('[Attachment] Stack trace: $stackTrace');
               continue;
             }
           }
@@ -6454,13 +6295,9 @@ class McpFunctionExecutor {
           }
 
           if (contentItems.isEmpty) {
-            print('[Attachment] No images generated from PDF');
             contentItems.add({'type': 'text', 'text': '[PDF 파일 첨부됨: $fileName - 이미지로 변환할 수 없습니다]'});
-          } else {
-            print('[Attachment] Generated ${contentItems.length} content items from PDF');
           }
         } catch (e) {
-          print('[Attachment] Error converting PDF to images: $e');
           contentItems.add({'type': 'text', 'text': '[PDF 파일 첨부됨: $fileName - 파일을 이미지로 변환하는 중 오류가 발생했습니다: $e]'});
         }
       }
@@ -6492,7 +6329,7 @@ class McpFunctionExecutor {
       }
       // Other file types - return empty
     } catch (e) {
-      print('[Attachment] Error extracting content: $e');
+      // Error extracting content
     }
 
     return contentItems;
