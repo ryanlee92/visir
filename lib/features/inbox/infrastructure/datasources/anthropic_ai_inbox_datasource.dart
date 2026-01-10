@@ -1060,10 +1060,7 @@ class AnthropicAiInboxDatasource extends InboxDatasource {
       // Add tools if includeTools is true
       if (includeTools) {
         final functions = McpFunctionRegistry.getAnthropicFunctions();
-        print('[Anthropic] Adding ${functions.length} functions to API call');
         body['tools'] = functions;
-      } else {
-        print('[Anthropic] Skipping tools for generateGeneralChat (includeTools=false)');
       }
 
       final response = await http.post(
@@ -1121,7 +1118,6 @@ class AnthropicAiInboxDatasource extends InboxDatasource {
           if (functionCalls.isNotEmpty) {
             final functionCallsJson = jsonEncode(functionCalls);
             finalContent = '$finalContent\n\n$functionCallsJson';
-            print('[Anthropic] Added ${functionCalls.length} function calls to content');
           }
 
           if (finalContent.isNotEmpty) {

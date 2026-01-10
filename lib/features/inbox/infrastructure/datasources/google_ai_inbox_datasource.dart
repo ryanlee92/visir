@@ -1246,14 +1246,11 @@ class GoogleAiInboxDatasource extends InboxDatasource {
       // Add function declarations if includeTools is true
       if (includeTools) {
         final functions = McpFunctionRegistry.getGoogleAiFunctions();
-        print('[GoogleAI] Adding ${functions.length} functions to API call');
         body['tools'] = [
           {
             'function_declarations': functions,
           },
         ];
-      } else {
-        print('[GoogleAI] Skipping tools for generateGeneralChat (includeTools=false)');
       }
 
       final response = await http.post(Uri.parse(endpoint), headers: {'Content-Type': 'application/json'}, body: jsonEncode(body));
@@ -1314,7 +1311,6 @@ class GoogleAiInboxDatasource extends InboxDatasource {
               if (functionCalls.isNotEmpty) {
                 final functionCallsJson = jsonEncode(functionCalls);
                 finalContent = '$finalContent\n\n$functionCallsJson';
-                print('[GoogleAI] Added ${functionCalls.length} function calls to content');
               }
 
               if (finalContent.isNotEmpty) {

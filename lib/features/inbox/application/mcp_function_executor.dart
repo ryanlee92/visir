@@ -3469,9 +3469,6 @@ class McpFunctionExecutor {
         }
         allInboxesForSummary2.addAll(searchResults);
 
-        print(
-          '[Attachment] Calling fetchConversationSummary (inbox-only path) with ${allInboxesForSummary2.length} inboxes (baseInbox included: ${baseInbox != null && (baseInbox.linkedMail != null || baseInbox.linkedMessage != null)})',
-        );
         final summaryResult = await repository.fetchConversationSummary(
           inbox: baseInbox ?? inbox,
           allInboxes: allInboxesForSummary2,
@@ -4616,14 +4613,9 @@ class McpFunctionExecutor {
     var filtered = localTasks;
     final now = DateTime.now();
 
-    print(
-      '[MCPExecutor] _filterLocalTasks: input tasks=${localTasks.length}, startDate=$startDate, endDate=$endDate, searchKeyword=$searchKeyword, taskId=$taskId, isDone=$isDone',
-    );
-
     // ID 필터
     if (taskId != null && taskId.isNotEmpty) {
       filtered = filtered.where((task) => task.id == taskId || task.id?.contains(taskId) == true).toList();
-      print('[MCPExecutor] After taskId filter: ${filtered.length} tasks');
       if (filtered.isEmpty) return [];
     }
 
@@ -4660,13 +4652,11 @@ class McpFunctionExecutor {
         }
       }
 
-      print('[MCPExecutor] Generated ${recurringInstances.length} recurring task instances, already expanded: ${alreadyExpandedInstances.length}');
       filtered = [...nonRecurringTasks, ...alreadyExpandedInstances, ...recurringInstances];
     }
 
     // 날짜 범위 필터
     if (startDate != null || endDate != null) {
-      print('[MCPExecutor] Applying date range filter: startDate=$startDate, endDate=$endDate, now=$now');
       final beforeFilter = filtered.length;
 
       // 날짜만 비교하기 위해 날짜를 정규화 (시간을 00:00:00으로 설정)
@@ -4684,7 +4674,6 @@ class McpFunctionExecutor {
         // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
         final taskDate = task.editedStartTime ?? task.startAt ?? task.startDate;
         if (taskDate == null) {
-          print('[MCPExecutor] Task ${task.id} has no date, excluding');
           return false;
         }
 
@@ -4693,7 +4682,6 @@ class McpFunctionExecutor {
 
         // startDate 체크 (날짜만 비교)
         if (normalizedStartDate != null && normalizedTaskDate.isBefore(normalizedStartDate)) {
-          print('[MCPExecutor] Task ${task.id} (${taskDate} -> ${normalizedTaskDate}) is before startDate ($startDate -> $normalizedStartDate), excluding');
           return false;
         }
 
@@ -4702,27 +4690,21 @@ class McpFunctionExecutor {
           // task 날짜의 하루 끝(23:59:59.999)과 endDate 비교
           final taskDateEnd = DateTime(taskDate.year, taskDate.month, taskDate.day, 23, 59, 59, 999);
           if (taskDateEnd.isAfter(normalizedEndDate)) {
-            print('[MCPExecutor] Task ${task.id} (${taskDate} -> ${taskDateEnd}) is after endDate ($endDate -> $normalizedEndDate), excluding');
             return false;
           }
         }
 
-        print('[MCPExecutor] Task ${task.id} (${taskDate} -> ${normalizedTaskDate}) passed date filter');
         return true;
       }).toList();
-      print('[MCPExecutor] After date filter: ${filtered.length} tasks (was $beforeFilter)');
       if (filtered.isEmpty) return [];
     } else {
       // 날짜 범위 필터가 없어도 now 이후의 task는 제외
-      print('[MCPExecutor] No date range, filtering out tasks after now ($now)');
-      final beforeFilter = filtered.length;
       filtered = filtered.where((task) {
         // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
         final taskDate = task.editedStartTime ?? task.startAt ?? task.startDate;
         if (taskDate == null) return false;
         return !taskDate.isAfter(now);
       }).toList();
-      print('[MCPExecutor] After now filter: ${filtered.length} tasks (was $beforeFilter)');
       if (filtered.isEmpty) return [];
     }
 
@@ -4838,68 +4820,37 @@ class McpFunctionExecutor {
       String? taskId;
 
       // AI에서 전달된 파라미터 확인
-      print('[MCPExecutor] Parsing search parameters...');
       if (args['startDate'] != null) {
         try {
           startDate = DateTime.parse(args['startDate'] as String).toLocal();
-          print('[MCPExecutor] Parsed startDate: $startDate');
         } catch (e) {
-          print('[MCPExecutor] Failed to parse startDate: ${args['startDate']}, error: $e');
           // Invalid date format, ignore
         }
       }
       if (args['endDate'] != null) {
         try {
           endDate = DateTime.parse(args['endDate'] as String).toLocal();
-          print('[MCPExecutor] Parsed endDate: $endDate');
         } catch (e) {
-          print('[MCPExecutor] Failed to parse endDate: ${args['endDate']}, error: $e');
           // Invalid date format, ignore
         }
       }
       if (args['taskId'] != null) {
         taskId = args['taskId'] as String?;
-        print('[MCPExecutor] taskId: $taskId');
       }
-      print('[MCPExecutor] Final search params: startDate=$startDate, endDate=$endDate, searchKeyword=$searchKeyword, taskId=$taskId, isDone=$isDone');
 
       // 로컬 데이터 확인
-      print('[MCPExecutor] Checking local data availability...');
       final hasLocalData = _hasLocalTaskDataForScope(startDate, endDate);
-      print('[MCPExecutor] Has local data: $hasLocalData');
       List<TaskEntity> searchResults;
 
       if (hasLocalData) {
         // 로컬 데이터에서 필터링
-        print('[MCPExecutor] Searching in local data...');
         final allTasks = _getAllTasksFromBothProviders();
-        print('[MCPExecutor] Total local tasks: ${allTasks.length}');
-
-        // 2026-01-10 날짜의 task가 있는지 확인
-        final targetDate = DateTime(2026, 1, 10);
-        final tasksOnTargetDate = allTasks.where((task) {
-          final taskDate = task.startAt ?? task.startDate;
-          if (taskDate == null) return false;
-          final normalizedTaskDate = DateTime(taskDate.year, taskDate.month, taskDate.day);
-          return normalizedTaskDate == targetDate;
-        }).toList();
-        print('[MCPExecutor] Local tasks on 2026-01-10: ${tasksOnTargetDate.length}');
-        for (final task in tasksOnTargetDate) {
-          print('[MCPExecutor] Local task on target date: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
-        }
-
-        // 각 task의 날짜 정보 로그 (처음 10개만)
-        for (final task in allTasks.take(10)) {
-          print('[MCPExecutor] Local task: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
-        }
         searchResults = _filterLocalTasks(allTasks, startDate, endDate, searchKeyword, taskId, isDone);
       } else {
         // Remote search 실행
-        print('[MCPExecutor] Searching remotely...');
         final user = ref.read(authControllerProvider).requireValue;
         final pref = ref.read(localPrefControllerProvider).value;
         if (pref == null) {
-          print('[MCPExecutor] Preferences not found');
           return {'success': false, 'error': 'Preferences not found'};
         }
 
@@ -4908,19 +4859,15 @@ class McpFunctionExecutor {
 
         // 날짜 범위가 있으면 fetchTasksBetweenDates 사용, 없으면 searchTasks 사용
         if (startDate != null && endDate != null) {
-          print('[MCPExecutor] Calling taskRepository.fetchTasksBetweenDates with startDate=$startDate, endDate=$endDate...');
           // UTC로 변환하여 데이터베이스 쿼리 (Supabase는 UTC를 사용)
           final startDateTimeUtc = startDate!.toUtc();
           final endDateTimeUtc = endDate!.toUtc();
-          print('[MCPExecutor] Converted to UTC: startDateTimeUtc=$startDateTimeUtc, endDateTimeUtc=$endDateTimeUtc');
           final fetchResult = await taskRepository.fetchTasksBetweenDates(startDateTime: startDateTimeUtc, endDateTime: endDateTimeUtc, pref: pref, userId: user.id);
           final allTasks = fetchResult.fold((failure) => <TaskEntity>[], (result) => result);
-          print('[MCPExecutor] fetchTasksBetweenDates completed, retrieved ${allTasks.length} tasks');
 
           // Recurring tasks를 날짜 범위에 맞게 필터링
           final nonRecurringTasks = allTasks.where((task) => task.rrule == null).toList();
           final recurringTasks = allTasks.where((task) => task.rrule != null).toList();
-          print('[MCPExecutor] Separated tasks: nonRecurring=${nonRecurringTasks.length}, recurring=${recurringTasks.length}');
 
           final recurringInstances = <TaskEntity>[];
           for (final recurringTask in recurringTasks) {
@@ -4928,7 +4875,6 @@ class McpFunctionExecutor {
 
             // Recurring task의 시작 날짜가 endDateTimeUtc 이후면 스킵
             if (recurringTask.startAt!.isAfter(endDateTimeUtc)) {
-              print('[MCPExecutor] Skipping recurring task ${recurringTask.id}: startAt (${recurringTask.startAt}) is after endDateTimeUtc ($endDateTimeUtc)');
               continue;
             }
 
@@ -4937,8 +4883,6 @@ class McpFunctionExecutor {
             // 원본 startAt이 날짜 범위 안에 있으면 그것도 포함해야 하므로, after를 원본 startAt으로 설정하지 않음
             final startAt = recurringTask.startAt!.isBefore(startDateTimeUtc) ? startDateTimeUtc : recurringTask.startAt!;
             final instances = recurringTask.rrule!.getInstances(start: recurringTask.startAt!, after: startAt, before: endDateTimeUtc, includeAfter: true).toList();
-
-            print('[MCPExecutor] Recurring task ${recurringTask.id} (${recurringTask.title}): ${instances.length} instances in date range');
 
             // 각 인스턴스를 TaskEntity로 생성
             final taskDuration = recurringTask.startAt != null && recurringTask.endAt != null ? recurringTask.endAt!.difference(recurringTask.startAt!) : const Duration(days: 1);
@@ -4973,40 +4917,15 @@ class McpFunctionExecutor {
             }
           }
 
-          print('[MCPExecutor] Generated ${recurringInstances.length} recurring task instances');
           // 원본 recurring tasks는 제외하고 인스턴스만 사용 (원본과 인스턴스 날짜가 같으면 중복 방지)
           tasks = [...nonRecurringTasks, ...recurringInstances];
-          print('[MCPExecutor] Combined tasks: ${tasks.length} total');
         } else {
-          print('[MCPExecutor] Calling taskRepository.searchTasks with query="$query", isDone=$isDone...');
           final searchResult = await taskRepository.searchTasks(query: query, pref: pref, userId: user.id, isDone: isDone);
-          print('[MCPExecutor] Repository search completed');
           tasks = searchResult.fold((failure) => <TaskEntity>[], (result) => result.tasks.values.expand((e) => e).toList());
-        }
-
-        print('[MCPExecutor] Retrieved ${tasks.length} tasks from repository');
-
-        // 2026-01-10 날짜의 task가 있는지 확인
-        final targetDate = DateTime(2026, 1, 10);
-        final tasksOnTargetDate = tasks.where((task) {
-          final taskDate = task.startAt ?? task.startDate;
-          if (taskDate == null) return false;
-          final normalizedTaskDate = DateTime(taskDate.year, taskDate.month, taskDate.day);
-          return normalizedTaskDate == targetDate;
-        }).toList();
-        print('[MCPExecutor] Tasks on 2026-01-10: ${tasksOnTargetDate.length}');
-        for (final task in tasksOnTargetDate) {
-          print('[MCPExecutor] Task on target date: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
-        }
-
-        // 각 task의 날짜 정보 로그 (처음 10개만)
-        for (final task in tasks.take(10)) {
-          print('[MCPExecutor] Remote task: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
         }
 
         // 로컬에서 추가 필터링 (날짜 범위 등)
         searchResults = _filterLocalTasks(tasks, startDate, endDate, searchKeyword, taskId, isDone);
-        print('[MCPExecutor] Filtered remote tasks: ${searchResults.length}');
       }
 
       // Sort by date (closest to today first) and limit results to 20

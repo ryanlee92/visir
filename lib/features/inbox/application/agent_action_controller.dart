@@ -398,8 +398,6 @@ class AgentActionController extends _$AgentActionController {
     bool isRecursiveCall = false, // 재귀 호출 방지 플래그
     String? searchContext, // 검색 결과 context
   }) async {
-    print('[AgentAction] _generateGeneralChat called: isRecursiveCall=$isRecursiveCall, searchContext length=${searchContext?.length ?? 0}');
-    print('[AgentAction] User message: ${userMessage.substring(0, userMessage.length > 100 ? 100 : userMessage.length)}');
     // 파일 정보를 메시지에 추가 (인박스 첨부 파일 포함)
     String enhancedUserMessage = userMessage;
 
@@ -657,10 +655,6 @@ class AgentActionController extends _$AgentActionController {
       if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
         enhancedUserMessage = '[IMPORTANT: Please start your response with <conversation_title>Title (max 30 chars)</conversation_title>]\n\n$enhancedUserMessage';
       }
-      print('[AgentAction] Calling _repository.generateGeneralChat...');
-      print('[AgentAction] Enhanced user message length: ${enhancedUserMessage.length}');
-      print('[AgentAction] Conversation history length: ${filteredHistory.length}');
-      print('[AgentAction] Search context length: ${searchContext?.length ?? 0}');
       final response = await _repository.generateGeneralChat(
         userMessage: enhancedUserMessage,
         conversationHistory: filteredHistory,
@@ -675,7 +669,6 @@ class AgentActionController extends _$AgentActionController {
         systemPrompt: systemPrompt,
       );
 
-      print('[AgentAction] Received response from repository');
       final aiResponse = response.fold(
         (failure) {
           // 크레딧 부족 예외 처리
@@ -707,11 +700,8 @@ class AgentActionController extends _$AgentActionController {
         },
       );
 
-      print('[AgentAction] Processing aiResponse: ${aiResponse != null ? "present" : "null"}');
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
-        print('[AgentAction] AI message length: ${aiMessage.length}');
-        print('[AgentAction] AI message preview: ${aiMessage.substring(0, aiMessage.length > 200 ? 200 : aiMessage.length)}');
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
@@ -757,10 +747,8 @@ class AgentActionController extends _$AgentActionController {
         aiMessage = aiMessage.replaceAll(RegExp(r'&lt;conversation_title&gt;.*?&lt;/conversation_title&gt;', dotAll: true), '');
 
         // MCP 함수 호출 감지 및 실행
-        print('[AgentAction] Parsing function calls from AI message...');
         final executor = McpFunctionExecutor();
         final allFunctionCalls = executor.parseFunctionCalls(aiMessage);
-        print('[AgentAction] Parsed ${allFunctionCalls.length} function calls');
 
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
@@ -865,14 +853,11 @@ class AgentActionController extends _$AgentActionController {
 
           // 검색 함수를 먼저 처리 (silent 실행)
           if (searchFunctionCalls.isNotEmpty && !isRecursiveCall) {
-            print('[AgentAction] Processing ${searchFunctionCalls.length} search function calls');
             String? searchContext;
 
             for (final searchCall in searchFunctionCalls) {
               final functionName = searchCall['function'] as String;
-              print('[AgentAction] Executing search function: $functionName');
               var functionArgs = searchCall['arguments'] as Map<String, dynamic>;
-              print('[AgentAction] Function args: ${functionArgs.keys}');
 
               // 태그된 항목들을 자동으로 파라미터에 추가
               functionArgs = _enrichFunctionArgsWithTaggedItems(
@@ -889,7 +874,6 @@ class AgentActionController extends _$AgentActionController {
 
               // 검색 함수 실행
               final tabType = _getTabTypeForFunction(functionName);
-              print('[AgentAction] Executing $functionName with tabType=$tabType');
               final result = await executor.executeFunction(
                 functionName,
                 functionArgs,
@@ -901,12 +885,9 @@ class AgentActionController extends _$AgentActionController {
                 remainingCredits: remainingCredits,
               );
 
-              print('[AgentAction] Function $functionName execution result: success=${result['success']}, results count=${(result['results'] as List<dynamic>?)?.length ?? 0}');
-
               // 검색 결과 처리
               if (result['success'] == true && result['results'] != null) {
                 final searchResults = result['results'] as List<dynamic>? ?? [];
-                print('[AgentAction] Processing search results: ${searchResults.length} items');
 
                 // 검색 결과가 비어있어도 context를 생성하여 AI에게 전달
                 // 검색 결과를 silent 메시지로 추가
@@ -954,9 +935,7 @@ class AgentActionController extends _$AgentActionController {
                     }
                   }
                 } else if (functionName == 'searchTask') {
-                  print('[AgentAction] Building task context from ${searchResults.length} search results');
                   currentSearchContext = _buildTaskContextFromSearchResults(searchResults);
-                  print('[AgentAction] Task context length: ${currentSearchContext.length}');
                   // 검색된 task를 taggedTasks에 추가
                   if (searchResults.isNotEmpty) {
                     final searchResultTasks = <TaskEntity>[];
@@ -972,11 +951,9 @@ class AgentActionController extends _$AgentActionController {
                         }
                       }
                     }
-                    print('[AgentAction] Found ${searchResultTasks.length} tasks from search results');
                     if (searchResultTasks.isNotEmpty) {
                       final existingIds = updatedTaggedTasks?.map((e) => e.id).toSet() ?? {};
                       final newTasks = searchResultTasks.where((e) => !existingIds.contains(e.id)).toList();
-                      print('[AgentAction] Adding ${newTasks.length} new tasks to taggedTasks');
                       updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
                     }
                   }
@@ -1008,32 +985,20 @@ class AgentActionController extends _$AgentActionController {
                 // 검색 결과를 context에 추가 (결과가 비어있어도 context가 생성되므로 항상 추가)
                 if (currentSearchContext != null && currentSearchContext.isNotEmpty) {
                   searchContext = searchContext == null ? currentSearchContext : '$searchContext\n\n$currentSearchContext';
-                  print('[AgentAction] Updated searchContext, total length: ${searchContext.length}');
-                } else {
-                  print('[AgentAction] No search context generated for $functionName');
                 }
-              } else {
-                print('[AgentAction] Function $functionName execution failed: ${result['error']}');
               }
             }
-
-            print('[AgentAction] Finished processing search functions. searchContext length: ${searchContext?.length ?? 0}');
 
             // 검색 결과가 있으면 state 업데이트 (재귀 호출 전에!)
             if (updatedLoadedInboxNumbers != state.loadedInboxNumbers ||
                 updatedTaggedTasks != taggedTasks ||
                 updatedTaggedEvents != taggedEvents ||
                 updatedAvailableInboxes != state.availableInboxes) {
-              print('[AgentAction] Updating state with search results');
               await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, availableInboxes: updatedAvailableInboxes);
-              print('[AgentAction] State updated');
-            } else {
-              print('[AgentAction] No state update needed');
             }
 
             // 검색 결과를 context로 추가하여 AI 재호출
             if (searchContext != null && searchContext.isNotEmpty) {
-              print('[AgentAction] Recursively calling _generateGeneralChat with searchContext (length: ${searchContext.length})');
               // 검색 결과를 context로 추가하여 재호출
               await _generateGeneralChat(
                 userMessage,
@@ -1049,10 +1014,7 @@ class AgentActionController extends _$AgentActionController {
                 isRecursiveCall: true, // 재귀 호출 플래그 설정
                 searchContext: searchContext, // 검색 결과 context 전달
               );
-              print('[AgentAction] Recursive call completed, returning');
               return; // 검색 함수 처리 후 종료
-            } else {
-              print('[AgentAction] No searchContext to pass to recursive call');
             }
           }
 
@@ -1069,7 +1031,6 @@ class AgentActionController extends _$AgentActionController {
             // 재귀 호출 중에 검색 함수만 호출된 경우, 일반 응답을 생성해야 함
             // (이미 searchContext에 결과가 있으므로 그것을 사용하여 응답 생성)
             if (isRecursiveCall) {
-              print('[AgentAction] Recursive call: only search functions called, proceeding to generate general response');
               // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
               // executionGroups를 건너뛰고 일반 응답 처리로 바로 넘어감
             } else {
@@ -1397,7 +1358,6 @@ class AgentActionController extends _$AgentActionController {
             // 재귀 호출에서 모든 함수 호출이 무시된 경우 (검색 함수만 호출된 경우)
             // 이미 searchContext에 결과가 있으므로 일반 응답 처리로 넘어가야 함
             if (isRecursiveCall && results.isEmpty && functionCallsToProcess.isEmpty) {
-              print('[AgentAction] Recursive call: no function results, proceeding to general response handling');
               // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
               resultMessage = ''; // 빈 메시지로 설정하여 일반 응답 처리로 넘어가도록 함
             } else if (isRecursiveCall && results.isEmpty) {
@@ -1542,7 +1502,6 @@ class AgentActionController extends _$AgentActionController {
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
           // 단, functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
           if (isRecursiveCall && !(functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty)) {
-            print('[AgentAction] Recursive call detected (function results), cleaning up messages and finishing...');
             // 재귀 호출 완료 시 로딩 상태 해제
             // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
             // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
@@ -1554,15 +1513,12 @@ class AgentActionController extends _$AgentActionController {
                     updatedMessagesWithResponse[2].role == 'assistant'
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
-            print('[AgentAction] Final messages count: ${finalMessages.length}');
             await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
-            print('[AgentAction] Recursive call completed (function results), state updated');
             return;
           }
 
           // functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
           if (isRecursiveCall && functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty) {
-            print('[AgentAction] Recursive call: empty resultMessage, proceeding to general response handling');
             // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
             // aiMessage를 사용하여 일반 응답 생성
             final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
@@ -1576,9 +1532,7 @@ class AgentActionController extends _$AgentActionController {
                     updatedMessagesWithResponse[2].role == 'assistant'
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
-            print('[AgentAction] Final messages count: ${finalMessages.length}');
             await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
-            print('[AgentAction] Recursive call completed (empty resultMessage), state updated');
             return;
           }
 
@@ -1590,7 +1544,6 @@ class AgentActionController extends _$AgentActionController {
             // function call만 포함하고 있으면 다시 API 호출하여 일반 응답 생성
             final isOnlyFunctionCall = aiMessage.trim().startsWith('[') && aiMessage.trim().endsWith(']');
             if (isOnlyFunctionCall) {
-              print('[AgentAction] Recursive call: only function call in response, calling API again to generate general response');
               // searchContext가 있으므로 다시 API 호출하여 일반 응답 생성
               final me = ref.read(authControllerProvider).value;
               final userId = me?.id;
@@ -1643,9 +1596,7 @@ class AgentActionController extends _$AgentActionController {
                         updatedMessagesWithResponse[2].role == 'assistant'
                     ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                     : updatedMessagesWithResponse;
-                print('[AgentAction] Final messages count: ${finalMessages.length}');
                 await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
-                print('[AgentAction] Recursive call completed (regenerated general response), state updated');
                 return;
               }
             }
@@ -1682,7 +1633,6 @@ class AgentActionController extends _$AgentActionController {
 
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
           if (isRecursiveCall) {
-            print('[AgentAction] Recursive call detected (general response), cleaning up messages and finishing...');
             // 재귀 호출 완료 시 로딩 상태 해제
             // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
             // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
@@ -1694,9 +1644,7 @@ class AgentActionController extends _$AgentActionController {
                     updatedMessagesWithResponse[2].role == 'assistant'
                 ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
                 : updatedMessagesWithResponse;
-            print('[AgentAction] Final messages count: ${finalMessages.length}');
             await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
-            print('[AgentAction] Recursive call completed (general response), state updated');
             return;
           }
 

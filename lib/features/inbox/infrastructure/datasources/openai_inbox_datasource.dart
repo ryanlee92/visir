@@ -2012,7 +2012,6 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
 
       // Get function schemas for OpenAI function calling
       final functions = McpFunctionRegistry.getOpenAiFunctions();
-      print('[OpenAI] Adding ${functions.length} functions to API call, including summarizeAttachment: ${functions.any((f) => f['name'] == 'summarizeAttachment')}');
 
       // Convert functions to OpenAI tools format
       final tools = functions.map((f) => {'type': 'function', 'function': f}).toList();
@@ -2023,26 +2022,13 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
       if (includeTools) {
         requestBody['tools'] = tools;
         requestBody['tool_choice'] = 'auto'; // Let AI decide when to use tools
-        print('[OpenAI] Tools count: ${tools.length}');
-      } else {
-        print('[OpenAI] Skipping tools for generateGeneralChat (includeTools=false)');
       }
 
-      print('[OpenAI] API request body keys: ${requestBody.keys}');
-
-      print('[OpenAI] Sending API request...');
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $finalApiKey'},
         body: jsonEncode(requestBody),
       );
-
-      print('[OpenAI] API response status: ${response.statusCode}');
-      print('[OpenAI] API response body length: ${response.bodyBytes.length}');
-
-      if (response.statusCode != 200) {
-        print('[OpenAI] API error response: ${response.body}');
-      }
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -2050,58 +2036,33 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
         final content = message?['content'] as String?;
         final toolCalls = message?['tool_calls'] as List<dynamic>?;
 
-        print('[OpenAI] API response received');
-        print('[OpenAI] Content: ${content != null ? "present (${content.length} chars)" : "null"}');
-        print('[OpenAI] Tool calls: ${toolCalls != null ? "${toolCalls.length} calls" : "none"}');
-        if (toolCalls != null && toolCalls.isNotEmpty) {
-          for (final toolCall in toolCalls) {
-            final functionName = toolCall['function']?['name'] as String?;
-            final argumentsJson = toolCall['function']?['arguments'] as String?;
-            print('[OpenAI] Tool call: $functionName');
-            print('[OpenAI] Tool call arguments: ${argumentsJson?.substring(0, argumentsJson.length > 200 ? 200 : argumentsJson.length)}');
-            if (functionName == 'summarizeAttachment') {
-              print('[OpenAI] ✓ summarizeAttachment tool call found!');
-            }
-          }
-        }
-
         // Handle tool calls - convert to function call format for parsing
         String finalContent = content ?? '';
         if (toolCalls != null && toolCalls.isNotEmpty) {
-          print('[OpenAI] Processing ${toolCalls.length} tool calls...');
           // Convert OpenAI tool_calls format to our function call format
           final functionCalls = <Map<String, dynamic>>[];
           for (final toolCall in toolCalls) {
             final function = toolCall['function'] as Map<String, dynamic>?;
             final functionName = function?['name'] as String?;
             final argumentsJson = function?['arguments'] as String?;
-            print('[OpenAI] Parsing tool call: functionName=$functionName, argumentsJson length=${argumentsJson?.length ?? 0}');
             if (functionName != null && argumentsJson != null) {
               try {
                 final arguments = jsonDecode(argumentsJson) as Map<String, dynamic>;
-                print('[OpenAI] Successfully parsed arguments for $functionName: ${arguments.keys}');
                 functionCalls.add({'function': functionName, 'arguments': arguments});
               } catch (e) {
-                print('[OpenAI] Failed to parse tool call arguments: $e');
-                print('[OpenAI] Arguments JSON: $argumentsJson');
+                // Failed to parse tool call arguments
               }
-            } else {
-              print('[OpenAI] Skipping tool call: functionName=$functionName, argumentsJson=$argumentsJson');
             }
           }
 
-          print('[OpenAI] Parsed ${functionCalls.length} function calls from ${toolCalls.length} tool calls');
           if (functionCalls.isNotEmpty) {
             // Convert function calls to JSON array format for parsing
             final functionCallsJson = jsonEncode(functionCalls);
             finalContent = '$finalContent\n\n$functionCallsJson';
-            print('[OpenAI] Added ${functionCalls.length} function calls to content');
-            print('[OpenAI] Final content length: ${finalContent.length}');
           }
         }
 
         if (finalContent.isNotEmpty) {
-          print('[OpenAI] Returning result with content (length: ${finalContent.length})');
           final result = <String, dynamic>{'message': finalContent};
 
           // Extract token usage information
@@ -2112,39 +2073,28 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
               'completion_tokens': usage['completion_tokens'] ?? 0,
               'total_tokens': usage['total_tokens'] ?? 0,
             };
-            print('[OpenAI] Token usage: ${result['_token_usage']}');
           }
 
-          print('[OpenAI] Returning result successfully');
           return result;
         } else if (toolCalls != null && toolCalls.isNotEmpty) {
           // Only tool calls, no content - return empty message with function calls
-          print('[OpenAI] Processing tool calls without content');
-          print('[OpenAI] Tool calls count: ${toolCalls.length}');
           final functionCalls = <Map<String, dynamic>>[];
           for (final toolCall in toolCalls) {
             final function = toolCall['function'] as Map<String, dynamic>?;
             final functionName = function?['name'] as String?;
             final argumentsJson = function?['arguments'] as String?;
-            print('[OpenAI] Processing tool call without content: functionName=$functionName, argumentsJson length=${argumentsJson?.length ?? 0}');
             if (functionName != null && argumentsJson != null) {
               try {
                 final arguments = jsonDecode(argumentsJson) as Map<String, dynamic>;
                 functionCalls.add({'function': functionName, 'arguments': arguments});
-                print('[OpenAI] Added function call: $functionName with arguments: ${arguments.keys}');
               } catch (e) {
-                print('[OpenAI] Failed to parse tool call arguments: $e');
-                print('[OpenAI] Arguments JSON: $argumentsJson');
+                // Failed to parse tool call arguments
               }
-            } else {
-              print('[OpenAI] Skipping invalid tool call: functionName=$functionName, argumentsJson=$argumentsJson');
             }
           }
 
-          print('[OpenAI] Parsed ${functionCalls.length} function calls from ${toolCalls.length} tool calls (no content)');
           if (functionCalls.isNotEmpty) {
             final functionCallsJson = jsonEncode(functionCalls);
-            print('[OpenAI] Function calls JSON: ${functionCallsJson.substring(0, functionCallsJson.length > 500 ? 500 : functionCallsJson.length)}');
             final result = <String, dynamic>{'message': functionCallsJson};
 
             // Extract token usage information
@@ -2155,28 +2105,15 @@ ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal()
                 'completion_tokens': usage['completion_tokens'] ?? 0,
                 'total_tokens': usage['total_tokens'] ?? 0,
               };
-              print('[OpenAI] Token usage: ${result['_token_usage']}');
             }
 
-            print('[OpenAI] Returning result with ${functionCalls.length} function calls (no content)');
             return result;
-          } else {
-            print('[OpenAI] No valid function calls parsed from tool_calls');
           }
-        } else {
-          print('[OpenAI] No content and no tool calls in response');
         }
-      } else {
-        print('[OpenAI] API returned non-200 status: ${response.statusCode}');
-        print('[OpenAI] Response body: ${response.body}');
       }
     } catch (e, stackTrace) {
-      print('[OpenAI] Error in generateGeneralChat: $e');
-      print('[OpenAI] Stack trace: $stackTrace');
       // Ignore exceptions but log them
     }
-
-    print('[OpenAI] Returning null from generateGeneralChat');
     return null;
   }
 
