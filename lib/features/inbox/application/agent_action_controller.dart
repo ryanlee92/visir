@@ -1066,12 +1066,20 @@ class AgentActionController extends _$AgentActionController {
               : otherFunctionCalls;
 
           if (functionCallsToProcess.isEmpty) {
-            // 검색 함수만 있었고 이미 처리되었으므로 종료
-            return;
+            // 재귀 호출 중에 검색 함수만 호출된 경우, 일반 응답을 생성해야 함
+            // (이미 searchContext에 결과가 있으므로 그것을 사용하여 응답 생성)
+            if (isRecursiveCall) {
+              print('[AgentAction] Recursive call: only search functions called, proceeding to generate general response');
+              // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
+              // executionGroups를 건너뛰고 일반 응답 처리로 바로 넘어감
+            } else {
+              // 검색 함수만 있었고 이미 처리되었으므로 종료
+              return;
+            }
           }
 
           // 함수 호출을 의존성에 따라 그룹화
-          final executionGroups = _groupFunctionCalls(functionCallsToProcess);
+          final executionGroups = functionCallsToProcess.isEmpty ? <List<Map<String, dynamic>>>[] : _groupFunctionCalls(functionCallsToProcess);
 
           // 모든 그룹의 결과를 수집할 리스트
           final allGroupResults = <Map<String, dynamic>?>[];
@@ -1386,8 +1394,13 @@ class AgentActionController extends _$AgentActionController {
           // 함수 호출 JSON 배열만 있고 자연어 응답이 없는 경우 처리
           // aiMessageWithoutFunctionCalls가 비어있거나 JSON 배열 형식인 경우
           if (resultMessage.trim().isEmpty || (resultMessage.trim().startsWith('[') && resultMessage.trim().endsWith(']'))) {
-            // 재귀 호출에서 모든 함수 호출이 무시된 경우, 원본 AI 메시지 사용
-            if (isRecursiveCall && results.isEmpty) {
+            // 재귀 호출에서 모든 함수 호출이 무시된 경우 (검색 함수만 호출된 경우)
+            // 이미 searchContext에 결과가 있으므로 일반 응답 처리로 넘어가야 함
+            if (isRecursiveCall && results.isEmpty && functionCallsToProcess.isEmpty) {
+              print('[AgentAction] Recursive call: no function results, proceeding to general response handling');
+              // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
+              resultMessage = ''; // 빈 메시지로 설정하여 일반 응답 처리로 넘어가도록 함
+            } else if (isRecursiveCall && results.isEmpty) {
               resultMessage = aiMessage;
             } else if (!isRecursiveCall && functionCalls.isNotEmpty) {
               // 함수 실행 후 자연어 응답이 없는 경우, 함수 실행 결과를 사용
@@ -1527,7 +1540,8 @@ class AgentActionController extends _$AgentActionController {
           }
 
           // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
-          if (isRecursiveCall) {
+          // 단, functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
+          if (isRecursiveCall && !(functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty)) {
             print('[AgentAction] Recursive call detected (function results), cleaning up messages and finishing...');
             // 재귀 호출 완료 시 로딩 상태 해제
             // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
@@ -1546,9 +1560,97 @@ class AgentActionController extends _$AgentActionController {
             return;
           }
 
+          // functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
+          if (isRecursiveCall && functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty) {
+            print('[AgentAction] Recursive call: empty resultMessage, proceeding to general response handling');
+            // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
+            // aiMessage를 사용하여 일반 응답 생성
+            final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
+            final updatedMessagesWithResponse = [...messages, assistantMessage];
+
+            // 재귀 호출 완료 시 로딩 상태 해제
+            final finalMessages =
+                updatedMessagesWithResponse.length >= 3 &&
+                    updatedMessagesWithResponse[0].role == 'user' &&
+                    updatedMessagesWithResponse[1].role == 'assistant' &&
+                    updatedMessagesWithResponse[2].role == 'assistant'
+                ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
+                : updatedMessagesWithResponse;
+            print('[AgentAction] Final messages count: ${finalMessages.length}');
+            await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
+            print('[AgentAction] Recursive call completed (empty resultMessage), state updated');
+            return;
+          }
+
           await _updateState(messages: updatedMessagesWithResponse, isLoading: false, taggedProjects: taggedProjects);
         } else {
           // 일반 응답
+          // 재귀 호출 중에 검색 함수만 호출되고 일반 응답이 function call만 포함하는 경우 처리
+          if (isRecursiveCall && functionCalls.isNotEmpty) {
+            // function call만 포함하고 있으면 다시 API 호출하여 일반 응답 생성
+            final isOnlyFunctionCall = aiMessage.trim().startsWith('[') && aiMessage.trim().endsWith(']');
+            if (isOnlyFunctionCall) {
+              print('[AgentAction] Recursive call: only function call in response, calling API again to generate general response');
+              // searchContext가 있으므로 다시 API 호출하여 일반 응답 생성
+              final me = ref.read(authControllerProvider).value;
+              final userId = me?.id;
+              final selectedModel = this.selectedModel;
+              String? apiKey;
+              if (useUserApiKey) {
+                final apiKeys = ref.read(aiApiKeysProvider);
+                apiKey = apiKeys[selectedModel.provider.name];
+              } else {
+                apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
+              }
+
+              final projects = ref.read(projectListControllerProvider);
+              final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
+
+              // conversation history에서 함수 호출 메시지 제거
+              final filteredHistory = messages.where((m) => !m.excludeFromHistory).map((m) => m.toJson(local: true)).toList();
+
+              // channelContext를 문자열로 변환
+              String? channelContextStr;
+              if (taggedChannels != null && taggedChannels.isNotEmpty) {
+                channelContextStr = await _buildChannelContext(taggedChannels);
+              }
+
+              // projectContext는 빈 문자열로 설정 (selectedProject가 있어도 일반 응답 생성에는 필요 없음)
+              final response = await _repository.generateGeneralChat(
+                userMessage: userMessage,
+                conversationHistory: filteredHistory,
+                projectContext: '',
+                projects: projectsList,
+                taggedContext: searchContext,
+                channelContext: channelContextStr,
+                inboxContext: null,
+                model: selectedModel.modelName,
+                apiKey: apiKey,
+                userId: userId,
+              );
+
+              final aiResponse = response.fold((failure) => null, (response) => response);
+              if (aiResponse != null && aiResponse['message'] != null) {
+                final generalResponse = aiResponse['message'] as String;
+                final assistantMessage = AgentActionMessage(role: 'assistant', content: generalResponse);
+                final updatedMessagesWithResponse = [...messages, assistantMessage];
+
+                // 재귀 호출 완료 시 로딩 상태 해제
+                final finalMessages =
+                    updatedMessagesWithResponse.length >= 3 &&
+                        updatedMessagesWithResponse[0].role == 'user' &&
+                        updatedMessagesWithResponse[1].role == 'assistant' &&
+                        updatedMessagesWithResponse[2].role == 'assistant'
+                    ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
+                    : updatedMessagesWithResponse;
+                print('[AgentAction] Final messages count: ${finalMessages.length}');
+                await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
+                print('[AgentAction] Recursive call completed (regenerated general response), state updated');
+                return;
+              }
+            }
+          }
+
           final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
           final updatedMessagesWithResponse = [...messages, assistantMessage];
 

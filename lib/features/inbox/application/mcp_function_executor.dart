@@ -4616,31 +4616,113 @@ class McpFunctionExecutor {
     var filtered = localTasks;
     final now = DateTime.now();
 
+    print(
+      '[MCPExecutor] _filterLocalTasks: input tasks=${localTasks.length}, startDate=$startDate, endDate=$endDate, searchKeyword=$searchKeyword, taskId=$taskId, isDone=$isDone',
+    );
+
     // ID 필터
     if (taskId != null && taskId.isNotEmpty) {
       filtered = filtered.where((task) => task.id == taskId || task.id?.contains(taskId) == true).toList();
+      print('[MCPExecutor] After taskId filter: ${filtered.length} tasks');
       if (filtered.isEmpty) return [];
     }
 
-    // 날짜 범위 필터 (endDate가 null이면 now를 사용, startDate가 null이면 제한 없음)
+    // Recurring tasks를 날짜 범위에 맞게 확장 (이미 확장된 instances는 제외)
     if (startDate != null || endDate != null) {
+      final nonRecurringTasks = filtered.where((task) => task.rrule == null).toList();
+      // editedStartTime이 있으면 이미 확장된 instance이므로 제외
+      final recurringTasks = filtered.where((task) => task.rrule != null && task.editedStartTime == null).toList();
+      final alreadyExpandedInstances = filtered.where((task) => task.rrule != null && task.editedStartTime != null).toList();
+
+      final recurringInstances = <TaskEntity>[];
+      final startDateTimeUtc = startDate?.toUtc();
+      final endDateTimeUtc = endDate?.toUtc();
+
+      for (final recurringTask in recurringTasks) {
+        if (recurringTask.startAt == null || recurringTask.rrule == null) continue;
+
+        // Recurring task의 시작 날짜가 endDateTimeUtc 이후면 스킵
+        if (endDateTimeUtc != null && recurringTask.startAt!.isAfter(endDateTimeUtc)) {
+          continue;
+        }
+
+        // rrule을 사용해서 날짜 범위에 해당하는 인스턴스 생성
+        final startAt = startDateTimeUtc != null && recurringTask.startAt!.isBefore(startDateTimeUtc) ? startDateTimeUtc : recurringTask.startAt!;
+        final before = endDateTimeUtc ?? DateTime.now().add(const Duration(days: 365));
+        final instances = recurringTask.rrule!.getInstances(start: recurringTask.startAt!, after: startAt, before: before, includeAfter: true).toList();
+
+        // 각 인스턴스를 TaskEntity로 생성
+        final taskDuration = recurringTask.startAt != null && recurringTask.endAt != null ? recurringTask.endAt!.difference(recurringTask.startAt!) : const Duration(days: 1);
+
+        for (final instanceDate in instances) {
+          final instanceTask = recurringTask.copyWith(editedStartTime: instanceDate, editedEndTime: instanceDate.add(taskDuration));
+          recurringInstances.add(instanceTask);
+        }
+      }
+
+      print('[MCPExecutor] Generated ${recurringInstances.length} recurring task instances, already expanded: ${alreadyExpandedInstances.length}');
+      filtered = [...nonRecurringTasks, ...alreadyExpandedInstances, ...recurringInstances];
+    }
+
+    // 날짜 범위 필터
+    if (startDate != null || endDate != null) {
+      print('[MCPExecutor] Applying date range filter: startDate=$startDate, endDate=$endDate, now=$now');
+      final beforeFilter = filtered.length;
+
+      // 날짜만 비교하기 위해 날짜를 정규화 (시간을 00:00:00으로 설정)
+      DateTime? normalizedStartDate;
+      DateTime? normalizedEndDate;
+      if (startDate != null) {
+        normalizedStartDate = DateTime(startDate.year, startDate.month, startDate.day);
+      }
+      if (endDate != null) {
+        // endDate는 하루의 끝(23:59:59.999)으로 정규화
+        normalizedEndDate = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999);
+      }
+
       filtered = filtered.where((task) {
-        final taskDate = task.startAt ?? task.startDate;
-        if (taskDate == null) return false;
-        // Always exclude tasks that start after now
-        if (taskDate.isAfter(now)) return false;
-        if (startDate != null && taskDate.isBefore(startDate)) return false;
-        if (endDate != null && taskDate.isAfter(endDate)) return false;
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final taskDate = task.editedStartTime ?? task.startAt ?? task.startDate;
+        if (taskDate == null) {
+          print('[MCPExecutor] Task ${task.id} has no date, excluding');
+          return false;
+        }
+
+        // task 날짜도 정규화 (날짜만 비교)
+        final normalizedTaskDate = DateTime(taskDate.year, taskDate.month, taskDate.day);
+
+        // startDate 체크 (날짜만 비교)
+        if (normalizedStartDate != null && normalizedTaskDate.isBefore(normalizedStartDate)) {
+          print('[MCPExecutor] Task ${task.id} (${taskDate} -> ${normalizedTaskDate}) is before startDate ($startDate -> $normalizedStartDate), excluding');
+          return false;
+        }
+
+        // endDate 체크 (날짜만 비교)
+        if (normalizedEndDate != null) {
+          // task 날짜의 하루 끝(23:59:59.999)과 endDate 비교
+          final taskDateEnd = DateTime(taskDate.year, taskDate.month, taskDate.day, 23, 59, 59, 999);
+          if (taskDateEnd.isAfter(normalizedEndDate)) {
+            print('[MCPExecutor] Task ${task.id} (${taskDate} -> ${taskDateEnd}) is after endDate ($endDate -> $normalizedEndDate), excluding');
+            return false;
+          }
+        }
+
+        print('[MCPExecutor] Task ${task.id} (${taskDate} -> ${normalizedTaskDate}) passed date filter');
         return true;
       }).toList();
+      print('[MCPExecutor] After date filter: ${filtered.length} tasks (was $beforeFilter)');
       if (filtered.isEmpty) return [];
     } else {
       // 날짜 범위 필터가 없어도 now 이후의 task는 제외
+      print('[MCPExecutor] No date range, filtering out tasks after now ($now)');
+      final beforeFilter = filtered.length;
       filtered = filtered.where((task) {
-        final taskDate = task.startAt ?? task.startDate;
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final taskDate = task.editedStartTime ?? task.startAt ?? task.startDate;
         if (taskDate == null) return false;
         return !taskDate.isAfter(now);
       }).toList();
+      print('[MCPExecutor] After now filter: ${filtered.length} tasks (was $beforeFilter)');
       if (filtered.isEmpty) return [];
     }
 
@@ -4671,12 +4753,61 @@ class McpFunctionExecutor {
       final allTasks = _getAllTasksFromBothProviders();
       if (allTasks.isEmpty) return false;
 
+      // Recurring tasks를 날짜 범위에 맞게 확장
+      final nonRecurringTasks = allTasks.where((task) => task.rrule == null).toList();
+      final recurringTasks = allTasks.where((task) => task.rrule != null).toList();
+
+      final recurringInstances = <TaskEntity>[];
+      final startDateTimeUtc = startDate?.toUtc();
+      final endDateTimeUtc = endDate?.toUtc();
+
+      for (final recurringTask in recurringTasks) {
+        if (recurringTask.startAt == null || recurringTask.rrule == null) continue;
+
+        // Recurring task의 시작 날짜가 endDateTimeUtc 이후면 스킵
+        if (endDateTimeUtc != null && recurringTask.startAt!.isAfter(endDateTimeUtc)) {
+          continue;
+        }
+
+        // rrule을 사용해서 날짜 범위에 해당하는 인스턴스 생성
+        final startAt = startDateTimeUtc != null && recurringTask.startAt!.isBefore(startDateTimeUtc) ? startDateTimeUtc : recurringTask.startAt!;
+        final before = endDateTimeUtc ?? DateTime.now().add(const Duration(days: 365));
+        final instances = recurringTask.rrule!.getInstances(start: recurringTask.startAt!, after: startAt, before: before, includeAfter: true).toList();
+
+        // 각 인스턴스를 TaskEntity로 생성
+        final taskDuration = recurringTask.startAt != null && recurringTask.endAt != null ? recurringTask.endAt!.difference(recurringTask.startAt!) : const Duration(days: 1);
+
+        for (final instanceDate in instances) {
+          final instanceTask = recurringTask.copyWith(editedStartTime: instanceDate, editedEndTime: instanceDate.add(taskDuration));
+          recurringInstances.add(instanceTask);
+        }
+      }
+
+      final expandedTasks = [...nonRecurringTasks, ...recurringInstances];
+
+      // 날짜만 비교하기 위해 날짜를 정규화
+      DateTime? normalizedStartDate;
+      DateTime? normalizedEndDate;
+      if (startDate != null) {
+        normalizedStartDate = DateTime(startDate.year, startDate.month, startDate.day);
+      }
+      if (endDate != null) {
+        normalizedEndDate = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999);
+      }
+
       // 날짜 범위에 해당하는 데이터가 있는지 확인
-      final matchingCount = allTasks.where((task) {
+      final matchingCount = expandedTasks.where((task) {
         final taskDate = task.startAt ?? task.startDate;
         if (taskDate == null) return false;
-        if (startDate != null && taskDate.isBefore(startDate)) return false;
-        if (endDate != null && taskDate.isAfter(endDate)) return false;
+
+        // task 날짜도 정규화 (날짜만 비교)
+        final normalizedTaskDate = DateTime(taskDate.year, taskDate.month, taskDate.day);
+
+        if (normalizedStartDate != null && normalizedTaskDate.isBefore(normalizedStartDate)) return false;
+        if (normalizedEndDate != null) {
+          final taskDateEnd = DateTime(taskDate.year, taskDate.month, taskDate.day, 23, 59, 59, 999);
+          if (taskDateEnd.isAfter(normalizedEndDate)) return false;
+        }
         return true;
       }).length;
 
@@ -4707,47 +4838,175 @@ class McpFunctionExecutor {
       String? taskId;
 
       // AI에서 전달된 파라미터 확인
+      print('[MCPExecutor] Parsing search parameters...');
       if (args['startDate'] != null) {
         try {
           startDate = DateTime.parse(args['startDate'] as String).toLocal();
+          print('[MCPExecutor] Parsed startDate: $startDate');
         } catch (e) {
+          print('[MCPExecutor] Failed to parse startDate: ${args['startDate']}, error: $e');
           // Invalid date format, ignore
         }
       }
       if (args['endDate'] != null) {
         try {
           endDate = DateTime.parse(args['endDate'] as String).toLocal();
+          print('[MCPExecutor] Parsed endDate: $endDate');
         } catch (e) {
+          print('[MCPExecutor] Failed to parse endDate: ${args['endDate']}, error: $e');
           // Invalid date format, ignore
         }
       }
       if (args['taskId'] != null) {
         taskId = args['taskId'] as String?;
+        print('[MCPExecutor] taskId: $taskId');
       }
+      print('[MCPExecutor] Final search params: startDate=$startDate, endDate=$endDate, searchKeyword=$searchKeyword, taskId=$taskId, isDone=$isDone');
 
       // 로컬 데이터 확인
+      print('[MCPExecutor] Checking local data availability...');
       final hasLocalData = _hasLocalTaskDataForScope(startDate, endDate);
+      print('[MCPExecutor] Has local data: $hasLocalData');
       List<TaskEntity> searchResults;
 
       if (hasLocalData) {
         // 로컬 데이터에서 필터링
+        print('[MCPExecutor] Searching in local data...');
         final allTasks = _getAllTasksFromBothProviders();
+        print('[MCPExecutor] Total local tasks: ${allTasks.length}');
+
+        // 2026-01-10 날짜의 task가 있는지 확인
+        final targetDate = DateTime(2026, 1, 10);
+        final tasksOnTargetDate = allTasks.where((task) {
+          final taskDate = task.startAt ?? task.startDate;
+          if (taskDate == null) return false;
+          final normalizedTaskDate = DateTime(taskDate.year, taskDate.month, taskDate.day);
+          return normalizedTaskDate == targetDate;
+        }).toList();
+        print('[MCPExecutor] Local tasks on 2026-01-10: ${tasksOnTargetDate.length}');
+        for (final task in tasksOnTargetDate) {
+          print('[MCPExecutor] Local task on target date: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
+        }
+
+        // 각 task의 날짜 정보 로그 (처음 10개만)
+        for (final task in allTasks.take(10)) {
+          print('[MCPExecutor] Local task: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
+        }
         searchResults = _filterLocalTasks(allTasks, startDate, endDate, searchKeyword, taskId, isDone);
       } else {
         // Remote search 실행
+        print('[MCPExecutor] Searching remotely...');
         final user = ref.read(authControllerProvider).requireValue;
         final pref = ref.read(localPrefControllerProvider).value;
         if (pref == null) {
+          print('[MCPExecutor] Preferences not found');
           return {'success': false, 'error': 'Preferences not found'};
         }
 
         final taskRepository = ref.read(taskRepositoryProvider);
-        final searchResult = await taskRepository.searchTasks(query: query, pref: pref, userId: user.id, isDone: isDone);
+        List<TaskEntity> tasks;
 
-        final tasks = searchResult.fold((failure) => <TaskEntity>[], (result) => result.tasks.values.expand((e) => e).toList());
+        // 날짜 범위가 있으면 fetchTasksBetweenDates 사용, 없으면 searchTasks 사용
+        if (startDate != null && endDate != null) {
+          print('[MCPExecutor] Calling taskRepository.fetchTasksBetweenDates with startDate=$startDate, endDate=$endDate...');
+          // UTC로 변환하여 데이터베이스 쿼리 (Supabase는 UTC를 사용)
+          final startDateTimeUtc = startDate!.toUtc();
+          final endDateTimeUtc = endDate!.toUtc();
+          print('[MCPExecutor] Converted to UTC: startDateTimeUtc=$startDateTimeUtc, endDateTimeUtc=$endDateTimeUtc');
+          final fetchResult = await taskRepository.fetchTasksBetweenDates(startDateTime: startDateTimeUtc, endDateTime: endDateTimeUtc, pref: pref, userId: user.id);
+          final allTasks = fetchResult.fold((failure) => <TaskEntity>[], (result) => result);
+          print('[MCPExecutor] fetchTasksBetweenDates completed, retrieved ${allTasks.length} tasks');
+
+          // Recurring tasks를 날짜 범위에 맞게 필터링
+          final nonRecurringTasks = allTasks.where((task) => task.rrule == null).toList();
+          final recurringTasks = allTasks.where((task) => task.rrule != null).toList();
+          print('[MCPExecutor] Separated tasks: nonRecurring=${nonRecurringTasks.length}, recurring=${recurringTasks.length}');
+
+          final recurringInstances = <TaskEntity>[];
+          for (final recurringTask in recurringTasks) {
+            if (recurringTask.startAt == null || recurringTask.rrule == null) continue;
+
+            // Recurring task의 시작 날짜가 endDateTimeUtc 이후면 스킵
+            if (recurringTask.startAt!.isAfter(endDateTimeUtc)) {
+              print('[MCPExecutor] Skipping recurring task ${recurringTask.id}: startAt (${recurringTask.startAt}) is after endDateTimeUtc ($endDateTimeUtc)');
+              continue;
+            }
+
+            // rrule을 사용해서 날짜 범위에 해당하는 인스턴스 생성
+            // after 파라미터는 원본 startAt 이후의 인스턴스만 가져오도록 설정
+            // 원본 startAt이 날짜 범위 안에 있으면 그것도 포함해야 하므로, after를 원본 startAt으로 설정하지 않음
+            final startAt = recurringTask.startAt!.isBefore(startDateTimeUtc) ? startDateTimeUtc : recurringTask.startAt!;
+            final instances = recurringTask.rrule!.getInstances(start: recurringTask.startAt!, after: startAt, before: endDateTimeUtc, includeAfter: true).toList();
+
+            print('[MCPExecutor] Recurring task ${recurringTask.id} (${recurringTask.title}): ${instances.length} instances in date range');
+
+            // 각 인스턴스를 TaskEntity로 생성
+            final taskDuration = recurringTask.startAt != null && recurringTask.endAt != null ? recurringTask.endAt!.difference(recurringTask.startAt!) : const Duration(days: 1);
+
+            // 원본 startAt이 날짜 범위 안에 있는지 확인
+            final originalStartDateOnly = DateTime(recurringTask.startAt!.year, recurringTask.startAt!.month, recurringTask.startAt!.day);
+            final startDateOnly = DateTime(startDateTimeUtc.year, startDateTimeUtc.month, startDateTimeUtc.day);
+            final endDateOnly = DateTime(endDateTimeUtc.year, endDateTimeUtc.month, endDateTimeUtc.day);
+            final originalInRange =
+                originalStartDateOnly.isAfter(startDateOnly.subtract(const Duration(days: 1))) && originalStartDateOnly.isBefore(endDateOnly.add(const Duration(days: 1)));
+
+            // 인스턴스들을 추가 (중복 제거를 위해 Set 사용)
+            final addedDates = <DateTime>{};
+            for (final instanceDate in instances) {
+              final instanceDateOnly = DateTime(instanceDate.year, instanceDate.month, instanceDate.day);
+
+              // 이미 추가된 날짜는 스킵 (중복 방지)
+              if (addedDates.contains(instanceDateOnly)) continue;
+
+              final instanceTask = recurringTask.copyWith(editedStartTime: instanceDate, editedEndTime: instanceDate.add(taskDuration));
+              recurringInstances.add(instanceTask);
+              addedDates.add(instanceDateOnly);
+            }
+
+            // 원본 startAt이 날짜 범위 안에 있고, 인스턴스에 포함되지 않은 경우 추가
+            if (originalInRange && !addedDates.contains(originalStartDateOnly)) {
+              final originalInstanceTask = recurringTask.copyWith(
+                editedStartTime: recurringTask.startAt!,
+                editedEndTime: recurringTask.endAt ?? recurringTask.startAt!.add(taskDuration),
+              );
+              recurringInstances.add(originalInstanceTask);
+            }
+          }
+
+          print('[MCPExecutor] Generated ${recurringInstances.length} recurring task instances');
+          // 원본 recurring tasks는 제외하고 인스턴스만 사용 (원본과 인스턴스 날짜가 같으면 중복 방지)
+          tasks = [...nonRecurringTasks, ...recurringInstances];
+          print('[MCPExecutor] Combined tasks: ${tasks.length} total');
+        } else {
+          print('[MCPExecutor] Calling taskRepository.searchTasks with query="$query", isDone=$isDone...');
+          final searchResult = await taskRepository.searchTasks(query: query, pref: pref, userId: user.id, isDone: isDone);
+          print('[MCPExecutor] Repository search completed');
+          tasks = searchResult.fold((failure) => <TaskEntity>[], (result) => result.tasks.values.expand((e) => e).toList());
+        }
+
+        print('[MCPExecutor] Retrieved ${tasks.length} tasks from repository');
+
+        // 2026-01-10 날짜의 task가 있는지 확인
+        final targetDate = DateTime(2026, 1, 10);
+        final tasksOnTargetDate = tasks.where((task) {
+          final taskDate = task.startAt ?? task.startDate;
+          if (taskDate == null) return false;
+          final normalizedTaskDate = DateTime(taskDate.year, taskDate.month, taskDate.day);
+          return normalizedTaskDate == targetDate;
+        }).toList();
+        print('[MCPExecutor] Tasks on 2026-01-10: ${tasksOnTargetDate.length}');
+        for (final task in tasksOnTargetDate) {
+          print('[MCPExecutor] Task on target date: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
+        }
+
+        // 각 task의 날짜 정보 로그 (처음 10개만)
+        for (final task in tasks.take(10)) {
+          print('[MCPExecutor] Remote task: id=${task.id}, title=${task.title}, startAt=${task.startAt}, startDate=${task.startDate}');
+        }
 
         // 로컬에서 추가 필터링 (날짜 범위 등)
         searchResults = _filterLocalTasks(tasks, startDate, endDate, searchKeyword, taskId, isDone);
+        print('[MCPExecutor] Filtered remote tasks: ${searchResults.length}');
       }
 
       // Sort by date (closest to today first) and limit results to 20
@@ -4760,14 +5019,17 @@ class McpFunctionExecutor {
 
       // Format results
       final results = limitedTasks.map((task) {
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final startAt = task.editedStartTime ?? task.startAt;
+        final endAt = task.editedEndTime ?? task.endAt;
         return {
           'id': task.id,
           'title': task.title ?? '',
           'description': task.description ?? '',
           'status': task.status.name,
           'projectId': task.projectId,
-          'startAt': task.startAt?.toIso8601String(),
-          'endAt': task.endAt?.toIso8601String(),
+          'startAt': startAt?.toIso8601String(),
+          'endAt': endAt?.toIso8601String(),
           'isAllDay': task.isAllDay ?? false,
         };
       }).toList();
@@ -4789,10 +5051,74 @@ class McpFunctionExecutor {
       if (filtered.isEmpty) return [];
     }
 
+    // Recurring events를 날짜 범위에 맞게 확장 (이미 확장된 instances는 제외)
+    if (startDate != null || endDate != null) {
+      final nonRecurringEvents = filtered.where((event) => event.recurrence == null).toList();
+      // editedStartTime이 있으면 이미 확장된 instance이므로 제외
+      final recurringEvents = filtered.where((event) => event.recurrence != null && event.editedStartTime == null).toList();
+      final alreadyExpandedInstances = filtered.where((event) => event.recurrence != null && event.editedStartTime != null).toList();
+
+      final recurringInstances = <EventEntity>[];
+      final startDateTimeUtc = startDate?.toUtc();
+      final endDateTimeUtc = endDate?.toUtc();
+
+      for (final recurringEvent in recurringEvents) {
+        if (recurringEvent.startDate == null || recurringEvent.recurrence == null) continue;
+
+        // Recurring event의 시작 날짜가 endDateTimeUtc 이후면 스킵
+        if (endDateTimeUtc != null && recurringEvent.startDate!.isAfter(endDateTimeUtc)) {
+          continue;
+        }
+
+        // rrule을 사용해서 날짜 범위에 해당하는 인스턴스 생성
+        final startAt = startDateTimeUtc != null && recurringEvent.startDate!.isBefore(startDateTimeUtc) ? startDateTimeUtc : recurringEvent.startDate!;
+        final before = endDateTimeUtc ?? DateTime.now().add(const Duration(days: 365));
+        final instances = recurringEvent.recurrence!.getInstances(start: recurringEvent.startDate!, after: startAt, before: before, includeAfter: true).toList();
+
+        // 각 인스턴스를 EventEntity로 생성
+        final eventDuration = recurringEvent.startDate != null && recurringEvent.endDate != null
+            ? recurringEvent.endDate!.difference(recurringEvent.startDate!)
+            : const Duration(hours: 1);
+
+        // 원본 startDate가 날짜 범위 안에 있는지 확인
+        final originalStartDateOnly = DateTime(recurringEvent.startDate!.year, recurringEvent.startDate!.month, recurringEvent.startDate!.day);
+        final startDateOnly = startDateTimeUtc != null ? DateTime(startDateTimeUtc.year, startDateTimeUtc.month, startDateTimeUtc.day) : null;
+        final endDateOnly = endDateTimeUtc != null ? DateTime(endDateTimeUtc.year, endDateTimeUtc.month, endDateTimeUtc.day) : null;
+        final originalInRange =
+            (startDateOnly == null || originalStartDateOnly.isAfter(startDateOnly.subtract(const Duration(days: 1)))) &&
+            (endDateOnly == null || originalStartDateOnly.isBefore(endDateOnly.add(const Duration(days: 1))));
+
+        // 인스턴스들을 추가 (중복 제거를 위해 Set 사용)
+        final addedDates = <DateTime>{};
+        for (final instanceDate in instances) {
+          final instanceDateOnly = DateTime(instanceDate.year, instanceDate.month, instanceDate.day);
+
+          // 이미 추가된 날짜는 스킵 (중복 방지)
+          if (addedDates.contains(instanceDateOnly)) continue;
+
+          final instanceEvent = recurringEvent.copyWith(editedStartTime: instanceDate, editedEndTime: instanceDate.add(eventDuration));
+          recurringInstances.add(instanceEvent);
+          addedDates.add(instanceDateOnly);
+        }
+
+        // 원본 startDate가 날짜 범위 안에 있고, 인스턴스에 포함되지 않은 경우 추가
+        if (originalInRange && !addedDates.contains(originalStartDateOnly)) {
+          final originalInstanceEvent = recurringEvent.copyWith(
+            editedStartTime: recurringEvent.startDate!,
+            editedEndTime: recurringEvent.endDate ?? recurringEvent.startDate!.add(eventDuration),
+          );
+          recurringInstances.add(originalInstanceEvent);
+        }
+      }
+
+      filtered = [...nonRecurringEvents, ...alreadyExpandedInstances, ...recurringInstances];
+    }
+
     // 날짜 범위 필터 (endDate가 null이면 now를 사용, startDate가 null이면 제한 없음)
     if (startDate != null || endDate != null) {
       filtered = filtered.where((event) {
-        final eventStart = event.startDate;
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final eventStart = event.editedStartTime ?? event.startDate;
         if (eventStart == null) return false;
         // Always exclude events that start after now
         if (eventStart.isAfter(now)) return false;
@@ -4804,7 +5130,8 @@ class McpFunctionExecutor {
     } else {
       // 날짜 범위 필터가 없어도 now 이후의 event는 제외
       filtered = filtered.where((event) {
-        final eventStart = event.startDate;
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final eventStart = event.editedStartTime ?? event.startDate;
         if (eventStart == null) return false;
         return !eventStart.isAfter(now);
       }).toList();
@@ -4833,9 +5160,69 @@ class McpFunctionExecutor {
       final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.calendar)).eventsOnView;
       if (allEvents.isEmpty) return false;
 
+      // Recurring events를 날짜 범위에 맞게 확장
+      final nonRecurringEvents = allEvents.where((event) => event.recurrence == null).toList();
+      final recurringEvents = allEvents.where((event) => event.recurrence != null).toList();
+
+      final recurringInstances = <EventEntity>[];
+      final startDateTimeUtc = startDate?.toUtc();
+      final endDateTimeUtc = endDate?.toUtc();
+
+      for (final recurringEvent in recurringEvents) {
+        if (recurringEvent.startDate == null || recurringEvent.recurrence == null) continue;
+
+        // Recurring event의 시작 날짜가 endDateTimeUtc 이후면 스킵
+        if (endDateTimeUtc != null && recurringEvent.startDate!.isAfter(endDateTimeUtc)) {
+          continue;
+        }
+
+        // rrule을 사용해서 날짜 범위에 해당하는 인스턴스 생성
+        final startAt = startDateTimeUtc != null && recurringEvent.startDate!.isBefore(startDateTimeUtc) ? startDateTimeUtc : recurringEvent.startDate!;
+        final before = endDateTimeUtc ?? DateTime.now().add(const Duration(days: 365));
+        final instances = recurringEvent.recurrence!.getInstances(start: recurringEvent.startDate!, after: startAt, before: before, includeAfter: true).toList();
+
+        // 각 인스턴스를 EventEntity로 생성
+        final eventDuration = recurringEvent.startDate != null && recurringEvent.endDate != null
+            ? recurringEvent.endDate!.difference(recurringEvent.startDate!)
+            : const Duration(hours: 1);
+
+        // 원본 startDate가 날짜 범위 안에 있는지 확인
+        final originalStartDateOnly = DateTime(recurringEvent.startDate!.year, recurringEvent.startDate!.month, recurringEvent.startDate!.day);
+        final startDateOnly = startDateTimeUtc != null ? DateTime(startDateTimeUtc.year, startDateTimeUtc.month, startDateTimeUtc.day) : null;
+        final endDateOnly = endDateTimeUtc != null ? DateTime(endDateTimeUtc.year, endDateTimeUtc.month, endDateTimeUtc.day) : null;
+        final originalInRange =
+            (startDateOnly == null || originalStartDateOnly.isAfter(startDateOnly.subtract(const Duration(days: 1)))) &&
+            (endDateOnly == null || originalStartDateOnly.isBefore(endDateOnly.add(const Duration(days: 1))));
+
+        // 인스턴스들을 추가 (중복 제거를 위해 Set 사용)
+        final addedDates = <DateTime>{};
+        for (final instanceDate in instances) {
+          final instanceDateOnly = DateTime(instanceDate.year, instanceDate.month, instanceDate.day);
+
+          // 이미 추가된 날짜는 스킵 (중복 방지)
+          if (addedDates.contains(instanceDateOnly)) continue;
+
+          final instanceEvent = recurringEvent.copyWith(editedStartTime: instanceDate, editedEndTime: instanceDate.add(eventDuration));
+          recurringInstances.add(instanceEvent);
+          addedDates.add(instanceDateOnly);
+        }
+
+        // 원본 startDate가 날짜 범위 안에 있고, 인스턴스에 포함되지 않은 경우 추가
+        if (originalInRange && !addedDates.contains(originalStartDateOnly)) {
+          final originalInstanceEvent = recurringEvent.copyWith(
+            editedStartTime: recurringEvent.startDate!,
+            editedEndTime: recurringEvent.endDate ?? recurringEvent.startDate!.add(eventDuration),
+          );
+          recurringInstances.add(originalInstanceEvent);
+        }
+      }
+
+      final expandedEvents = [...nonRecurringEvents, ...recurringInstances];
+
       // 날짜 범위에 해당하는 데이터가 있는지 확인
-      final matchingCount = allEvents.where((event) {
-        final eventStart = event.startDate;
+      final matchingCount = expandedEvents.where((event) {
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final eventStart = event.editedStartTime ?? event.startDate;
         if (eventStart == null) return false;
         if (startDate != null && eventStart.isBefore(startDate)) return false;
         if (endDate != null && eventStart.isAfter(endDate)) return false;
@@ -4954,13 +5341,16 @@ class McpFunctionExecutor {
 
       // Format results
       final results = searchResults.map((event) {
+        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+        final startDate = event.editedStartTime ?? event.startDate;
+        final endDate = event.editedEndTime ?? event.endDate;
         return {
           'id': event.eventId,
           'uniqueId': event.uniqueId,
           'title': event.title ?? '',
           'description': event.description ?? '',
-          'startDate': event.startDate?.toIso8601String(),
-          'endDate': event.endDate?.toIso8601String(),
+          'startDate': startDate?.toIso8601String(),
+          'endDate': endDate?.toIso8601String(),
           'isAllDay': event.isAllDay ?? false,
           'location': event.location,
           'calendarId': event.calendar?.id,
