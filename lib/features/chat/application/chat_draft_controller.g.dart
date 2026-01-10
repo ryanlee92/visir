@@ -171,7 +171,7 @@ final class ChatDraftControllerInternalProvider
 }
 
 String _$chatDraftControllerInternalHash() =>
-    r'2582986222d15f8b9cd698f62a995b875b802c51';
+    r'c3e39f1864fc667ce45e8672f2fd4b52e63ab43e';
 
 final class ChatDraftControllerInternalFamily extends $Family
     with

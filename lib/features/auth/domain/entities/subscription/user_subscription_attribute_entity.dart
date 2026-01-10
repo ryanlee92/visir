@@ -20,6 +20,8 @@ enum SubscriptionStatus {
   pastDue,
   @JsonValue('unpaid')
   unPaid,
+  @JsonValue('paid')
+  paid,
 } //https://docs.lemonsqueezy.com/api/subscriptions/the-subscription-object
 
 extension SubscriptionStatusX on SubscriptionStatus {
@@ -33,7 +35,6 @@ abstract class UserSubscriptionAttributeEntity with _$UserSubscriptionAttributeE
   const UserSubscriptionAttributeEntity._();
 
   @JsonSerializable(fieldRename: FieldRename.snake)
-
   /// Factory Constructor
   const factory UserSubscriptionAttributeEntity({
     required int storeId,

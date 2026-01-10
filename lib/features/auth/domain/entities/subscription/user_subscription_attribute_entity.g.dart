@@ -85,4 +85,5 @@ const _$SubscriptionStatusEnumMap = {
   SubscriptionStatus.cancelled: 'cancelled',
   SubscriptionStatus.pastDue: 'past_due',
   SubscriptionStatus.unPaid: 'unpaid',
+  SubscriptionStatus.paid: 'paid',
 };

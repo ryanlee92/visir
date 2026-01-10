@@ -186,7 +186,7 @@ final class CalendarEventListControllerInternalProvider
 }
 
 String _$calendarEventListControllerInternalHash() =>
-    r'c7c64545a9fb0d6dd45df1c32ff3a01f7fa39dbb';
+    r'26b20aee86bce698b679d03b23ca6d9391063a49';
 
 final class CalendarEventListControllerInternalFamily extends $Family
     with
