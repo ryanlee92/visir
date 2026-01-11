@@ -1572,6 +1572,16 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         break;
                                                       case 'inbox':
                                                         targetInbox = taggedInboxes.where((e) => e.id == tagId).firstOrNull;
+                                                        // If not found in taggedInboxes, try to find in widget.inboxes and add it
+                                                        if (targetInbox == null) {
+                                                          final allInboxes = widget.inboxes ?? [];
+                                                          final foundInbox = allInboxes.firstWhereOrNull((i) => i.id == tagId);
+                                                          if (foundInbox != null) {
+                                                            // Add to taggedInboxes for future reference
+                                                            messageController.addTaggedData(inbox: foundInbox);
+                                                            targetInbox = foundInbox;
+                                                          }
+                                                        }
                                                         break;
                                                     }
                                                   } else {
