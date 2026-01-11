@@ -332,6 +332,7 @@ class AgentActionController extends _$AgentActionController {
       userMessage: userMessage,
       taggedTasks: taggedTasks,
       taggedEvents: taggedEvents,
+      taggedInboxes: taggedInboxes,
       taggedConnections: taggedConnections,
       taggedChannels: taggedChannels,
       taggedProjects: taggedProjects,
@@ -1767,16 +1768,27 @@ class AgentActionController extends _$AgentActionController {
     required String userMessage,
     List<TaskEntity>? taggedTasks,
     List<EventEntity>? taggedEvents,
+    List<InboxEntity>? taggedInboxes,
     List<ConnectionEntity>? taggedConnections,
     List<MessageChannelEntity>? taggedChannels,
     List<ProjectEntity>? taggedProjects,
   }) {
     // 사용자 메시지에서 @task:, @event:, @inbox: 형식의 태그 제거
+    // Include dot (.) in the pattern to match full IDs like message_slack_T88CZ5ZV4_1762838044.008519
     String cleanedMessage = userMessage;
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@task:[a-zA-Z0-9\-_]+'), '');
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@event:[a-zA-Z0-9\-_]+'), '');
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@inbox:[a-zA-Z0-9\-_]+'), '');
+    print('[AgentActionController] _buildMessageWithTaggedItems - userMessage length: ${userMessage.length}');
+    print('[AgentActionController] userMessage representation: ${userMessage.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
+    // Match \u200b@type:id\u200b format (from agentInputField) or @type:id format
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@task:[^\u200b]+\u200b'), '');
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@event:[^\u200b]+\u200b'), '');
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@inbox:[^\u200b]+\u200b'), '');
+    // Also handle plain @type:id format (without \u200b) for backward compatibility
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@task:[a-zA-Z0-9\-_.]+'), '');
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@event:[a-zA-Z0-9\-_.]+'), '');
+    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@inbox:[a-zA-Z0-9\-_.]+'), '');
     cleanedMessage = cleanedMessage.trim();
+    print('[AgentActionController] cleanedMessage length: ${cleanedMessage.length}');
+    print('[AgentActionController] cleanedMessage representation: ${cleanedMessage.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
 
     final buffer = StringBuffer();
     buffer.write(cleanedMessage);
@@ -1805,6 +1817,13 @@ class AgentActionController extends _$AgentActionController {
           'isAllDay': event.isAllDay,
         });
         buffer.write('<tagged_event>$eventJson</tagged_event>');
+      }
+    }
+
+    if (taggedInboxes != null && taggedInboxes.isNotEmpty) {
+      for (final inbox in taggedInboxes) {
+        final inboxJson = jsonEncode(inbox.toJson());
+        buffer.write('<tagged_inbox>$inboxJson</tagged_inbox>');
       }
     }
 
@@ -2887,6 +2906,7 @@ class AgentActionController extends _$AgentActionController {
         userMessage: cleanMessage,
         taggedTasks: updatedTaggedTasks,
         taggedEvents: updatedTaggedEvents,
+        taggedInboxes: null, // Function call context doesn't include inboxes
         taggedConnections: taggedConnections,
         taggedChannels: taggedChannels,
         taggedProjects: taggedProjects,
@@ -2921,6 +2941,7 @@ class AgentActionController extends _$AgentActionController {
       userMessage: userMessage,
       taggedTasks: taggedTasks,
       taggedEvents: taggedEvents,
+      taggedInboxes: null, // This function doesn't receive taggedInboxes
       taggedConnections: taggedConnections,
       taggedChannels: taggedChannels,
       taggedProjects: taggedProjects,

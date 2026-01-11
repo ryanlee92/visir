@@ -58,19 +58,32 @@ class AgentTagController extends QuillController {
 
   String get text => document.toPlainText();
   String get html {
+    final textBeforeConversion = document.toPlainText();
+    print('[AgentTagController] Converting to HTML, text length: ${textBeforeConversion.length}');
+    print('[AgentTagController] Text before conversion: ${textBeforeConversion.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
     final ops = document.toDelta().toJson();
+    print('[AgentTagController] Delta ops: $ops');
     final converter = quill_delta_to_html.QuillDeltaToHtmlConverter(ops, quill_delta_to_html.ConverterOptions.forEmail());
 
     final html = converter.convert();
+    print('[AgentTagController] Converted HTML length: ${html.length}');
+    print('[AgentTagController] Converted HTML: ${html.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
     return html;
   }
 
   set text(String value) {
+    print('[AgentTagController] Setting text: length=${value.length}');
+    print('[AgentTagController] Text representation: ${value.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
     // Document.fromJson은 마지막 줄이 \n으로 끝나야 함
     final textWithNewline = value.endsWith('\n') ? value : '$value\n';
+    print('[AgentTagController] Text with newline: length=${textWithNewline.length}');
     document = Document.fromJson([
       {'insert': textWithNewline},
     ]);
+    print('[AgentTagController] Document created, reading back text:');
+    final textAfterSet = this.text;
+    print('[AgentTagController] Text after Document.fromJson: length=${textAfterSet.length}');
+    print('[AgentTagController] Text after Document.fromJson representation: ${textAfterSet.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
     try {
       notifyListeners();
     } catch (e) {
