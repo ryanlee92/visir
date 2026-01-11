@@ -1340,20 +1340,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
         // User messages: Process \u200b@id:name\u200b or \u200b@name\u200b format (like agentInputField)
         // Convert to special HTML tags for rendering
         // Use greedy match to capture full ID including dots
-        print('[AgentActionMessagesWidget] Processing user message HTML');
-        print('[AgentActionMessagesWidget] Original HTML length: ${finalContent.length}');
-        print('[AgentActionMessagesWidget] Original HTML representation: ${finalContent.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
         final mentionRegex = RegExp(r'\u200b@([^\u200b]*)\u200b', unicode: true);
-        final matches = mentionRegex.allMatches(finalContent);
-        print('[AgentActionMessagesWidget] Found ${matches.length} mention matches');
-        for (final match in matches) {
-          print('[AgentActionMessagesWidget] Match: start=${match.start}, end=${match.end}, group0=${match.group(0)?.replaceAll('\u200b', '[ZWS]')}, group1=${match.group(1)}');
-        }
         processedHtml = finalContent.replaceAllMapped(mentionRegex, (match) {
           final tagContent = match.group(1) ?? '';
-          print('[AgentActionMessagesWidget] Processing tagContent: $tagContent');
           if (tagContent.isEmpty) {
-            print('[AgentActionMessagesWidget] tagContent is empty, returning original match');
             return match.group(0)!;
           }
 
@@ -1365,37 +1355,28 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             final parts = tagContent.split(':');
             tagType = parts[0];
             tagId = parts.sublist(1).join(':'); // In case id contains ':'
-            print('[AgentActionMessagesWidget] Parsed tagType: $tagType, tagId: $tagId');
           } else {
             tagName = tagContent;
-            print('[AgentActionMessagesWidget] No colon found, using tagName: $tagName');
           }
 
           // Find matching entity from taggedItems (try ID first, then name)
           String? matchedKey;
           if (tagType != null && tagId != null) {
             // New format: type:id - Try to find by ID and type
-            print('[AgentActionMessagesWidget] Searching for tagType: $tagType, tagId: $tagId');
-            print('[AgentActionMessagesWidget] taggedItems keys: ${taggedItems.keys.toList()}');
             for (final key in taggedItems.keys) {
               final itemData = taggedItems[key]!;
               final itemType = itemData['type'] as String;
               final jsonData = itemData['data'] as Map<String, dynamic>;
               
-              print('[AgentActionMessagesWidget] Checking key: $key, itemType: $itemType');
-              
               // Match type first
               if (itemType != tagType) {
-                print('[AgentActionMessagesWidget] Type mismatch: $itemType != $tagType');
                 continue;
               }
               
               // Then match ID
               final itemId = jsonData['id'] as String? ?? jsonData['event_id'] as String?;
-              print('[AgentActionMessagesWidget] Comparing itemId: $itemId with tagId: $tagId');
               if (itemId == tagId) {
                 matchedKey = key;
-                print('[AgentActionMessagesWidget] Found match! key: $key');
                 break;
               }
             }
@@ -1403,12 +1384,10 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
 
           // If not found by ID, try by name (old format or fallback)
           if (matchedKey == null) {
-            print('[AgentActionMessagesWidget] No match found by ID, trying by name: $tagName');
             for (final key in taggedItems.keys) {
               final keyName = key.substring(1); // Remove @
               if (keyName == tagName) {
                 matchedKey = key;
-                print('[AgentActionMessagesWidget] Found match by name! key: $key');
                 break;
               }
             }

@@ -688,11 +688,9 @@ class _MessageWidgetState extends ConsumerState<MessageWidget> with SingleTicker
             icon: VisirIconType.at,
             title: 'Start Chat',
             onTap: () {
-              print('[MessageWidget] Start Chat button tapped');
               final channels = ref.read(chatChannelListControllerProvider.select((v) => v[widget.channel.teamId]?.channels ?? []));
               final sender = widget.members.firstWhereOrNull((e) => e.id == widget.message.userId);
               if (sender == null) {
-                print('[MessageWidget] Sender not found, returning');
                 return;
               }
               
@@ -713,11 +711,7 @@ class _MessageWidgetState extends ConsumerState<MessageWidget> with SingleTicker
                 widget.groups,
               );
 
-              print('[MessageWidget] Created inbox: id=${inbox.id}, title=${inbox.decryptedTitle}');
-              print('[MessageWidget] Inbox config: inboxUniqueId=${inboxConfig.inboxUniqueId}');
-
               // Navigate to home tab
-              print('[MessageWidget] Navigating to home tab');
               Navigator.maybeOf(Utils.mainContext)?.popUntil((route) => route.isFirst);
               tabNotifier.value = TabType.home;
               UserActionSwtichAction.onSwtichTab(targetTab: TabType.home);
@@ -725,21 +719,16 @@ class _MessageWidgetState extends ConsumerState<MessageWidget> with SingleTicker
 
               // Add tag to AgentInputField after navigation - retry multiple times
               void tryAddTag({int retryCount = 0}) {
-                print('[MessageWidget] tryAddTag called: retryCount=$retryCount');
                 final agentInputFieldState = AgentInputField.of(Utils.mainContext);
                 if (agentInputFieldState != null) {
-                  print('[MessageWidget] AgentInputField found, calling addInboxTag');
                   agentInputFieldState.addInboxTag(inbox);
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     agentInputFieldState.requestFocus();
                   });
                 } else if (retryCount < 10) {
-                  print('[MessageWidget] AgentInputField not found, retrying in ${100 * (retryCount + 1)}ms');
                   Future.delayed(Duration(milliseconds: 100 * (retryCount + 1)), () {
                     tryAddTag(retryCount: retryCount + 1);
                   });
-                } else {
-                  print('[MessageWidget] AgentInputField not found after 10 retries, giving up');
                 }
               }
 

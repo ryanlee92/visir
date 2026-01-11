@@ -313,9 +313,7 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
   }
 
   void _addInboxTag(InboxEntity inbox) {
-    print('[AgentInputField] _addInboxTag called: inbox.id=${inbox.id}, inbox.title=${inbox.decryptedTitle}');
     if (!mounted) {
-      print('[AgentInputField] Not mounted, returning');
       return;
     }
 
@@ -328,22 +326,14 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
       final _selection = controller.selection;
       // Use _selection to avoid unused variable warning
       if (_selection.start < 0) {
-        print('[AgentInputField] Invalid selection, returning');
         return;
       }
     } catch (e) {
-      print('[AgentInputField] Error accessing messageController: $e');
       return;
-    }
-
-    print('[AgentInputField] Current taggedInboxes count: ${controller.taggedInboxes.length}');
-    for (final taggedInbox in controller.taggedInboxes) {
-      print('[AgentInputField] Already tagged inbox: id=${taggedInbox.id}, title=${taggedInbox.decryptedTitle}');
     }
 
     // Check if inbox is already tagged
     final isAlreadyTagged = controller.taggedInboxes.any((i) => i.id == inbox.id);
-    print('[AgentInputField] Is already tagged: $isAlreadyTagged');
     if (isAlreadyTagged) {
       // Just focus the input field
       if (mounted) {
@@ -353,39 +343,20 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     }
 
     // Add to tagged list
-    print('[AgentInputField] Adding inbox to taggedInboxes: id=${inbox.id}');
     controller.addTaggedData(inbox: inbox);
-    print('[AgentInputField] After addTaggedData, taggedInboxes count: ${controller.taggedInboxes.length}');
-    for (final taggedInbox in controller.taggedInboxes) {
-      print('[AgentInputField] Tagged inbox after add: id=${taggedInbox.id}, title=${taggedInbox.decryptedTitle}');
-    }
 
     // Add @tag to text with type:id format for reliable matching
     final tagString = '\u200b@inbox:${inbox.id}\u200b ';
-    print('[AgentInputField] Created tagString: length=${tagString.length}');
-    print('[AgentInputField] tagString bytes: ${tagString.codeUnits}');
-    print('[AgentInputField] tagString representation: ${tagString.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
     final currentText = controller.text;
-    print('[AgentInputField] Current text before insert: length=${currentText.length}, text=$currentText');
     final selection = controller.selection;
     final insertPosition = selection.end;
-    print('[AgentInputField] Insert position: $insertPosition');
 
     final newText = currentText.substring(0, insertPosition) + tagString + currentText.substring(insertPosition);
-    print('[AgentInputField] New text after insert: length=${newText.length}');
-    print('[AgentInputField] New text representation: ${newText.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
 
     try {
-      print('[AgentInputField] Setting controller.text with tagString: $tagString');
       controller.text = newText;
-      print('[AgentInputField] After setting controller.text, reading back:');
-      final textAfterSet = controller.text;
-      print('[AgentInputField] Text after set: length=${textAfterSet.length}');
-      print('[AgentInputField] Text after set representation: ${textAfterSet.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
       controller.updateSelection(TextSelection.collapsed(offset: insertPosition + tagString.length), ChangeSource.local);
-      print('[AgentInputField] Controller text updated successfully');
     } catch (e) {
-      print('[AgentInputField] Error setting controller.text: $e');
       if (e.toString().contains('disposed')) {
         return;
       }
@@ -393,11 +364,9 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
     }
 
     if (!mounted) {
-      print('[AgentInputField] Not mounted after text update, returning');
       return;
     }
 
-    print('[AgentInputField] Calling setState()');
     setState(() {});
 
     // Request focus after a short delay
@@ -1549,8 +1518,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                               keyboardAppearance: context.isDarkMode ? Brightness.dark : Brightness.light,
                                               padding: EdgeInsets.only(top: 2, bottom: 3),
                                               textSpanBuilder: (context, node, textOffset, text, style, recognizer) {
-                                                print('[AgentInputField] textSpanBuilder called, text length: ${text.length}');
-                                                print('[AgentInputField] Full text: $text');
                                                 String remainingText = text;
                                                 final List<InlineSpan> spans = [];
                                                 // Use greedy match to capture full ID including dots
@@ -1559,10 +1526,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                 int offset = 0;
 
                                                 final mentionMatches = mentionRegex.allMatches(text);
-                                                print('[AgentInputField] Found ${mentionMatches.length} mention matches');
-                                                for (final match in mentionMatches) {
-                                                  print('[AgentInputField] Match: start=${match.start}, end=${match.end}, group0=${match.group(0)}, group1=${match.group(1)}');
-                                                }
 
                                                 // Get tagged entities from controller
                                                 final taggedTasks = messageController.taggedTasks;
@@ -1578,14 +1541,11 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                   }
 
                                                   final piece = text.substring(match.start, match.end);
-                                                  print('[AgentInputField] Extracted piece: $piece');
                                                   // Remove only the first @ and all \u200b characters
                                                   // Keep @ characters that are part of the ID (e.g., email addresses)
                                                   String tagContent = piece.replaceAll('\u200b', '').trim();
-                                                  print('[AgentInputField] After removing \\u200b: $tagContent');
                                                   if (tagContent.startsWith('@')) {
                                                     tagContent = tagContent.substring(1); // Remove only the first @
-                                                    print('[AgentInputField] After removing @: $tagContent');
                                                   }
 
                                                   // Parse tag content: could be "type:id" (new format) or "name" (old format)
@@ -1596,10 +1556,8 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                     final parts = tagContent.split(':');
                                                     tagType = parts[0];
                                                     tagId = parts.sublist(1).join(':'); // In case id contains ':'
-                                                    print('[AgentInputField] Parsed tagType: $tagType, tagId: $tagId');
                                                   } else {
                                                     tagName = tagContent;
-                                                    print('[AgentInputField] No colon found, using tagName: $tagName');
                                                   }
 
                                                   // Find matching entity from tagged entities based on type:id or name
@@ -1617,54 +1575,32 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                         targetEvent = taggedEvents.where((e) => e.eventId == tagId).firstOrNull;
                                                         break;
                                                       case 'inbox':
-                                                        print('[AgentInputField] Rendering inbox tag: tagId=$tagId');
-                                                        print('[AgentInputField] taggedInboxes count: ${taggedInboxes.length}');
-                                                        for (final inbox in taggedInboxes) {
-                                                          print('[AgentInputField] Tagged inbox: id=${inbox.id}, title=${inbox.decryptedTitle}');
-                                                        }
                                                         targetInbox = taggedInboxes.where((e) => e.id == tagId).firstOrNull;
-                                                        print('[AgentInputField] Found in taggedInboxes: ${targetInbox != null}');
                                                         // If not found in taggedInboxes, try to find in widget.inboxes and add it
                                                         if (targetInbox == null) {
                                                           final allInboxes = widget.inboxes ?? [];
-                                                          print('[AgentInputField] widget.inboxes count: ${allInboxes.length}');
-                                                          for (final inbox in allInboxes) {
-                                                            print('[AgentInputField] Widget inbox: id=${inbox.id}, title=${inbox.decryptedTitle}');
-                                                          }
                                                           final foundInbox = allInboxes.firstWhereOrNull((i) => i.id == tagId);
-                                                          print('[AgentInputField] Found in widget.inboxes: ${foundInbox != null}');
                                                           if (foundInbox != null) {
                                                             // Add to taggedInboxes for future reference
-                                                            print('[AgentInputField] Adding inbox to taggedInboxes: id=${foundInbox.id}');
                                                             messageController.addTaggedData(inbox: foundInbox);
                                                             targetInbox = foundInbox;
                                                           } else {
                                                             // Still not found in widget.inboxes, check if we can find it from inbox list controller
                                                             // This handles cases where chat inbox is created dynamically but not in widget.inboxes
-                                                            print('[AgentInputField] Trying inboxAgentListControllerProvider...');
                                                             try {
                                                               final inboxFetchList = ref.read(inboxAgentListControllerProvider);
-                                                              print('[AgentInputField] inboxFetchList: ${inboxFetchList != null}');
                                                               if (inboxFetchList != null) {
-                                                                print('[AgentInputField] inboxFetchList.inboxes count: ${inboxFetchList.inboxes.length}');
-                                                                for (final inbox in inboxFetchList.inboxes) {
-                                                                  print('[AgentInputField] Inbox from list: id=${inbox.id}, title=${inbox.decryptedTitle}');
-                                                                }
                                                                 final foundInboxFromList = inboxFetchList.inboxes.firstWhereOrNull((i) => i.id == tagId);
-                                                                print('[AgentInputField] Found in inboxFetchList: ${foundInboxFromList != null}');
                                                                 if (foundInboxFromList != null) {
-                                                                  print('[AgentInputField] Adding inbox from list to taggedInboxes: id=${foundInboxFromList.id}');
                                                                   messageController.addTaggedData(inbox: foundInboxFromList);
                                                                   targetInbox = foundInboxFromList;
                                                                 }
                                                               }
                                                             } catch (e) {
-                                                              print('[AgentInputField] Error reading inboxAgentListControllerProvider: $e');
                                                               // Inbox list controller might not be available, ignore
                                                             }
                                                           }
                                                         }
-                                                        print('[AgentInputField] Final targetInbox: ${targetInbox != null ? "found (id=${targetInbox!.id})" : "null"}');
                                                         break;
                                                     }
                                                   } else {
@@ -1682,20 +1618,14 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
 
                                                   ProjectEntity? targetProject = taggedProjects.where((e) => tagName == e.name).firstOrNull;
 
-                                                  print('[AgentInputField] Before if check: targetInbox=${targetInbox != null ? "not null (id=${targetInbox!.id})" : "null"}');
                                                   if (targetInbox != null) {
-                                                    print('[AgentInputField] Rendering inbox tag UI for: id=${targetInbox.id}, title=${targetInbox.decryptedTitle}');
                                                     final displayName = targetInbox.suggestion?.decryptedSummary ?? targetInbox.decryptedTitle;
-                                                    print('[AgentInputField] displayName: $displayName');
 
                                                     // Get inbox provider for avatarUrl and icon
                                                     final inboxProviders = targetInbox.providers;
                                                     final firstProvider = inboxProviders.isNotEmpty ? inboxProviders.first : null;
                                                     final avatarUrl = firstProvider?.avatarUrl;
                                                     final providerIcon = firstProvider?.icon;
-                                                    print('[AgentInputField] avatarUrl: $avatarUrl, providerIcon: $providerIcon');
-
-                                                    print('[AgentInputField] Adding WidgetSpan to spans');
                                                     spans.add(
                                                       WidgetSpan(
                                                         alignment: PlaceholderAlignment.middle,
@@ -1739,7 +1669,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                       ),
                                                     );
                                                     offset = match.end;
-                                                    print('[AgentInputField] WidgetSpan added, offset set to: $offset');
                                                   } else if (targetProject != null) {
                                                     final displayName = targetProject.name;
                                                     spans.add(
@@ -1959,13 +1888,6 @@ class AgentInputFieldState extends ConsumerState<AgentInputField> {
                                                     );
                                                     offset = match.end;
                                                   } else {
-                                                    print('[AgentInputField] No matching entity found, adding piece as TextSpan: $piece');
-                                                    print('[AgentInputField] targetInbox: ${targetInbox != null ? "not null" : "null"}');
-                                                    print('[AgentInputField] targetTask: ${targetTask != null ? "not null" : "null"}');
-                                                    print('[AgentInputField] targetEvent: ${targetEvent != null ? "not null" : "null"}');
-                                                    print('[AgentInputField] targetConnection: ${targetConnection != null ? "not null" : "null"}');
-                                                    print('[AgentInputField] targetChannel: ${targetChannel != null ? "not null" : "null"}');
-                                                    print('[AgentInputField] targetProject: ${targetProject != null ? "not null" : "null"}');
                                                     spans.add(TextSpan(text: piece));
                                                     offset = match.end;
                                                   }

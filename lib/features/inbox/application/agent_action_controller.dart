@@ -1776,8 +1776,6 @@ class AgentActionController extends _$AgentActionController {
     // 사용자 메시지에서 @task:, @event:, @inbox: 형식의 태그 제거
     // Include dot (.) in the pattern to match full IDs like message_slack_T88CZ5ZV4_1762838044.008519
     String cleanedMessage = userMessage;
-    print('[AgentActionController] _buildMessageWithTaggedItems - userMessage length: ${userMessage.length}');
-    print('[AgentActionController] userMessage representation: ${userMessage.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
     // Match \u200b@type:id\u200b format (from agentInputField) or @type:id format
     cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@task:[^\u200b]+\u200b'), '');
     cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@event:[^\u200b]+\u200b'), '');
@@ -1787,8 +1785,6 @@ class AgentActionController extends _$AgentActionController {
     cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@event:[a-zA-Z0-9\-_.]+'), '');
     cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@inbox:[a-zA-Z0-9\-_.]+'), '');
     cleanedMessage = cleanedMessage.trim();
-    print('[AgentActionController] cleanedMessage length: ${cleanedMessage.length}');
-    print('[AgentActionController] cleanedMessage representation: ${cleanedMessage.replaceAll('\u200b', '[ZWS]').replaceAll(' ', '[SPACE]')}');
 
     final buffer = StringBuffer();
     buffer.write(cleanedMessage);
