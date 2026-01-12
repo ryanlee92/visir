@@ -91,23 +91,53 @@ class InboxConversationSummary extends _$InboxConversationSummary {
 
     // Step 3: Generate with AI if both caches miss
     final throttleKey = 'inbox_conversation_summary:$taskId:$eventId';
-    String? result;
     final completer = Completer<String?>();
+    bool isCompleted = false;
 
     EasyDebounce.debounce(throttleKey, const Duration(seconds: 1), () async {
+      if (isCompleted) return;
       try {
-        result = await _inboxConversationSummary(ref, taskId, eventId);
-        if (!completer.isCompleted) {
-          completer.complete(result);
+        final result = await _inboxConversationSummary(ref, taskId, eventId);
+        if (!isCompleted) {
+          isCompleted = true;
+          if (!completer.isCompleted) {
+            completer.complete(result);
+          }
         }
       } catch (e) {
-        if (!completer.isCompleted) {
-          completer.completeError(e);
+        if (!isCompleted) {
+          isCompleted = true;
+          // Ensure loading state is updated even if error occurs
+          ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+          if (!completer.isCompleted) {
+            completer.completeError(e);
+          }
         }
       }
     });
 
-    return await completer.future;
+    // Add timeout to prevent completer from hanging forever
+    try {
+      return await completer.future.timeout(
+        const Duration(seconds: 60),
+        onTimeout: () {
+          if (!isCompleted) {
+            isCompleted = true;
+            ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+            if (!completer.isCompleted) {
+              completer.complete(null);
+            }
+          }
+          return null;
+        },
+      );
+    } catch (e) {
+      if (!isCompleted) {
+        isCompleted = true;
+        ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+      }
+      return null;
+    }
   }
 }
 
@@ -207,8 +237,8 @@ Future<String?> _searchAndGenerateContext(
 
     final keywords = keywordsResult.fold((failure) => null, (keywords) => keywords);
     if (keywords == null || keywords.isEmpty) {
-      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
-      return '';
+      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+      return null;
     }
 
     // Get all integrated OAuth accounts
@@ -666,7 +696,7 @@ Future<String?> _searchAndGenerateContext(
     eventEntities = eventEntities.take(20).toList();
 
     if (searchResults.isEmpty && taskEntities.isEmpty && eventEntities.isEmpty) {
-      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
+      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
       return null;
     }
 
@@ -703,8 +733,22 @@ Future<String?> _searchAndGenerateContext(
       eventId: eventId,
     );
 
-    ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
-    return summaryResult.fold((failure) => null, (summary) => summary);
+    // Update loading state before returning result
+    final summary = summaryResult.fold((failure) {
+      // On failure, update to error state to show error message
+      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+      return null;
+    }, (summary) {
+      // Check if summary is empty or null
+      if (summary == null || summary.isEmpty || summary.trim().isEmpty) {
+        ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+        return null;
+      }
+      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
+      return summary;
+    });
+    
+    return summary;
   } catch (e) {
     ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
     return null;

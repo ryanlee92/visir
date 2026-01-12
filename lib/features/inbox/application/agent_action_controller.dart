@@ -999,24 +999,22 @@ class AgentActionController extends _$AgentActionController {
             }
 
             // 검색 결과를 context로 추가하여 AI 재호출
-            if (searchContext != null && searchContext.isNotEmpty) {
-              // 검색 결과를 context로 추가하여 재호출
-              await _generateGeneralChat(
-                userMessage,
-                selectedProject: selectedProject,
-                updatedMessages: messages,
-                taggedTasks: updatedTaggedTasks,
-                taggedEvents: updatedTaggedEvents,
-                taggedConnections: taggedConnections,
-                taggedChannels: taggedChannels,
-                taggedProjects: taggedProjects,
-                inboxes: updatedAvailableInboxes,
-                files: files,
-                isRecursiveCall: true, // 재귀 호출 플래그 설정
-                searchContext: searchContext, // 검색 결과 context 전달
-              );
-              return; // 검색 함수 처리 후 종료
-            }
+            // searchContext가 비어있어도 재귀 호출하여 일반 응답 생성 (검색 결과가 비어있을 수 있음)
+            await _generateGeneralChat(
+              userMessage,
+              selectedProject: selectedProject,
+              updatedMessages: messages,
+              taggedTasks: updatedTaggedTasks,
+              taggedEvents: updatedTaggedEvents,
+              taggedConnections: taggedConnections,
+              taggedChannels: taggedChannels,
+              taggedProjects: taggedProjects,
+              inboxes: updatedAvailableInboxes,
+              files: files,
+              isRecursiveCall: true, // 재귀 호출 플래그 설정
+              searchContext: searchContext, // 검색 결과 context 전달 (null이거나 비어있을 수 있음)
+            );
+            return; // 검색 함수 처리 후 종료
           }
 
           // 검색 함수가 없거나 재귀 호출인 경우, 일반 함수 처리
@@ -1034,6 +1032,8 @@ class AgentActionController extends _$AgentActionController {
             if (isRecursiveCall) {
               // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
               // executionGroups를 건너뛰고 일반 응답 처리로 바로 넘어감
+              // results를 비워두어 resultMessage가 비어있게 만들어 일반 응답 처리로 넘어가도록 함
+              results.clear();
             } else {
               // 검색 함수만 있었고 이미 처리되었으므로 종료
               return;
@@ -1365,9 +1365,17 @@ class AgentActionController extends _$AgentActionController {
               resultMessage = aiMessage;
             } else if (!isRecursiveCall && functionCalls.isNotEmpty) {
               // 함수 실행 후 자연어 응답이 없는 경우, 함수 실행 결과를 사용
-              // 이 경우는 일반 함수 처리 부분에서 재귀 호출이 이루어져야 함
-              // 함수 실행 결과가 있으면 사용, 없으면 기본 메시지
-              if (results.isNotEmpty) {
+              // 검색 함수만 호출된 경우 results가 비어있을 수 있으므로 재귀 호출로 일반 응답 생성
+              final hasSearchFunctions = functionCalls.any((call) {
+                final functionName = call['function'] as String? ?? '';
+                return functionName == 'searchInbox' || functionName == 'searchTask' || functionName == 'searchCalendarEvent' || functionName == 'getInboxDetails';
+              });
+              
+              // 검색 함수만 호출된 경우 재귀 호출로 일반 응답 생성 (이미 위에서 처리되었을 수 있음)
+              if (hasSearchFunctions && results.isEmpty) {
+                // 검색 함수만 호출된 경우, 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
+                resultMessage = ''; // 빈 메시지로 설정하여 일반 응답 처리로 넘어가도록 함
+              } else if (results.isNotEmpty) {
                 final successResults = results.where((r) => r['success'] == true).toList();
                 final errorResults = results.where((r) => r['success'] == false).toList();
 
@@ -1488,56 +1496,151 @@ class AgentActionController extends _$AgentActionController {
 
           // 확인이 필요한 함수 호출은 pendingFunctionCalls에 저장되어 있으므로 태그 추가 불필요
 
-          final assistantMessage = AgentActionMessage(
-            role: 'assistant',
-            content: resultMessage,
-            files: attachmentFilesFromResults?.isNotEmpty == true ? attachmentFilesFromResults : null,
-          );
-          final updatedMessagesWithResponse = [...messages, assistantMessage];
-
-          // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
-          if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
-            await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, taggedProjects: taggedProjects);
+          // Check if resultMessage is empty after all processing
+          // 재귀 호출에서 검색 함수만 호출된 경우는 일반 응답 처리로 넘어가야 하므로 에러 메시지 설정하지 않음
+          if (resultMessage.isEmpty || resultMessage.trim().isEmpty) {
+            // Check if there are error messages from function calls
+            if (errorMessages.isNotEmpty) {
+              resultMessage = errorMessages.join('\n\n');
+            } else if (!(isRecursiveCall && functionCallsToProcess.isEmpty)) {
+              // 재귀 호출에서 검색 함수만 호출된 경우가 아니면 에러 메시지 설정
+              resultMessage = '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: No response generated';
+            }
+            // 재귀 호출에서 검색 함수만 호출된 경우는 resultMessage를 비워두어 일반 응답 처리로 넘어가도록 함
           }
 
-          // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
-          // 단, functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
-          if (isRecursiveCall && !(functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty)) {
-            // 재귀 호출 완료 시 로딩 상태 해제
-            // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
-            // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
-            // 최종 메시지: [user, assistant(두 번째)]만 남김
-            final finalMessages =
-                updatedMessagesWithResponse.length >= 3 &&
-                    updatedMessagesWithResponse[0].role == 'user' &&
-                    updatedMessagesWithResponse[1].role == 'assistant' &&
-                    updatedMessagesWithResponse[2].role == 'assistant'
-                ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
-                : updatedMessagesWithResponse;
-            await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
-            return;
+          // 재귀 호출에서 검색 함수만 호출된 경우, assistantMessage를 생성하지 않고 바로 일반 응답 처리로 넘어감
+          List<AgentActionMessage>? updatedMessagesWithResponse;
+          if (isRecursiveCall && functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty) {
+            // 일반 응답 처리는 아래에서 수행
+            updatedMessagesWithResponse = null;
+          } else {
+            final assistantMessage = AgentActionMessage(
+              role: 'assistant',
+              content: resultMessage,
+              files: attachmentFilesFromResults?.isNotEmpty == true ? attachmentFilesFromResults : null,
+            );
+            updatedMessagesWithResponse = [...messages, assistantMessage];
+
+            // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
+            if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
+              await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, taggedProjects: taggedProjects);
+            }
+
+            // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
+            // 단, functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
+            if (isRecursiveCall && !(functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty)) {
+              // 재귀 호출 완료 시 로딩 상태 해제
+              // 재귀 호출에서는 첫 번째 응답을 제거하고 새로운 응답만 사용
+              // updatedMessagesWithResponse 구조: [user, assistant(첫 번째), assistant(두 번째)]
+              // 최종 메시지: [user, assistant(두 번째)]만 남김
+              final finalMessages =
+                  updatedMessagesWithResponse.length >= 3 &&
+                      updatedMessagesWithResponse[0].role == 'user' &&
+                      updatedMessagesWithResponse[1].role == 'assistant' &&
+                      updatedMessagesWithResponse[2].role == 'assistant'
+                  ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
+                  : updatedMessagesWithResponse;
+              await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
+              return;
+            }
           }
 
           // functionCallsToProcess가 비어있고 resultMessage가 비어있으면 일반 응답 처리로 넘어감
+          // 검색 함수만 호출된 경우, searchContext를 가지고 원래 사용자 요청을 다시 처리
           if (isRecursiveCall && functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty) {
-            // 일반 응답 처리로 넘어감 (아래 else 블록에서 처리)
-            // aiMessage를 사용하여 일반 응답 생성
-            final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
-            final updatedMessagesWithResponse = [...messages, assistantMessage];
+            // searchContext를 가지고 원래 사용자 요청을 다시 처리하여 자연어 응답 생성
+            final me = ref.read(authControllerProvider).value;
+            final userId = me?.id;
+            final selectedModel = this.selectedModel;
+            String? apiKey;
+            if (useUserApiKey) {
+              final apiKeys = ref.read(aiApiKeysProvider);
+              apiKey = apiKeys[selectedModel.provider.name];
+            } else {
+              apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
+            }
+
+            final projects = ref.read(projectListControllerProvider);
+            final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
+
+            // conversation history에서 함수 호출 메시지 제거
+            final filteredHistory = messages.where((m) => !m.excludeFromHistory).map((m) => m.toJson(local: true)).toList();
+
+            // channelContext를 문자열로 변환
+            String? channelContextStr;
+            if (taggedChannels != null && taggedChannels.isNotEmpty) {
+              channelContextStr = await _buildChannelContext(taggedChannels);
+            }
+
+            // searchContext를 가지고 원래 사용자 요청을 다시 처리
+            final response = await _repository.generateGeneralChat(
+              userMessage: userMessage,
+              conversationHistory: filteredHistory,
+              projectContext: '',
+              projects: projectsList,
+              taggedContext: searchContext, // 검색 결과 context 사용
+              channelContext: channelContextStr,
+              inboxContext: null,
+              model: selectedModel.modelName,
+              apiKey: apiKey,
+              userId: userId,
+            );
+
+            final aiResponse = response.fold((failure) {
+              // Show actual error message from failure
+              String errorContent = Utils.mainContext.tr.agent_action_error_occurred;
+              if (failure is Failure) {
+                final errorMsg = failure.toString();
+                if (errorMsg.isNotEmpty) {
+                  errorContent = '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: $errorMsg';
+                }
+              }
+              final errorMessage = AgentActionMessage(
+                role: 'assistant',
+                content: errorContent,
+              );
+              return [...messages, errorMessage];
+            }, (response) {
+              if (response != null && response['message'] != null) {
+                final generalResponse = response['message'] as String;
+                // Check if response is empty or null
+                if (generalResponse.isEmpty || generalResponse.trim().isEmpty) {
+                  // Empty response - show error message
+                  final errorMessage = AgentActionMessage(
+                    role: 'assistant',
+                    content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: Empty response from AI',
+                  );
+                  return [...messages, errorMessage];
+                }
+                final assistantMessage = AgentActionMessage(role: 'assistant', content: generalResponse);
+                return [...messages, assistantMessage];
+              } else {
+                // AI response is null or empty - show error message
+                final errorMessage = AgentActionMessage(
+                  role: 'assistant',
+                  content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: No response from AI',
+                );
+                return [...messages, errorMessage];
+              }
+            });
 
             // 재귀 호출 완료 시 로딩 상태 해제
             final finalMessages =
-                updatedMessagesWithResponse.length >= 3 &&
-                    updatedMessagesWithResponse[0].role == 'user' &&
-                    updatedMessagesWithResponse[1].role == 'assistant' &&
-                    updatedMessagesWithResponse[2].role == 'assistant'
-                ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
-                : updatedMessagesWithResponse;
+                aiResponse.length >= 3 &&
+                    aiResponse[0].role == 'user' &&
+                    aiResponse[1].role == 'assistant' &&
+                    aiResponse[2].role == 'assistant'
+                ? [aiResponse[0], aiResponse[2]]
+                : aiResponse;
             await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
             return;
           }
 
-          await _updateState(messages: updatedMessagesWithResponse, isLoading: false, taggedProjects: taggedProjects);
+          // 재귀 호출에서 검색 함수만 호출된 경우는 이미 위에서 처리되었으므로 여기서는 처리하지 않음
+          if (!(isRecursiveCall && functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty)) {
+            await _updateState(messages: updatedMessagesWithResponse, isLoading: false, taggedProjects: taggedProjects);
+          }
         } else {
           // 일반 응답
           // 재귀 호출 중에 검색 함수만 호출되고 일반 응답이 function call만 포함하는 경우 처리
@@ -1583,24 +1686,68 @@ class AgentActionController extends _$AgentActionController {
                 userId: userId,
               );
 
-              final aiResponse = response.fold((failure) => null, (response) => response);
-              if (aiResponse != null && aiResponse['message'] != null) {
-                final generalResponse = aiResponse['message'] as String;
-                final assistantMessage = AgentActionMessage(role: 'assistant', content: generalResponse);
-                final updatedMessagesWithResponse = [...messages, assistantMessage];
+              final aiResponse = response.fold((failure) {
+                // Show actual error message from failure
+                String errorContent = Utils.mainContext.tr.agent_action_error_occurred;
+                if (failure is Failure) {
+                  final errorMsg = failure.toString();
+                  if (errorMsg.isNotEmpty) {
+                    errorContent = '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: $errorMsg';
+                  }
+                }
+                final errorMessage = AgentActionMessage(
+                  role: 'assistant',
+                  content: errorContent,
+                );
+                final updatedMessagesWithResponse = [...messages, errorMessage];
+                return updatedMessagesWithResponse;
+              }, (response) {
+                if (response != null && response['message'] != null) {
+                  final generalResponse = response['message'] as String;
+                  // Check if response is empty or null
+                  if (generalResponse.isEmpty || generalResponse.trim().isEmpty) {
+                    // Empty response - show error message
+                    final errorMessage = AgentActionMessage(
+                      role: 'assistant',
+                      content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: Empty response from AI',
+                    );
+                    return [...messages, errorMessage];
+                  }
+                  final assistantMessage = AgentActionMessage(role: 'assistant', content: generalResponse);
+                  return [...messages, assistantMessage];
+                } else {
+                  // AI response is null or empty - show error message
+                  final errorMessage = AgentActionMessage(
+                    role: 'assistant',
+                    content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: No response from AI',
+                  );
+                  return [...messages, errorMessage];
+                }
+              });
 
-                // 재귀 호출 완료 시 로딩 상태 해제
-                final finalMessages =
-                    updatedMessagesWithResponse.length >= 3 &&
-                        updatedMessagesWithResponse[0].role == 'user' &&
-                        updatedMessagesWithResponse[1].role == 'assistant' &&
-                        updatedMessagesWithResponse[2].role == 'assistant'
-                    ? [updatedMessagesWithResponse[0], updatedMessagesWithResponse[2]]
-                    : updatedMessagesWithResponse;
-                await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
-                return;
-              }
+              // 재귀 호출 완료 시 로딩 상태 해제
+              final finalMessages =
+                  aiResponse.length >= 3 &&
+                      aiResponse[0].role == 'user' &&
+                      aiResponse[1].role == 'assistant' &&
+                      aiResponse[2].role == 'assistant'
+                  ? [aiResponse[0], aiResponse[2]]
+                  : aiResponse;
+              await _updateState(messages: finalMessages, isLoading: false, taggedProjects: taggedProjects);
+              return;
             }
+          }
+
+          // Check if aiMessage is empty after processing
+          if (aiMessage.isEmpty || aiMessage.trim().isEmpty) {
+            // Empty response - show error message
+            final errorMessage = AgentActionMessage(
+              role: 'assistant',
+              content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: Empty message after processing',
+            );
+            final updatedMessagesWithResponse = [...messages, errorMessage];
+            await _updateState(messages: updatedMessagesWithResponse, isLoading: false, taggedProjects: taggedProjects);
+            return;
           }
 
           final assistantMessage = AgentActionMessage(role: 'assistant', content: aiMessage);
@@ -1656,9 +1803,13 @@ class AgentActionController extends _$AgentActionController {
       }
     } catch (e) {
       // 크레딧 부족 예외 처리
+      String errorContent = Utils.mainContext.tr.agent_action_error_occurred;
+      bool handledCreditsError = false;
+      
       if (e is Failure) {
         e.whenOrNull(
           insufficientCredits: (_, required, available) {
+            handledCreditsError = true;
             // 크레딧을 토큰 수로 변환
             final requiredTokens = AiPricingCalculator.calculateTokensFromCredits(required);
             final availableTokens = AiPricingCalculator.calculateTokensFromCredits(available);
@@ -1676,10 +1827,26 @@ class AgentActionController extends _$AgentActionController {
                 size: Size(500, 600),
               );
             });
+            errorContent = Utils.mainContext.tr.ai_credits_insufficient_message(
+              Utils.numberFormatter(requiredTokens.toDouble(), fractionDigits: 0),
+              Utils.numberFormatter(availableTokens.toDouble(), fractionDigits: 0),
+            );
           },
         );
       }
-      await _updateState(messages: messages, isLoading: false);
+      
+      // 크레딧 부족이 아닌 다른 에러의 경우 실제 에러 메시지 표시
+      if (!handledCreditsError && e.toString().isNotEmpty) {
+        errorContent = '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: ${e.toString()}';
+      }
+      
+      await _updateState(
+        messages: [
+          ...messages,
+          AgentActionMessage(role: 'assistant', content: errorContent),
+        ],
+        isLoading: false,
+      );
     }
   }
 
@@ -2967,10 +3134,15 @@ class AgentActionController extends _$AgentActionController {
         files: files,
       );
     } catch (e) {
+      // Show actual error message
+      String errorContent = Utils.mainContext.tr.agent_action_error_occurred;
+      if (e.toString().isNotEmpty) {
+        errorContent = '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: ${e.toString()}';
+      }
       await _updateState(
         messages: [
           ...updatedMessages,
-          AgentActionMessage(role: 'assistant', content: Utils.mainContext.tr.agent_action_error_occurred),
+          AgentActionMessage(role: 'assistant', content: errorContent),
         ],
         isLoading: false,
         taggedProjects: taggedProjects,

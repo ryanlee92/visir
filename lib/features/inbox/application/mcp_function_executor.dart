@@ -4541,9 +4541,8 @@ class McpFunctionExecutor {
         return true;
       }).length;
 
-      // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
-      final result = matchingCount >= 5;
-      return result;
+      // 로컬 데이터가 있으면 사용
+      return matchingCount > 0;
     } catch (e) {
       return false;
     }
@@ -4830,8 +4829,8 @@ class McpFunctionExecutor {
         return true;
       }).length;
 
-      // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
-      return matchingCount >= 5;
+      // 로컬 데이터가 있으면 사용
+      return matchingCount > 0;
     } catch (e) {
       return false;
     }
@@ -4963,6 +4962,15 @@ class McpFunctionExecutor {
 
         // 로컬에서 추가 필터링 (날짜 범위 등)
         searchResults = _filterLocalTasks(tasks, startDate, endDate, searchKeyword, taskId, isDone);
+        
+        // 원격 검색 결과가 비어있으면 로컬 데이터도 확인
+        if (searchResults.isEmpty) {
+          final allLocalTasks = _getAllTasksFromBothProviders();
+          final localSearchResults = _filterLocalTasks(allLocalTasks, startDate, endDate, searchKeyword, taskId, isDone);
+          if (localSearchResults.isNotEmpty) {
+            searchResults = localSearchResults;
+          }
+        }
       }
 
       // Sort by date (closest to today first) and limit results to 20
@@ -5187,8 +5195,8 @@ class McpFunctionExecutor {
         return true;
       }).length;
 
-      // 최소 5개 이상의 데이터가 있으면 로컬 데이터가 충분하다고 판단
-      return matchingCount >= 5;
+      // 로컬 데이터가 있으면 사용
+      return matchingCount > 0;
     } catch (e) {
       return false;
     }
