@@ -2790,7 +2790,7 @@ class McpFunctionExecutor {
           final allTasks = _getAllTasksFromBothProviders(includeRecentMonths: true);
 
           // Filter by date range (last 3 months) and keywords
-          final filteredTasks = _filterLocalTasks(allTasks, startDate, endDate, taskQuery, null, null);
+          final filteredTasks = _filterLocalTasks(allTasks, startDate, endDate, taskQuery, null, null, excludeFutureTasks: true);
           // Sort by date (closest to today first) and take 20
           filteredTasks.sort((a, b) {
             final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
@@ -2951,48 +2951,67 @@ class McpFunctionExecutor {
           }
         }
 
-        // Search in calendar (same logic as _searchAndGenerateContext)
+        // Search in calendar (local first, then remote if needed)
         List<EventEntity> eventEntities = [];
         final calendarQuery = keywords.join(' ');
-        if (calendarQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
-          for (final oauth in calendarOAuths) {
-            final calendarRepository = ref.watch(calendarRepositoryProvider);
-            final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+        if (calendarQuery.isNotEmpty) {
+          final now = DateTime.now();
+          final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+          final startDate = threeMonthsAgo;
+          final endDate = now;
 
-            await calendarListResult.fold(
-              (failure) async {
-                // Calendar list fetch failed, skip this OAuth account
-              },
-              (calendarMap) async {
-                final calendars = calendarMap.values
-                    .expand((e) => e)
-                    .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
-                    .toList();
-                if (calendars.isEmpty) return;
+          // Get local events first
+          final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+          final filteredEvents = _filterLocalEvents(allEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
+          
+          // Exclude the current event if provided
+          final localFilteredEvents = filteredEvents.where((e) => event == null || e.uniqueId != event.uniqueId).toList();
+          eventEntities.addAll(localFilteredEvents.take(20));
 
-                final eventResult = await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+          // If we don't have enough results and mock data is disabled, search remotely
+          if (eventEntities.length < 20 && !ref.read(shouldUseMockDataProvider)) {
+            for (final oauth in calendarOAuths) {
+              final calendarRepository = ref.watch(calendarRepositoryProvider);
+              final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
 
-                await eventResult.fold(
-                  (failure) async {
-                    // Calendar search failed, skip this OAuth account
-                  },
-                  (result) async {
-                    final now = DateTime.now();
-                    for (final eventList in result.events.values) {
-                      for (final foundEvent in eventList) {
-                        // Exclude events that start after now
-                        if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(now)) {
-                          continue;
-                        }
-                        if (event == null || foundEvent.uniqueId != event.uniqueId) {
-                          eventEntities.add(foundEvent);
+              await calendarListResult.fold(
+                (failure) async {
+                  // Calendar list fetch failed, skip this OAuth account
+                },
+                (calendarMap) async {
+                  final calendars = calendarMap.values
+                      .expand((e) => e)
+                      .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                      .toList();
+                  if (calendars.isEmpty) return;
+
+                  final eventResult = await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+
+                  await eventResult.fold(
+                    (failure) async {
+                      // Calendar search failed, skip this OAuth account
+                    },
+                    (result) async {
+                      final remoteEvents = <EventEntity>[];
+                      for (final eventList in result.events.values) {
+                        for (final foundEvent in eventList) {
+                          if (event == null || foundEvent.uniqueId != event.uniqueId) {
+                            remoteEvents.add(foundEvent);
+                          }
                         }
                       }
-                    }
-                  },
-                );
-              },
-            );
+                      
+                      // Filter remote events using _filterLocalEvents
+                      final filteredRemoteEvents = _filterLocalEvents(remoteEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
+                      eventEntities.addAll(filteredRemoteEvents);
+                      
+                      // Stop if we have enough results
+                      if (eventEntities.length >= 20) return;
+                    },
+                  );
+                },
+              );
+            }
           }
         }
 
@@ -3216,7 +3235,7 @@ class McpFunctionExecutor {
             final allTasks = _getAllTasksFromBothProviders(includeRecentMonths: true);
 
             // Filter by date range (last 3 months) and keywords
-            final filteredTasks = _filterLocalTasks(allTasks, startDate, endDate, taskQuery, null, null);
+            final filteredTasks = _filterLocalTasks(allTasks, startDate, endDate, taskQuery, null, null, excludeFutureTasks: true);
             // Sort by date (closest to today first) and take 20
             filteredTasks.sort((a, b) {
               final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
@@ -3376,45 +3395,61 @@ class McpFunctionExecutor {
             }
           }
 
-          // Search in calendar
+          // Search in calendar (local first, then remote if needed)
           final calendarQuery = keywords.join(' ');
-          if (calendarQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
-            for (final oauth in calendarOAuths) {
-              final calendarRepository = ref.watch(calendarRepositoryProvider);
-              final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+          if (calendarQuery.isNotEmpty) {
+            final now = DateTime.now();
+            final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+            final startDate = threeMonthsAgo;
+            final endDate = now;
 
-              await calendarListResult.fold(
-                (failure) async {
-                  // Calendar list fetch failed, skip this OAuth account
-                },
-                (calendarMap) async {
-                  final calendars = calendarMap.values
-                      .expand((e) => e)
-                      .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
-                      .toList();
-                  if (calendars.isEmpty) return;
+            // Get local events first
+            final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+            final filteredEvents = _filterLocalEvents(allEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
+            eventEntities.addAll(filteredEvents.take(20));
 
-                  final eventResult = await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+            // If we don't have enough results and mock data is disabled, search remotely
+            if (eventEntities.length < 20 && !ref.read(shouldUseMockDataProvider)) {
+              for (final oauth in calendarOAuths) {
+                final calendarRepository = ref.watch(calendarRepositoryProvider);
+                final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
 
-                  await eventResult.fold(
-                    (failure) async {
-                      // Calendar search failed, skip this OAuth account
-                    },
-                    (result) async {
-                      final now = DateTime.now();
-                      for (final eventList in result.events.values) {
-                        for (final foundEvent in eventList) {
-                          // Exclude events that start after now
-                          if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(now)) {
-                            continue;
+                await calendarListResult.fold(
+                  (failure) async {
+                    // Calendar list fetch failed, skip this OAuth account
+                  },
+                  (calendarMap) async {
+                    final calendars = calendarMap.values
+                        .expand((e) => e)
+                        .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                        .toList();
+                    if (calendars.isEmpty) return;
+
+                    final eventResult = await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+
+                    await eventResult.fold(
+                      (failure) async {
+                        // Calendar search failed, skip this OAuth account
+                      },
+                      (result) async {
+                        final remoteEvents = <EventEntity>[];
+                        for (final eventList in result.events.values) {
+                          for (final foundEvent in eventList) {
+                            remoteEvents.add(foundEvent);
                           }
-                          eventEntities.add(foundEvent);
                         }
-                      }
-                    },
-                  );
-                },
-              );
+                        
+                        // Filter remote events using _filterLocalEvents
+                        final filteredRemoteEvents = _filterLocalEvents(remoteEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
+                        eventEntities.addAll(filteredRemoteEvents);
+                        
+                        // Stop if we have enough results
+                        if (eventEntities.length >= 20) return;
+                      },
+                    );
+                  },
+                );
+              }
             }
           }
         }
@@ -4609,7 +4644,7 @@ class McpFunctionExecutor {
   }
 
   /// 로컬 태스크 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
-  List<TaskEntity> _filterLocalTasks(List<TaskEntity> localTasks, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? taskId, bool? isDone) {
+  List<TaskEntity> _filterLocalTasks(List<TaskEntity> localTasks, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? taskId, bool? isDone, {bool excludeFutureTasks = false}) {
     var filtered = localTasks;
     final now = DateTime.now();
 
@@ -4698,14 +4733,16 @@ class McpFunctionExecutor {
       }).toList();
       if (filtered.isEmpty) return [];
     } else {
-      // 날짜 범위 필터가 없어도 now 이후의 task는 제외
-      filtered = filtered.where((task) {
-        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
-        final taskDate = task.editedStartTime ?? task.startAt ?? task.startDate;
-        if (taskDate == null) return false;
-        return !taskDate.isAfter(now);
-      }).toList();
-      if (filtered.isEmpty) return [];
+      // 날짜 범위 필터가 없을 때, excludeFutureTasks가 true인 경우에만 now 이후의 task 제외
+      if (excludeFutureTasks) {
+        filtered = filtered.where((task) {
+          // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+          final taskDate = task.editedStartTime ?? task.startAt ?? task.startDate;
+          if (taskDate == null) return false;
+          return !taskDate.isAfter(now);
+        }).toList();
+        if (filtered.isEmpty) return [];
+      }
     }
 
     // 완료 상태 필터
@@ -4960,7 +4997,7 @@ class McpFunctionExecutor {
   }
 
   /// 로컬 일정 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
-  List<EventEntity> _filterLocalEvents(List<EventEntity> localEvents, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? eventId) {
+  List<EventEntity> _filterLocalEvents(List<EventEntity> localEvents, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? eventId, {bool excludeFutureEvents = false}) {
     var filtered = localEvents;
     final now = DateTime.now();
 
@@ -5039,22 +5076,24 @@ class McpFunctionExecutor {
         // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
         final eventStart = event.editedStartTime ?? event.startDate;
         if (eventStart == null) return false;
-        // Always exclude events that start after now
-        if (eventStart.isAfter(now)) return false;
+        // excludeFutureEvents가 true인 경우에만 now 이후의 event 제외
+        if (excludeFutureEvents && eventStart.isAfter(now)) return false;
         if (startDate != null && eventStart.isBefore(startDate)) return false;
         if (endDate != null && eventStart.isAfter(endDate)) return false;
         return true;
       }).toList();
       if (filtered.isEmpty) return [];
     } else {
-      // 날짜 범위 필터가 없어도 now 이후의 event는 제외
-      filtered = filtered.where((event) {
-        // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
-        final eventStart = event.editedStartTime ?? event.startDate;
-        if (eventStart == null) return false;
-        return !eventStart.isAfter(now);
-      }).toList();
-      if (filtered.isEmpty) return [];
+      // 날짜 범위 필터가 없을 때, excludeFutureEvents가 true인 경우에만 now 이후의 event 제외
+      if (excludeFutureEvents) {
+        filtered = filtered.where((event) {
+          // editedStartTime이 있으면 확장된 instance이므로 그것을 사용, 없으면 원본 날짜 사용
+          final eventStart = event.editedStartTime ?? event.startDate;
+          if (eventStart == null) return false;
+          return !eventStart.isAfter(now);
+        }).toList();
+        if (filtered.isEmpty) return [];
+      }
     }
 
     // 검색어 필터 (제목, 설명, 위치에서 검색)
