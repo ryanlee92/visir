@@ -534,7 +534,9 @@ Future<String?> _searchAndGenerateContext(
         if (taskDate == null) return false;
         // Always exclude tasks that start after now
         if (taskDate.isAfter(nowForFilter)) return false;
+        // Filter by date range (last 3 months)
         if (taskDate.isBefore(startDate)) return false;
+        // Note: endDate is same as nowForFilter, so this check is redundant but kept for clarity
         if (taskDate.isAfter(endDate)) return false;
         return true;
       }).toList();
@@ -558,54 +560,92 @@ Future<String?> _searchAndGenerateContext(
       taskEntities.addAll(filteredTasks.take(20));
     }
 
-    // Search in calendar (Google Calendar, Outlook Calendar)
+    // Search in calendar (local first, then remote if needed)
     // Combine all keywords into a single query (space-separated) for better search results
     List<EventEntity> eventEntities = [];
     final calendarQuery = keywords.join(' ');
-    if (calendarQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
-      for (final oauth in calendarOAuths) {
-        final calendarRepository = ref.watch(calendarRepositoryProvider);
-        final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+    if (calendarQuery.isNotEmpty) {
+      final now = DateTime.now();
+      final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+      final startDate = threeMonthsAgo;
+      final endDate = now;
 
-        await calendarListResult.fold(
-          (failure) async {
-            // Calendar list fetch failed, skip this OAuth account
-          },
-          (calendarMap) async {
-            final calendars = calendarMap.values
-                .expand((e) => e)
-                .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
-                .toList();
-            if (calendars.isEmpty) return;
+      // Get local events first
+      final allLocalEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
+      
+      // Filter local events by date range and keywords, excluding future events
+      final keyword = calendarQuery.toLowerCase();
+      final localFilteredEvents = allLocalEvents.where((e) {
+        final eventStart = e.startDate;
+        if (eventStart == null) return false;
+        // Always exclude events that start after now
+        if (eventStart.isAfter(now)) return false;
+        // Filter by date range (last 3 months)
+        if (eventStart.isBefore(startDate)) return false;
+        if (eventStart.isAfter(endDate)) return false;
+        // Filter by keywords
+        final title = e.title?.toLowerCase() ?? '';
+        final description = e.description?.toLowerCase() ?? '';
+        final location = e.location?.toLowerCase() ?? '';
+        if (!title.contains(keyword) && !description.contains(keyword) && !location.contains(keyword)) {
+          return false;
+        }
+        // Exclude the current event if it exists
+        if (event != null && e.uniqueId == event.uniqueId) return false;
+        return true;
+      }).toList();
+      
+      eventEntities.addAll(localFilteredEvents.take(20));
 
-            // Retry with backoff on failure
-            final eventResult = await _retryEitherWithBackoff(() async {
-              return await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
-            });
+      // If we don't have enough results and mock data is disabled, search remotely
+      if (eventEntities.length < 20 && !ref.read(shouldUseMockDataProvider)) {
+        for (final oauth in calendarOAuths) {
+          final calendarRepository = ref.watch(calendarRepositoryProvider);
+          final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
 
-            await eventResult.fold(
-              (failure) async {
-                // Calendar search failed, skip this OAuth account
-              },
-              (result) async {
-                // Collect all events from the result, excluding the current event
-                final now = DateTime.now();
-                for (final eventList in result.events.values) {
-                  for (final foundEvent in eventList) {
-                    // Exclude events that start after now
-                    if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(now)) {
-                      continue;
-                    }
-                    // Exclude the current event if it exists
-                    if (event == null || foundEvent.uniqueId != event.uniqueId) {
-                      eventEntities.add(foundEvent);
+          await calendarListResult.fold(
+            (failure) async {
+              // Calendar list fetch failed, skip this OAuth account
+            },
+            (calendarMap) async {
+              final calendars = calendarMap.values
+                  .expand((e) => e)
+                  .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                  .toList();
+              if (calendars.isEmpty) return;
+
+              // Retry with backoff on failure
+              final eventResult = await _retryEitherWithBackoff(() async {
+                return await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+              });
+
+              await eventResult.fold(
+                (failure) async {
+                  // Calendar search failed, skip this OAuth account
+                },
+                (result) async {
+                  // Collect all events from the result, excluding the current event
+                  final nowForFilter = DateTime.now();
+                  for (final eventList in result.events.values) {
+                    for (final foundEvent in eventList) {
+                      // Always exclude events that start after now
+                      if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(nowForFilter)) {
+                        continue;
+                      }
+                      // Exclude the current event if it exists
+                      if (event == null || foundEvent.uniqueId != event.uniqueId) {
+                        eventEntities.add(foundEvent);
+                      }
                     }
                   }
-                }
-              },
-            );
-          },
-        );
+                  
+                  // Stop if we have enough results
+                  if (eventEntities.length >= 20) return;
+                },
+              );
+            },
+          );
+        }
       }
     }
 
