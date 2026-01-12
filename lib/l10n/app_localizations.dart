@@ -4807,7 +4807,7 @@ abstract class AppLocalizations {
   /// No description provided for @google_calendar_permission_description.
   ///
   /// In en, this message translates to:
-  /// **'On the next screen, make sure to check all permission boxes. These permissions are required to manage your calendar events in Taskey.'**
+  /// **'On the next screen, make sure to check all permission boxes. These permissions are required to manage your calendar events in Visir.'**
   String get google_calendar_permission_description;
 
   /// No description provided for @google_calendar_permission_button.
@@ -4825,7 +4825,7 @@ abstract class AppLocalizations {
   /// No description provided for @google_mail_permission_description.
   ///
   /// In en, this message translates to:
-  /// **'On the next screen, make sure to check all permission boxes. These permissions are required to manage your emails in Taskey.'**
+  /// **'On the next screen, make sure to check all permission boxes. These permissions are required to manage your emails in Visir.'**
   String get google_mail_permission_description;
 
   /// No description provided for @google_mail_permission_button.
@@ -4855,13 +4855,13 @@ abstract class AppLocalizations {
   /// No description provided for @download_mobile_app_popup_title.
   ///
   /// In en, this message translates to:
-  /// **'Get Taskey on mobile'**
+  /// **'Get Visir on mobile'**
   String get download_mobile_app_popup_title;
 
   /// No description provided for @download_mobile_app_popup_description.
   ///
   /// In en, this message translates to:
-  /// **'Scan this QR code to download the app for iOS or Android. Taskey on mobile offers the same full functionality as desktop.'**
+  /// **'Scan this QR code to download the app for iOS or Android. Visir on mobile offers the same full functionality as desktop.'**
   String get download_mobile_app_popup_description;
 
   /// No description provided for @download_mobile_app_popup_button.
@@ -5839,7 +5839,7 @@ abstract class AppLocalizations {
   /// No description provided for @default_task_before_signin_tour_desc.
   ///
   /// In en, this message translates to:
-  /// **'Click the \"See how it works\" button to take a quick tour of Taskey.'**
+  /// **'Click the \"See how it works\" button to take a quick tour of Visir.'**
   String get default_task_before_signin_tour_desc;
 
   /// No description provided for @default_task_before_signin_explore_title.
@@ -5887,7 +5887,7 @@ abstract class AppLocalizations {
   /// No description provided for @default_task_before_signin_signin_desc.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to start using Taskey and unlock all features.'**
+  /// **'Sign in to start using Visir and unlock all features.'**
   String get default_task_before_signin_signin_desc;
 
   /// No description provided for @default_task_after_signin_connect_services_title.

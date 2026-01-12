@@ -2523,7 +2523,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get google_calendar_permission_description =>
-      'On the next screen, make sure to check all permission boxes. These permissions are required to manage your calendar events in Taskey.';
+      'On the next screen, make sure to check all permission boxes. These permissions are required to manage your calendar events in Visir.';
 
   @override
   String get google_calendar_permission_button => 'Continue';
@@ -2534,7 +2534,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get google_mail_permission_description =>
-      'On the next screen, make sure to check all permission boxes. These permissions are required to manage your emails in Taskey.';
+      'On the next screen, make sure to check all permission boxes. These permissions are required to manage your emails in Visir.';
 
   @override
   String get google_mail_permission_button => 'Continue';
@@ -2551,11 +2551,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inbox_filter_tutorial_button => 'Got it';
 
   @override
-  String get download_mobile_app_popup_title => 'Get Taskey on mobile';
+  String get download_mobile_app_popup_title => 'Get Visir on mobile';
 
   @override
   String get download_mobile_app_popup_description =>
-      'Scan this QR code to download the app for iOS or Android. Taskey on mobile offers the same full functionality as desktop.';
+      'Scan this QR code to download the app for iOS or Android. Visir on mobile offers the same full functionality as desktop.';
 
   @override
   String get download_mobile_app_popup_button => 'Close';
@@ -3125,7 +3125,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get default_task_before_signin_tour_desc =>
-      'Click the \"See how it works\" button to take a quick tour of Taskey.';
+      'Click the \"See how it works\" button to take a quick tour of Visir.';
 
   @override
   String get default_task_before_signin_explore_title =>
@@ -3156,7 +3156,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get default_task_before_signin_signin_desc =>
-      'Sign in to start using Taskey and unlock all features.';
+      'Sign in to start using Visir and unlock all features.';
 
   @override
   String get default_task_after_signin_connect_services_title =>

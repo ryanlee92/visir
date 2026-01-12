@@ -53,14 +53,14 @@ bool SendAppLinkToInstance(const std::wstring& title) {
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
                         
-  if (SendAppLinkToInstance(L"Taskey")) {
+  if (SendAppLinkToInstance(L"Visir")) {
     return EXIT_SUCCESS;
   }
 
   SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
   // Replace protocol_handler_example with your_window_title.
-  HWND hwnd = ::FindWindow(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Taskey");
+  HWND hwnd = ::FindWindow(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Visir");
   if (hwnd != NULL) {
 
     // Dispatch new link to current window
@@ -88,7 +88,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.CreateAndShow(L"Taskey", origin, size)) {
+  if (!window.CreateAndShow(L"Visir", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
