@@ -5,24 +5,24 @@
 		<description>Your AI Executive Assistant.</description>
 		<language>en</language>
 		<item>
-			<title>Version 2.0.0</title>
+			<title>Version 2.0.3</title>
 			<!-- For the macOS item, it is recommended to add 'sparkle:version' and 'sparkle:shortVersionString' to the item node, rather than as part of the enclosure. -->
-			<sparkle:version>1010</sparkle:version>
-			<sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
+			<sparkle:version>1029</sparkle:version>
+			<sparkle:shortVersionString>2.0.3</sparkle:shortVersionString>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Tue, 30 Dec 2025 14:00:00 +0900</pubDate>
+			<pubDate>Tue, 13 Jan 2026 02:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.zip"
-                sparkle:edSignature="dXHnuom8Yg6fddY0CUCH7ES35Yuvced7yJKSbtUS2/JhR86r8JLYif6/Fml1ockvd5PYNyspTwU0PP6n64QICQ==" length="102069407"
+                sparkle:edSignature="ZnTByTxbpwqRg6ja8hrgB0Y0gZAP0Up44KjV9DAt6e/0Cv1NzvDBtmd1DiaSrHEs2tpBqJ2NzHWluIv9vzIVAA==" length="102535651"
 				sparkle:os="macos"
 				type="application/octet-stream" />
 		</item>
 		<item>
-			<title>Version 2.0.0</title>
+			<title>Version 2.0.3</title>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Tue, 30 Dec 2025 14:00:00 +0900</pubDate>
+			<pubDate>Tue, 13 Jan 2026 02:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.exe"
-                sparkle:dsaSignature="MDwCHCFH4gksXADQEqiabi0fyPVvLI6mJI68fphetjgCHDBQ5XxHbD2xT+UEZzweT0AD7p5IG4xFJ8uRbDQ=" length="0"
-				sparkle:version="2.0.0+1011"
+                sparkle:dsaSignature="MDwCHBqbqMmpx3gRd4GqgxIjk1mPgMYq+/n+Xf0aQB8CHBgXdamx10xd8H7LUMG73W9vzJYpkTf9iyxXxQM=" length="0"
+				sparkle:version="2.0.3+1029"
 				sparkle:os="windows"
 				type="application/octet-stream" />
 		</item>
