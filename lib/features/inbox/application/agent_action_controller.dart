@@ -749,7 +749,6 @@ class AgentActionController extends _$AgentActionController {
 
         // MCP 함수 호출 감지 및 실행
         // 재귀 호출에서는 함수 호출을 파싱하지 않음 (무한 루프 방지)
-        print('[AgentAction] Starting function call parsing - isRecursiveCall: $isRecursiveCall, aiMessage.length: ${aiMessage.length}');
 
         // 함수 호출 태그 제거 (재귀 호출에서도 함수 호출 태그만 있는지 확인하기 위해)
         String aiMessageWithoutFunctionCalls = aiMessage;
@@ -834,15 +833,8 @@ class AgentActionController extends _$AgentActionController {
         // 앞뒤 공백 제거
         aiMessageWithoutFunctionCalls = aiMessageWithoutFunctionCalls.trim();
 
-        print(
-          '[AgentAction] After function call tag removal - aiMessage.length: ${aiMessage.length}, aiMessageWithoutFunctionCalls.length: ${aiMessageWithoutFunctionCalls.length}',
-        );
-
         final executor = McpFunctionExecutor();
         final allFunctionCalls = isRecursiveCall ? <Map<String, dynamic>>[] : executor.parseFunctionCalls(aiMessage);
-        print(
-          '[AgentAction] Parsed function calls - allFunctionCalls.length: ${allFunctionCalls.length}, aiMessageWithoutFunctionCalls.length: ${aiMessageWithoutFunctionCalls.length}',
-        );
 
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
@@ -873,11 +865,7 @@ class AgentActionController extends _$AgentActionController {
           }
         }
 
-        print(
-          '[AgentAction] After function call filtering - functionCalls.length: ${functionCalls.length}, aiMessageWithoutFunctionCalls.length: ${aiMessageWithoutFunctionCalls.length}',
-        );
         if (functionCalls.isNotEmpty) {
-          print('[AgentAction] Entering function execution block - functionCalls.length: ${functionCalls.length}');
           // 여러 개의 함수 호출이 감지되면 순차적으로 실행
           // availableInboxes는 state.availableInboxes를 우선 사용하고, 없으면 state.inbox, 그래도 없으면 전달받은 inboxes 사용
           final availableInboxes = state.availableInboxes?.isNotEmpty == true ? state.availableInboxes : (state.inbox != null ? [state.inbox!] : inboxes);
@@ -914,9 +902,7 @@ class AgentActionController extends _$AgentActionController {
           }
 
           // 검색 함수를 먼저 처리 (silent 실행)
-          print('[AgentAction] Checking search functions - searchFunctionCalls.length: ${searchFunctionCalls.length}, isRecursiveCall: $isRecursiveCall');
           if (searchFunctionCalls.isNotEmpty && !isRecursiveCall) {
-            print('[AgentAction] Executing search functions');
             String? searchContext;
 
             for (final searchCall in searchFunctionCalls) {
@@ -1082,7 +1068,6 @@ class AgentActionController extends _$AgentActionController {
               isRecursiveCall: true, // 재귀 호출 플래그 설정
               searchContext: searchContext, // 검색 결과 context 전달 (null이거나 비어있을 수 있음)
             );
-            print('[AgentAction] Recursive call completed, returning');
             return; // 재귀 호출에서 이미 state를 업데이트했으므로 종료
           }
 
@@ -1723,21 +1708,13 @@ class AgentActionController extends _$AgentActionController {
         } else {
           // 일반 응답
           // 재귀 호출에서는 함수 호출을 파싱하지 않으므로, 여기서는 일반 응답만 처리
-          print(
-            '[AgentAction] Entering else block (no function calls) - isRecursiveCall: $isRecursiveCall, aiMessage.length: ${aiMessage.length}, searchContext: ${searchContext != null ? "exists" : "null"}',
-          );
 
           // Check if aiMessage is empty after processing
           // 재귀 호출에서는 함수 호출 태그를 제거한 후 확인
           final messageToCheck = isRecursiveCall ? aiMessageWithoutFunctionCalls : aiMessage;
-          print(
-            '[AgentAction] Checking message - isRecursiveCall: $isRecursiveCall, messageToCheck.length: ${messageToCheck.length}, aiMessage.length: ${aiMessage.length}, aiMessageWithoutFunctionCalls.length: ${aiMessageWithoutFunctionCalls.length}',
-          );
           if (messageToCheck.isEmpty || messageToCheck.trim().isEmpty) {
-            print('[AgentAction] messageToCheck is empty - isRecursiveCall: $isRecursiveCall');
             // 재귀 호출에서 메시지가 비어있으면 searchContext를 사용하여 일반 응답 생성
             if (isRecursiveCall && searchContext != null) {
-              print('[AgentAction] Generating general response with searchContext in else block');
               // searchContext를 가지고 원래 사용자 요청을 다시 처리하여 자연어 응답 생성
               final me = ref.read(authControllerProvider).value;
               final userId = me?.id;
@@ -1789,7 +1766,6 @@ class AgentActionController extends _$AgentActionController {
 
               final aiResponse = response.fold(
                 (failure) {
-                  print('[AgentAction] generateGeneralChat failed: $failure');
                   // Show actual error message from failure
                   String errorContent = Utils.mainContext.tr.agent_action_error_occurred;
                   if (failure is Failure) {
@@ -1802,14 +1778,11 @@ class AgentActionController extends _$AgentActionController {
                   return [...messages, errorMessage];
                 },
                 (response) {
-                  print('[AgentAction] generateGeneralChat response: ${response != null ? "exists" : "null"}');
                   if (response != null && response['message'] != null) {
                     final generalResponse = response['message'] as String;
-                    print('[AgentAction] General response length: ${generalResponse.length}, isEmpty: ${generalResponse.trim().isEmpty}');
                     // Check if response is empty or null
                     if (generalResponse.isEmpty || generalResponse.trim().isEmpty) {
                       // Empty response - show error message
-                      print('[AgentAction] General response is empty');
                       final errorMessage = AgentActionMessage(role: 'assistant', content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: Empty response from AI');
                       return [...messages, errorMessage];
                     }
@@ -1892,59 +1865,21 @@ class AgentActionController extends _$AgentActionController {
                     }
 
                     if (cleanedResponse.isEmpty) {
-                      print('[AgentAction] General response contains only function calls, showing error message');
                       // 함수 호출만 반환된 경우, 사용자에게 더 나은 메시지 표시
                       final errorMessage = AgentActionMessage(role: 'assistant', content: '죄송합니다. 검색 결과를 바탕으로 답변을 생성하는 중에 문제가 발생했습니다. 다시 시도해주세요.');
                       return [...messages, errorMessage];
                     }
-                    print('[AgentAction] Creating assistant message with general response (cleaned length: ${cleanedResponse.length})');
                     final assistantMessage = AgentActionMessage(role: 'assistant', content: cleanedResponse);
                     return [...messages, assistantMessage];
                   } else {
                     // AI response is null or empty - show error message
-                    print('[AgentAction] Response is null or has no message');
                     final errorMessage = AgentActionMessage(role: 'assistant', content: '${Utils.mainContext.tr.agent_action_error_occurred}\n\nError: No response from AI');
                     return [...messages, errorMessage];
                   }
                 },
               );
 
-              print(
-                '[AgentAction] aiResponse.length: ${aiResponse.length}, roles: ${aiResponse.map((m) => m.role).join(", ")}, last message length: ${aiResponse.isNotEmpty ? aiResponse.last.content.length : 0}',
-              );
-              if (aiResponse.isNotEmpty) {
-                print(
-                  '[AgentAction] Last message content preview: ${aiResponse.last.content.substring(0, aiResponse.last.content.length > 200 ? 200 : aiResponse.last.content.length)}',
-                );
-                print('[AgentAction] Last message excludeFromHistory: ${aiResponse.last.excludeFromHistory}');
-              }
               await _updateState(messages: aiResponse, isLoading: false, taggedProjects: taggedProjects);
-              print('[AgentAction] State updated successfully in recursive call, final state.messages.length: ${state.messages.length}');
-              if (state.messages.isNotEmpty) {
-                print('[AgentAction] Final state last message length: ${state.messages.last.content.length}, excludeFromHistory: ${state.messages.last.excludeFromHistory}');
-                print(
-                  '[AgentAction] Final state last message content preview: ${state.messages.last.content.substring(0, state.messages.last.content.length > 200 ? 200 : state.messages.last.content.length)}',
-                );
-              }
-              return;
-
-              print(
-                '[AgentAction] aiResponse.length: ${aiResponse.length}, roles: ${aiResponse.map((m) => m.role).join(", ")}, last message length: ${aiResponse.isNotEmpty ? aiResponse.last.content.length : 0}',
-              );
-              if (aiResponse.isNotEmpty) {
-                print(
-                  '[AgentAction] Last message content preview: ${aiResponse.last.content.substring(0, aiResponse.last.content.length > 200 ? 200 : aiResponse.last.content.length)}',
-                );
-                print('[AgentAction] Last message excludeFromHistory: ${aiResponse.last.excludeFromHistory}');
-              }
-              await _updateState(messages: aiResponse, isLoading: false, taggedProjects: taggedProjects);
-              print('[AgentAction] State updated successfully in recursive call, final state.messages.length: ${state.messages.length}');
-              if (state.messages.isNotEmpty) {
-                print('[AgentAction] Final state last message length: ${state.messages.last.content.length}, excludeFromHistory: ${state.messages.last.excludeFromHistory}');
-                print(
-                  '[AgentAction] Final state last message content preview: ${state.messages.last.content.substring(0, state.messages.last.content.length > 200 ? 200 : state.messages.last.content.length)}',
-                );
-              }
               return;
             }
             // Empty response - show error message
