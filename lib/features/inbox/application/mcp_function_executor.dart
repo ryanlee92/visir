@@ -95,6 +95,7 @@ class McpFunctionExecutor {
       'responseCalendarInvitation',
       // 생성 (DB에 쓰는 작업)
       'createTask',
+      'createTaskFromInbox',
       'createEvent',
       'createProject',
       // 기타 데이터 변경 함수
