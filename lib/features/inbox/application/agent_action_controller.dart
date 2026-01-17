@@ -1511,6 +1511,7 @@ class AgentActionController extends _$AgentActionController {
               files: attachmentFilesFromResults?.isNotEmpty == true ? attachmentFilesFromResults : null,
             );
             updatedMessagesWithResponse = [...messages, assistantMessage];
+            print('DEBUG: Created assistant message. Total messages: ${updatedMessagesWithResponse.length}');
 
             // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
             if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
@@ -3695,8 +3696,11 @@ class AgentActionController extends _$AgentActionController {
 
   /// 챗 히스토리를 저장합니다 (로컬 + Supabase).
   Future<void> _saveChatHistory({List<ProjectEntity>? taggedProjects}) async {
+    print('DEBUG: _saveChatHistory called. Messages count: ${state.messages.length}');
+
     // 메시지가 비어있으면 저장하지 않음
     if (state.messages.isEmpty) {
+      print('DEBUG: Messages empty, skipping save');
       return;
     }
 
@@ -3733,7 +3737,10 @@ class AgentActionController extends _$AgentActionController {
     try {
       await _historyRepository.saveChatHistory(userId: me.id, history: history);
     } catch (e) {
-      // Supabase 저장 실패는 무시
+      // Supabase 저장 실패는 무시 (but log for debugging)
+      print('ERROR: Failed to save chat history: $e');
+      print('Session ID: $sessionId');
+      print('Messages count: ${state.messages.length}');
     }
   }
 }
