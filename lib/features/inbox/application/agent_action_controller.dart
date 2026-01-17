@@ -58,6 +58,9 @@ class AgentActionMessage {
   final List<TaskEntity>? deletedTasks; // 삭제된 task 정보 (confirm 후에도 preview 유지용)
   final List<EventEntity>? deletedEvents; // 삭제된 event 정보 (confirm 후에도 preview 유지용)
 
+  // Token optimization: limit conversation history to reduce context size
+  static const int maxHistoryMessages = 10;
+
   AgentActionMessage({required this.role, required this.content, this.excludeFromHistory = false, this.files, this.deletedTasks, this.deletedEvents});
 
   Map<String, dynamic> toJson({bool? local}) {
@@ -575,10 +578,12 @@ class AgentActionController extends _$AgentActionController {
       // 재귀 호출인 경우 conversation history의 마지막 user 메시지를 사용
       // conversation history에서 함수 실행 결과 메시지 제거 (excludeFromHistory 플래그 사용)
       // 룰베이스 제거: 함수 호출 태그나 JSON 배열 제거하지 않음
-      final filteredHistory = messages
-          .where((m) => !m.excludeFromHistory) // excludeFromHistory가 true인 메시지는 제외
-          .map((m) => m.toJson(local: true))
-          .toList();
+      // Token optimization: limit history to recent messages only
+      final filteredMessages = messages.where((m) => !m.excludeFromHistory).toList();
+      final limitedMessages = filteredMessages.length > AgentActionMessage.maxHistoryMessages
+          ? filteredMessages.sublist(filteredMessages.length - AgentActionMessage.maxHistoryMessages)
+          : filteredMessages;
+      final filteredHistory = limitedMessages.map((m) => m.toJson(local: true)).toList();
 
       // conversationSummary가 없으면 user message에도 conversation_title 요청 추가
       if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
@@ -1553,8 +1558,12 @@ class AgentActionController extends _$AgentActionController {
             final projects = ref.read(projectListControllerProvider);
             final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
 
-            // conversation history에서 함수 호출 메시지 제거
-            final filteredHistory = messages.where((m) => !m.excludeFromHistory).map((m) => m.toJson(local: true)).toList();
+            // Token optimization: limit history to recent messages only
+            final filteredMessages = messages.where((m) => !m.excludeFromHistory).toList();
+            final limitedMessages = filteredMessages.length > AgentActionMessage.maxHistoryMessages
+                ? filteredMessages.sublist(filteredMessages.length - AgentActionMessage.maxHistoryMessages)
+                : filteredMessages;
+            final filteredHistory = limitedMessages.map((m) => m.toJson(local: true)).toList();
 
             // channelContext를 문자열로 변환
             String? channelContextStr;

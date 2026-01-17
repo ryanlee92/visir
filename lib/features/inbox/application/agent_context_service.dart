@@ -10,8 +10,9 @@ import 'package:Visir/features/task/domain/entities/project_entity.dart';
 /// Optimized to reduce token usage while maintaining necessary information
 class AgentContextService {
   /// Maximum length for content snippets to avoid token bloat
-  static const int maxContentLength = 2000;
-  static const int maxFullContentLength = 8000;
+  /// Token optimization: reduced from 2000/8000 to be more aggressive
+  static const int maxContentLength = 1000;
+  static const int maxFullContentLength = 4000;
 
   /// Build context from inbox items
   /// [summaryOnly] - if true, only include title and snippet
@@ -128,7 +129,6 @@ class AgentContextService {
         buffer.writeln('End: ${task.endAt!.toIso8601String()}');
       }
       buffer.writeln('Status: ${task.status}');
-      buffer.writeln('Is All Day: ${task.isAllDay}');
       if (task.projectId != null) {
         buffer.writeln('Project ID: ${task.projectId}');
       }
@@ -196,10 +196,6 @@ class AgentContextService {
         buffer.writeln('Status: ${result['status']}');
       }
 
-      if (result['isAllDay'] != null) {
-        buffer.writeln('Is All Day: ${result['isAllDay']}');
-      }
-
       if (result['projectId'] != null) {
         buffer.writeln('Project ID: ${result['projectId']}');
       }
@@ -231,7 +227,6 @@ class AgentContextService {
       }
       buffer.writeln('Start: ${event.startDate.toIso8601String()}');
       buffer.writeln('End: ${event.endDate.toIso8601String()}');
-      buffer.writeln('Is All Day: ${event.isAllDay}');
       buffer.writeln('Calendar ID: ${event.calendar.uniqueId}');
       if (event.location != null && event.location!.isNotEmpty) {
         buffer.writeln('Location: ${event.location}');
@@ -287,10 +282,6 @@ class AgentContextService {
 
       if (result['location'] != null) {
         buffer.writeln('Location: ${result['location']}');
-      }
-
-      if (result['isAllDay'] != null) {
-        buffer.writeln('Is All Day: ${result['isAllDay']}');
       }
 
       if (result['calendarId'] != null) {

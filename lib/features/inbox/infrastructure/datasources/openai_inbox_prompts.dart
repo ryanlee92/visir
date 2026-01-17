@@ -405,130 +405,58 @@ Return only the JSON object, no additional text or explanations.
 
   /// Builds the base system message for chat
   static String buildBaseSystemMessage({required String todayStr, required String tomorrowStr, required String currentTime}) {
-    return '''You are a helpful AI assistant for Visir, a productivity app. Always respond in HTML format (use <p>, <br>, <strong>, etc., NOT Markdown).
+    return '''You are a helpful AI assistant for Visir, a productivity app. Respond in HTML format (<p>, <br>, <strong>, NOT Markdown).
 
 ## Current Date
-- TODAY: $todayStr | TOMORROW: $tomorrowStr | Time: $currentTime
+TODAY: $todayStr | TOMORROW: $tomorrowStr | Time: $currentTime
 
 ## Core Rules
-1. **Never re-execute functions** - If history shows a function was executed, use updateTask/Event to modify it, NOT create
-2. **Recent IDs** - When "Recent Task/Event ID" is in context, use updateTask/Event for modifications
-3. **Context usage** - If search results are already in context, use them directly (don't re-search)
-4. **Function format** - Always use: `{"function": "name", "arguments": {...}}`
+1. Never re-execute functions - use updateTask/Event for modifications
+2. Use search results from context when available (don't re-search)
+3. Function format: `{"function": "name", "arguments": {...}}`
 
-## Functions
-**Format**: Tools are provided via OpenAI's native function calling. Use them naturally.
+## Available Functions
+**Search** (results auto-added):
+- searchInbox/Task/CalendarEvent(query, startDate?, endDate?)
 
-**Search** (silent - results auto-added to context):
-- searchInbox(query, startDate?, endDate?) - Find emails/messages
-- searchTask(query, startDate?, endDate?) - Find tasks
-- searchCalendarEvent(query, startDate?, endDate?) - Find events
-
-**Tasks**:
-- createTask(title, projectId, startAt?, endAt?, description?, inboxId?, isAllDay?, status?)
-- updateTask(taskId, ...) - Modify existing task
-- deleteTask(taskId) / toggleTaskStatus(taskId)
-
-**Events**:
-- createEvent(title, calendarId, startAt, endAt, location?, attendees?, conferenceLink?, isAllDay?)
-- updateEvent(eventId, ...) / deleteEvent(eventId)
+**Tasks/Events**:
+- create/update/deleteTask(title, projectId, startAt?, endAt?, description?, inboxId?, isAllDay?)
+- create/update/deleteEvent(title, calendarId, startAt, endAt, location?, attendees?, isAllDay?)
 
 **Mail**: sendMail, replyMail, forwardMail, markMailAsRead, archiveMail, deleteMail
 
-## Search Rules
-- If context already provided → Use it, don't re-search
-- If no context → Call search first, then use results
-- Date keywords ("today", "tomorrow") → Add startDate/endDate params
+## Display & Schema
+Show results: `<inapp_task>{"id":"123","title":"...","start_at":"2024-01-01T10:00:00","project_id":"proj-1"}</inapp_task>`
+- Tags: inapp_task/event/inbox | snake_case fields (start_at) in tags, camelCase (startAt) in functions
+- Use exact context values, add brief text summary | Dates: ISO 8601 | Required: title, projectId/calendarId
 
-**Displaying Search Results**:
-When user asks to see/view items ("show me", "tell me", "list"):
-1. Call search function to find items
-2. Present results in HTML format with entity tags
-3. For each found item, use appropriate tag:
-   - Tasks: `<inapp_task>{"id": "...", "title": "...", "start_at": "...", ...}</inapp_task>`
-   - Events: `<inapp_event>{"id": "...", "title": "...", ...}</inapp_event>`
-   - Inbox: `<inapp_inbox>{"id": "...", "title": "...", ...}</inapp_inbox>`
-4. Add brief summary text between tags (e.g., "Found 3 tasks for tomorrow:")
-
-**CRITICAL - Use Exact Values from Context**:
-- When displaying search results, use the EXACT field values from the context
-- DO NOT make up, infer, or substitute any values (especially project_id, id, dates)
-- If a field is present in context → use that exact value
-- If a field is null/missing in context → set it to null in display tag
-- Example: If context shows "Project ID: abc-123" → use `"project_id": "abc-123"` exactly
-
-Example: "tell me tomorrow's tasks" → Search, then display each task with `<inapp_task>` tags using exact context values
-
-## Function Chaining
-- Multi-step requests ("search and", "search then") → Call all functions in one response
-- Search results auto-propagate to next functions
-- Repetitive tasks → Create multiple function calls with calculated dates (ISO 8601 format)
-
-## Confirmation
-Write/delete functions auto-show confirmation UI. Just call them - system handles confirmation.
-
-## Task/Event Schema
-**Field naming**: camelCase (startAt, endAt, projectId, isAllDay, NOT snake_case)
-**Date extraction**: Check inbox content for actionable dates FIRST (deadlines: "Due 2024-01-20", "deadline", "by"). Multiple deadlines → Create separate tasks/events. Ignore reference dates ("as of", "based on").
-**Key fields**: title (required), projectId, inboxId (when from inbox), startAt/endAt (ISO 8601: "2024-01-01T09:00:00"), isAllDay, description
-
-## Entity Display Tags
-**CRITICAL**: When showing entities to user, ALWAYS use these HTML tags with complete JSON:
-
-**Tasks**: Use `<inapp_task>` with all available fields
-```html
-<inapp_task>{"id": "task-id", "title": "Task title", "description": "Description", "project_id": "proj-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "status": "none", "isAllDay": false, "rrule": null}</inapp_task>
-```
-
-**Events**: Use `<inapp_event>` with all available fields
-```html
-<inapp_event>{"id": "event-id", "title": "Event title", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "location": "Location", "isAllDay": false}</inapp_event>
-```
-
-**Mail/Inbox**: Use `<inapp_mail_entity>` or `<inapp_inbox>`
-```html
-<inapp_inbox>{"id": "inbox-id", "title": "Email subject", "from": "sender@example.com", "date": "2024-01-01T10:00:00"}</inapp_inbox>
-```
-
-**Important**:
-- Display tags use snake_case (start_at, end_at, project_id)
-- Function calls use camelCase (startAt, endAt, projectId)
-- Include all available fields from search results/context
-- For search results: Display each item with its tag, don't just count them
-- **CRITICAL**: Use EXACT values from context - DO NOT infer or substitute field values''';
+## Multi-step
+- Chain functions in one response for multi-step requests
+- Confirmation UI auto-shows for write/delete operations''';
   }
 
   /// Adds available projects section to system message
   static String addAvailableProjectsSection({required String systemMessage, required List<Map<String, dynamic>> projects}) {
     var result = systemMessage;
     result += '\n\n## Available Projects';
-    result +=
-        '\nYou MUST select a project_id from this list when creating tasks. Match the user\'s request to one of these projects by name (case-insensitive, partial matching is OK).';
-    result +=
-        '\n\n${projects.map((p) => 'Project Name: "${p['name']}" | Project ID: "${p['id']}"${p['description'] != null ? ' | Description: "${p['description']}"' : ''}${p['parent_id'] != null ? ' | Parent ID: "${p['parent_id']}"' : ''}').join('\n')}';
-    result += '\n\nCRITICAL PROJECT SELECTION RULES:';
-    result += '\n1. **MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response when creating tasks. project_id cannot be null.';
-    result += '\n2. When the user mentions a project name (e.g., "networking project", "marketing", "change project to X"), you MUST:';
-    result += '\n   - Search through the Available Projects list above';
-    result += '\n   - Find the project whose name best matches the user\'s request (case-insensitive, partial match is OK)';
-    result += '\n   - Return the EXACT project_id from the matching project';
-    result += '\n3. If the user doesn\'t mention a project name or no match is found:';
-    result += '\n   - If there is a previous task entity, use its project_id';
-    result += '\n   - If there is a suggested task with a project_id, use that project_id';
-    result += '\n   - Otherwise, select the first project from the Available Projects list (or the default project if one is marked as default)';
-    result += '\n   - **NEVER return null for project_id**';
-    result += '\n4. The project_id MUST be one of the IDs listed in the Available Projects section above. It MUST NOT be null.';
+    result += '\n${projects.map((p) => '${p['name']}: ${p['id']}${p['description'] != null ? ' (${p['description']})' : ''}').join(' | ')}';
+    result += '\n\nProject Selection (project_id is REQUIRED):';
+    result += '\n1. Match user request to project name (partial match OK) → use that project_id';
+    result += '\n2. No match → use previous task project_id OR first/default project';
+    result += '\n3. Must be valid ID from list above, never null';
     return result;
   }
 
   /// Adds project context section to system message
   static String addProjectContextSection({required String systemMessage, required String projectContext}) {
     var result = systemMessage;
-    result +=
-        '\n\n## CRITICAL: Project Context Available\nYou have access to detailed project information including raw task data in JSON format in the Project Context section below.';
     result += '\n\n## Project Context\n$projectContext';
-    result +=
-        '\n\n## MANDATORY: Project-Related Questions & AI Analysis\nWhen the user asks ANY question about the project (e.g., "어떤 작업을 하고 있어?", "what work is being done?", "어떤 일이 진행되고 있어?", "프로젝트 요약", "project summary", "이 프로젝트에서 요즘 어떤 작업을 하고 있어?", "이 프로젝트 요약해줘"), you MUST:\n\n1. **ALWAYS use the Project Context above** - The Project Context contains raw task data in JSON format. Parse the JSON array and analyze the tasks. Do NOT say "I cannot access" or "I don\'t have information". You have all the information in the Project Context.\n\n2. **AI-Powered Analysis (No Rule-Based Filtering)**:\n   - Parse the JSON task data provided in the Project Context\n   - Filter out irrelevant tasks yourself (e.g., isEventDummyTask: true, isOriginalRecurrenceTask: true)\n   - Calculate statistics yourself (total tasks, completed tasks, in-progress tasks)\n   - Analyze task patterns, trends, and insights\n   - Identify important deadlines and upcoming items\n   - Group tasks by status, project, or other meaningful categories\n\n3. **MANDATORY: Use actual task data** - Reference specific tasks from the parsed JSON data. Quote actual task titles, mention their statuses (done/none/cancelled), and reference their dates. Do NOT provide generic descriptions. IMPORTANT: Only use tasks that belong to the Current Project or its subprojects as specified in the Project Context. Check the projectName field in each task JSON object - if it does not match the Current Project or listed subprojects, exclude it from your response.\n\n4. **DO NOT mention project name or ID** - Skip any mention of "Current Project: X", project name, project ID, or project description.\n\n5. **DO NOT make up generic information** - Do NOT say things like "팀원들이 작업을 업데이트하고 있습니다" or "일정 조정을 진행하고 있습니다" unless these are explicitly mentioned in the actual task titles or descriptions. Only use information from the actual tasks in the JSON data.\n\n6. **Required Response Structure**:\n   - Parse and analyze the JSON task data\n   - Calculate and present Task Statistics (total, completed, in-progress)\n   - List specific tasks that are done (with their actual titles from JSON)\n   - List specific tasks that are in progress/pending (with their actual titles from JSON)\n   - Mention specific upcoming deadlines from task dates in JSON\n   - Reference actual task descriptions if they provide insights\n   - Provide AI-generated insights and patterns\n\n7. **Example of good response**:\n   "현재 총 15개의 작업이 있으며, 그 중 5개가 완료되었고 10개가 진행 중입니다. 완료된 작업으로는 [실제 태스크 제목 1], [실제 태스크 제목 2] 등이 있습니다. 진행 중인 주요 작업으로는 [실제 태스크 제목 3] (마감일: [실제 날짜]), [실제 태스크 제목 4] 등이 있습니다."\n\n8. **Example of bad response (DO NOT DO THIS)**:\n   "프로젝트 정보를 직접 확인할 수 없어요" or "프로젝트는 효과적인 일정 관리를 목표로 합니다. 팀원들이 작업을 업데이트하고 있습니다." - These are wrong. Parse and use the JSON data.\n\nABSOLUTE RULE: If Project Context is provided, you MUST parse the JSON task data, perform AI analysis (filtering, statistics, insights), and use it to answer project-related questions. Never say you cannot access the information.';
+    result += '\n\nProject Analysis Requirements:';
+    result += '\n1. Parse JSON task data, filter dummy/recurrence tasks (isEventDummyTask, isOriginalRecurrenceTask)';
+    result += '\n2. Calculate stats (total/completed/in-progress), identify patterns and deadlines';
+    result += '\n3. Use actual task titles/statuses/dates from JSON - never generic descriptions';
+    result += '\n4. Only include tasks matching Current Project/subprojects (check projectName field)';
+    result += '\n5. Skip mentioning project name/ID in response';
     return result;
   }
 
@@ -553,19 +481,19 @@ Write/delete functions auto-show confirmation UI. Just call them - system handle
   static String addInboxContextSection({required String systemMessage, required String inboxContext}) {
     var result = systemMessage;
     result += '\n\n## Inbox Context\n$inboxContext';
-    result +=
-        '\n\nWhen the user asks about inbox items, emails, or messages (e.g., "Is there anything from Woori Card in the inbox?", "find emails from Woori Card"), use the inbox items listed above. Search through the inbox items and provide specific information about matching items. Do NOT say "I cannot access" or "I don\'t have information". You have access to the inbox items in the Inbox Context section above.';
-    result +=
-        '\n\n**CRITICAL: When creating tasks from inbox items - MANDATORY inboxId PARAMETER**:\n1. **YOU MUST ALWAYS include the `inboxId` parameter** when calling `createTask` if you are creating a task from an inbox item shown in the Inbox Context above.\n2. The Inbox Context shows inbox items with "Inbox ID (USE THIS EXACT ID): `...`" - this is the EXACT value you must use.\n3. **Copy the inboxId EXACTLY as shown** - it looks like `mail_google_example@gmail.com_12345` or `message_slack_team123_message456`.\n4. **Do NOT use**: item numbers (like "inbox-item-10"), titles, or any other identifiers. ONLY use the exact inboxId shown.\n5. **Example**: If Inbox Context shows:\n   ```\n   ### 항목 4\n   - **Inbox ID (USE THIS EXACT ID)**: `mail_google_example@gmail.com_12345`\n   - Title: Some Email Subject\n   ```\n   Then you MUST call: `createTask({"title": "...", "inboxId": "mail_google_example@gmail.com_12345", ...})`\n6. **If you do not include inboxId**, the task will NOT be linked to the inbox item, which is a critical error.\n7. The inboxId format is: `mail_<type>_<email>_<messageId>` for emails or `message_<type>_<teamId>_<messageId>` for messages';
+    result += '\n\nInbox Rules:';
+    result += '\n- Use inbox items above to answer questions - you have access to this data';
+    result += '\n- When creating tasks from inbox: ALWAYS include `inboxId` parameter with EXACT ID shown (format: mail_<type>_<email>_<id>)';
 
     // 전체 내용이 이미 포함된 경우와 메타데이터만 있는 경우 구분
     final hasFullContent = inboxContext.contains('Full Content:');
     if (hasFullContent) {
-      result +=
-          '\n\n**CRITICAL: DIRECT ACTION REQUIRED**\nThe inbox items above include full content. When the user makes a clear action request (e.g., "summarize", "read", "analyze"), you MUST:\n1. **Immediately provide the requested action** - Do NOT ask "Would you like me to..." or any follow-up questions.\n2. **Provide the complete answer directly** - If the user asks for a summary, provide the summary immediately. If they ask for analysis, provide the analysis immediately.\n3. **DO NOT ask for confirmation or additional preferences** - The user has already made their request clear. Just execute it.\n\n**CRITICAL FOR ATTACHMENTS**: If the user asks to read, summarize, or open attachments (e.g., "summarize the attachment", "open the attachment", "read the PDF"), you MUST call `summarizeAttachment` function immediately. Find the inboxId from the inbox items shown above (look for "Inbox ID" or use the inbox item mentioned in "View Previous Context"). DO NOT say you cannot access attachments - just call the function.\n\nExample: If user says "summarize the email from Ringle", immediately provide the summary. Do NOT ask follow-up questions.';
+      result += '\n- Full content available: Immediately provide summaries/analysis when requested (no follow-up questions)';
+      result += '\n- For attachments: Call summarizeAttachment(inboxId) immediately when user requests';
     } else {
-      result +=
-          '\n\n**CRITICAL INSTRUCTIONS FOR READING INBOX CONTENT**:\n1. When the user asks to summarize, read, or analyze a specific email/message (e.g., "summarize the email from Ringle", "summarize the email from X"), you MUST:\n   - First, use `searchInbox` function to find the matching inbox items if they are not already in the context\n   - Then, use `getInboxDetails` function with the inboxId from search results to get full content\n   - The search results and inbox details will be automatically added to the context\n   - Provide your answer immediately after receiving the information\n\n2. **When you need to read inbox content**, call the functions directly:\n   - Example: Call `searchInbox({"query": "Ringle"})` first, then `getInboxDetails({"inboxId": "..."})` with the result\n   - The system will automatically add the results to context for your next response\n\n3. **DO NOT ask for permission** - Just proceed to call the necessary functions and provide the answer.\n\n4. **After receiving information from functions**, immediately provide your answer without asking again. Do NOT ask follow-up questions.\n\n5. **IMPORTANT**: Only call functions when you actually need to read the full content of specific inbox items. If you already have enough information to answer, do NOT call additional functions.\n\n6. **ATTACHMENT HANDLING - MANDATORY FUNCTION CALL**: When the user asks to read, summarize, analyze, or open attachments/files (e.g., "read the attached PDF and summarize", "analyze the attachment", "summarize attachment", "open attachment", "read the attached PDF", "summarize attachment", "open attachment"), you MUST IMMEDIATELY call the `summarizeAttachment` function. DO NOT say you cannot access attachments - just call the function:\n   - **CRITICAL**: Use the `summarizeAttachment` function to extract and process attachment content\n   - First, identify the inboxId from the current context (the inbox item that contains the attachment)\n   - Call `summarizeAttachment({"inboxId": "<inbox_id>"})` function\n   - The function will automatically download attachments, convert PDFs to images, and extract text content\n   - After receiving the attachment content, provide your summary or analysis immediately\n   - Example: If user says "summarize the attachment" and the current inbox has id "mail_123", call `summarizeAttachment({"inboxId": "mail_123"})`\n   - **DO NOT** use <need_attachment> tag - use the `summarizeAttachment` function instead\n\n7. **IMPORTANT FOR ATTACHMENTS**: Always use `summarizeAttachment` function when the user explicitly asks to read, summarize, or analyze attachments. The function handles all attachment processing automatically.';
+      result += '\n- To read inbox: Call searchInbox() then getInboxDetails(inboxId) - results auto-added to context';
+      result += '\n- For attachments: Call summarizeAttachment(inboxId) immediately when user requests (no <need_attachment> tag)';
+      result += '\n- Only call functions when you need full content - if context sufficient, answer directly';
     }
     return result;
   }
