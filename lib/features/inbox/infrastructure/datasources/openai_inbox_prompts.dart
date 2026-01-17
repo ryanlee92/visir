@@ -440,6 +440,18 @@ Return only the JSON object, no additional text or explanations.
 - If no context → Call search first, then use results
 - Date keywords ("today", "오늘") → Add startDate/endDate params
 
+**Displaying Search Results**:
+When user asks to see/view items ("알려줘", "보여줘", "show me", "tell me"):
+1. Call search function to find items
+2. Present results in HTML format with entity tags
+3. For each found item, use appropriate tag:
+   - Tasks: `<inapp_task>{"id": "...", "title": "...", "start_at": "...", ...}</inapp_task>`
+   - Events: `<inapp_event>{"id": "...", "title": "...", ...}</inapp_event>`
+   - Inbox: `<inapp_inbox>{"id": "...", "title": "...", ...}</inapp_inbox>`
+4. Add brief summary text between tags (e.g., "Found 3 tasks for tomorrow:")
+
+Example: "내일 할일 알려줘" → Search, then display each task with `<inapp_task>` tags
+
 ## Function Chaining
 - Multi-step requests ("찾아서", "search then") → Call all functions in one response
 - Search results auto-propagate to next functions
@@ -454,12 +466,28 @@ Write/delete functions auto-show confirmation UI. Just call them - system handle
 **Key fields**: title (required), projectId, inboxId (when from inbox), startAt/endAt (ISO 8601: "2024-01-01T09:00:00"), isAllDay, description
 
 ## Entity Display Tags
-When showing entities (tasks/events/mail), use HTML tags with JSON:
-- Tasks: `<inapp_task>{"title": "...", "start_at": "...", ...}</inapp_task>`
-- Events: `<inapp_event>{...}</inapp_event>`
-- Mail: `<inapp_mail_entity>{...}</inapp_mail_entity>`
+**CRITICAL**: When showing entities to user, ALWAYS use these HTML tags with complete JSON:
 
-Note: Display tags use snake_case, but function calls use camelCase.''';
+**Tasks**: Use `<inapp_task>` with all available fields
+```html
+<inapp_task>{"id": "task-id", "title": "Task title", "description": "Description", "project_id": "proj-id", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "status": "none", "isAllDay": false, "rrule": null}</inapp_task>
+```
+
+**Events**: Use `<inapp_event>` with all available fields
+```html
+<inapp_event>{"id": "event-id", "title": "Event title", "start_at": "2024-01-01T10:00:00", "end_at": "2024-01-01T11:00:00", "location": "Location", "isAllDay": false}</inapp_event>
+```
+
+**Mail/Inbox**: Use `<inapp_mail_entity>` or `<inapp_inbox>`
+```html
+<inapp_inbox>{"id": "inbox-id", "title": "Email subject", "from": "sender@example.com", "date": "2024-01-01T10:00:00"}</inapp_inbox>
+```
+
+**Important**:
+- Display tags use snake_case (start_at, end_at, project_id)
+- Function calls use camelCase (startAt, endAt, projectId)
+- Include all available fields from search results/context
+- For search results: Display each item with its tag, don't just count them''';
   }
 
   /// Adds available projects section to system message
