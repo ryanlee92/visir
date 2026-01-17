@@ -83,20 +83,21 @@ class AgentContextService {
       buffer.writeln('ID: ${result['id']}');
       buffer.writeln('Title: ${result['title'] ?? 'N/A'}');
 
-      if (result['from'] != null) {
-        buffer.writeln('From: ${result['from']}');
+      // Note: search results use 'sender' and 'description', not 'from' and 'snippet'
+      if (result['sender'] != null) {
+        buffer.writeln('From: ${result['sender']}');
       }
 
-      if (result['snippet'] != null) {
-        final snippet = result['snippet'] as String;
-        final truncated = snippet.length > maxContentLength
-            ? '${snippet.substring(0, maxContentLength)}...'
-            : snippet;
+      if (result['description'] != null) {
+        final description = result['description'] as String;
+        final truncated = description.length > maxContentLength
+            ? '${description.substring(0, maxContentLength)}...'
+            : description;
         buffer.writeln('Snippet: $truncated');
       }
 
-      if (result['datetime'] != null) {
-        buffer.writeln('Date: ${result['datetime']}');
+      if (result['inboxDatetime'] != null) {
+        buffer.writeln('Date: ${result['inboxDatetime']}');
       }
     }
 
@@ -182,12 +183,13 @@ class AgentContextService {
         buffer.writeln('Description: $truncated');
       }
 
-      if (result['start_at'] != null) {
-        buffer.writeln('Start: ${result['start_at']}');
+      // Note: search results use camelCase (projectId, startAt, endAt), not snake_case
+      if (result['startAt'] != null) {
+        buffer.writeln('Start: ${result['startAt']}');
       }
 
-      if (result['end_at'] != null) {
-        buffer.writeln('End: ${result['end_at']}');
+      if (result['endAt'] != null) {
+        buffer.writeln('End: ${result['endAt']}');
       }
 
       if (result['status'] != null) {
@@ -198,8 +200,8 @@ class AgentContextService {
         buffer.writeln('Is All Day: ${result['isAllDay']}');
       }
 
-      if (result['project_id'] != null) {
-        buffer.writeln('Project ID: ${result['project_id']}');
+      if (result['projectId'] != null) {
+        buffer.writeln('Project ID: ${result['projectId']}');
       }
 
       if (result['rrule'] != null) {
@@ -274,12 +276,13 @@ class AgentContextService {
         buffer.writeln('Description: $truncated');
       }
 
-      if (result['start_at'] != null) {
-        buffer.writeln('Start: ${result['start_at']}');
+      // Note: search results use camelCase (startAt, endAt, calendarId), not snake_case
+      if (result['startAt'] != null || result['startDate'] != null) {
+        buffer.writeln('Start: ${result['startAt'] ?? result['startDate']}');
       }
 
-      if (result['end_at'] != null) {
-        buffer.writeln('End: ${result['end_at']}');
+      if (result['endAt'] != null || result['endDate'] != null) {
+        buffer.writeln('End: ${result['endAt'] ?? result['endDate']}');
       }
 
       if (result['location'] != null) {
@@ -290,8 +293,8 @@ class AgentContextService {
         buffer.writeln('Is All Day: ${result['isAllDay']}');
       }
 
-      if (result['calendar_id'] != null) {
-        buffer.writeln('Calendar ID: ${result['calendar_id']}');
+      if (result['calendarId'] != null) {
+        buffer.writeln('Calendar ID: ${result['calendarId']}');
       }
 
       if (result['rrule'] != null) {
@@ -302,8 +305,8 @@ class AgentContextService {
         buffer.writeln('Attendees: ${result['attendees']}');
       }
 
-      if (result['conference_link'] != null) {
-        buffer.writeln('Conference Link: ${result['conference_link']}');
+      if (result['conferenceLink'] != null) {
+        buffer.writeln('Conference Link: ${result['conferenceLink']}');
       }
     }
 
