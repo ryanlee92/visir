@@ -283,16 +283,16 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
 - Only extract and apply the specific changes requested by the user.
 - CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
   1. FIRST: Check the Inbox Item Information (Description section above) for **actionable dates/times** that should be used for the task/event:
-     - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20")
-     - **Meeting/Event times** (e.g., "Meeting on January 15th at 3pm", "회의 시간: 1월 15일 오후 3시")
-     - **Schedule dates** (e.g., "Schedule for next Monday", "일정: 내일")
-     - **Task completion dates** (e.g., "Complete by Friday", "완료 기한: 금요일")
-     - **DO NOT** use reference dates that are just mentioned for context (e.g., "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are just reference points, not deadlines)
+     - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th")
+     - **Meeting/Event times** (e.g., "Meeting on January 15th at 3pm", "Meeting time: January 15 3 PM")
+     - **Schedule dates** (e.g., "Schedule for next Monday", "Scheduled for: tomorrow")
+     - **Task completion dates** (e.g., "Complete by Friday", "Due: Friday")
+     - **DO NOT** use reference dates that are just mentioned for context (e.g., "as of 2025-12-31", "based on December 31st data" - these are just reference points, not deadlines)
   2. SECOND: Check the user's explicit request for dates/times
   3. THIRD: Use suggested task information if available
   4. LAST: Use default dates (today/tomorrow) only if no actionable dates are found in the inbox item or user request
-- CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "기준", "based on"). If the inbox item contains an actionable date/time (e.g., "Due date: 2024-01-20", "Meeting on January 15th at 3pm", "Deadline: tomorrow"), you MUST extract and use that date/time from the inbox item's content. Do NOT ignore actionable dates mentioned in the inbox item.
-- CRITICAL: If the user requests a date/time change (e.g., "tomorrow", "내일", "change date to X", "make it tomorrow", "I want to create task at tomorrow"), you MUST extract the new date and include it in start_at (LOCAL timezone format: YYYY-MM-DDTHH:mm:ss without Z suffix). Do NOT leave start_at as null or empty. Do NOT use the previous task's date.
+- CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "based on"). If the inbox item contains an actionable date/time (e.g., "Due date: 2024-01-20", "Meeting on January 15th at 3pm", "Deadline: tomorrow"), you MUST extract and use that date/time from the inbox item's content. Do NOT ignore actionable dates mentioned in the inbox item.
+- CRITICAL: If the user requests a date/time change (e.g., "tomorrow", "change date to X", "make it tomorrow", "I want to create task at tomorrow"), you MUST extract the new date and include it in start_at (LOCAL timezone format: YYYY-MM-DDTHH:mm:ss without Z suffix). Do NOT leave start_at as null or empty. Do NOT use the previous task's date.
 - CRITICAL PROJECT SELECTION: You MUST always include a project_id in your response. project_id cannot be null. If the user mentions a project name or requests a project change (e.g., "change project to X", "I want to change project to networking project", "set project to Y", "networking project"), you MUST:
   1. Look at the Available Projects section above
   2. Find the project whose name best matches the user's request (case-insensitive, partial matching is OK)
@@ -302,7 +302,7 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
 - CRITICAL DATE CALCULATION: 
   * TODAY's date is $finalTodayStr (see Current Date Information above)
   * TOMORROW's date is $finalTomorrowStr (see Current Date Information above)
-  * When the user says "tomorrow" or "내일", you MUST use TOMORROW's date ($finalTomorrowStr), NOT today's date ($finalTodayStr), and NOT the previous task's date.
+  * When the user says "tomorrow", you MUST use TOMORROW's date ($finalTomorrowStr), NOT today's date ($finalTodayStr), and NOT the previous task's date.
   * Example: If user says "tomorrow" or "I want to create task at tomorrow", set start_at to "${finalTomorrowStr}T00:00:00" (or the appropriate time based on previous task)
 - For example:
   - If user says "change title to X", only change the title, keep everything else the same.
@@ -313,7 +313,7 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
     * Set project_id in your response to that exact ID
     * Keep all other fields the same as the previous task
     * Example: If user says "networking project" and Available Projects shows "Project Name: 'Networking Project' | Project ID: 'abc-123'", then set project_id to "abc-123"
-  - If user says "change date to tomorrow" or "I want to create task at tomorrow" or "make it tomorrow" or "내일로 바꿔줘":
+  - If user says "change date to tomorrow" or "I want to create task at tomorrow" or "make it tomorrow" or "change to tomorrow":
     * Use TOMORROW's date: $finalTomorrowStr (NOT today: $finalTodayStr, NOT previous task date)
     * Set start_at to "${finalTomorrowStr}T00:00:00" (or the appropriate time if previous task had a specific time)
     * Keep the same time as the previous task, or use 00:00:00 if the previous task was all-day
@@ -322,21 +322,21 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
 - CRITICAL PROJECT SELECTION: Look at the Available Projects section above. You MUST always include a project_id in your response. If the user mentions a project name, find the matching project from the list and return its EXACT project_id. Match project names case-insensitively with partial matching. If no project is mentioned or no match is found, use the previous task's project_id, or the suggested task's project_id, or the first available project_id. NEVER use null for project_id.
 - CRITICAL DATE EXTRACTION PRIORITY: When extracting dates/times, follow this priority order:
   1. FIRST: Check the Inbox Item Information (Description section above) for **actionable dates/times** that should be used for the task/event:
-     - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th", "마감일: 2024-01-20")
-     - **Meeting/Event times** (e.g., "Meeting on January 15th at 3pm", "Event starts at 2:00 PM on Friday", "회의 시간: 1월 15일 오후 3시")
-     - **Schedule dates** (e.g., "Schedule for next Monday", "일정: 내일")
-     - **Task completion dates** (e.g., "Complete by Friday", "완료 기한: 금요일")
-     - **DO NOT** use reference dates that are just mentioned for context (e.g., "as of 2025-12-31", "2025-12-31 기준", "based on December 31st data" - these are just reference points, not deadlines)
+     - **Deadlines** (e.g., "Due date: 2024-01-20", "Deadline: tomorrow", "Submit by January 15th")
+     - **Meeting/Event times** (e.g., "Meeting on January 15th at 3pm", "Event starts at 2:00 PM on Friday", "Meeting time: January 15 3 PM")
+     - **Schedule dates** (e.g., "Schedule for next Monday", "Scheduled for: tomorrow")
+     - **Task completion dates** (e.g., "Complete by Friday", "Due: Friday")
+     - **DO NOT** use reference dates that are just mentioned for context (e.g., "as of 2025-12-31", "based on December 31st data" - these are just reference points, not deadlines)
   2. SECOND: Check the user's explicit request for dates/times (e.g., "create task for tomorrow", "make it next Monday")
   3. THIRD: Use suggested task information if available
   4. LAST: Use default dates (today/tomorrow) only if no actionable dates are found in the inbox item or user request
-- CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "기준", "based on"). Parse dates in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", etc.) and convert them to ISO 8601 format.
+- CRITICAL: Extract only **actionable dates** (deadlines, meeting times, schedules) from the inbox item's content. Ignore reference dates that are just mentioned for context (e.g., "as of", "based on"). Parse dates in various formats (e.g., "January 15th", "2024-01-15", "tomorrow", "next Monday", "3pm on Friday", etc.) and convert them to ISO 8601 format.
 - If the user mentions a specific date or time, extract it and include it in start_at (ISO 8601 format).
-- CRITICAL: If the user mentions a specific time (e.g., "9시", "9 o'clock", "9am", "오후 3시", "3pm"), you MUST include the time in start_at (format: YYYY-MM-DDTHH:mm:ss) and set isAllDay to false. If only a date is mentioned without time, you can set isAllDay to true or include 00:00:00 in start_at.
+- CRITICAL: If the user mentions a specific time (e.g., "9 o'clock", "9am", "3pm", "3:00 PM"), you MUST include the time in start_at (format: YYYY-MM-DDTHH:mm:ss) and set isAllDay to false. If only a date is mentioned without time, you can set isAllDay to true or include 00:00:00 in start_at.
 - ${suggestionSummary != null ? 'If the user requests to create the task "as is", "as suggested", "create as suggested", or similar phrases, use the suggested task\'s start_at, end_at, and isAllDay values from the Suggested Task Information section above.' : ''}
 - Keep the task title concise and action-oriented.
 - The description should include relevant details from the inbox item.
-- RECURRENCE (RRULE): If the user mentions recurring/repeating patterns (e.g., "every day", "weekly", "every Monday", "monthly", "repeat", "반복"), extract the recurrence rule and include it in rrule field as an RFC 5545 RRULE string.
+- RECURRENCE (RRULE): If the user mentions recurring/repeating patterns (e.g., "every day", "weekly", "every Monday", "monthly", "repeat", "recurring"), extract the recurrence rule and include it in rrule field as an RFC 5545 RRULE string.
   - Examples:
     * "every day" or "daily" → "FREQ=DAILY"
     * "every week" or "weekly" or "every Monday" → "FREQ=WEEKLY;BYDAY=MO"
@@ -355,7 +355,7 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
   - Examples of isConfirmed = true (ONLY when no changes are requested):
     * "yes", "ok", "create it", "go ahead", "confirm", "sounds good", "that's fine"
     * "create task as is", "create as is", "make it", "do it", "proceed", "let's do it"
-    * "이대로 만들어줘", "이대로 생성해줘", "이대로 해줘", "확인", "좋아"
+    * "create as shown", "generate as shown", "do it as shown", "confirm", "okay"
     * "create it as shown", "create this task", "go ahead and create"
   - CRITICAL: Set isConfirmed to false if ANY of the following is true:
     - A previous task entity exists AND the user is requesting ANY changes (e.g., "change date to tomorrow", "make it tomorrow", "change title to X", "modify the date", etc.)
@@ -367,7 +367,7 @@ ${hasPreviousTask ? '''- IMPORTANT: A previous task entity is provided above. Us
     * ALWAYS set isConfirmed to false when applying changes
     * The user must see the modified task and explicitly confirm it separately
     * Even if the user says "create" or "make" while requesting changes, isConfirmed MUST be false
-    * Only set isConfirmed to true when the user explicitly confirms the final modified version (e.g., "이대로 만들어줘", "create it as shown", "yes, create it")
+    * Only set isConfirmed to true when the user explicitly confirms the final modified version (e.g., "create it as shown", "yes, create it", "go ahead and create")
 - Generate a user-friendly message in HTML format that displays the task information in a structured way.
   - Always format the message using HTML with proper structure.
   - If isConfirmed is false and you need to display inbox item information, use the custom element format: <inapp_inbox>{JSON stringified inbox entity}</inapp_inbox>
@@ -438,10 +438,10 @@ Return only the JSON object, no additional text or explanations.
 ## Search Rules
 - If context already provided → Use it, don't re-search
 - If no context → Call search first, then use results
-- Date keywords ("today", "오늘") → Add startDate/endDate params
+- Date keywords ("today", "tomorrow") → Add startDate/endDate params
 
 **Displaying Search Results**:
-When user asks to see/view items ("알려줘", "보여줘", "show me", "tell me"):
+When user asks to see/view items ("show me", "tell me", "list"):
 1. Call search function to find items
 2. Present results in HTML format with entity tags
 3. For each found item, use appropriate tag:
@@ -457,10 +457,10 @@ When user asks to see/view items ("알려줘", "보여줘", "show me", "tell me"
 - If a field is null/missing in context → set it to null in display tag
 - Example: If context shows "Project ID: abc-123" → use `"project_id": "abc-123"` exactly
 
-Example: "내일 할일 알려줘" → Search, then display each task with `<inapp_task>` tags using exact context values
+Example: "tell me tomorrow's tasks" → Search, then display each task with `<inapp_task>` tags using exact context values
 
 ## Function Chaining
-- Multi-step requests ("찾아서", "search then") → Call all functions in one response
+- Multi-step requests ("search and", "search then") → Call all functions in one response
 - Search results auto-propagate to next functions
 - Repetitive tasks → Create multiple function calls with calculated dates (ISO 8601 format)
 
@@ -469,7 +469,7 @@ Write/delete functions auto-show confirmation UI. Just call them - system handle
 
 ## Task/Event Schema
 **Field naming**: camelCase (startAt, endAt, projectId, isAllDay, NOT snake_case)
-**Date extraction**: Check inbox content for actionable dates FIRST (deadlines: "Due 2024-01-20", "마감일", "까지"). Multiple deadlines → Create separate tasks/events. Ignore reference dates ("기준", "as of", "based on").
+**Date extraction**: Check inbox content for actionable dates FIRST (deadlines: "Due 2024-01-20", "deadline", "by"). Multiple deadlines → Create separate tasks/events. Ignore reference dates ("as of", "based on").
 **Key fields**: title (required), projectId, inboxId (when from inbox), startAt/endAt (ISO 8601: "2024-01-01T09:00:00"), isAllDay, description
 
 ## Entity Display Tags
@@ -554,7 +554,7 @@ Write/delete functions auto-show confirmation UI. Just call them - system handle
     var result = systemMessage;
     result += '\n\n## Inbox Context\n$inboxContext';
     result +=
-        '\n\nWhen the user asks about inbox items, emails, or messages (e.g., "인박스 중에 우리카드에서 온거 있어?", "Is there anything from Woori Card in the inbox?", "인박스에서 우리카드 메일 찾아줘"), use the inbox items listed above. Search through the inbox items and provide specific information about matching items. Do NOT say "I cannot access" or "I don\'t have information". You have access to the inbox items in the Inbox Context section above.';
+        '\n\nWhen the user asks about inbox items, emails, or messages (e.g., "Is there anything from Woori Card in the inbox?", "find emails from Woori Card"), use the inbox items listed above. Search through the inbox items and provide specific information about matching items. Do NOT say "I cannot access" or "I don\'t have information". You have access to the inbox items in the Inbox Context section above.';
     result +=
         '\n\n**CRITICAL: When creating tasks from inbox items - MANDATORY inboxId PARAMETER**:\n1. **YOU MUST ALWAYS include the `inboxId` parameter** when calling `createTask` if you are creating a task from an inbox item shown in the Inbox Context above.\n2. The Inbox Context shows inbox items with "Inbox ID (USE THIS EXACT ID): `...`" - this is the EXACT value you must use.\n3. **Copy the inboxId EXACTLY as shown** - it looks like `mail_google_example@gmail.com_12345` or `message_slack_team123_message456`.\n4. **Do NOT use**: item numbers (like "inbox-item-10"), titles, or any other identifiers. ONLY use the exact inboxId shown.\n5. **Example**: If Inbox Context shows:\n   ```\n   ### 항목 4\n   - **Inbox ID (USE THIS EXACT ID)**: `mail_google_example@gmail.com_12345`\n   - Title: Some Email Subject\n   ```\n   Then you MUST call: `createTask({"title": "...", "inboxId": "mail_google_example@gmail.com_12345", ...})`\n6. **If you do not include inboxId**, the task will NOT be linked to the inbox item, which is a critical error.\n7. The inboxId format is: `mail_<type>_<email>_<messageId>` for emails or `message_<type>_<teamId>_<messageId>` for messages';
 
@@ -562,10 +562,10 @@ Write/delete functions auto-show confirmation UI. Just call them - system handle
     final hasFullContent = inboxContext.contains('Full Content:');
     if (hasFullContent) {
       result +=
-          '\n\n**CRITICAL: DIRECT ACTION REQUIRED**\nThe inbox items above include full content. When the user makes a clear action request (e.g., "요약해줘", "summarize", "읽어줘", "read", "분석해줘", "analyze"), you MUST:\n1. **Immediately provide the requested action** - Do NOT ask "재정리해드릴까요?" or "Would you like me to..." or any follow-up questions.\n2. **Provide the complete answer directly** - If the user asks for a summary, provide the summary immediately. If they ask for analysis, provide the analysis immediately.\n3. **DO NOT ask for confirmation or additional preferences** - The user has already made their request clear. Just execute it.\n\n**CRITICAL FOR ATTACHMENTS**: If the user asks to read, summarize, or open attachments (e.g., "첨부파일 요약해줘", "첨부파일 열어서", "PDF 읽어서"), you MUST call `summarizeAttachment` function immediately. Find the inboxId from the inbox items shown above (look for "Inbox ID" or use the inbox item mentioned in "View Previous Context"). DO NOT say you cannot access attachments - just call the function.\n\nExample: If user says "링글에서 온 메일 요약해줘", immediately provide the summary. Do NOT say "원하시면 재정리해드릴까요?" or similar questions.';
+          '\n\n**CRITICAL: DIRECT ACTION REQUIRED**\nThe inbox items above include full content. When the user makes a clear action request (e.g., "summarize", "read", "analyze"), you MUST:\n1. **Immediately provide the requested action** - Do NOT ask "Would you like me to..." or any follow-up questions.\n2. **Provide the complete answer directly** - If the user asks for a summary, provide the summary immediately. If they ask for analysis, provide the analysis immediately.\n3. **DO NOT ask for confirmation or additional preferences** - The user has already made their request clear. Just execute it.\n\n**CRITICAL FOR ATTACHMENTS**: If the user asks to read, summarize, or open attachments (e.g., "summarize the attachment", "open the attachment", "read the PDF"), you MUST call `summarizeAttachment` function immediately. Find the inboxId from the inbox items shown above (look for "Inbox ID" or use the inbox item mentioned in "View Previous Context"). DO NOT say you cannot access attachments - just call the function.\n\nExample: If user says "summarize the email from Ringle", immediately provide the summary. Do NOT ask follow-up questions.';
     } else {
       result +=
-          '\n\n**CRITICAL INSTRUCTIONS FOR READING INBOX CONTENT**:\n1. When the user asks to summarize, read, or analyze a specific email/message (e.g., "링글에서 온 메일 요약해줘", "summarize the email from X"), you MUST:\n   - First, use `searchInbox` function to find the matching inbox items if they are not already in the context\n   - Then, use `getInboxDetails` function with the inboxId from search results to get full content\n   - The search results and inbox details will be automatically added to the context\n   - Provide your answer immediately after receiving the information\n\n2. **When you need to read inbox content**, call the functions directly:\n   - Example: Call `searchInbox({"query": "링글"})` first, then `getInboxDetails({"inboxId": "..."})` with the result\n   - The system will automatically add the results to context for your next response\n\n3. **DO NOT ask for permission** - Just proceed to call the necessary functions and provide the answer.\n\n4. **After receiving information from functions**, immediately provide your answer without asking again. Do NOT ask "재정리해드릴까요?" or similar follow-up questions.\n\n5. **IMPORTANT**: Only call functions when you actually need to read the full content of specific inbox items. If you already have enough information to answer, do NOT call additional functions.\n\n6. **ATTACHMENT HANDLING - MANDATORY FUNCTION CALL**: When the user asks to read, summarize, analyze, or open attachments/files (e.g., "PDF 읽어서 요약해줘", "첨부파일 분석해줘", "첨부파일 요약해줘", "첨부파일 열어서", "read the attached PDF", "summarize attachment", "open attachment"), you MUST IMMEDIATELY call the `summarizeAttachment` function. DO NOT say you cannot access attachments - just call the function:\n   - **CRITICAL**: Use the `summarizeAttachment` function to extract and process attachment content\n   - First, identify the inboxId from the current context (the inbox item that contains the attachment)\n   - Call `summarizeAttachment({"inboxId": "<inbox_id>"})` function\n   - The function will automatically download attachments, convert PDFs to images, and extract text content\n   - After receiving the attachment content, provide your summary or analysis immediately\n   - Example: If user says "첨부파일 요약해줘" and the current inbox has id "mail_123", call `summarizeAttachment({"inboxId": "mail_123"})`\n   - **DO NOT** use <need_attachment> tag - use the `summarizeAttachment` function instead\n\n7. **IMPORTANT FOR ATTACHMENTS**: Always use `summarizeAttachment` function when the user explicitly asks to read, summarize, or analyze attachments. The function handles all attachment processing automatically.';
+          '\n\n**CRITICAL INSTRUCTIONS FOR READING INBOX CONTENT**:\n1. When the user asks to summarize, read, or analyze a specific email/message (e.g., "summarize the email from Ringle", "summarize the email from X"), you MUST:\n   - First, use `searchInbox` function to find the matching inbox items if they are not already in the context\n   - Then, use `getInboxDetails` function with the inboxId from search results to get full content\n   - The search results and inbox details will be automatically added to the context\n   - Provide your answer immediately after receiving the information\n\n2. **When you need to read inbox content**, call the functions directly:\n   - Example: Call `searchInbox({"query": "Ringle"})` first, then `getInboxDetails({"inboxId": "..."})` with the result\n   - The system will automatically add the results to context for your next response\n\n3. **DO NOT ask for permission** - Just proceed to call the necessary functions and provide the answer.\n\n4. **After receiving information from functions**, immediately provide your answer without asking again. Do NOT ask follow-up questions.\n\n5. **IMPORTANT**: Only call functions when you actually need to read the full content of specific inbox items. If you already have enough information to answer, do NOT call additional functions.\n\n6. **ATTACHMENT HANDLING - MANDATORY FUNCTION CALL**: When the user asks to read, summarize, analyze, or open attachments/files (e.g., "read the attached PDF and summarize", "analyze the attachment", "summarize attachment", "open attachment", "read the attached PDF", "summarize attachment", "open attachment"), you MUST IMMEDIATELY call the `summarizeAttachment` function. DO NOT say you cannot access attachments - just call the function:\n   - **CRITICAL**: Use the `summarizeAttachment` function to extract and process attachment content\n   - First, identify the inboxId from the current context (the inbox item that contains the attachment)\n   - Call `summarizeAttachment({"inboxId": "<inbox_id>"})` function\n   - The function will automatically download attachments, convert PDFs to images, and extract text content\n   - After receiving the attachment content, provide your summary or analysis immediately\n   - Example: If user says "summarize the attachment" and the current inbox has id "mail_123", call `summarizeAttachment({"inboxId": "mail_123"})`\n   - **DO NOT** use <need_attachment> tag - use the `summarizeAttachment` function instead\n\n7. **IMPORTANT FOR ATTACHMENTS**: Always use `summarizeAttachment` function when the user explicitly asks to read, summarize, or analyze attachments. The function handles all attachment processing automatically.';
     }
     return result;
   }
@@ -700,26 +700,26 @@ Return only the JSON array, no additional text or explanations.
     String? threadId,
   }) {
     return '''
-다음 원본 메일에 대한 답장을 작성해주세요.
+Please compose a reply to the following original email.
 
-## 원본 메일 정보
-${threadId != null ? 'Thread ID: $threadId\n' : ''}제목: $originalSubject
-보낸 사람: $fromName <$fromEmail>
-본문:
+## Original Email Information
+${threadId != null ? 'Thread ID: $threadId\n' : ''}Subject: $originalSubject
+From: $fromName <$fromEmail>
+Body:
 $originalSnippet
 
-## 대화 히스토리
+## Conversation History
 $conversationText
 
-## 요구사항
-- 사용자의 요청에 맞는 자연스러운 답장을 작성해주세요.
-- HTML 형식으로 작성해주세요.
-- 적절한 인사말과 마무리 인사를 포함해주세요.
-- 원본 메일의 내용을 참고하여 맥락에 맞는 답장을 작성해주세요.
-- 불필요한 인용이나 반복을 피해주세요.
+## Requirements
+- Write a natural reply that matches the user's request.
+- Format the reply in HTML.
+- Include appropriate greetings and closing remarks.
+- Reference the original email content to ensure the reply is contextually appropriate.
+- Avoid unnecessary quotations or repetition.
 
-## 출력 형식
-HTML 형식의 메일 본문만 반환해주세요. 추가 설명이나 주석은 포함하지 마세요.
+## Output Format
+Return only the HTML-formatted email body. Do not include additional explanations or comments.
 ''';
   }
 
@@ -1309,7 +1309,7 @@ ${hasPreviousEventEntity ? '''- IMPORTANT: A previous event entity is provided a
 - Keep the event title concise and action-oriented.
 - The description should include relevant details from the inbox item.
 - LOCATION: If the user mentions a location (e.g., "at office", "in conference room", "서울시 강남구"), extract it and include it in the location field. If no location is mentioned, set location to null.
-- RECURRENCE (RRULE): If the user mentions recurring/repeating patterns (e.g., "every day", "weekly", "every Monday", "monthly", "repeat", "반복"), extract the recurrence rule and include it in rrule field as an RFC 5545 RRULE string.
+- RECURRENCE (RRULE): If the user mentions recurring/repeating patterns (e.g., "every day", "weekly", "every Monday", "monthly", "repeat", "recurring"), extract the recurrence rule and include it in rrule field as an RFC 5545 RRULE string.
   - Examples:
     * "every day" or "daily" → "FREQ=DAILY"
     * "every week" or "weekly" or "every Monday" → "FREQ=WEEKLY;BYDAY=MO"
@@ -1370,7 +1370,7 @@ ${hasPreviousEventEntity ? '''- IMPORTANT: A previous event entity is provided a
   - Examples of isConfirmed = true (ONLY when no changes are requested):
     * "yes", "ok", "create it", "go ahead", "confirm", "sounds good", "that's fine"
     * "create event as is", "create as is", "make it", "do it", "proceed", "let's do it"
-    * "이대로 만들어줘", "이대로 생성해줘", "이대로 해줘", "확인", "좋아"
+    * "create as shown", "generate as shown", "do it as shown", "confirm", "okay"
     * "create it as shown", "create this event", "go ahead and create"
   - CRITICAL: Set isConfirmed to false if ANY of the following is true:
     - A previous event entity exists AND the user is requesting ANY changes (e.g., "change date to tomorrow", "make it tomorrow", "change title to X", "modify the date", "add video call", "remove conference", etc.)
@@ -1382,7 +1382,7 @@ ${hasPreviousEventEntity ? '''- IMPORTANT: A previous event entity is provided a
     * ALWAYS set isConfirmed to false when applying changes
     * The user must see the modified event and explicitly confirm it separately
     * Even if the user says "create" or "make" while requesting changes, isConfirmed MUST be false
-    * Only set isConfirmed to true when the user explicitly confirms the final modified version (e.g., "이대로 만들어줘", "create it as shown", "yes, create it")
+    * Only set isConfirmed to true when the user explicitly confirms the final modified version (e.g., "create it as shown", "yes, create it", "go ahead and create")
 - Generate a user-friendly message in HTML format that displays the event information in a structured way.
   - Always format the message using HTML with proper structure.
   - If isConfirmed is false and you need to display inbox item information, use the custom element format: <inapp_inbox>{JSON stringified inbox entity}</inapp_inbox>
