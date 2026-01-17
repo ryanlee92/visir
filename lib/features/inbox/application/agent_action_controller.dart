@@ -8,7 +8,6 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
 import 'package:Visir/features/calendar/application/calendar_event_list_controller.dart';
-import 'package:Visir/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:Visir/features/calendar/domain/entities/event_entity.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
@@ -16,12 +15,12 @@ import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/domain/entities/agent_model_entity.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_entity.dart';
 import 'package:Visir/features/inbox/application/mcp_function_executor.dart';
+import 'package:Visir/features/inbox/application/agent_context_service.dart';
 import 'package:Visir/features/inbox/infrastructure/repositories/inbox_repository.dart';
 import 'package:Visir/features/inbox/infrastructure/repositories/agent_chat_history_repository.dart';
 import 'package:Visir/features/inbox/domain/entities/agent_chat_history_entity.dart';
 import 'package:Visir/features/inbox/presentation/widgets/inbox_action_suggestions_widget.dart';
 import 'package:Visir/features/inbox/providers.dart';
-import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
 import 'package:Visir/features/task/application/project_list_controller.dart';
@@ -209,6 +208,7 @@ class AgentActionState {
 class AgentActionController extends _$AgentActionController {
   late InboxRepository _repository;
   late AgentChatHistoryRepository _historyRepository;
+  final _contextService = AgentContextService();
 
   // deleteTask의 경우 함수 실행 전에 추출한 task 정보를 저장 (confirm 후에도 preview 유지용)
   final Map<String, List<TaskEntity>> _deletedTasksCache = {};
@@ -328,7 +328,7 @@ class AgentActionController extends _$AgentActionController {
     }
 
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
-    final messageWithTags = _buildMessageWithTaggedItems(
+    final messageWithTags = _contextService.buildMessageWithTaggedItems(
       userMessage: userMessage,
       taggedTasks: taggedTasks,
       taggedEvents: taggedEvents,
@@ -466,7 +466,7 @@ class AgentActionController extends _$AgentActionController {
 
       // 명시적으로 태그된 항목이 있는 경우에만 context 추가 (사용자가 직접 선택한 경우)
       if (taggedTasks != null && taggedTasks.isNotEmpty || taggedEvents != null && taggedEvents.isNotEmpty || taggedConnections != null && taggedConnections.isNotEmpty) {
-        taggedContext = _buildTaggedContext(taggedTasks: taggedTasks, taggedEvents: taggedEvents, taggedConnections: taggedConnections);
+        taggedContext = _contextService.buildTaggedContext(taggedTasks: taggedTasks, taggedEvents: taggedEvents, taggedConnections: taggedConnections);
       }
 
       // 명시적으로 태그된 채널이 있는 경우에만 context 추가
@@ -480,7 +480,7 @@ class AgentActionController extends _$AgentActionController {
       if (inboxes != null && inboxes.isNotEmpty) {
         final requestedNumbers = state.loadedInboxNumbers;
         final summaryOnly = requestedNumbers.isEmpty;
-        inboxContext = await _buildInboxContext(inboxes, summaryOnly: summaryOnly, requestedInboxNumbers: requestedNumbers, includeAttachmentInfo: true);
+        inboxContext = _contextService.buildInboxContext(inboxes, summaryOnly: summaryOnly, requestedInboxNumbers: requestedNumbers);
       }
 
       // 검색 결과 context가 있으면 inboxContext에 병합
@@ -557,56 +557,11 @@ class AgentActionController extends _$AgentActionController {
       String systemPrompt = systemPromptProvider is String ? systemPromptProvider : '';
 
       // 최근 생성/수정된 taskId/eventId를 system prompt에 추가 (AI가 참조할 수 있도록)
-      // IMPORTANT: state.recentTaskIds/recentEventIds를 직접 참조하여 최신 상태 사용
-      final currentState = state; // 최신 state 참조
-      if (currentState.recentTaskIds.isNotEmpty || currentState.recentEventIds.isNotEmpty) {
-        String contextInfo = '\n\n## CRITICAL: Recent Task/Event IDs (MUST USE THESE WHEN USER REQUESTS MODIFICATIONS):';
-        if (currentState.recentTaskIds.isNotEmpty) {
-          // 가장 최근 taskId를 명확히 표시
-          final mostRecentTaskId = currentState.recentTaskIds.last;
-          contextInfo += '\n- MOST RECENT task ID: $mostRecentTaskId (use this EXACT one!)';
-          if (currentState.recentTaskIds.length > 1) {
-            contextInfo += '\n- All recent task IDs: ${currentState.recentTaskIds.join(', ')}';
-            contextInfo += '\n  The LAST one in the list ($mostRecentTaskId) is the MOST RECENT.';
-          }
-          contextInfo += '\n  These taskIds were JUST created/updated in this conversation.';
-          contextInfo += '\n  When user says "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", etc., you MUST use this EXACT taskId: $mostRecentTaskId';
-          contextInfo += '\n  DO NOT say "taskId가 보이지 않아서" or "taskId가 이 대화에 표시되어 있지 않아서" - the taskId is RIGHT HERE: $mostRecentTaskId';
-          contextInfo += '\n  DO NOT create a new task - use updateTask with taskId: $mostRecentTaskId';
-        }
-        if (currentState.recentEventIds.isNotEmpty) {
-          // 가장 최근 eventId를 명확히 표시
-          final mostRecentEventId = currentState.recentEventIds.last;
-          contextInfo += '\n- MOST RECENT event ID: $mostRecentEventId (use this EXACT one!)';
-          if (currentState.recentEventIds.length > 1) {
-            contextInfo += '\n- All recent event IDs: ${currentState.recentEventIds.join(', ')}';
-            contextInfo += '\n  The LAST one in the list ($mostRecentEventId) is the MOST RECENT.';
-          }
-          contextInfo += '\n  These eventIds were JUST created/updated in this conversation.';
-          contextInfo += '\n  When user requests to modify an event, use this EXACT eventId: $mostRecentEventId';
-          contextInfo += '\n  DO NOT say "eventId가 보이지 않아서" - the eventId is RIGHT HERE: $mostRecentEventId';
-          contextInfo += '\n  DO NOT create a new event - use updateEvent with eventId: $mostRecentEventId';
-        }
-        contextInfo += '\n\n## CRITICAL RULE: Understanding User Intent for Task/Event Actions';
-        contextInfo += '\nWhen recentTaskIds/recentEventIds are provided above, you MUST carefully analyze the user\'s request to determine their intent:';
-        contextInfo += '\n1. **MODIFICATION REQUEST** (use updateTask/updateEvent):';
-        contextInfo +=
-            '\n   - User wants to modify/change an EXISTING task/event (e.g., "이거 프로젝트로 바꿔줘", "change this to project X", "이거 visir 프로젝트로 변경해줘", "음.. 이거 visir 프로젝트로 옮겨줘", "이거 옮겨줘", "이거 바꿔줘", "이거 수정해줘")';
-        contextInfo += '\n   - User refers to a task/event that was JUST created (e.g., "방금 만든 거", "지금 만든 거", "이거")';
-        contextInfo += '\n   - **ACTION**: Use updateTask/updateEvent with the MOST RECENT taskId/eventId from above';
-        contextInfo += '\n   - **DO NOT** call createTask/createEvent - the task/event already exists';
-        contextInfo += '\n2. **NEW CREATION REQUEST** (use createTask/createEvent):';
-        contextInfo += '\n   - User explicitly asks to create a NEW task/event (e.g., "하나 더 만들어줘", "또 하나 생성해줘", "새로운 테스크 만들어줘", "create another one", "make one more")';
-        contextInfo += '\n   - User provides completely new task/event details that are different from the recent one';
-        contextInfo += '\n   - **ACTION**: Call createTask/createEvent with the new details';
-        contextInfo += '\n3. **KEY PRINCIPLE**: Base your decision on the USER\'S EXPLICIT REQUEST, not on whether recentTaskIds exists.';
-        contextInfo += '\n   - If user says "이거 바꿔줘" → use updateTask (modification)';
-        contextInfo += '\n   - If user says "하나 더 만들어줘" → use createTask (new creation)';
-        contextInfo += '\n   - If user says "이거 visir 프로젝트로 옮겨줘" → use updateTask (modification)';
-        contextInfo += '\n   - If user says "새로운 테스크 만들어줘" → use createTask (new creation)';
-        contextInfo += '\n4. **WHEN TO USE MOST RECENT ID**: Only when the user\'s request is clearly a MODIFICATION request.';
-        contextInfo += '\n5. **WHEN TO CREATE NEW**: Only when the user explicitly asks for a NEW task/event to be created.';
-        systemPrompt += contextInfo;
+      if (state.recentTaskIds.isNotEmpty || state.recentEventIds.isNotEmpty) {
+        systemPrompt += _contextService.buildRecentItemsContext(
+          recentTaskIds: state.recentTaskIds,
+          recentEventIds: state.recentEventIds,
+        );
       }
 
       // conversationSummary가 없으면 항상 제목 생성 요청 추가
@@ -624,33 +579,6 @@ class AgentActionController extends _$AgentActionController {
           .where((m) => !m.excludeFromHistory) // excludeFromHistory가 true인 메시지는 제외
           .map((m) => m.toJson(local: true))
           .toList();
-
-      // 최근 생성된 taskId/eventId를 user message에 추가하여 AI가 직접 참조할 수 있도록 함
-      // IMPORTANT: state.recentTaskIds/recentEventIds를 직접 참조하여 최신 상태 사용
-      // 파일 정보가 포함된 enhancedUserMessage를 유지하면서 contextSuffix만 추가
-      final latestState = state; // 최신 state 참조
-      if (latestState.recentTaskIds.isNotEmpty || latestState.recentEventIds.isNotEmpty) {
-        String contextSuffix = '';
-        if (latestState.recentTaskIds.isNotEmpty) {
-          // 가장 최근 taskId를 명확히 표시 (리스트의 마지막 항목)
-          final mostRecentTaskId = latestState.recentTaskIds.last;
-          contextSuffix +=
-              '\n\n[CRITICAL CONTEXT: The MOST RECENT task ID is: $mostRecentTaskId. This task was JUST created/updated in this conversation. Analyze the user\'s request carefully: 1) If user wants to MODIFY this task (e.g., "이거 visir 프로젝트로 변경해줘", "이거 프로젝트로 바꿔줘", "음.. 이거 visir 프로젝트로 옮겨줘", "이거 옮겨줘", "이거 바꿔줘"), use updateTask with taskId: $mostRecentTaskId. 2) If user explicitly asks to CREATE A NEW task (e.g., "하나 더 만들어줘", "또 하나 생성해줘", "새로운 테스크 만들어줘"), use createTask. Base your decision on the USER\'S EXPLICIT REQUEST, not on whether recentTaskIds exists. The taskId $mostRecentTaskId is available if you need to modify the existing task.]';
-          if (latestState.recentTaskIds.length > 1) {
-            contextSuffix += '\n[All recent task IDs: ${latestState.recentTaskIds.join(', ')}. The last one ($mostRecentTaskId) is the most recent.]';
-          }
-        }
-        if (latestState.recentEventIds.isNotEmpty) {
-          // 가장 최근 eventId를 명확히 표시 (리스트의 마지막 항목)
-          final mostRecentEventId = latestState.recentEventIds.last;
-          contextSuffix +=
-              '\n\n[CRITICAL CONTEXT: The MOST RECENT event ID is: $mostRecentEventId. When user requests to modify an event, you MUST use this EXACT eventId: $mostRecentEventId. DO NOT create a new event - use updateEvent with eventId: $mostRecentEventId. DO NOT say "eventId가 보이지 않아서" - the eventId is RIGHT HERE: $mostRecentEventId.]';
-          if (latestState.recentEventIds.length > 1) {
-            contextSuffix += '\n[All recent event IDs: ${latestState.recentEventIds.join(', ')}. The last one ($mostRecentEventId) is the most recent.]';
-          }
-        }
-        enhancedUserMessage = enhancedUserMessage + contextSuffix;
-      }
 
       // conversationSummary가 없으면 user message에도 conversation_title 요청 추가
       if (state.conversationSummary == null || state.conversationSummary!.isEmpty) {
@@ -948,7 +876,7 @@ class AgentActionController extends _$AgentActionController {
                 // 검색 결과를 context로 변환 (결과가 비어있어도 context 생성)
                 String? currentSearchContext;
                 if (functionName == 'searchInbox') {
-                  currentSearchContext = await _buildInboxContextFromSearchResults(searchResults);
+                  currentSearchContext = _contextService.buildInboxContextFromSearchResults(searchResults);
                   // 검색된 inbox를 availableInboxes에 추가
                   // 검색 결과는 inboxControllerProvider에 반영되어 있으므로, 거기서 찾아서 추가
                   if (searchResults.isNotEmpty) {
@@ -985,7 +913,7 @@ class AgentActionController extends _$AgentActionController {
                     }
                   }
                 } else if (functionName == 'searchTask') {
-                  currentSearchContext = _buildTaskContextFromSearchResults(searchResults);
+                  currentSearchContext = _contextService.buildTaskContextFromSearchResults(searchResults);
                   // 검색된 task를 taggedTasks에 추가
                   if (searchResults.isNotEmpty) {
                     final searchResultTasks = <TaskEntity>[];
@@ -1008,7 +936,7 @@ class AgentActionController extends _$AgentActionController {
                     }
                   }
                 } else if (functionName == 'searchCalendarEvent') {
-                  currentSearchContext = _buildEventContextFromSearchResults(searchResults);
+                  currentSearchContext = _contextService.buildEventContextFromSearchResults(searchResults);
                   // 검색된 event를 taggedEvents에 추가
                   if (searchResults.isNotEmpty) {
                     final searchResultEvents = <EventEntity>[];
@@ -1641,8 +1569,9 @@ class AgentActionController extends _$AgentActionController {
                 : userMessage;
 
             // 재귀 호출에서는 검색 결과가 이미 있으므로 systemPrompt 추가
+            // 검색 결과가 비어있을 때도 자연스럽게 응답하도록 지시
             final recursiveSystemPrompt = searchContext != null && searchContext.isNotEmpty
-                ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results.'
+                ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results. If the search results indicate that no items were found (e.g., "검색 결과: 해당 기간에 할일이 없습니다"), you MUST still provide a natural, friendly response to the user explaining that no items were found. Never return an empty response.'
                 : null;
 
             final response = await _repository.generateGeneralChat(
@@ -1745,8 +1674,9 @@ class AgentActionController extends _$AgentActionController {
                   : userMessage;
 
               // 재귀 호출에서는 검색 결과가 이미 있으므로 systemPrompt 추가
+              // 검색 결과가 비어있을 때도 자연스럽게 응답하도록 지시
               final recursiveSystemPrompt = searchContext != null && searchContext.isNotEmpty
-                  ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results.'
+                  ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results. If the search results indicate that no items were found (e.g., "검색 결과: 해당 기간에 할일이 없습니다"), you MUST still provide a natural, friendly response to the user explaining that no items were found. Never return an empty response.'
                   : null;
 
               final response = await _repository.generateGeneralChat(
@@ -2069,191 +1999,6 @@ class AgentActionController extends _$AgentActionController {
     return cleaned.trim();
   }
 
-  /// 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함합니다.
-  String _buildMessageWithTaggedItems({
-    required String userMessage,
-    List<TaskEntity>? taggedTasks,
-    List<EventEntity>? taggedEvents,
-    List<InboxEntity>? taggedInboxes,
-    List<ConnectionEntity>? taggedConnections,
-    List<MessageChannelEntity>? taggedChannels,
-    List<ProjectEntity>? taggedProjects,
-  }) {
-    // 사용자 메시지에서 @task:, @event:, @inbox: 형식의 태그 제거
-    // Include dot (.) in the pattern to match full IDs like message_slack_T88CZ5ZV4_1762838044.008519
-    String cleanedMessage = userMessage;
-    // Match \u200b@type:id\u200b format (from agentInputField) or @type:id format
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@task:[^\u200b]+\u200b'), '');
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@event:[^\u200b]+\u200b'), '');
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'\u200b@inbox:[^\u200b]+\u200b'), '');
-    // Also handle plain @type:id format (without \u200b) for backward compatibility
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@task:[a-zA-Z0-9\-_.]+'), '');
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@event:[a-zA-Z0-9\-_.]+'), '');
-    cleanedMessage = cleanedMessage.replaceAll(RegExp(r'@inbox:[a-zA-Z0-9\-_.]+'), '');
-    cleanedMessage = cleanedMessage.trim();
-
-    final buffer = StringBuffer();
-    buffer.write(cleanedMessage);
-
-    // 태그된 항목들을 HTML 태그로 추가
-    if (taggedTasks != null && taggedTasks.isNotEmpty) {
-      for (final task in taggedTasks) {
-        final taskJson = jsonEncode(task.toJson(local: true));
-        buffer.write('<tagged_task>$taskJson</tagged_task>');
-      }
-    }
-
-    if (taggedEvents != null && taggedEvents.isNotEmpty) {
-      for (final event in taggedEvents) {
-        final eventJson = jsonEncode({
-          'id': event.eventId,
-          'title': event.title,
-          'description': event.description,
-          'calendar_id': event.calendar.uniqueId,
-          'start_at': event.startDate.toIso8601String(),
-          'end_at': event.endDate.toIso8601String(),
-          'location': event.location,
-          'rrule': event.rrule?.toString(),
-          'attendees': event.attendees.map((a) => a.email).whereType<String>().toList(),
-          'conference_link': event.conferenceLink,
-          'isAllDay': event.isAllDay,
-        });
-        buffer.write('<tagged_event>$eventJson</tagged_event>');
-      }
-    }
-
-    if (taggedInboxes != null && taggedInboxes.isNotEmpty) {
-      for (final inbox in taggedInboxes) {
-        final inboxJson = jsonEncode(inbox.toJson());
-        buffer.write('<tagged_inbox>$inboxJson</tagged_inbox>');
-      }
-    }
-
-    if (taggedConnections != null && taggedConnections.isNotEmpty) {
-      for (final connection in taggedConnections) {
-        final connectionJson = jsonEncode({'name': connection.name, 'email': connection.email});
-        buffer.write('<tagged_connection>$connectionJson</tagged_connection>');
-      }
-    }
-
-    if (taggedChannels != null && taggedChannels.isNotEmpty) {
-      for (final channel in taggedChannels) {
-        final channelJson = jsonEncode({'id': channel.id, 'name': channel.name, 'teamId': channel.teamId});
-        buffer.write('<tagged_channel>$channelJson</tagged_channel>');
-      }
-    }
-
-    if (taggedProjects != null && taggedProjects.isNotEmpty) {
-      for (final project in taggedProjects) {
-        final projectJson = jsonEncode({'id': project.uniqueId, 'name': project.name});
-        buffer.write('<tagged_project>$projectJson</tagged_project>');
-      }
-    }
-
-    return buffer.toString();
-  }
-
-  /// 태그된 항목들을 컨텍스트 문자열로 변환합니다.
-  String _buildTaggedContext({
-    List<TaskEntity>? taggedTasks,
-    List<EventEntity>? taggedEvents,
-    List<ConnectionEntity>? taggedConnections,
-    List<MessageChannelEntity>? taggedChannels,
-    List<ProjectEntity>? taggedProjects,
-  }) {
-    final buffer = StringBuffer();
-
-    if (taggedTasks != null && taggedTasks.isNotEmpty) {
-      buffer.writeln('## Tagged Tasks');
-      for (final task in taggedTasks) {
-        buffer.writeln('- Task ID: ${task.id}');
-        buffer.writeln('  Title: ${task.title ?? 'Untitled'}');
-        if (task.description != null && task.description!.isNotEmpty) {
-          buffer.writeln('  Description: ${task.description}');
-        }
-        if (task.startAt != null) {
-          buffer.writeln('  Start: ${task.startAt}');
-        }
-        if (task.endAt != null) {
-          buffer.writeln('  End: ${task.endAt}');
-        }
-        buffer.writeln('  Status: ${task.status.name}');
-
-        // linkedMail 또는 linkedMessages가 있으면 inboxId 정보 제공
-        if (task.linkedMails.isNotEmpty) {
-          buffer.writeln('  Linked Mails:');
-          for (final mail in task.linkedMails) {
-            final inboxId = InboxEntity.getInboxIdFromLinkedMail(mail);
-            if (inboxId.isNotEmpty) {
-              buffer.writeln('    - Inbox ID: $inboxId');
-            }
-          }
-        }
-        if (task.linkedMessages.isNotEmpty) {
-          buffer.writeln('  Linked Messages:');
-          for (final message in task.linkedMessages) {
-            final inboxId = InboxEntity.getInboxIdFromLinkedChat(message);
-            if (inboxId.isNotEmpty) {
-              buffer.writeln('    - Inbox ID: $inboxId');
-            }
-          }
-        }
-
-        buffer.writeln('');
-      }
-    }
-
-    if (taggedEvents != null && taggedEvents.isNotEmpty) {
-      buffer.writeln('## Tagged Events');
-      for (final event in taggedEvents) {
-        buffer.writeln('- Event ID: ${event.eventId}');
-        buffer.writeln('  Title: ${event.title ?? 'Untitled'}');
-        if (event.description != null && event.description!.isNotEmpty) {
-          buffer.writeln('  Description: ${event.description}');
-        }
-        buffer.writeln('  Start: ${event.startDate}');
-        buffer.writeln('  End: ${event.endDate}');
-        if (event.location != null && event.location!.isNotEmpty) {
-          buffer.writeln('  Location: ${event.location}');
-        }
-        buffer.writeln('');
-      }
-    }
-
-    if (taggedConnections != null && taggedConnections.isNotEmpty) {
-      buffer.writeln('## Tagged Connections');
-      for (final connection in taggedConnections) {
-        buffer.writeln('- Name: ${connection.name ?? 'No name'}');
-        buffer.writeln('  Email: ${connection.email ?? 'No email'}');
-        buffer.writeln('');
-      }
-    }
-
-    if (taggedChannels != null && taggedChannels.isNotEmpty) {
-      buffer.writeln('## Tagged Channels');
-      for (final channel in taggedChannels) {
-        buffer.writeln('- Channel ID: ${channel.id}');
-        buffer.writeln('  Name: ${channel.name ?? 'No name'}');
-        buffer.writeln('  Team ID: ${channel.teamId}');
-        buffer.writeln('');
-      }
-    }
-
-    if (taggedProjects != null && taggedProjects.isNotEmpty) {
-      buffer.writeln('## Tagged Projects');
-      for (final project in taggedProjects) {
-        buffer.writeln('- Project ID: ${project.uniqueId}');
-        buffer.writeln('  Name: ${project.name}');
-        if (project.description != null && project.description!.isNotEmpty) {
-          buffer.writeln('  Description: ${project.description}');
-        }
-        buffer.writeln('');
-      }
-    }
-
-    return buffer.toString();
-  }
-
   /// 함수 호출 인자를 태그된 항목들로 자동 보강합니다.
   Map<String, dynamic> _enrichFunctionArgsWithTaggedItems({
     required String functionName,
@@ -2416,203 +2161,6 @@ class AgentActionController extends _$AgentActionController {
     return enrichedArgs;
   }
 
-  /// 검색 결과로부터 인박스 컨텍스트를 생성합니다.
-  Future<String> _buildInboxContextFromSearchResults(List<dynamic> searchResults) async {
-    final buffer = StringBuffer();
-    buffer.writeln('## Searched Inbox Items');
-    buffer.writeln('');
-
-    // 검색 결과가 없는 경우에도 context를 생성하여 AI에게 전달
-    if (searchResults.isEmpty) {
-      buffer.writeln('**검색 결과**: 해당 조건에 맞는 인박스 항목이 없습니다.');
-      buffer.writeln('');
-      buffer.writeln('사용자에게 인박스 항목이 없다는 것을 자연스럽게 알려주세요.');
-      return buffer.toString();
-    }
-
-    buffer.writeln('**CRITICAL: When creating tasks from these inbox items, you MUST use the exact "Inbox ID" shown below. Do NOT use item numbers or any other identifiers.**');
-    buffer.writeln('');
-
-    int itemIndex = 1;
-    for (final result in searchResults.take(20)) {
-      if (result is Map<String, dynamic>) {
-        final inboxId = result['id'] as String?;
-        if (inboxId == null) continue;
-
-        final title = result['title'] as String? ?? '';
-        final description = result['description'] as String? ?? '';
-        final sender = result['sender'] as String? ?? '';
-        final inboxDatetime = result['inboxDatetime'] as String?;
-        final sourceType = result['sourceType'] as String? ?? '';
-
-        buffer.writeln('### Item $itemIndex');
-        buffer.writeln('- **Inbox ID (USE THIS EXACT ID)**: `$inboxId`');
-        if (title.isNotEmpty) buffer.writeln('- **Title**: $title');
-        if (sender.isNotEmpty) buffer.writeln('- **Sender**: $sender');
-        if (sourceType.isNotEmpty) buffer.writeln('- **Source Type**: $sourceType');
-        if (inboxDatetime != null) {
-          try {
-            final dateTime = DateTime.parse(inboxDatetime);
-            buffer.writeln('- **Date/Time**: ${dateTime.toLocal().toString()}');
-          } catch (e) {
-            buffer.writeln('- **Date/Time**: $inboxDatetime');
-          }
-        }
-        if (description.isNotEmpty) {
-          // description 전체를 포함 (200자 제한 제거)
-          buffer.writeln('- **Description**:');
-          buffer.writeln('  $description');
-        }
-        buffer.writeln('');
-        itemIndex++;
-      }
-    }
-
-    buffer.writeln(
-      '**REMINDER: When calling createTask, use the exact Inbox ID shown above (e.g., `mail_google_example@gmail.com_12345`). Do NOT use "inbox-item-10" or item numbers.**',
-    );
-
-    return buffer.toString();
-  }
-
-  /// Builds task context from search results.
-  String _buildTaskContextFromSearchResults(List<dynamic> searchResults) {
-    final buffer = StringBuffer();
-    buffer.writeln('## Searched Tasks');
-    buffer.writeln('');
-
-    // 검색 결과가 없는 경우에도 context를 생성하여 AI에게 전달
-    if (searchResults.isEmpty) {
-      buffer.writeln('**검색 결과**: 해당 기간에 할일이 없습니다.');
-      buffer.writeln('');
-      buffer.writeln('사용자에게 할일이 없다는 것을 자연스럽게 알려주세요.');
-      return buffer.toString();
-    }
-
-    int itemIndex = 1;
-    for (final result in searchResults.take(20)) {
-      if (result is Map<String, dynamic>) {
-        final taskId = result['id'] as String?;
-        if (taskId == null) continue;
-
-        final title = result['title'] as String? ?? '';
-        final description = result['description'] as String? ?? '';
-        final status = result['status'] as String? ?? '';
-        final projectId = result['projectId'] as String?;
-        final startAt = result['startAt'] as String?;
-        final endAt = result['endAt'] as String?;
-        final isAllDay = result['isAllDay'] as bool? ?? false;
-
-        buffer.writeln('### Task $itemIndex');
-        buffer.writeln('- **Task ID**: `$taskId`');
-        if (title.isNotEmpty) buffer.writeln('- **Title**: $title');
-        if (status.isNotEmpty) buffer.writeln('- **Status**: $status');
-        if (projectId != null && projectId.isNotEmpty) {
-          buffer.writeln('- **Project ID**: $projectId');
-        }
-        if (startAt != null) {
-          try {
-            final dateTime = DateTime.parse(startAt);
-            buffer.writeln('- **Start At**: ${dateTime.toLocal().toString()}');
-          } catch (e) {
-            buffer.writeln('- **Start At**: $startAt');
-          }
-        }
-        if (endAt != null) {
-          try {
-            final dateTime = DateTime.parse(endAt);
-            buffer.writeln('- **End At**: ${dateTime.toLocal().toString()}');
-          } catch (e) {
-            buffer.writeln('- **End At**: $endAt');
-          }
-        }
-        buffer.writeln('- **Is All Day**: $isAllDay');
-        if (description.isNotEmpty) {
-          // description 전체를 포함 (200자 제한 제거)
-          buffer.writeln('- **Description**:');
-          buffer.writeln('  $description');
-        }
-        buffer.writeln('');
-        itemIndex++;
-      }
-    }
-
-    return buffer.toString();
-  }
-
-  /// Builds event context from search results.
-  String _buildEventContextFromSearchResults(List<dynamic> searchResults) {
-    final buffer = StringBuffer();
-    buffer.writeln('## Searched Events');
-    buffer.writeln('');
-
-    // 검색 결과가 없는 경우에도 context를 생성하여 AI에게 전달
-    if (searchResults.isEmpty) {
-      buffer.writeln('**검색 결과**: 해당 기간에 일정이 없습니다.');
-      buffer.writeln('');
-      buffer.writeln('사용자에게 일정이 없다는 것을 자연스럽게 알려주세요.');
-      return buffer.toString();
-    }
-
-    int itemIndex = 1;
-    for (final result in searchResults.take(20)) {
-      if (result is Map<String, dynamic>) {
-        final eventId = result['id'] as String?;
-        final uniqueId = result['uniqueId'] as String?;
-        if (eventId == null && uniqueId == null) continue;
-
-        final title = result['title'] as String? ?? '';
-        final description = result['description'] as String? ?? '';
-        final startDate = result['startDate'] as String?;
-        final endDate = result['endDate'] as String?;
-        final isAllDay = result['isAllDay'] as bool? ?? false;
-        final location = result['location'] as String?;
-        final calendarId = result['calendarId'] as String?;
-        final calendarName = result['calendarName'] as String?;
-
-        buffer.writeln('### Event $itemIndex');
-        if (eventId != null) buffer.writeln('- **Event ID**: `$eventId`');
-        if (uniqueId != null) buffer.writeln('- **Unique ID**: `$uniqueId`');
-        if (title.isNotEmpty) buffer.writeln('- **Title**: $title');
-        if (calendarName != null && calendarName.isNotEmpty) {
-          buffer.writeln('- **Calendar Name**: $calendarName');
-        }
-        if (calendarId != null && calendarId.isNotEmpty) {
-          buffer.writeln('- **Calendar ID**: $calendarId');
-        }
-        if (startDate != null) {
-          try {
-            final dateTime = DateTime.parse(startDate);
-            buffer.writeln('- **Start Date**: ${dateTime.toLocal().toString()}');
-          } catch (e) {
-            buffer.writeln('- **Start Date**: $startDate');
-          }
-        }
-        if (endDate != null) {
-          try {
-            final dateTime = DateTime.parse(endDate);
-            buffer.writeln('- **End Date**: ${dateTime.toLocal().toString()}');
-          } catch (e) {
-            buffer.writeln('- **End Date**: $endDate');
-          }
-        }
-        buffer.writeln('- **Is All Day**: $isAllDay');
-        if (location != null && location.isNotEmpty) {
-          buffer.writeln('- **Location**: $location');
-        }
-        if (description.isNotEmpty) {
-          // description 전체를 포함 (200자 제한 제거)
-          buffer.writeln('- **Description**:');
-          buffer.writeln('  $description');
-        }
-        buffer.writeln('');
-        itemIndex++;
-      }
-    }
-
-    return buffer.toString();
-  }
-
   /// 태그된 채널의 메시지를 컨텍스트로 제공합니다 (최근 3일).
   Future<String> _buildChannelContext(List<MessageChannelEntity> taggedChannels) async {
     final buffer = StringBuffer();
@@ -2708,206 +2256,6 @@ class AgentActionController extends _$AgentActionController {
 
   /// 인박스 목록을 컨텍스트로 제공합니다.
   /// [summaryOnly]: true면 제목, sender, 날짜만 보냄 (메타데이터만), false면 전체 내용 포함
-  /// [requestedInboxNumbers]: 전체 내용을 보낼 inbox 번호 목록 (1부터 시작)
-  /// [maxItems]: 최대 보낼 인박스 개수 (기본값: summaryOnly일 때 300, 아닐 때 50)
-  /// [includeAttachmentInfo]: 첨부 파일 정보를 포함할지 여부 (기본값: false, 사용자 요청이 있을 때만 true)
-  Future<String> _buildInboxContext(
-    List<InboxEntity> inboxes, {
-    bool summaryOnly = true,
-    Set<int> requestedInboxNumbers = const {},
-    int? maxItems,
-    bool includeAttachmentInfo = false,
-  }) async {
-    // summaryOnly일 때는 메타데이터만 보내므로 더 많이 보낼 수 있음
-    final defaultMaxItems = summaryOnly ? 300 : 50;
-    final effectiveMaxItems = maxItems ?? defaultMaxItems;
-    if (inboxes.isEmpty) return '';
-
-    final buffer = StringBuffer();
-    buffer.writeln('## Inbox Items');
-    if (summaryOnly && requestedInboxNumbers.isEmpty) {
-      buffer.writeln('The following inbox items (emails and messages) are available in the user\'s inbox.');
-      buffer.writeln('Each item shows only metadata (title, sender, date). To read the full content of a specific item, request it by its item number.');
-    } else {
-      buffer.writeln('The following inbox items (emails and messages) are available in the user\'s inbox:');
-    }
-    buffer.writeln('');
-
-    // 최대 effectiveMaxItems개만 포함
-    final limitedInboxes = inboxes.take(effectiveMaxItems).toList();
-
-    for (int i = 0; i < limitedInboxes.length; i++) {
-      final inbox = limitedInboxes[i];
-      final itemNumber = i + 1;
-      final shouldIncludeFullContent = requestedInboxNumbers.contains(itemNumber) || !summaryOnly;
-
-      buffer.writeln('### Inbox Item $itemNumber');
-      buffer.writeln('- Inbox ID: ${inbox.id}');
-
-      if (inbox.linkedMail != null) {
-        final mail = inbox.linkedMail!;
-        buffer.writeln('- Type: Email');
-        buffer.writeln('- From: ${mail.fromName}');
-        buffer.writeln('- Subject: ${inbox.title}');
-        buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
-        buffer.writeln('- Thread ID: ${mail.threadId}');
-        buffer.writeln('- Message ID: ${mail.messageId}');
-
-        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만, 사용자 요청이 있을 때만)
-        if (includeAttachmentInfo) {
-          try {
-            // 메일 첨부 파일 정보
-            final mailEntity = await _getMailEntityFromInbox(inbox);
-            if (mailEntity != null) {
-              final attachments = mailEntity.getAttachments();
-              if (attachments.isNotEmpty) {
-                buffer.writeln('- Attachments: ${attachments.length} file(s)');
-                for (final attachment in attachments) {
-                  final fileName = attachment.name;
-                  final mimeType = attachment.mimeType;
-                  String fileType = '';
-                  if (fileName.toLowerCase().endsWith('.pdf')) {
-                    fileType = ' (PDF)';
-                  } else if (mimeType.startsWith('image/')) {
-                    fileType = ' (Image)';
-                  } else if (mimeType.startsWith('video/')) {
-                    fileType = ' (Video)';
-                  } else if (mimeType.startsWith('text/')) {
-                    fileType = ' (Text)';
-                  }
-                  buffer.writeln('  - $fileName$fileType');
-                }
-              }
-            }
-          } catch (e) {
-            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
-          }
-        }
-      } else if (inbox.linkedMessage != null) {
-        final message = inbox.linkedMessage!;
-        buffer.writeln('- Type: Message');
-        buffer.writeln('- From: ${message.userName}');
-        buffer.writeln('- Channel: ${message.channelName}');
-        buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
-        buffer.writeln('- Message ID: ${message.messageId}');
-        buffer.writeln('- Thread ID: ${message.threadId}');
-        buffer.writeln('- Channel ID: ${message.channelId}');
-        buffer.writeln('- Team ID: ${message.teamId}');
-
-        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
-        if (includeAttachmentInfo) {
-          try {
-            // 메시지 첨부 파일 정보
-            final messageEntity = await _getMessageEntityFromInbox(inbox);
-            if (messageEntity != null) {
-              final files = messageEntity.files;
-              if (files.isNotEmpty) {
-                buffer.writeln('- Attachments: ${files.length} file(s)');
-                for (final file in files) {
-                  final fileName = file.name ?? 'unknown';
-                  final mimeType = file.slackFile?.mimetype ?? '';
-                  String fileType = '';
-                  if (fileName.toLowerCase().endsWith('.pdf')) {
-                    fileType = ' (PDF)';
-                  } else if (file.isImage) {
-                    fileType = ' (Image)';
-                  } else if (file.isVideo) {
-                    fileType = ' (Video)';
-                  } else if (file.isAudio) {
-                    fileType = ' (Audio)';
-                  } else if (mimeType.startsWith('text/')) {
-                    fileType = ' (Text)';
-                  }
-                  buffer.writeln('  - $fileName$fileType');
-                }
-              }
-            }
-          } catch (e) {
-            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
-          }
-        }
-
-        if (shouldIncludeFullContent) {
-          // 전체 내용 포함
-          if (inbox.description != null && inbox.description!.isNotEmpty) {
-            buffer.writeln('- Full Content:');
-            buffer.writeln(inbox.description!);
-          }
-        } else {
-          // 메타데이터만
-          if (inbox.description != null && inbox.description!.isNotEmpty) {
-            final snippet = inbox.description!.length > 100 ? '${inbox.description!.substring(0, 100)}...' : inbox.description!;
-            buffer.writeln('- Preview: $snippet');
-          }
-        }
-      } else if (inbox.linkedMessage != null) {
-        final message = inbox.linkedMessage!;
-        buffer.writeln('- Type: Message');
-        buffer.writeln('- From: ${message.userName}');
-        buffer.writeln('- Channel: ${message.channelName}');
-        buffer.writeln('- Date: ${inbox.inboxDatetime.toIso8601String()}');
-
-        // 첨부 파일 정보 추가 (includeAttachmentInfo가 true일 때만)
-        if (includeAttachmentInfo) {
-          try {
-            // 메시지 첨부 파일 정보
-            final messageEntity = await _getMessageEntityFromInbox(inbox);
-            if (messageEntity != null) {
-              final files = messageEntity.files;
-              if (files.isNotEmpty) {
-                buffer.writeln('- Attachments: ${files.length} file(s)');
-                for (final file in files) {
-                  final fileName = file.name ?? 'unknown';
-                  final mimeType = file.slackFile?.mimetype ?? '';
-                  String fileType = '';
-                  if (fileName.toLowerCase().endsWith('.pdf')) {
-                    fileType = ' (PDF)';
-                  } else if (file.isImage) {
-                    fileType = ' (Image)';
-                  } else if (file.isVideo) {
-                    fileType = ' (Video)';
-                  } else if (file.isAudio) {
-                    fileType = ' (Audio)';
-                  } else if (mimeType.startsWith('text/')) {
-                    fileType = ' (Text)';
-                  }
-                  buffer.writeln('  - $fileName$fileType');
-                }
-              }
-            }
-          } catch (e) {
-            // 첨부 파일 정보를 가져오는 데 실패해도 계속 진행
-          }
-        }
-
-        if (shouldIncludeFullContent) {
-          // 전체 내용 포함
-          if (inbox.description != null && inbox.description!.isNotEmpty) {
-            buffer.writeln('- Full Content:');
-            buffer.writeln(inbox.description!);
-          }
-        } else {
-          // 메타데이터만
-          if (inbox.description != null && inbox.description!.isNotEmpty) {
-            final snippet = inbox.description!.length > 100 ? '${inbox.description!.substring(0, 100)}...' : inbox.description!;
-            buffer.writeln('- Preview: $snippet');
-          }
-        }
-      }
-      buffer.writeln('');
-    }
-
-    if (inboxes.length > effectiveMaxItems) {
-      buffer.writeln('Note: Showing first $effectiveMaxItems items (out of ${inboxes.length} total inbox items).');
-    }
-
-    if (summaryOnly && requestedInboxNumbers.isEmpty) {
-      buffer.writeln('\nTo read the full content of any inbox item, specify its item number (e.g., "read inbox item 1" or "show me the full content of inbox item 5").');
-    }
-
-    return buffer.toString();
-  }
-
   /// InboxEntity에서 MailEntity를 가져옵니다.
   Future<MailEntity?> _getMailEntityFromInbox(InboxEntity inbox) async {
     if (inbox.linkedMail == null) return null;
@@ -3204,7 +2552,7 @@ class AgentActionController extends _$AgentActionController {
 
       // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
       final cleanMessage = cleanUserMessage.isNotEmpty ? cleanUserMessage : userMessage.replaceAll(RegExp(r'<function_call>.*?</function_call>', dotAll: true), '').trim();
-      final messageWithTags = _buildMessageWithTaggedItems(
+      final messageWithTags = _contextService.buildMessageWithTaggedItems(
         userMessage: cleanMessage,
         taggedTasks: updatedTaggedTasks,
         taggedEvents: updatedTaggedEvents,
@@ -3239,7 +2587,7 @@ class AgentActionController extends _$AgentActionController {
     }
 
     // 태그된 항목들을 HTML 태그로 감싸서 메시지에 포함
-    final messageWithTags = _buildMessageWithTaggedItems(
+    final messageWithTags = _contextService.buildMessageWithTaggedItems(
       userMessage: userMessage,
       taggedTasks: taggedTasks,
       taggedEvents: taggedEvents,
