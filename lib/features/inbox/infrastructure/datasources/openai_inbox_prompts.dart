@@ -450,7 +450,14 @@ When user asks to see/view items ("알려줘", "보여줘", "show me", "tell me"
    - Inbox: `<inapp_inbox>{"id": "...", "title": "...", ...}</inapp_inbox>`
 4. Add brief summary text between tags (e.g., "Found 3 tasks for tomorrow:")
 
-Example: "내일 할일 알려줘" → Search, then display each task with `<inapp_task>` tags
+**CRITICAL - Use Exact Values from Context**:
+- When displaying search results, use the EXACT field values from the context
+- DO NOT make up, infer, or substitute any values (especially project_id, id, dates)
+- If a field is present in context → use that exact value
+- If a field is null/missing in context → set it to null in display tag
+- Example: If context shows "Project ID: abc-123" → use `"project_id": "abc-123"` exactly
+
+Example: "내일 할일 알려줘" → Search, then display each task with `<inapp_task>` tags using exact context values
 
 ## Function Chaining
 - Multi-step requests ("찾아서", "search then") → Call all functions in one response
@@ -487,7 +494,8 @@ Write/delete functions auto-show confirmation UI. Just call them - system handle
 - Display tags use snake_case (start_at, end_at, project_id)
 - Function calls use camelCase (startAt, endAt, projectId)
 - Include all available fields from search results/context
-- For search results: Display each item with its tag, don't just count them''';
+- For search results: Display each item with its tag, don't just count them
+- **CRITICAL**: Use EXACT values from context - DO NOT infer or substitute field values''';
   }
 
   /// Adds available projects section to system message
