@@ -4,7 +4,7 @@ import 'package:Visir/features/inbox/domain/entities/agent_model_entity.dart';
 /// 
 /// 토큰 기반 비용 계산 및 크레딧 변환 유틸리티
 class AiPricingCalculator {
-  // Ultra Plan 기준: $10 = 500K 토큰 = 토큰당 $0.00002
+  // Ultra Plan 기준: $12 = 600K 토큰 = 토큰당 $0.00002 (Pro Plan 100K + $10 = 500K)
   static const double baseTokenPrice = 0.00002; // 토큰당 기본 가격 ($)
   
   // 크레딧 패키지별 프리미엄 (패키지별 차등 적용)
@@ -20,7 +20,8 @@ class AiPricingCalculator {
     'gpt-4.1-mini': 0.40,
     'gpt-4o-mini': 0.15,
     'gpt-5': 0.15, // 예상 가격
-    'gpt-5.1': 0.15,
+    'gpt-5.1': 1.25, // OpenAI 공식 가격
+    'gpt-5.2': 1.75, // OpenAI 공식 가격
     'gpt-5-mini': 0.10,
   };
 
@@ -28,7 +29,8 @@ class AiPricingCalculator {
     'gpt-4.1-mini': 1.60,
     'gpt-4o-mini': 0.60,
     'gpt-5': 0.60,
-    'gpt-5.1': 0.60,
+    'gpt-5.1': 10.00, // OpenAI 공식 가격
+    'gpt-5.2': 14.00, // OpenAI 공식 가격
     'gpt-5-mini': 0.40,
   };
 
@@ -64,7 +66,7 @@ class AiPricingCalculator {
   static double getInputTokenPrice(String provider, String model) {
     switch (provider.toLowerCase()) {
       case 'openai':
-        return openaiInputPrices[model] ?? openaiInputPrices['gpt-4o-mini']!;
+        return openaiInputPrices[model] ?? openaiInputPrices['gpt-5.2']!;
       case 'google':
         return googleInputPrices[model] ?? googleInputPrices['gemini-2.5-flash']!;
       case 'anthropic':
@@ -78,7 +80,7 @@ class AiPricingCalculator {
   static double getOutputTokenPrice(String provider, String model) {
     switch (provider.toLowerCase()) {
       case 'openai':
-        return openaiOutputPrices[model] ?? openaiOutputPrices['gpt-4o-mini']!;
+        return openaiOutputPrices[model] ?? openaiOutputPrices['gpt-5.2']!;
       case 'google':
         return googleOutputPrices[model] ?? googleOutputPrices['gemini-2.5-flash']!;
       case 'anthropic':
@@ -113,7 +115,7 @@ class AiPricingCalculator {
 
   /// 크레딧 비용 계산 (Visir 크레딧 단위)
   /// 
-  /// Ultra Plan 기준: $10 = 500K 토큰 = 토큰당 $0.00002
+  /// Ultra Plan 기준: $12 = 600K 토큰 = 토큰당 $0.00002 (Pro Plan 100K + $10 = 500K)
   /// 일회성 결제는 프리미엄 적용
   /// 
   /// [promptTokens] 입력 토큰 수
@@ -210,7 +212,10 @@ class AiPricingCalculator {
     return tokens;
   }
 
-  /// Ultra Plan 기본 제공량 (월간 500K 토큰)
-  static const int ultraPlanMonthlyTokens = 500000;
+  /// Ultra Plan 기본 제공량 (월간 600K 토큰 = Pro Plan 100K + $10에 해당하는 500K)
+  static const int ultraPlanMonthlyTokens = 600000;
+  
+  /// Pro Plan 기본 제공량 (월간 100K 토큰)
+  static const int proPlanMonthlyTokens = 100000;
 }
 

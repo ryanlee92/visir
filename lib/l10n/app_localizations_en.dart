@@ -2155,6 +2155,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscription_pro_next_schedule_summary => 'Next schedule summary';
 
   @override
+  String get subscription_pro_100k_ai_tokens =>
+      '100K AI tokens monthly for AI-powered summaries and insights';
+
+  @override
   String get subscription_all_features => 'All features';
 
   @override
@@ -2178,7 +2182,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscription_ultra_500k_ai_tokens =>
-      '500K AI tokens monthly for AI-based orders and summaries';
+      '500K additional AI tokens monthly';
 
   @override
   String get subscription_ultra_advanced_ai_features =>

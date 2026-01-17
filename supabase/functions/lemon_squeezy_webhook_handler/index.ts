@@ -253,8 +253,11 @@ serve(async (req) => {
 
   // Ultra Plan variant IDs (Test & Production)
   const ultraPlanVariantIds = ['1139396', '1139389']; // Test: 1139396, Production: 1139389
+  // Pro Plan variant IDs (Test & Production)
+  const proPlanVariantIds = ['915989', '921376', '881561', '921377']; // Monthly: Test: 915989, Production: 921376 | Yearly: Test: 881561, Production: 921377
   const variantId = payload.data?.attributes?.variant_id?.toString();
   const isUltraPlan = variantId && ultraPlanVariantIds.includes(variantId);
+  const isProPlan = variantId && proPlanVariantIds.includes(variantId);
   
   // 구독 상태 확인
   const subscriptionStatus = payload.data?.attributes?.status;
@@ -262,10 +265,12 @@ serve(async (req) => {
   const isSubscriptionCreated = eventName === 'subscription_created';
   const isSubscriptionUpdated = eventName === 'subscription_updated';
 
-  // Ultra Plan 구독 생성 또는 월간 갱신 시 500K 토큰 ($10 크레딧) 추가 여부 확인
+  // Ultra Plan 또는 Pro Plan 구독 생성 또는 월간 갱신 시 토큰 추가 여부 확인
   let shouldAddCredits = false;
+  let planType: 'ultra' | 'pro' | null = null;
   
   if (isUltraPlan && isActiveOrCreated) {
+    planType = 'ultra';
     if (isSubscriptionCreated) {
       // 구독 생성 시 항상 토큰 추가
       shouldAddCredits = true;
@@ -337,6 +342,81 @@ serve(async (req) => {
         }
       }
     }
+  } else if (isProPlan && isActiveOrCreated) {
+    planType = 'pro';
+    if (isSubscriptionCreated) {
+      // 구독 생성 시 항상 토큰 추가
+      shouldAddCredits = true;
+    } else if (isSubscriptionUpdated) {
+      // 구독 업데이트 시: 이전 구독 정보와 마지막 크레딧 추가 날짜를 가져와서 갱신 여부 확인
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("subscription, ai_credits_updated_at")
+        .eq("id", userId)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching user subscription:", userError);
+        // 에러가 나도 구독 정보는 업데이트해야 하므로 계속 진행
+      } else {
+        const oldSubscription = userData?.subscription;
+        const newRenewsAt = payload.data?.attributes?.renews_at;
+        const oldRenewsAt = oldSubscription?.attributes?.renews_at;
+        const lastCreditsAddedAt = userData?.ai_credits_updated_at;
+
+        // renews_at이 변경되었고, 새로운 갱신일이 이전 갱신일보다 미래인 경우
+        if (newRenewsAt && oldRenewsAt) {
+          const newRenewsDate = new Date(newRenewsAt);
+          const oldRenewsDate = new Date(oldRenewsAt);
+          
+          // Pro Plan의 경우 월간/연간 구독 모두 처리
+          // 월간: 25-35일 차이, 연간: 360-370일 차이
+          const daysDifference = (newRenewsDate.getTime() - oldRenewsDate.getTime()) / (1000 * 60 * 60 * 24);
+          
+          // 월간 갱신 (25-35일) 또는 연간 갱신 (360-370일)
+          if ((daysDifference >= 25 && daysDifference <= 35) || (daysDifference >= 360 && daysDifference <= 370)) {
+            // 중복 추가 방지: 새로운 renews_at의 년-월이 마지막 크레딧 추가 년-월과 다른 경우에만 추가
+            const newRenewsYearMonth = `${newRenewsDate.getFullYear()}-${String(newRenewsDate.getMonth() + 1).padStart(2, '0')}`;
+            
+            if (lastCreditsAddedAt) {
+              const lastAddedDate = new Date(lastCreditsAddedAt);
+              const lastAddedYearMonth = `${lastAddedDate.getFullYear()}-${String(lastAddedDate.getMonth() + 1).padStart(2, '0')}`;
+              
+              // 새로운 갱신 월이 마지막 추가 월과 다를 때만 추가
+              if (newRenewsYearMonth !== lastAddedYearMonth) {
+                shouldAddCredits = true;
+                console.log(`Pro Plan renewal detected. Old renews_at: ${oldRenewsAt}, New renews_at: ${newRenewsAt}, Days difference: ${daysDifference}, New month: ${newRenewsYearMonth}, Last added month: ${lastAddedYearMonth}`);
+              } else {
+                console.log(`Credits already added for this renewal month (${newRenewsYearMonth}). Skipping.`);
+              }
+            } else {
+              // 마지막 추가 날짜가 없으면 추가 (첫 구독)
+              shouldAddCredits = true;
+              console.log(`Pro Plan renewal detected (first time). New renews_at: ${newRenewsAt}`);
+            }
+          }
+        } else if (newRenewsAt && !oldRenewsAt) {
+          // 이전 갱신일이 없고 새로운 갱신일이 있으면 첫 구독 또는 재활성화
+          // 하지만 마지막 추가 날짜를 확인하여 중복 방지
+          if (lastCreditsAddedAt) {
+            const newRenewsDate = new Date(newRenewsAt);
+            const lastAddedDate = new Date(lastCreditsAddedAt);
+            const newRenewsYearMonth = `${newRenewsDate.getFullYear()}-${String(newRenewsDate.getMonth() + 1).padStart(2, '0')}`;
+            const lastAddedYearMonth = `${lastAddedDate.getFullYear()}-${String(lastAddedDate.getMonth() + 1).padStart(2, '0')}`;
+            
+            if (newRenewsYearMonth !== lastAddedYearMonth) {
+              shouldAddCredits = true;
+              console.log(`Pro Plan subscription reactivated. New renews_at: ${newRenewsAt}, New month: ${newRenewsYearMonth}, Last added month: ${lastAddedYearMonth}`);
+            } else {
+              console.log(`Credits already added for this month (${newRenewsYearMonth}). Skipping reactivation credits.`);
+            }
+          } else {
+            shouldAddCredits = true;
+            console.log(`First Pro Plan subscription or reactivation. New renews_at: ${newRenewsAt}`);
+          }
+        }
+      }
+    }
   }
 
   // 사용자 정보 업데이트
@@ -353,8 +433,8 @@ serve(async (req) => {
     return new Response("Failed to update user", { status: 500 });
   }
 
-  // Ultra Plan 구독 생성 또는 월간 갱신 시 500K 토큰 ($10 크레딧) 추가
-  if (shouldAddCredits) {
+  // Ultra Plan 또는 Pro Plan 구독 생성 또는 갱신 시 토큰 추가
+  if (shouldAddCredits && planType) {
     // 기존 크레딧 조회
     const { data: userData, error: userError } = await supabase
       .from("users")
@@ -368,8 +448,21 @@ serve(async (req) => {
     }
 
     const currentCredits = userData?.ai_credits || 0;
-    const ultraPlanCredits = 10.0; // 500K tokens = $10
-    const newCredits = currentCredits + ultraPlanCredits;
+    let planCredits: number;
+    let planTokens: number;
+    let planName: string;
+    
+    if (planType === 'ultra') {
+      planCredits = 12.0; // 600K tokens = $12 (Pro Plan 100K + $10 = 500K)
+      planTokens = 600000; // 600K tokens
+      planName = "Ultra Plan";
+    } else {
+      planCredits = 2.0; // 100K tokens = $2
+      planTokens = 100000; // 100K tokens
+      planName = "Pro Plan";
+    }
+    
+    const newCredits = currentCredits + planCredits;
 
     // 크레딧 업데이트
     const { error: creditsError } = await supabase
@@ -385,32 +478,31 @@ serve(async (req) => {
       return new Response("Failed to update credits", { status: 500 });
     }
 
-    const eventType = isSubscriptionCreated ? "subscription creation" : "monthly renewal";
-    console.log(`Added ${ultraPlanCredits} credits (500K tokens) for Ultra Plan ${eventType}. User: ${userId}, Variant: ${variantId}`);
+    const eventType = isSubscriptionCreated ? "subscription creation" : "renewal";
+    console.log(`Added ${planCredits} credits (${planTokens} tokens) for ${planName} ${eventType}. User: ${userId}, Variant: ${variantId}`);
     
-    // Ultra Plan 구독 크레딧 추가 로그 저장
-    const ultraPlanTokens = 500000; // 500K tokens
+    // 구독 크레딧 추가 로그 저장
     const { error: logError } = await supabase
       .from("ai_api_usage_logs")
       .insert({
         id: crypto.randomUUID(),
         user_id: userId,
         api_provider: "lemon_squeezy",
-        model: "ultra_plan",
+        model: planType === 'ultra' ? "ultra_plan" : "pro_plan",
         function_name: isSubscriptionCreated ? "subscription_created" : "subscription_renewal",
         prompt_tokens: 0,
         completion_tokens: 0,
-        total_tokens: ultraPlanTokens,
-        credits_used: ultraPlanCredits,
+        total_tokens: planTokens,
+        credits_used: planCredits,
         used_user_api_key: false,
         created_at: new Date().toISOString(),
       });
 
     if (logError) {
-      console.error("Error saving Ultra Plan credit log:", logError);
+      console.error(`Error saving ${planName} credit log:`, logError);
       // 로그 저장 실패해도 크레딧 추가는 성공했으므로 계속 진행
     } else {
-      console.log(`Saved Ultra Plan credit log for ${ultraPlanCredits} credits (${ultraPlanTokens} tokens)`);
+      console.log(`Saved ${planName} credit log for ${planCredits} credits (${planTokens} tokens)`);
     }
   }
 

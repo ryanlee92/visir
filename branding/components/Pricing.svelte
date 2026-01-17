@@ -39,6 +39,10 @@
             <div class="p-0.5 rounded-full bg-orange-500/10 text-orange-500 mt-0.5"><Icon name="CheckCircle2" size={16} /></div>
             <span>Smart schedule insights</span>
           </li>
+          <li class="flex items-start gap-3 text-visir-text font-light">
+            <div class="p-0.5 rounded-full bg-orange-500/10 text-orange-500 mt-0.5"><Icon name="CheckCircle2" size={16} /></div>
+            <span>100K AI tokens monthly for AI-powered summaries and insights</span>
+          </li>
         </ul>
       </div>
 
@@ -68,7 +72,7 @@
           </li>
           <li class="flex items-start gap-3 text-visir-text font-light">
             <div class="p-0.5 rounded-full bg-orange-500/10 text-orange-500 mt-0.5"><Icon name="CheckCircle2" size={16} /></div>
-            <span>500K AI tokens monthly for AI-powered summaries and insights</span>
+            <span>500K additional AI tokens monthly</span>
           </li>
           <li class="flex items-start gap-3 text-visir-text font-light">
             <div class="p-0.5 rounded-full bg-orange-500/10 text-orange-500 mt-0.5"><Icon name="CheckCircle2" size={16} /></div>

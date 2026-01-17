@@ -423,9 +423,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           // context.tr.subscription_ai_suggestion,
           context.tr.subscription_pro_ai_based_inbox_summary,
           context.tr.subscription_pro_next_schedule_summary,
+          context.tr.subscription_pro_100k_ai_tokens,
         ].mapIndexed(
           (index, e) => VisirListItem(
             verticalMarginOverride: 0,
+            titleMaxLines: 2,
             titleBuilder: (height, baseStyle, subStyle, horizontalSpacing) => TextSpan(
               children: [
                 WidgetSpan(

@@ -47,11 +47,18 @@ class AiCreditsService {
       (user) => user,
     );
 
-    // Ultra Plan 사용자의 경우 기본 제공량 확인
+    // Ultra Plan 또는 Pro Plan 사용자의 경우 기본 제공량 확인
     final isUltraPlan = _isUltraPlan(user);
+    final isProPlan = _isProPlan(user);
     if (isUltraPlan) {
       final monthlyUsage = await _usageLogDatasource.getMonthlyUsage(userId: userId);
       if (monthlyUsage < AiPricingCalculator.ultraPlanMonthlyTokens) {
+        // 기본 제공량 내에서 사용 중이면 크레딧 체크 스킵
+        return;
+      }
+    } else if (isProPlan) {
+      final monthlyUsage = await _usageLogDatasource.getMonthlyUsage(userId: userId);
+      if (monthlyUsage < AiPricingCalculator.proPlanMonthlyTokens) {
         // 기본 제공량 내에서 사용 중이면 크레딧 체크 스킵
         return;
       }
@@ -108,11 +115,34 @@ class AiCreditsService {
       return 0.0;
     }
 
-    // Ultra Plan 사용자의 경우 기본 제공량 확인
+    // Ultra Plan 또는 Pro Plan 사용자의 경우 기본 제공량 확인
     final isUltraPlan = _isUltraPlan(user);
+    final isProPlan = _isProPlan(user);
     if (isUltraPlan) {
       final monthlyUsage = await _usageLogDatasource.getMonthlyUsage(userId: userId);
       if (monthlyUsage < AiPricingCalculator.ultraPlanMonthlyTokens) {
+        // 기본 제공량 내에서 사용 중이면 크레딧 차감 없음
+        // 하지만 사용 로그는 기록해야 함
+        final creditsUsed = AiPricingCalculator.calculateCreditsCostFromModel(
+          promptTokens: tokenUsage.promptTokens,
+          completionTokens: tokenUsage.completionTokens,
+          model: model,
+        );
+        
+        await _saveUsageLog(
+          userId: userId,
+          model: model,
+          functionName: functionName,
+          tokenUsage: tokenUsage,
+          creditsUsed: creditsUsed,
+          usedUserApiKey: false,
+        );
+        
+        return 0.0;
+      }
+    } else if (isProPlan) {
+      final monthlyUsage = await _usageLogDatasource.getMonthlyUsage(userId: userId);
+      if (monthlyUsage < AiPricingCalculator.proPlanMonthlyTokens) {
         // 기본 제공량 내에서 사용 중이면 크레딧 차감 없음
         // 하지만 사용 로그는 기록해야 함
         final creditsUsed = AiPricingCalculator.calculateCreditsCostFromModel(
@@ -200,6 +230,31 @@ class AiCreditsService {
     
     // Ultra Plan은 "ultra" 키워드가 포함되어 있을 것으로 예상
     return productName.contains('ultra') || variantName.contains('ultra');
+  }
+
+  /// Pro Plan 여부 확인
+  bool _isProPlan(UserEntity user) {
+    final subscription = user.subscription;
+    if (subscription == null || subscription.isExpired) {
+      return false;
+    }
+
+    // Pro Plan variant IDs: Monthly (Test: 915989, Production: 921376), Yearly (Test: 881561, Production: 921377)
+    final proPlanVariantIds = ['915989', '921376', '881561', '921377'];
+    final variantId = subscription.attributes?.variantId?.toString();
+    
+    if (variantId != null && proPlanVariantIds.contains(variantId)) {
+      return true;
+    }
+    
+    // Fallback: productName이나 variantName으로 확인
+    final productName = subscription.subscriptionProductName.toLowerCase();
+    final variantName = subscription.attributes?.variantName?.toLowerCase() ?? '';
+    
+    // Pro Plan은 "pro" 키워드가 포함되어 있고 "ultra"가 아닌 경우
+    return (productName.contains('pro') || variantName.contains('pro')) && 
+           !productName.contains('ultra') && 
+           !variantName.contains('ultra');
   }
 
   /// 사용 로그 저장

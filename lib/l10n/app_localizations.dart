@@ -4126,6 +4126,12 @@ abstract class AppLocalizations {
   /// **'Next schedule summary'**
   String get subscription_pro_next_schedule_summary;
 
+  /// No description provided for @subscription_pro_100k_ai_tokens.
+  ///
+  /// In en, this message translates to:
+  /// **'100K AI tokens monthly for AI-powered summaries and insights'**
+  String get subscription_pro_100k_ai_tokens;
+
   /// No description provided for @subscription_all_features.
   ///
   /// In en, this message translates to:
@@ -4171,7 +4177,7 @@ abstract class AppLocalizations {
   /// No description provided for @subscription_ultra_500k_ai_tokens.
   ///
   /// In en, this message translates to:
-  /// **'500K AI tokens monthly for AI-based orders and summaries'**
+  /// **'500K additional AI tokens monthly'**
   String get subscription_ultra_500k_ai_tokens;
 
   /// No description provided for @subscription_ultra_advanced_ai_features.
