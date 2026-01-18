@@ -54,6 +54,7 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
   List<AiApiUsageLogEntity> _historyLogs = [];
   bool _isLoadingHistory = false;
   bool _hasMoreHistory = true;
+  bool _hasAttemptedInitialLoad = false;
   int _historyOffset = 0;
   static const int _historyPageSize = 20;
 
@@ -74,7 +75,9 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
   }
 
   void _onHistoryScroll() {
-    if (_historyScrollController.position.pixels >= _historyScrollController.position.maxScrollExtent - 200) {
+    // Only trigger load more if we have scrollable content
+    if (_historyScrollController.position.maxScrollExtent > 0 &&
+        _historyScrollController.position.pixels >= _historyScrollController.position.maxScrollExtent - 200) {
       _loadMoreHistory();
     }
   }
@@ -119,6 +122,7 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
       _historyLogs = [];
       _historyOffset = 0;
       _hasMoreHistory = true;
+      _hasAttemptedInitialLoad = true;
     });
 
     try {
@@ -291,8 +295,8 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
     final user = ref.watch(authControllerProvider).value;
     if (user == null) return SizedBox.shrink();
 
-    // 초기 로딩 시 데이터 가져오기
-    if (_historyLogs.isEmpty && !_isLoadingHistory) {
+    // 초기 로딩 시 데이터 가져오기 (한 번만 시도)
+    if (!_hasAttemptedInitialLoad && !_isLoadingHistory) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _loadInitialHistory();
       });
