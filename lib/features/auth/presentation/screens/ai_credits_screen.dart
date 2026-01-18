@@ -76,8 +76,7 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
 
   void _onHistoryScroll() {
     // Only trigger load more if we have scrollable content
-    if (_historyScrollController.position.maxScrollExtent > 0 &&
-        _historyScrollController.position.pixels >= _historyScrollController.position.maxScrollExtent - 200) {
+    if (_historyScrollController.position.maxScrollExtent > 0 && _historyScrollController.position.pixels >= _historyScrollController.position.maxScrollExtent - 200) {
       _loadMoreHistory();
     }
   }
@@ -148,8 +147,8 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authControllerProvider).value;
-    final currentCredits = user?.userAiCredits ?? 0.0;
+    final currentCredits = ref.watch(authControllerProvider.select((state) => state.value?.userAiCredits)) ?? 0.0;
+    print('####### currentCredits: ${currentCredits}');
     final tokens = AiPricingCalculator.calculateTokensFromCredits(currentCredits);
     final tokensString = '${Utils.numberFormatter(tokens.toDouble())}';
 

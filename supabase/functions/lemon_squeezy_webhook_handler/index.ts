@@ -465,21 +465,28 @@ serve(async (req) => {
     const newCredits = currentCredits + planCredits;
 
     // 크레딧 업데이트
-    const { error: creditsError } = await supabase
+    console.log(`Attempting to update credits: ${currentCredits} + ${planCredits} = ${newCredits} for user ${userId}`);
+    const { data: updateData, error: creditsError } = await supabase
       .from("users")
       .update({
         ai_credits: newCredits,
         ai_credits_updated_at: new Date().toISOString(),
       })
-      .eq("id", userId);
+      .eq("id", userId)
+      .select();
 
     if (creditsError) {
       console.error("Error updating credits:", creditsError);
       return new Response("Failed to update credits", { status: 500 });
     }
 
+    if (!updateData || updateData.length === 0) {
+      console.error(`CRITICAL: Credits update returned no rows for user ${userId}. User may not exist.`);
+      return new Response("User not found for credit update", { status: 404 });
+    }
+
     const eventType = isSubscriptionCreated ? "subscription creation" : "renewal";
-    console.log(`Added ${planCredits} credits (${planTokens} tokens) for ${planName} ${eventType}. User: ${userId}, Variant: ${variantId}`);
+    console.log(`Successfully added ${planCredits} credits (${planTokens} tokens) for ${planName} ${eventType}. User: ${userId}, New total: ${newCredits}, Variant: ${variantId}`);
     
     // 구독 크레딧 추가 로그 저장
     const { error: logError } = await supabase
@@ -503,6 +510,24 @@ serve(async (req) => {
       // 로그 저장 실패해도 크레딧 추가는 성공했으므로 계속 진행
     } else {
       console.log(`Saved ${planName} credit log for ${planCredits} credits (${planTokens} tokens)`);
+    }
+
+    // Final verification: Check if credits are actually in the database
+    const { data: verifyData, error: verifyError } = await supabase
+      .from("users")
+      .select("ai_credits")
+      .eq("id", userId)
+      .single();
+
+    if (verifyError) {
+      console.error(`ERROR: Failed to verify credits after update: ${verifyError}`);
+    } else if (verifyData) {
+      const dbCredits = verifyData.ai_credits || 0;
+      if (dbCredits === newCredits) {
+        console.log(`✓ VERIFIED: Credits correctly persisted in DB: ${dbCredits}`);
+      } else {
+        console.error(`✗ CRITICAL: Credits mismatch! Expected ${newCredits}, but DB has ${dbCredits}. Credits may have been overwritten!`);
+      }
     }
   }
 

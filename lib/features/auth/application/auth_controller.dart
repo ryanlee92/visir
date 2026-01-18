@@ -140,8 +140,15 @@ class AuthController extends _$AuthController {
     if (ref.read(shouldUseMockDataProvider)) return;
     final prevUser = state.value;
     if (prevUser == user) return;
+
+    // Merge subscription and credits from current state before writing
+    // This prevents overwriting webhook-updated values with stale local data
+    final subscription = user.subscription ?? state.requireValue.subscription;
+    final aiCredits = user.aiCredits ?? state.requireValue.aiCredits;
+    final mergedUser = user.copyWith(subscription: subscription, aiCredits: aiCredits);
+
     _updateState(user: user);
-    await repository.updateUser(user: user);
+    await repository.updateUser(user: mergedUser); // Write merged user, not original
   }
 
   Future<void> clearBadge() async {
