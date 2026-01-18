@@ -115,9 +115,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Navigator.of(context).popUntil((route) => route.isFirst);
 
-      // 즉시 실행할 필수 작업들
-      showAppFirstOpenPopup();
-
       // 무거운 작업들을 백그라운드로 이동 (UI 블로킹 방지)
       unawaited(_initializeBackgroundServices());
     });
@@ -173,32 +170,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   bool get isSignedIn => ref.read(isSignedInProvider);
-
-  void showAppFirstOpenPopup() {
-    if (!isSignedIn) return;
-
-    bool isMobileView = PlatformX.isMobileView;
-    Size popupSize = isMobileView ? Size(328, 100) : Size(440, 100);
-
-    final user = ref.read(authControllerProvider).requireValue;
-    if (!user.isSignedIn) return;
-
-    bool showPopup = PlatformX.isWeb
-        ? false
-        : PlatformX.isDesktop
-        ? !user.userDesktopAppOpened
-        : !user.userMobileAppOpened;
-
-    if (showPopup) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-      Utils.showPopupDialog(
-        child: AppFirstOpenPopup(width: popupSize.width),
-        size: popupSize,
-        forcePopup: true,
-        isFlexibleHeightPopup: true,
-      );
-    }
-  }
 
   bool oAuthNotWorkPopupShown = false;
 
@@ -686,7 +657,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             onUpdateInboxConfig: (config) {
               final date = ref.read(inboxListDateProvider);
               final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-              ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [config], onlyLocal: true);
+              ref
+                  .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+                  .updateInboxConfig(configs: [config], onlyLocal: true);
             },
             onDeleteInboxConfig: (configId) => {},
           );
