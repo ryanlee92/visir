@@ -322,13 +322,22 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
         ..._historyLogs.map((log) {
           final dateFormat = DateFormat('MMM dd, yyyy HH:mm');
           final isPurchase = log.functionName == 'credit_purchase' || log.functionName == 'subscription_created' || log.functionName == 'subscription_renewal';
+
+          // Determine plan name from model field
+          String planName = 'Plan';
+          if (log.model == 'ultra_plan') {
+            planName = 'Ultra Plan';
+          } else if (log.model == 'pro_plan') {
+            planName = 'Pro Plan';
+          }
+
           final displayTitle =
               (isPurchase
                       ? (log.functionName == 'credit_purchase'
                             ? 'Token Purchase'
                             : log.functionName == 'subscription_created'
-                            ? 'Ultra Plan Subscription'
-                            : 'Ultra Plan Renewal')
+                            ? '$planName Subscription'
+                            : '$planName Renewal')
                       : log.functionName)
                   .toSentenceCase();
 

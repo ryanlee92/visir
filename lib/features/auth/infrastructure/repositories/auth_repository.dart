@@ -148,8 +148,32 @@ class AuthRepository implements AuthRepositoryInterface {
 
   Future<Either<Failure, UserEntity>> getUser({required String userId}) async {
     try {
-      final response = await client.from(_tableUser).select().eq('id', userId).single().withConverter(UserEntity.fromJson);
-      return right(response);
+      final response = await client.from(_tableUser).select().eq('id', userId).maybeSingle();
+
+      // If user doesn't exist in database, create a new user record from auth data
+      if (response == null) {
+        final authUser = client.auth.currentUser;
+        if (authUser == null) {
+          return left(Failure.empty(StackTrace.current, 'Auth user not found'));
+        }
+
+        // Create new user with data from auth
+        final newUser = UserEntity(
+          id: userId,
+          email: authUser.email,
+          name: authUser.userMetadata?['name'] as String? ?? authUser.email?.split('@').first,
+          avatarUrl: authUser.userMetadata?['avatar_url'] as String?,
+          createdAt: DateTime.parse(authUser.createdAt),
+          aiCredits: 0.0,
+        );
+
+        // Insert the new user into database
+        await client.from(_tableUser).upsert(newUser.toJson());
+
+        return right(newUser);
+      }
+
+      return right(UserEntity.fromJson(response));
     } catch (e) {
       return Utils.debugLeft(e);
     }

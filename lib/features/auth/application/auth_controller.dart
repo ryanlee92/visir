@@ -36,8 +36,7 @@ class AuthController extends _$AuthController {
   LemonSqueezyCustomerEntity? get subscriptionCustomer => _subscriptionCustomer;
   List<LemonSqueezyDiscountEntity> get subscriptionDiscounts => _subscriptionDiscounts;
 
-  bool _isSubscriptionTestMode = false;
-  bool get isSubscriptionTestMode => _isSubscriptionTestMode;
+  bool get isSubscriptionTestMode => onToggleTestMode;
 
   @override
   Future<UserEntity> build() async {
@@ -75,20 +74,6 @@ class AuthController extends _$AuthController {
 
     // persist 데이터가 없으면 getUser를 호출
     final user = await _getUser();
-
-    // 순환 의존성 방지를 위해 build 완료 후 subscriptionTestModeProvider 구독
-    // ref.listen을 사용하여 변경사항을 추적
-    ref.listen(subscriptionTestModeProvider, (previous, next) {
-      _isSubscriptionTestMode = next;
-    });
-    // 초기값 설정 (build 완료 후이므로 순환 의존성 없음)
-    try {
-      _isSubscriptionTestMode = ref.read(subscriptionTestModeProvider);
-    } catch (e) {
-      // 순환 의존성 발생 시 기본값 사용
-      _isSubscriptionTestMode = false;
-    }
-
     return user;
   }
 

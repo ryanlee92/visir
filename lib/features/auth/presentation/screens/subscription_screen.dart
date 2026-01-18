@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:Visir/config/providers.dart';
 import 'package:Visir/dependency/master_detail_flow/src/details_item.dart';
 import 'package:Visir/dependency/modal_bottom_sheet/src/utils/modal_scroll_controller.dart';
 import 'package:Visir/features/auth/application/auth_controller.dart';
@@ -15,7 +16,6 @@ import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_list_item.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_list_section.dart';
-import 'package:Visir/features/common/provider.dart' hide TextScaler;
 import 'package:Visir/features/preference/presentation/screens/preference_screen.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:collection/collection.dart';
@@ -111,7 +111,6 @@ class SubscriptionScreen extends ConsumerStatefulWidget {
 class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   bool onCancel = false;
   bool onResume = false;
-  bool onToggleTestMode = false;
   bool onRefreshSubscriptionProducts = false;
 
   ScrollController? _scrollController;
@@ -233,7 +232,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
 
   Widget subscriptionWidget({required SubscriptionType type, required LemonSqueezyVariantEntity? bestValueVariant}) {
     final subscription = ref.watch(authControllerProvider.select((v) => v.requireValue.subscription));
-    bool isSubscriptionTestMode = ref.watch(subscriptionTestModeProvider);
+    bool isSubscriptionTestMode = onToggleTestMode;
 
     List<LemonSqueezyProductEntity> subscriptionProducts = ref.read(authControllerProvider.notifier).subscriptionProducts;
     List<LemonSqueezyVariantEntity> subscriptionVariants = ref.read(authControllerProvider.notifier).subscriptionVariants;
@@ -338,7 +337,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     final subscription = ref.watch(authControllerProvider.select((v) => v.requireValue.subscription));
     final isAdmin = ref.watch(authControllerProvider.select((v) => v.requireValue.userIsAdmin));
 
-    bool isSubscriptionTestMode = ref.read(authControllerProvider.notifier).isSubscriptionTestMode;
+    bool isSubscriptionTestMode = onToggleTestMode;
 
     List<LemonSqueezyVariantEntity> subscriptionVariants = ref.read(authControllerProvider.notifier).subscriptionVariants;
 
