@@ -1029,7 +1029,7 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       cleanedContent = cleanedContent.trim();
     }
 
-    // Convert entity tags to inline badge format
+    // Convert entity tags based on message role
     if (isUser) {
       // User messages: Convert all entity tags to user_tagged_xxx for inline badge rendering
       cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'<inapp_task>(.*?)</inapp_task>', dotAll: true), (m) => '<user_tagged_task>${m.group(1)}</user_tagged_task>');
@@ -1039,10 +1039,8 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
       cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'<tagged_event>(.*?)</tagged_event>', dotAll: true), (m) => '<user_tagged_event>${m.group(1)}</user_tagged_event>');
       cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'<tagged_inbox>(.*?)</tagged_inbox>', dotAll: true), (m) => '<user_tagged_inbox>${m.group(1)}</user_tagged_inbox>');
     } else {
-      // Assistant messages: Convert inapp_xxx to tagged_xxx for inline badge rendering
-      cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'<inapp_task>(.*?)</inapp_task>', dotAll: true), (m) => '<tagged_task>${m.group(1)}</tagged_task>');
-      cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'<inapp_event>(.*?)</inapp_event>', dotAll: true), (m) => '<tagged_event>${m.group(1)}</tagged_event>');
-      cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'<inapp_inbox>(.*?)</inapp_inbox>', dotAll: true), (m) => '<tagged_inbox>${m.group(1)}</tagged_inbox>');
+      // Assistant messages: Keep inapp_xxx tags as-is for full widget card rendering
+      // No conversion needed - inapp_task, inapp_event, inapp_inbox will be rendered as full widgets
     }
 
     // Wrap content in <div> if it doesn't start with < (to make it HTML)

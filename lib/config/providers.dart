@@ -87,11 +87,9 @@ List<Color> accountColors = [
   Colors.blueGrey,
 ];
 
-ValueNotifier<bool> useDebugDbNotifier = ValueNotifier(kDebugMode ? true : false);
+ValueNotifier<bool> useDebugDbNotifier = ValueNotifier(kDebugMode ? false : false);
 bool get useDebugDb => useDebugDbNotifier.value;
 set useDebugDb(bool value) => useDebugDbNotifier.value = value;
-
-bool onToggleTestMode = kDebugMode ? true : false;
 
 final supabaseProvider = FutureProvider<supabase.Supabase>((ref) async {
   try {
