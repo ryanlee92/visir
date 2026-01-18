@@ -164,7 +164,7 @@ class AuthRepository implements AuthRepositoryInterface {
           name: authUser.userMetadata?['name'] as String? ?? authUser.email?.split('@').first,
           avatarUrl: authUser.userMetadata?['avatar_url'] as String?,
           createdAt: DateTime.parse(authUser.createdAt),
-          aiCredits: 0.0,
+          aiCredits: 2.0,
         );
 
         // Insert the new user into database
