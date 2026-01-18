@@ -19,6 +19,72 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class AnthropicAiInboxDatasource extends InboxDatasource {
+  /// Helper method to build conversation snippet from related inboxes
+  /// Truncated to max 1000 chars to reduce token usage
+  String _buildConversationSnippet(InboxEntity inbox, List<InboxEntity> allInboxes) {
+    const maxSnippetLength = 1000;
+
+    if (allInboxes.isNotEmpty) {
+      final mailInboxes = allInboxes.where((i) => i.linkedMail != null).toList();
+      final messageInboxes = allInboxes.where((i) => i.linkedMessage != null).toList();
+
+      List<String> snippets = [];
+
+      if (mailInboxes.isNotEmpty) {
+        final Map<String, List<InboxEntity>> mailThreads = {};
+        for (final mailInbox in mailInboxes) {
+          final threadKey = '${mailInbox.linkedMail!.threadId}_${mailInbox.linkedMail!.hostMail}';
+          if (!mailThreads.containsKey(threadKey)) {
+            mailThreads[threadKey] = [];
+          }
+          mailThreads[threadKey]!.add(mailInbox);
+        }
+
+        for (final threadInboxes in mailThreads.values) {
+          threadInboxes.sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
+          if (threadInboxes.length > 1) {
+            final snippet = threadInboxes.map((i) => '${i.title}: ${i.description ?? i.title}').join('\n---\n');
+            snippets.add(snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet);
+          } else {
+            final singleSnippet = threadInboxes.first.description ?? threadInboxes.first.title;
+            snippets.add(singleSnippet.length > maxSnippetLength ? '${singleSnippet.substring(0, maxSnippetLength)}...' : singleSnippet);
+          }
+        }
+      }
+
+      if (messageInboxes.isNotEmpty) {
+        final Map<String, List<InboxEntity>> messageGroups = {};
+        for (final msgInbox in messageInboxes) {
+          final linkedMsg = msgInbox.linkedMessage!;
+          final groupKey = linkedMsg.threadId.isNotEmpty && linkedMsg.threadId != linkedMsg.messageId
+              ? 'thread_${linkedMsg.threadId}_${linkedMsg.teamId}_${linkedMsg.channelId}'
+              : 'channel_${linkedMsg.teamId}_${linkedMsg.channelId}';
+          if (!messageGroups.containsKey(groupKey)) {
+            messageGroups[groupKey] = [];
+          }
+          messageGroups[groupKey]!.add(msgInbox);
+        }
+
+        for (final groupInboxes in messageGroups.values) {
+          groupInboxes.sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
+          if (groupInboxes.length > 1) {
+            final snippet = groupInboxes.map((i) => '${i.title}: ${i.description ?? i.title}').join('\n---\n');
+            snippets.add(snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet);
+          } else {
+            final singleSnippet = groupInboxes.first.description ?? groupInboxes.first.title;
+            snippets.add(singleSnippet.length > maxSnippetLength ? '${singleSnippet.substring(0, maxSnippetLength)}...' : singleSnippet);
+          }
+        }
+      }
+
+      final combinedSnippet = snippets.isNotEmpty ? snippets.join('\n\n===\n\n') : (inbox.description ?? inbox.title);
+      return combinedSnippet.length > maxSnippetLength ? '${combinedSnippet.substring(0, maxSnippetLength)}...' : combinedSnippet;
+    } else {
+      final fallbackSnippet = inbox.description ?? inbox.title;
+      return fallbackSnippet.length > maxSnippetLength ? '${fallbackSnippet.substring(0, maxSnippetLength)}...' : fallbackSnippet;
+    }
+  }
+
   /// Helper method to call Anthropic Claude API
   Future<String?> _callAnthropicApi({required String prompt, required String model, String? apiKey, String? systemPrompt, int maxTokens = 4096}) async {
     if (apiKey == null || apiKey.isEmpty) {
@@ -255,62 +321,8 @@ class AnthropicAiInboxDatasource extends InboxDatasource {
   }) async {
     final modelName = model ?? 'claude-3-5-sonnet-20241022';
 
-    // Build conversation snippet (same as OpenAI implementation)
-    String conversationSnippet;
-
-    if (allInboxes.isNotEmpty) {
-      final mailInboxes = allInboxes.where((i) => i.linkedMail != null).toList();
-      final messageInboxes = allInboxes.where((i) => i.linkedMessage != null).toList();
-
-      List<String> snippets = [];
-
-      if (mailInboxes.isNotEmpty) {
-        final Map<String, List<InboxEntity>> mailThreads = {};
-        for (final mailInbox in mailInboxes) {
-          final threadKey = '${mailInbox.linkedMail!.threadId}_${mailInbox.linkedMail!.hostMail}';
-          if (!mailThreads.containsKey(threadKey)) {
-            mailThreads[threadKey] = [];
-          }
-          mailThreads[threadKey]!.add(mailInbox);
-        }
-
-        for (final threadInboxes in mailThreads.values) {
-          threadInboxes.sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
-          if (threadInboxes.length > 1) {
-            snippets.add(threadInboxes.map((i) => '${i.title}: ${i.description ?? i.title}').join('\n---\n'));
-          } else {
-            snippets.add(threadInboxes.first.description ?? threadInboxes.first.title);
-          }
-        }
-      }
-
-      if (messageInboxes.isNotEmpty) {
-        final Map<String, List<InboxEntity>> messageGroups = {};
-        for (final msgInbox in messageInboxes) {
-          final linkedMsg = msgInbox.linkedMessage!;
-          final groupKey = linkedMsg.threadId.isNotEmpty && linkedMsg.threadId != linkedMsg.messageId
-              ? 'thread_${linkedMsg.threadId}_${linkedMsg.teamId}_${linkedMsg.channelId}'
-              : 'channel_${linkedMsg.teamId}_${linkedMsg.channelId}';
-          if (!messageGroups.containsKey(groupKey)) {
-            messageGroups[groupKey] = [];
-          }
-          messageGroups[groupKey]!.add(msgInbox);
-        }
-
-        for (final groupInboxes in messageGroups.values) {
-          groupInboxes.sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
-          if (groupInboxes.length > 1) {
-            snippets.add(groupInboxes.map((i) => '${i.title}: ${i.description ?? i.title}').join('\n---\n'));
-          } else {
-            snippets.add(groupInboxes.first.description ?? groupInboxes.first.title);
-          }
-        }
-      }
-
-      conversationSnippet = snippets.isNotEmpty ? snippets.join('\n\n===\n\n') : (inbox.description ?? inbox.title);
-    } else {
-      conversationSnippet = inbox.description ?? inbox.title;
-    }
+    // Build conversation snippet using helper method
+    final conversationSnippet = _buildConversationSnippet(inbox, allInboxes);
 
     String? eventSnippet;
     if (eventEntities != null && eventEntities.isNotEmpty) {

@@ -55,7 +55,9 @@ class OpenAiInboxDatasource extends InboxDatasource {
 
     // Helper function to build conversation snippet from related inboxes
     // All thread messages should already be in allInboxes (fetched by controller)
+    // Truncated to max 1000 chars to reduce token usage
     String _buildConversationSnippet(InboxEntity inbox, List<InboxEntity> allInboxes) {
+      const maxSnippetLength = 1000;
       if (inbox.linkedMail != null) {
         // For mail: get all messages in the same thread
         final threadId = inbox.linkedMail!.threadId;
@@ -64,9 +66,11 @@ class OpenAiInboxDatasource extends InboxDatasource {
           ..sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
 
         if (threadInboxes.length > 1) {
-          return threadInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+          final snippet = threadInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+          return snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet;
         }
-        return inbox.description ?? '';
+        final singleSnippet = inbox.description ?? '';
+        return singleSnippet.length > maxSnippetLength ? '${singleSnippet.substring(0, maxSnippetLength)}...' : singleSnippet;
       } else if (inbox.linkedMessage != null) {
         final linkedMsg = inbox.linkedMessage!;
 
@@ -79,7 +83,8 @@ class OpenAiInboxDatasource extends InboxDatasource {
                 ..sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
 
           if (threadInboxes.length > 1) {
-            return threadInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+            final snippet = threadInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+            return snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet;
           }
         } else {
           // For regular chat messages (not thread): include context messages from the same channel
@@ -100,155 +105,38 @@ class OpenAiInboxDatasource extends InboxDatasource {
                 ..sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
 
           if (contextInboxes.length > 1) {
-            return contextInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+            final snippet = contextInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+            return snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet;
           }
         }
 
-        return inbox.description ?? '';
+        final singleSnippet = inbox.description ?? '';
+        return singleSnippet.length > maxSnippetLength ? '${singleSnippet.substring(0, maxSnippetLength)}...' : singleSnippet;
       }
 
-      return inbox.description ?? '';
+      final fallbackSnippet = inbox.description ?? '';
+      return fallbackSnippet.length > maxSnippetLength ? '${fallbackSnippet.substring(0, maxSnippetLength)}...' : fallbackSnippet;
     }
 
     Future<void> fetchSuggestions(List<InboxEntity> batch) async {
       final prompt =
           '''
-You are an expert productivity assistant who triages a user's email-like inbox.
+Triage inbox items. Return JSON array with exactly one object per input item (no skipping).
 
-## Task
-For **EVERY** item provided, you MUST return exactly one suggestion object. Do not skip or omit any items.
-Decide whether each item deserves the user's attention and, if so, extract a deadline.
-Return your results **only** as a JSON array, with exactly one object per input item, in the same order as the input items.
+Output: [{"id":"<input id>","summary":"<action title>","urgency":"urgent|important|action_required|need_review|none","reason":"meeting_invitation|meeting_followup|meeting_notes|task_assignment|task_status_update|scheduling_request|scheduling_confirmation|document_review|code_review|approval_request|question|information_sharing|announcement|system_notification|cold_contact|customer_contact|other","date_type":"task|event","project_id":"<id>","target_date":"<RFC3339|null>","duration":<mins|null>,"is_asap":<bool>,"is_date_only":<bool>,"estimated_effort":<mins|null>,"sender_name":"<name|null>","priority_score":<0-100>,"reasoned_body":"<20 chars>"}]
 
-## Input
-Each item has:
-- `id` (string)
-- `title` (string)
-- `snippet` (string)    - full conversation content including thread messages or related messages in time window
-- `datetime` (string, RFC 3339) - when the item arrived
-- `timezone` (string) - timezone offset for the item (e.g., "+09:00", "-05:00")
-
-## Output schema
-```jsonc
-[
-  {
-    "id":               "<same as input>",
-    "summary":          "<short summary of the item>",
-    "urgency":          "urgent | important | action_required | need_review | none",
-    "reason":           "meeting_invitation | meeting_followup | meeting_notes | task_assignment | task_status_update | scheduling_request | scheduling_confirmation | document_review | code_review | approval_request | question | information_sharing | announcement | system_notification | cold_contact | customer_contact | other",
-    "date_type":        "task | event",
-    "project_id":       "<project id>",
-    "target_date":      "<RFC 3339 timestamp with timezone or null>",   // For tasks: response/action deadline. For events: event start time
-    "duration":         <number>,
-    "is_asap":          <boolean>,
-    "is_date_only":     <boolean>,
-    "estimated_effort": <number>,  // Estimated minutes to read/respond/complete
-    "sender_name":      "<sender name or null>",
-    "priority_score":   <number>,  // 0-100, AI's overall priority assessment
-    "reasoned_body":    "<≤ 20 characters from the snippet that justify the urgency>"
-  },
-  …
-]
-
-No additional keys, comments, or text are allowed.
-
-Rules
-	1.	When to set urgency = none:
-	•	The snippet is advertisement-like or
-	•	The message does not require reading, replying, acting, or has no deadline the user must meet.
-	2.	Urgency classification (pick exactly one based on time sensitivity):
-	•	urgent: must be read/replied immediately on sight
-	•	important: not instant, but must be handled today
-	•	action_required: user must reply or act, but the timing is flexible
-	•	need_review: only needs reading/awareness (no reply)
-	•	none: unimportant, ads, newsletters, etc.
-	3.	Reason classification (pick exactly one based on content type):
-	•	meeting_invitation     : Calendar invites, meeting requests.
-	•	meeting_followup      : Post-meeting action items, decisions.
-	•	meeting_notes        : Meeting recaps, notes, recordings.
-	•	task_assignment       : Explicit task assignments, work requests, or action items directed to the user. This includes:
-		- Direct requests to complete a task ("please do X", "can you handle Y", "I need you to Z")
-		- Work assignments ("assign this to you", "your task is to...", "please take care of...")
-		- Action items from meetings or discussions ("action item: you will...", "your responsibility is...")
-		- Requests to review, prepare, or deliver something specific ("please review...", "can you prepare...", "please send me...")
-		- Any message where someone is explicitly asking the user to do something specific
-	•	task_status_update     : Updates on existing tasks/projects.
-	•	scheduling_request     : Asking for availability, time proposals.
-	•	scheduling_confirmation  : Confirming times, finalizing meetings.
-	•	document_review       : Documents/reports needing review.
-	•	code_review         : Pull requests, code reviews.
-	•	approval_request      : Needing user approval/sign-off.
-	•	question          : Direct questions to user. **DO NOT** use this reason for emails from noreply@ addresses, no-reply@ addresses, or any automated/system sender addresses. Use "system_notification" or "announcement" instead.
-	•	information_sharing    : FYI emails, sharing information.
-	•	announcement        : Team/company announcements.
-	•	system_notification     : Automated system messages.
-	•	cold_contact        : Initial outreach from unknown contacts (people you don't know or haven't interacted with before).
-	•	customer_contact      : Messages from YOUR customers or clients (people/companies who are YOUR customers, meaning you provide services/products to them). **DO NOT** use this for emails where YOU are the customer (e.g., emails from companies you buy from, subscription services, vendors you purchase from). Use "other" or "system_notification" instead.
-	•	other            : Doesn't fit other categories.
-	4.	Target-date logic:
-	•	For actionable tasks (date_type = "task"):
-		- Set date_type = "task"
-		- target_date should be the RESPONSE/ACTION DEADLINE (when user must reply or act), NOT the task completion date
-		- Extract from phrases like "please respond by...", "reply before...", "let me know by..."
-		- Use RFC 3339 format with timezone offset (e.g., "2024-03-15T14:30:00+09:00")
-		- Use the item's timezone to interpret any dates/times mentioned in the snippet
-		- If no specific deadline is mentioned → target_date = null, is_asap = false
-		- If "ASAP" or "urgent response needed" is mentioned → is_asap = true and omit target_date
-	•	For calendar events (date_type = "event"):
-		- Set date_type = "event"
-		- Set target_date to the event's START TIME in RFC 3339 format with timezone offset
-		- Use the item's timezone to interpret the event time
-		- Include duration in minutes (as integer) if mentioned
-		- If only a date (no time) is given → set is_date_only = true and use YYYY-MM-DD format
-	•	target_date must be on or after the item's datetime; otherwise use null
-	5.	Estimated effort:
-	•	Estimate how many minutes it will take the user to read, understand, and respond/complete this item
-	•	Consider: email length, complexity, number of questions, attachments mentioned
-	•	Typical ranges: Quick read (1-5 min), Simple reply (5-15 min), Detailed response (15-30 min), Complex task (30+ min)
-	•	Set to null if cannot estimate
-	6.	Sender information:
-	•	Extract the sender's name from the snippet if available
-	•	Use the most human-readable form (e.g., "John Smith" not "john.smith@company.com")
-	•	Set to null if sender is unclear or system-generated
-	7.	Priority score:
-	•	Calculate a 0-100 priority score combining:
-		- Urgency level (urgent=high, need_review=low)
-		- Sender importance (if recognizable as manager/client/VIP)
-		- Deadline proximity
-		- Content complexity
-	•	Higher score = higher priority
-	8.	Reasoned body:
-	•	Copy ≤ 20 consecutive characters (no line breaks) from the original snippet that best explain why the item has this urgency level.
-	9.	**CRITICAL REQUIREMENT**: You MUST return exactly one suggestion object for EVERY input item. Never skip, omit, or filter out any items. The output array must have the same length as the input array.
-	11.	De-duplication & Noise Control:
-	•	If multiple items are about the same topic (e.g., a series of commit messages, repeated system alerts, or duplicate notifications), mark the redundant items with urgency="none" but still return a suggestion for each item.
-	•	For commit messages, unless they explicitly mention a failure or urgent action, mark them as urgency="none" if they are just logs, but still return a suggestion for each item.
-	•	**STRICTLY** mark as urgency="none" if the item is:
-		- A newsletter, marketing email, or promotional offer.
-		- A notification about a sale, discount, or new product launch.
-		- A generic "Welcome" or "Thank you for subscribing" message.
-		- Contains keywords like "unsubscribe", "view in browser", "limited time offer", "sale ends soon".
-	•	**MANDATORY**: The number of suggestions in your output must exactly match the number of items in the input. If you receive N items, you must return N suggestions.
-	10.	Summary:
-	•	Generate a concise, action-oriented title (e.g., "Review Q3 Report", "Meeting with John").
-	•	Avoid generic titles like "Forwarded message" or "Re: Hello".
-	11.	Project id:
-	•	**MANDATORY: project_id MUST ALWAYS be included** - You MUST always provide a project_id in your response. project_id cannot be null.
-	•	Select the most relevant project ID from the list below based on the item content and project name/description.
-	•	Consider the project hierarchy (parent_id) to understand the context.
-	•	If the item does not clearly belong to any project, select the first project from the Available Projects list.
-	•	Available Projects: ${jsonEncode(projects.map((e) => {'id': e.uniqueId, 'name': e.name, 'description': e.description, 'parent_id': e.parentId}).toList())}
-	•	**CRITICAL: project_id is REQUIRED and MUST always be included. It cannot be null. If you cannot determine which project to use, select the first project from the Available Projects list.**
-
-Style requirements
-	•	Return valid JSON only.
-	•	Do not output explanations, comments, or markdown.
-	•	Think through the rules internally before writing the final JSON, but do not reveal your reasoning.
-
-Begin
+Urgency: urgent(immediate), important(today), action_required(flexible), need_review(read only), none(ads/no action)
+Reason: task_assignment(explicit requests), question(not from noreply@), cold_contact(unknown), customer_contact(YOUR customers only)
+Date: task=response deadline(RFC3339+TZ, use item timezone), event=start time, is_asap if ASAP mentioned, is_date_only if date only, must be >= item datetime
+Effort: 1-5(quick), 5-15(simple), 15-30(detailed), 30+(complex) minutes
+Priority: 0-100 based on urgency+sender+deadline+complexity
+Reasoned_body: ≤20 chars from snippet justifying urgency
+Summary: concise action title, avoid "Re:" or "Fwd:"
+project_id: REQUIRED, select from available projects or use first project
+Duplicates/ads/newsletters: mark urgency=none but include in output
+Projects: ${jsonEncode(projects.map((e) => {'id': e.uniqueId, 'name': e.name}).toList())}
 
 Items:
-
 ${jsonEncode(batch.map((e) => {'id': e.id, 'datetime': e.inboxDatetime.toLocal().toIso8601String(), 'timezone': getItemTimezone(e), 'snippet': _buildConversationSnippet(e, inboxes), 'title': e.title}).toList())}
 ''';
 

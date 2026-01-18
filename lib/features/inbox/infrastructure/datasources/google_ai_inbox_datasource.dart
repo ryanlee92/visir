@@ -19,6 +19,70 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class GoogleAiInboxDatasource extends InboxDatasource {
+  /// Helper method to build conversation snippet from related inboxes
+  /// Truncated to max 1000 chars to reduce token usage
+  String _buildConversationSnippet(InboxEntity inbox, List<InboxEntity> allInboxes) {
+    const maxSnippetLength = 1000;
+    if (inbox.linkedMail != null) {
+      // For mail: get all messages in the same thread
+      final threadId = inbox.linkedMail!.threadId;
+      final hostMail = inbox.linkedMail!.hostMail;
+      final threadInboxes = allInboxes.where((i) => i.linkedMail?.threadId == threadId && i.linkedMail?.hostMail == hostMail).toList()
+        ..sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
+
+      if (threadInboxes.length > 1) {
+        final snippet = threadInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+        return snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet;
+      }
+      final singleSnippet = inbox.description ?? '';
+      return singleSnippet.length > maxSnippetLength ? '${singleSnippet.substring(0, maxSnippetLength)}...' : singleSnippet;
+    } else if (inbox.linkedMessage != null) {
+      final linkedMsg = inbox.linkedMessage!;
+
+      if (linkedMsg.threadId.isNotEmpty && linkedMsg.threadId != linkedMsg.messageId) {
+        // For chat thread: get all messages in the same thread
+        final threadInboxes =
+            allInboxes
+                .where((i) => i.linkedMessage?.threadId == linkedMsg.threadId && i.linkedMessage?.teamId == linkedMsg.teamId && i.linkedMessage?.channelId == linkedMsg.channelId)
+                .toList()
+              ..sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
+
+        if (threadInboxes.length > 1) {
+          final snippet = threadInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+          return snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet;
+        }
+      } else {
+        // For regular chat messages (not thread): include context messages from the same channel
+        // These are messages fetched around the target message for context
+        final contextInboxes =
+            allInboxes
+                .where(
+                  (i) =>
+                      i.linkedMessage != null &&
+                      i.linkedMessage?.teamId == linkedMsg.teamId &&
+                      i.linkedMessage?.channelId == linkedMsg.channelId &&
+                      // Exclude thread replies (they are handled separately)
+                      (i.linkedMessage?.threadId == null || i.linkedMessage?.threadId == i.linkedMessage?.messageId) &&
+                      // Include messages within a reasonable time window (e.g., 2 hours)
+                      (i.inboxDatetime.difference(inbox.inboxDatetime).abs() <= const Duration(hours: 2)),
+                )
+                .toList()
+              ..sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
+
+        if (contextInboxes.length > 1) {
+          final snippet = contextInboxes.map((i) => '${i.title}: ${i.description ?? ''}').join('\n---\n');
+          return snippet.length > maxSnippetLength ? '${snippet.substring(0, maxSnippetLength)}...' : snippet;
+        }
+      }
+
+      final singleSnippet = inbox.description ?? '';
+      return singleSnippet.length > maxSnippetLength ? '${singleSnippet.substring(0, maxSnippetLength)}...' : singleSnippet;
+    }
+
+    final fallbackSnippet = inbox.description ?? '';
+    return fallbackSnippet.length > maxSnippetLength ? '${fallbackSnippet.substring(0, maxSnippetLength)}...' : fallbackSnippet;
+  }
+
   /// Helper method to call Google Gemini API
   Future<String?> _callGoogleAiApi({required String prompt, required String model, String? apiKey, Map<String, dynamic>? generationConfig}) async {
     if (apiKey == null || apiKey.isEmpty) {
@@ -249,7 +313,7 @@ class GoogleAiInboxDatasource extends InboxDatasource {
   }) async {
     final modelName = model ?? 'gemini-1.5-flash';
 
-    // Build conversation snippet (same as OpenAI implementation)
+    // Build conversation snippet using helper method with truncation
     String conversationSnippet;
 
     if (allInboxes.isNotEmpty) {
@@ -270,11 +334,8 @@ class GoogleAiInboxDatasource extends InboxDatasource {
 
         for (final threadInboxes in mailThreads.values) {
           threadInboxes.sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
-          if (threadInboxes.length > 1) {
-            snippets.add(threadInboxes.map((i) => '${i.title}: ${i.description ?? i.title}').join('\n---\n'));
-          } else {
-            snippets.add(threadInboxes.first.description ?? threadInboxes.first.title);
-          }
+          final firstInbox = threadInboxes.first;
+          snippets.add(_buildConversationSnippet(firstInbox, allInboxes));
         }
       }
 
@@ -293,17 +354,14 @@ class GoogleAiInboxDatasource extends InboxDatasource {
 
         for (final groupInboxes in messageGroups.values) {
           groupInboxes.sort((a, b) => a.inboxDatetime.compareTo(b.inboxDatetime));
-          if (groupInboxes.length > 1) {
-            snippets.add(groupInboxes.map((i) => '${i.title}: ${i.description ?? i.title}').join('\n---\n'));
-          } else {
-            snippets.add(groupInboxes.first.description ?? groupInboxes.first.title);
-          }
+          final firstInbox = groupInboxes.first;
+          snippets.add(_buildConversationSnippet(firstInbox, allInboxes));
         }
       }
 
-      conversationSnippet = snippets.isNotEmpty ? snippets.join('\n\n===\n\n') : (inbox.description ?? inbox.title);
+      conversationSnippet = snippets.isNotEmpty ? snippets.join('\n\n===\n\n') : _buildConversationSnippet(inbox, allInboxes);
     } else {
-      conversationSnippet = inbox.description ?? inbox.title;
+      conversationSnippet = _buildConversationSnippet(inbox, allInboxes);
     }
 
     String? eventSnippet;
