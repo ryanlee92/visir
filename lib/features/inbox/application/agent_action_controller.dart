@@ -640,9 +640,12 @@ class AgentActionController extends _$AgentActionController {
 
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
+        print('DEBUG: AI response received, message length: ${aiMessage.length}');
 
         // Extract and save token usage
+        print('DEBUG: Calling _saveTokenUsage...');
         await _saveTokenUsage(aiResponse, selectedModel, useUserApiKey);
+        print('DEBUG: _saveTokenUsage completed');
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
@@ -3756,22 +3759,34 @@ class AgentActionController extends _$AgentActionController {
 
   /// AI 응답에서 토큰 사용량을 추출하고 저장합니다
   Future<void> _saveTokenUsage(Map<String, dynamic> aiResponse, AgentModel model, bool useUserApiKey) async {
+    print('DEBUG: _saveTokenUsage START - provider: ${model.provider.name}, model: ${model.modelName}, useUserApiKey: $useUserApiKey');
+
     try {
       final me = ref.read(authControllerProvider).value;
-      if (me == null) return;
+      if (me == null) {
+        print('DEBUG: User is null, skipping token usage tracking');
+        return;
+      }
+
+      print('DEBUG: User ID: ${me.id}');
+      print('DEBUG: AI response keys: ${aiResponse.keys.join(", ")}');
 
       // Extract token usage based on provider
       TokenUsage? tokenUsage;
       if (model.provider == AiProvider.anthropic) {
+        print('DEBUG: Extracting from Anthropic response');
         tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
       } else if (model.provider == AiProvider.google) {
+        print('DEBUG: Extracting from Google AI response');
         tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
       } else if (model.provider == AiProvider.openai) {
+        print('DEBUG: Extracting from OpenAI response');
         tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
       }
 
       if (tokenUsage == null) {
         print('WARNING: Could not extract token usage from AI response');
+        print('WARNING: Response structure: ${aiResponse.toString().substring(0, aiResponse.toString().length > 500 ? 500 : aiResponse.toString().length)}');
         return;
       }
 
