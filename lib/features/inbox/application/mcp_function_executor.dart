@@ -5789,6 +5789,8 @@ class McpFunctionExecutor {
   /// Summarizes attachments for a specific inbox
   Future<Map<String, dynamic>> _executeSummarizeAttachment(Map<String, dynamic> args, {required TabType tabType}) async {
     final inboxId = args['inboxId'] as String?;
+    print('DEBUG: summarizeAttachment called with inboxId: $inboxId');
+
     if (inboxId == null || inboxId.isEmpty) {
       return {'success': false, 'error': 'inboxId is required'};
     }
@@ -5802,6 +5804,8 @@ class McpFunctionExecutor {
     if (inboxId.startsWith('mail_')) {
       // Parse mail inboxId: mail_${type}_${hostMail}_${messageId}
       final parts = inboxId.split('_');
+      print('DEBUG: inboxId parts: $parts');
+
       if (parts.length < 4) {
         return {'success': false, 'error': 'Invalid inboxId format'};
       }
@@ -5809,6 +5813,8 @@ class McpFunctionExecutor {
       final messageId = parts.last;
       final typeName = parts[1];
       final hostMail = parts.sublist(2, parts.length - 1).join('_'); // hostMail may contain underscores
+
+      print('DEBUG: Extracted - messageId: $messageId, typeName: $typeName, hostMail: $hostMail');
 
       // Find mail type
       MailEntityType? mailType;
@@ -5822,10 +5828,17 @@ class McpFunctionExecutor {
 
       // Find OAuth for this email
       final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
+      print('DEBUG: Available mail accounts: ${oauths.map((o) => o.email).join(", ")}');
+
       final oauth = oauths.firstWhereOrNull((o) => o.email == hostMail);
 
       if (oauth == null) {
-        return {'success': false, 'error': 'Mail account not found for: $hostMail'};
+        print('ERROR: No OAuth found for hostMail: $hostMail');
+        print('ERROR: Available accounts: ${oauths.map((o) => o.email).toList()}');
+        return {
+          'success': false,
+          'error': 'Mail account not found for: $hostMail\n\nThis email account is not connected. Please add the account in Settings > Mail, or the task may be linked to an old/removed email account.'
+        };
       }
 
       // Fetch mail by messageId
