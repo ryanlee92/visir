@@ -779,6 +779,14 @@ class AgentActionController extends _$AgentActionController {
         final executor = McpFunctionExecutor();
         final allFunctionCalls = isRecursiveCall ? <Map<String, dynamic>>[] : executor.parseFunctionCalls(aiMessage);
 
+        if (allFunctionCalls.isNotEmpty) {
+          print('DEBUG: Parsed ${allFunctionCalls.length} function calls from AI response');
+          for (final call in allFunctionCalls) {
+            final funcName = call['function'] as String? ?? '';
+            print('DEBUG: Function call: $funcName');
+          }
+        }
+
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
         if (!isRecursiveCall) {
@@ -1122,6 +1130,10 @@ class AgentActionController extends _$AgentActionController {
                   remainingCredits: remainingCredits,
                 );
 
+                if (functionName == 'getPreviousContext') {
+                  print('DEBUG getPreviousContext executed: result=$result');
+                }
+
                 return {'functionCall': functionCall, 'result': result, 'functionName': functionName};
               }),
             );
@@ -1278,11 +1290,13 @@ class AgentActionController extends _$AgentActionController {
                 }
                 successMessages.add(messageWithId);
               } else if (result['success'] == true) {
-                // summarizeAttachment의 경우 result['result']['summary'] 사용
+                // summarizeAttachment and getPreviousContext의 경우 result['result']['summary'] 사용
                 String successMessage;
-                if (functionName == 'summarizeAttachment' && result['result'] != null) {
+                if ((functionName == 'summarizeAttachment' || functionName == 'getPreviousContext') && result['result'] != null) {
                   final resultData = result['result'] as Map<String, dynamic>;
                   final summary = resultData['summary'] as String?;
+                  print('DEBUG getPreviousContext: functionName=$functionName, summary length=${summary?.length ?? 0}');
+                  print('DEBUG getPreviousContext: summary preview=${summary?.substring(0, summary.length > 100 ? 100 : summary.length)}');
                   successMessage = summary ?? result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
                 } else {
                   successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
@@ -2560,6 +2574,9 @@ class AgentActionController extends _$AgentActionController {
 
       // 함수 실행 결과를 메시지로 변환
       final functionResultsSummary = <String>[];
+      bool onlyGetPreviousContext = functionResults.length == 1 &&
+          (functionResults.first['function_name'] == 'getPreviousContext');
+
       for (final result in functionResults) {
         final success = result['success'] as bool? ?? false;
         if (success) {
@@ -2602,6 +2619,16 @@ class AgentActionController extends _$AgentActionController {
         AgentActionMessage(role: 'user', content: messageWithTags, files: files),
         if (functionResultsMessage.isNotEmpty) AgentActionMessage(role: 'assistant', content: functionResultsMessage, excludeFromHistory: false),
       ];
+
+      // If only getPreviousContext was called, directly show the result without asking AI to summarize
+      if (onlyGetPreviousContext) {
+        await _updateState(
+          messages: messagesWithFunctionResults,
+          isLoading: false,
+        );
+        return;
+      }
+
       await _updateState(messages: messagesWithFunctionResults, isLoading: true);
 
       // 함수 실행 결과를 포함해서 AI에게 전달
@@ -3079,6 +3106,8 @@ class AgentActionController extends _$AgentActionController {
 
     // 함수 실행 결과 요약 생성 - 실제 실행된 함수 호출 개수와 결과를 정확히 전달
     final functionResultsSummary = <String>[];
+    String? getPreviousContextSummary; // Store getPreviousContext summary separately
+
     for (final result in functionResults) {
       final functionName = result['function_name'] as String? ?? '';
       final success = result['success'] as bool? ?? false;
@@ -3089,8 +3118,18 @@ class AgentActionController extends _$AgentActionController {
         final eventId = result['eventId'] as String?;
         final projectId = result['projectId'] as String?;
 
-        // summarizeAttachment and getPreviousContext: extract summary from result
-        if (functionName == 'summarizeAttachment' || functionName == 'getPreviousContext') {
+        // getPreviousContext: extract summary and store separately (don't ask AI to summarize)
+        if (functionName == 'getPreviousContext') {
+          final resultData = result['result'] as Map<String, dynamic>?;
+          final summary = resultData?['summary'] as String?;
+          if (summary != null && summary.isNotEmpty) {
+            getPreviousContextSummary = summary;
+          }
+          continue; // Don't add to functionResultsSummary
+        }
+
+        // summarizeAttachment: extract summary from result
+        if (functionName == 'summarizeAttachment') {
           final resultData = result['result'] as Map<String, dynamic>?;
 
           // summary를 메시지에 사용
@@ -3130,8 +3169,12 @@ class AgentActionController extends _$AgentActionController {
     final successCount = functionResults.where((r) => r['success'] == true).length;
     final errorCount = functionResults.where((r) => r['success'] == false).length;
 
+    // getPreviousContext was called alone - directly use the summary without AI processing
+    if (getPreviousContextSummary != null && functionResultsSummary.isEmpty) {
+      resultMessage = getPreviousContextSummary;
+    }
     // 함수 실행 결과를 AI에게 전달하여 메시지 생성
-    if (functionResultsSummary.isNotEmpty) {
+    else if (functionResultsSummary.isNotEmpty) {
       final functionResultsText = functionResultsSummary.join('\n');
 
       // taskId, eventId가 포함된 결과를 명확히 표시
