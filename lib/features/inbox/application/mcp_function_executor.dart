@@ -98,6 +98,9 @@ class McpFunctionExecutor {
       'createTaskFromInbox',
       'createEvent',
       'createProject',
+      // 스케줄 최적화 (다수의 작업 시간 변경)
+      'reschedule',
+      'optimizeSchedule',
       // 기타 데이터 변경 함수
       'sendMessage',
       'replyMessage',
@@ -3771,8 +3774,14 @@ class McpFunctionExecutor {
   }) async {
     final taskIds = args['taskIds'] as List<dynamic>?;
 
-    if (taskIds == null || taskIds.isEmpty) {
-      return {'success': false, 'error': 'taskIds is required and must not be empty'};
+    // If no task IDs provided but availableTasks exist, use all available task IDs
+    List<dynamic> effectiveTaskIds = taskIds ?? [];
+    if ((effectiveTaskIds.isEmpty) && availableTasks != null && availableTasks.isNotEmpty) {
+      effectiveTaskIds = availableTasks.where((t) => t.id != null).map((t) => t.id!).toList();
+    }
+
+    if (effectiveTaskIds.isEmpty) {
+      return {'success': false, 'error': 'No tasks available to reschedule. Please tag tasks or provide task IDs.'};
     }
 
     // Get all tasks and events for conflict checking
@@ -3786,6 +3795,7 @@ class McpFunctionExecutor {
     // Find tasks to reschedule from availableTasks or all tasks
     final tasksToReschedule = <TaskEntity>[];
     final allTasksMap = <String, TaskEntity>{};
+    final today = DateUtils.dateOnly(DateTime.now());
 
     // Build a map of all tasks for quick lookup
     if (availableTasks != null) {
@@ -3803,16 +3813,15 @@ class McpFunctionExecutor {
     }
 
     // Get tasks to reschedule
-    for (final taskId in taskIds) {
+    for (final taskId in effectiveTaskIds) {
       final taskIdStr = taskId?.toString() ?? '';
       if (taskIdStr.isEmpty) continue;
       final task = allTasksMap[taskIdStr];
       if (task != null && task.recurringTaskId == null) {
         // Exclude recurring task instances
         final taskStartDate = task.startAt ?? task.startDate;
-        final today = DateUtils.dateOnly(DateTime.now());
         // Exclude tasks already scheduled for today
-        if (DateUtils.dateOnly(taskStartDate) != today) {
+        if (taskStartDate != null && DateUtils.dateOnly(taskStartDate) != today) {
           tasksToReschedule.add(task);
         }
       }
@@ -3824,7 +3833,6 @@ class McpFunctionExecutor {
 
     // Find the best available time slots
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
 
     // Get all scheduled items (excluding tasks being rescheduled)

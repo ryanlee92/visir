@@ -464,7 +464,11 @@ Show results: `<inapp_task>{"id":"123","title":"...","start_at":"2024-01-01T10:0
   static String addTaggedContextSection({required String systemMessage, required String taggedContext}) {
     var result = systemMessage;
     result += '\n\n## Tagged Items (Available for Function Calls)\n$taggedContext';
-    result += '\n\nWhen calling functions that require taskId or eventId, use the IDs from the tagged items above if the user doesn\'t specify one.';
+    result += '\n\n**CRITICAL**: When calling functions that require taskId, eventId, or taskIds (array):';
+    result += '\n- Extract IDs directly from tagged items above';
+    result += '\n- For single ID: use the ID from the tagged task/event';
+    result += '\n- For taskIds array (reschedule, etc.): use ALL tagged task IDs as array ["id1", "id2", ...]';
+    result += '\n- Do NOT omit IDs when tagged items are available';
     return result;
   }
 
