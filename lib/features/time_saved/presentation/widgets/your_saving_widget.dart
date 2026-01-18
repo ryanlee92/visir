@@ -9,6 +9,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/ui_extension
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/presentation/widgets/custom_circualr_loading_indicator.dart';
+import 'package:Visir/features/common/presentation/widgets/mesh_loading_background.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
 import 'package:Visir/features/common/presentation/widgets/selection_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
@@ -22,6 +23,7 @@ import 'package:Visir/features/time_saved/presentation/screens/time_saved_screen
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:super_clipboard/super_clipboard.dart';
@@ -141,9 +143,7 @@ class _YourSavingWidgetState extends ConsumerState<YourSavingWidget> {
   Widget build(BuildContext context) {
     final prefHourlyWage = ref.watch(hourlyWageProvider);
     UserEntity? user = ref.watch(authControllerProvider.select((v) => v.requireValue));
-    DateTime firstDay = user?.isSignedIn == true
-        ? DateUtils.dateOnly(user?.createdAt ?? DateTime.now())
-        : DateUtils.dateOnly(DateTime.now().subtract(Duration(days: 366)));
+    DateTime firstDay = user?.isSignedIn == true ? DateUtils.dateOnly(user?.createdAt ?? DateTime.now()) : DateUtils.dateOnly(DateTime.now().subtract(Duration(days: 366)));
     int totalDays = DateUtils.dateOnly(DateTime.now()).difference(firstDay).inDays;
 
     final viewType = widget.isTotalSavedPopup ? TimeSavedViewType.total : ref.watch(timeSavedViewTypeProvider);
@@ -158,10 +158,10 @@ class _YourSavingWidgetState extends ConsumerState<YourSavingWidget> {
     // 정렬된 리스트 사용 - build 메서드 내 정렬 제거로 성능 개선
     final list = ref.watch(_sortedUserActionSwitchListProvider(viewType));
 
-    Color _gray800 = Color(0xFF2C2C2E);
-    Color _gray900 = Color(0xFF1C1C1E);
-    Color _black = Color(0xFF000000);
-    Color _secondary = Color(0xFF5856D6);
+    Color _gray800 = context.onInverseSurface;
+    Color _gray900 = context.onSurfaceVariant;
+    Color _black = context.onBackground;
+    Color _secondary = context.secondary;
 
     final mostFrequentSwitch = list?.firstOrNull;
     final timeSaved = list?.totalWastedTime ?? 0;
@@ -245,26 +245,12 @@ class _YourSavingWidgetState extends ConsumerState<YourSavingWidget> {
                       children: [
                         TextSpan(
                           text: contentString,
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 40,
-                            height: 49 / 40,
-                            letterSpacing: -0.3,
-                            color: _black,
-                          ),
+                          style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w700, fontSize: 40, height: 49 / 40, letterSpacing: -0.3, color: _black),
                         ),
                         if (unitString != null)
                           TextSpan(
                             text: ' ${unitString}',
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
-                              height: 49 / 18,
-                              letterSpacing: -0.3,
-                              color: _black,
-                            ),
+                            style: TextStyle(fontFamily: 'Montserrat', fontWeight: FontWeight.w500, fontSize: 18, height: 49 / 18, letterSpacing: -0.3, color: _black),
                           ),
                       ],
                     ),
@@ -367,198 +353,207 @@ class _YourSavingWidgetState extends ConsumerState<YourSavingWidget> {
                         child: Container(
                           width: maxWidth,
                           height: maxWidth,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_background.jpg'),
-                              fit: BoxFit.cover,
-                            ),
+
+                          // image: DecorationImage(image: AssetImage('${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_background.jpg'), fit: BoxFit.cover),
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: EdgeInsets.only(left: 42, right: 42, top: 24, bottom: 31),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(context.tr.time_saved_savings_with, style: context.titleMedium?.textColor(_gray900).appFont(context).textBold),
-                                    SizedBox(width: 6),
-                                    Image.asset('${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_logo.png', width: 76, height: 22),
-                                    SizedBox(width: 2),
-                                    Text(
-                                      ': ${viewType.getTitle(context)}${viewType == TimeSavedViewType.total ? ' (${totalDays} ${context.tr.days.toLowerCase()})' : ''}',
-                                      style: context.titleMedium?.textColor(_secondary).appFont(context).textBold,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (mostFrequentSwitch == null && !isLoading)
-                                Expanded(
-                                  child: Center(
-                                    child: FutureBuilder(
-                                      future: Future.delayed(const Duration(milliseconds: 200)),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        return Text(
-                                          context.tr.time_saved_start_using_taskey,
-                                          style: context.titleMedium?.textColor(_gray900).appFont(context).textBold,
-                                          textAlign: TextAlign.center,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                )
-                              else ...[
-                                SizedBox(height: 16),
-                                Row(
-                                  spacing: 44,
-                                  children: [
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(text: context.tr.time_saved_time_saved),
-                                        contentString: timeSaved.toStringAsFixed(1),
-                                        unitString: context.tr.hours.toLowerCase(),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(text: context.tr.time_saved_money_saved),
-                                        contentString: '\$${Utils.numberFormatter(moneySaved)}',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 22),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 1),
-                                  child: Text(
-                                    context.tr.time_saved_that_is_equivalent_to,
-                                    style: context.titleMedium?.textColor(_gray900).appFont(context).textBold,
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  spacing: 44,
-                                  children: [
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(
-                                          text: context.tr.time_saved_watching,
-                                          children: [
-                                            TextSpan(
-                                              text: ' ${formatDisplayValue(formattedEpisodeCount)} ',
-                                              style: context.bodyLarge?.textColor(_gray800).textBold,
-                                            ),
-                                            TextSpan(
-                                              text: context.tr.time_saved_episodes.replaceAll(RegExp(r's$'), formattedEpisodeCount == 1 ? '' : 's'),
-                                              style: context.bodyLarge?.textColor(_gray800),
-                                            ),
-                                          ],
-                                        ),
-                                        contentString: '',
-                                        contentWidget: buildStackedImages(
-                                          formattedEpisodeCount,
-                                          '${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_popcorn.png',
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(
-                                          text: context.tr.time_saved_buy,
-                                          children: [
-                                            TextSpan(
-                                              text: ' ${formatDisplayValue(formattedBurgerCount)} ',
-                                              style: context.bodyLarge?.textColor(_gray800).textBold,
-                                            ),
-                                            TextSpan(
-                                              text: context.tr.time_saved_burgers.replaceAll(RegExp(r's$'), formattedBurgerCount == 1 ? '' : 's'),
-                                              style: context.bodyLarge?.textColor(_gray800),
-                                            ),
-                                          ],
-                                        ),
-                                        contentString: '',
-                                        contentWidget: buildStackedImages(
-                                          formattedBurgerCount,
-                                          '${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_burger.png',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 28),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 1),
-                                  child: Text(context.tr.time_saved_how_i_did_it, style: context.titleMedium?.textColor(_gray900).appFont(context).textBold),
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  spacing: 44,
-                                  children: [
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(text: context.tr.time_saved_switches_avoided),
-                                        contentString: Utils.numberFormatter(totalAppSwitches.toDouble()),
-                                        unitString: context.tr.time_saved_times,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(text: context.tr.time_saved_most_frequent_switch),
-                                        contentString: '',
-                                        contentWidget: mostFrequentSwitch == null
-                                            ? const SizedBox.shrink()
-                                            : Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(child: MeshLoadingBackground(doNotAnimate: true)),
+                                Positioned.fill(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 42, right: 42, top: 16, bottom: 16),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(context.tr.time_saved_savings_with, style: context.titleLarge?.textColor(_gray900).appFont(context).textBold),
+                                              SizedBox(width: 6),
+                                              // Visir logo with icon and text (same style as splash screen)
+                                              Row(
+                                                textDirection: TextDirection.ltr,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  Image.asset(
-                                                    mostFrequentSwitch.prevAction.transitionAssetPath,
-                                                    width: 36,
-                                                    height: 36,
-                                                    fit: BoxFit.contain,
-                                                    errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  VisirIcon(type: VisirIconType.arrowRight, size: 24, color: _gray800),
-                                                  const SizedBox(width: 8),
-                                                  Image.asset(
-                                                    mostFrequentSwitch.nextAction.transitionAssetPath,
-                                                    width: 36,
-                                                    height: 36,
-                                                    fit: BoxFit.contain,
-                                                    errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                                                  Image.asset('${(kDebugMode && kIsWeb) ? "" : "assets/"}app_icon/visir_foreground.png', width: 22, height: 22),
+                                                  SizedBox(width: 5),
+                                                  Text(
+                                                    'Visir',
+                                                    style: GoogleFonts.playfairDisplay(
+                                                      fontSize: context.titleLarge!.fontSize,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: _gray900,
+                                                      letterSpacing: -0.5,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                      ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          '${viewType.getTitle(context)}${viewType == TimeSavedViewType.total ? ' (${totalDays} ${context.tr.days.toLowerCase()})' : ''}',
+                                          style: context.titleSmall?.textColor(_secondary).appFont(context),
+                                        ),
+                                        if (mostFrequentSwitch == null && !isLoading)
+                                          Expanded(
+                                            child: Center(
+                                              child: FutureBuilder(
+                                                future: Future.delayed(const Duration(milliseconds: 200)),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                                    return const SizedBox.shrink();
+                                                  }
+                                                  return Text(
+                                                    context.tr.time_saved_start_using_taskey,
+                                                    style: context.titleMedium?.textColor(_gray900).appFont(context).textBold,
+                                                    textAlign: TextAlign.center,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        else ...[
+                                          SizedBox(height: 16),
+                                          Row(
+                                            spacing: 44,
+                                            children: [
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(text: context.tr.time_saved_time_saved),
+                                                  contentString: timeSaved.toStringAsFixed(1),
+                                                  unitString: context.tr.hours.toLowerCase(),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(text: context.tr.time_saved_money_saved),
+                                                  contentString: '\$${Utils.numberFormatter(moneySaved)}',
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 22),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 1),
+                                            child: Text(context.tr.time_saved_that_is_equivalent_to, style: context.titleMedium?.textColor(_gray900).appFont(context).textBold),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Row(
+                                            spacing: 44,
+                                            children: [
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(
+                                                    text: context.tr.time_saved_watching,
+                                                    children: [
+                                                      TextSpan(text: ' ${formatDisplayValue(formattedEpisodeCount)} ', style: context.bodyLarge?.textColor(_gray800).textBold),
+                                                      TextSpan(
+                                                        text: context.tr.time_saved_episodes.replaceAll(RegExp(r's$'), formattedEpisodeCount == 1 ? '' : 's'),
+                                                        style: context.bodyLarge?.textColor(_gray800),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  contentString: '',
+                                                  contentWidget: buildStackedImages(formattedEpisodeCount, '${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_popcorn.png'),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(
+                                                    text: context.tr.time_saved_buy,
+                                                    children: [
+                                                      TextSpan(text: ' ${formatDisplayValue(formattedBurgerCount)} ', style: context.bodyLarge?.textColor(_gray800).textBold),
+                                                      TextSpan(
+                                                        text: context.tr.time_saved_burgers.replaceAll(RegExp(r's$'), formattedBurgerCount == 1 ? '' : 's'),
+                                                        style: context.bodyLarge?.textColor(_gray800),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  contentString: '',
+                                                  contentWidget: buildStackedImages(formattedBurgerCount, '${(kDebugMode && kIsWeb) ? "" : "assets/"}images/saved_burger.png'),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 28),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 1),
+                                            child: Text(context.tr.time_saved_how_i_did_it, style: context.titleMedium?.textColor(_gray900).appFont(context).textBold),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Row(
+                                            spacing: 44,
+                                            children: [
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(text: context.tr.time_saved_switches_avoided),
+                                                  contentString: Utils.numberFormatter(totalAppSwitches.toDouble()),
+                                                  unitString: context.tr.time_saved_times,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(text: context.tr.time_saved_most_frequent_switch),
+                                                  contentString: '',
+                                                  contentWidget: mostFrequentSwitch == null
+                                                      ? const SizedBox.shrink()
+                                                      : Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Image.asset(
+                                                              mostFrequentSwitch.prevAction.transitionAssetPath,
+                                                              width: 36,
+                                                              height: 36,
+                                                              fit: BoxFit.contain,
+                                                              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                                                            ),
+                                                            const SizedBox(width: 8),
+                                                            VisirIcon(type: VisirIconType.arrowRight, size: 24, color: _gray800),
+                                                            const SizedBox(width: 8),
+                                                            Image.asset(
+                                                              mostFrequentSwitch.nextAction.transitionAssetPath,
+                                                              width: 36,
+                                                              height: 36,
+                                                              fit: BoxFit.contain,
+                                                              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 26),
+                                          Row(
+                                            spacing: 44,
+                                            children: [
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(text: context.tr.time_saved_hours_in_low_focus),
+                                                  contentString: lowFocusTimeInHours.toStringAsFixed(1),
+                                                  unitString: context.tr.hours.toLowerCase(),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: _detailSection(
+                                                  titleTextSpan: TextSpan(text: context.tr.time_saved_productive_hours_reclaimed),
+                                                  contentString: (productiveHoursReclaimedRatio * 100).toStringAsFixed(1),
+                                                  unitString: '%',
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 26),
-                                Row(
-                                  spacing: 44,
-                                  children: [
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(text: context.tr.time_saved_hours_in_low_focus),
-                                        contentString: lowFocusTimeInHours.toStringAsFixed(1),
-                                        unitString: context.tr.hours.toLowerCase(),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: _detailSection(
-                                        titleTextSpan: TextSpan(text: context.tr.time_saved_productive_hours_reclaimed),
-                                        contentString: (productiveHoursReclaimedRatio * 100).toStringAsFixed(1),
-                                        unitString: '%',
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ],
-                            ],
+                            ),
                           ),
                         ),
                       ),
