@@ -421,19 +421,19 @@ class AgentActionController extends _$AgentActionController {
             final isVideo = f.isVideo;
             String typeInfo = '';
             if (isImage) {
-              typeInfo = ' (이미지 파일)';
+              typeInfo = ' (image file)';
             } else if (isVideo) {
-              typeInfo = ' (비디오 파일)';
+              typeInfo = ' (video file)';
             } else if (f.name.toLowerCase().endsWith('.pdf')) {
-              typeInfo = ' (PDF 문서)';
+              typeInfo = ' (PDF document)';
             } else if (f.name.toLowerCase().endsWith('.txt') || f.name.toLowerCase().endsWith('.md')) {
-              typeInfo = ' (텍스트 파일)';
+              typeInfo = ' (text file)';
             }
-            return '파일명: ${f.name}${typeInfo}, 크기: ${sizeKB} KB';
+            return 'Filename: ${f.name}${typeInfo}, Size: ${sizeKB} KB';
           })
           .join('\n');
       // 파일 정보만 제공하고, AI가 판단하도록 함 (룰베이스 제거)
-      enhancedUserMessage = '$userMessage\n\n[첨부된 파일 정보]\n$fileInfoList';
+      enhancedUserMessage = '$userMessage\n\n[Attached File Information]\n$fileInfoList';
     }
 
     // updatedMessages가 제공되지 않으면 새로 생성 (파일 정보 포함)
@@ -1376,8 +1376,8 @@ class AgentActionController extends _$AgentActionController {
                 final successResults = results.where((r) => r['success'] == true).toList();
                 final errorResults = results.where((r) => r['success'] == false).toList();
 
-                final successMessages = successResults.map((r) => r['message'] as String? ?? '완료되었습니다.').where((m) => m.isNotEmpty).toList();
-                final errorMessages = errorResults.map((r) => '오류: ${r['error'] as String? ?? '알 수 없는 오류'}').where((m) => m.isNotEmpty).toList();
+                final successMessages = successResults.map((r) => r['message'] as String? ?? 'Completed successfully.').where((m) => m.isNotEmpty).toList();
+                final errorMessages = errorResults.map((r) => 'Error: ${r['error'] as String? ?? 'Unknown error'}').where((m) => m.isNotEmpty).toList();
 
                 final allMessages = <String>[];
                 if (successMessages.isNotEmpty) {
@@ -1390,14 +1390,14 @@ class AgentActionController extends _$AgentActionController {
                 if (allMessages.isNotEmpty) {
                   resultMessage = allMessages.join('\n\n');
                 } else {
-                  resultMessage = '함수가 실행되었습니다.';
+                  resultMessage = 'Function executed successfully.';
                 }
               } else {
-                resultMessage = '함수가 실행되었습니다.';
+                resultMessage = 'Function executed successfully.';
               }
             } else {
               // 그 외의 경우 기본 메시지 사용
-              resultMessage = '함수가 실행되었습니다.';
+              resultMessage = 'Function executed successfully.';
             }
           }
 
@@ -1588,13 +1588,13 @@ class AgentActionController extends _$AgentActionController {
             // searchContext를 가지고 원래 사용자 요청을 다시 처리
             // 재귀 호출에서는 이미 검색 결과가 있으므로 명확히 지시
             final enhancedUserMessage = searchContext != null && searchContext.isNotEmpty
-                ? '$userMessage\n\n[CRITICAL: 이미 검색이 완료되었고 검색 결과가 아래 "Searched Tasks" 또는 "Searched Events" 섹션에 포함되어 있습니다. 사용자의 질문에 직접 답변해주세요. "찾아볼게요", "불러올게요", "검색해볼게요", "조회해서", "목록으로 정리해드릴게요" 같은 표현을 사용하지 마세요. 검색 결과를 바탕으로 바로 답변해주세요.]'
+                ? '$userMessage\n\n[CRITICAL: The search has already been completed and the search results are included in the "Searched Tasks" or "Searched Events" section below. Please answer the user\'s question directly. DO NOT use phrases like "I will search", "I will retrieve", "I will look up", "I will check", "I will organize into a list". Just provide the answer based on the search results immediately.]'
                 : userMessage;
 
             // 재귀 호출에서는 검색 결과가 이미 있으므로 systemPrompt 추가
             // 검색 결과가 비어있을 때도 자연스럽게 응답하도록 지시
             final recursiveSystemPrompt = searchContext != null && searchContext.isNotEmpty
-                ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results. If the search results indicate that no items were found (e.g., "검색 결과: 해당 기간에 할일이 없습니다"), you MUST still provide a natural, friendly response to the user explaining that no items were found. Never return an empty response.'
+                ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results. If the search results indicate that no items were found (e.g., "Search results: No tasks found for this period"), you MUST still provide a natural, friendly response to the user explaining that no items were found. Never return an empty response.'
                 : null;
 
             final response = await _repository.generateGeneralChat(
@@ -1693,13 +1693,13 @@ class AgentActionController extends _$AgentActionController {
 
               // 재귀 호출에서는 이미 검색 결과가 있으므로 명확히 지시
               final enhancedUserMessage = searchContext != null && searchContext.isNotEmpty
-                  ? '$userMessage\n\n[CRITICAL: 이미 검색이 완료되었고 검색 결과가 아래 "Searched Tasks" 또는 "Searched Events" 섹션에 포함되어 있습니다. 사용자의 질문에 직접 답변해주세요. "찾아볼게요", "불러올게요", "검색해볼게요", "조회해서", "목록으로 정리해드릴게요" 같은 표현을 사용하지 마세요. 검색 결과를 바탕으로 바로 답변해주세요.]'
+                  ? '$userMessage\n\n[CRITICAL: The search has already been completed and the search results are included in the "Searched Tasks" or "Searched Events" section below. Please answer the user\'s question directly. DO NOT use phrases like "I will search", "I will retrieve", "I will look up", "I will check", "I will organize into a list". Just provide the answer based on the search results immediately.]'
                   : userMessage;
 
               // 재귀 호출에서는 검색 결과가 이미 있으므로 systemPrompt 추가
               // 검색 결과가 비어있을 때도 자연스럽게 응답하도록 지시
               final recursiveSystemPrompt = searchContext != null && searchContext.isNotEmpty
-                  ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results. If the search results indicate that no items were found (e.g., "검색 결과: 해당 기간에 할일이 없습니다"), you MUST still provide a natural, friendly response to the user explaining that no items were found. Never return an empty response.'
+                  ? 'IMPORTANT: The user has already requested a search, and the search results are provided in the "Searched Tasks" or "Searched Events" section below. You MUST answer the user\'s question directly based on these search results. DO NOT say things like "I will search", "I will retrieve", "I will look up", "I will check", "I will bring", "I will organize into a list" - the search is already done. Just provide the answer based on the search results. If the search results indicate that no items were found (e.g., "Search results: No tasks found for this period"), you MUST still provide a natural, friendly response to the user explaining that no items were found. Never return an empty response.'
                   : null;
 
               final response = await _repository.generateGeneralChat(
@@ -1819,7 +1819,7 @@ class AgentActionController extends _$AgentActionController {
 
                     if (cleanedResponse.isEmpty) {
                       // 함수 호출만 반환된 경우, 사용자에게 더 나은 메시지 표시
-                      final errorMessage = AgentActionMessage(role: 'assistant', content: '죄송합니다. 검색 결과를 바탕으로 답변을 생성하는 중에 문제가 발생했습니다. 다시 시도해주세요.');
+                      final errorMessage = AgentActionMessage(role: 'assistant', content: 'Sorry, there was an issue generating a response based on the search results. Please try again.');
                       return [...messages, errorMessage];
                     }
                     final assistantMessage = AgentActionMessage(role: 'assistant', content: cleanedResponse);
@@ -2563,11 +2563,22 @@ class AgentActionController extends _$AgentActionController {
       for (final result in functionResults) {
         final success = result['success'] as bool? ?? false;
         if (success) {
-          final message = result['message'] as String? ?? result['result']?.toString() ?? '완료되었습니다';
+          // For getPreviousContext, extract the actual summary content
+          var message = result['message'] as String? ?? 'Completed successfully';
+          if (result['result'] != null && result['result'] is Map<String, dynamic>) {
+            final resultData = result['result'] as Map<String, dynamic>;
+            if (resultData.containsKey('summary')) {
+              message = resultData['summary'] as String? ?? message;
+            }
+          }
+          if (message == result['message'] && result['result'] != null) {
+            // Fallback: if we only have the success message, try to use the full result
+            message = result['result'].toString();
+          }
           functionResultsSummary.add(message);
         } else {
-          final error = result['error'] as String? ?? '오류가 발생했습니다';
-          functionResultsSummary.add('오류: $error');
+          final error = result['error'] as String? ?? 'An error occurred';
+          functionResultsSummary.add('Error: $error');
         }
       }
 
@@ -2596,7 +2607,7 @@ class AgentActionController extends _$AgentActionController {
       // 함수 실행 결과를 포함해서 AI에게 전달
       final inboxesToUse = currentState2.availableInboxes?.isNotEmpty == true ? currentState2.availableInboxes : inboxes;
       await _generateGeneralChat(
-        cleanMessage.isNotEmpty ? cleanMessage : '함수 실행 완료',
+        cleanMessage.isNotEmpty ? cleanMessage : 'Function execution completed',
         updatedMessages: messagesWithFunctionResults,
         taggedTasks: updatedTaggedTasks,
         taggedEvents: updatedTaggedEvents,
@@ -3078,8 +3089,8 @@ class AgentActionController extends _$AgentActionController {
         final eventId = result['eventId'] as String?;
         final projectId = result['projectId'] as String?;
 
-        // summarizeAttachment의 경우 files 추출 및 summary 사용
-        if (functionName == 'summarizeAttachment') {
+        // summarizeAttachment and getPreviousContext: extract summary from result
+        if (functionName == 'summarizeAttachment' || functionName == 'getPreviousContext') {
           final resultData = result['result'] as Map<String, dynamic>?;
 
           // summary를 메시지에 사용
@@ -3090,9 +3101,7 @@ class AgentActionController extends _$AgentActionController {
             functionResultsSummary.add('$functionName: $summaryMessage');
           }
 
-          // summarizeAttachment는 요약만 제공하므로 파일을 첨부하지 않음
-
-          // summarizeAttachment는 이미 처리했으므로 continue
+          // Already processed, continue
           continue;
         }
 
@@ -3152,7 +3161,7 @@ class AgentActionController extends _$AgentActionController {
       }
 
       final functionResultsPrompt =
-          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo$recentIdsWarning\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "작업 ID: xxx" in Korean.\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
+          'The following $executedCount function call(s) were executed (${successCount} succeeded, ${errorCount} failed):\n$functionResultsText$additionalInfo$recentIdsWarning\n\nPlease provide a natural, user-friendly message summarizing what was done. Be concise and clear. IMPORTANT: Use the exact number of function calls executed ($executedCount), not any other number.\n\nCRITICAL: If any taskId or eventId is mentioned above (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Format: "Task created successfully (taskId: xxx)" or "Task ID: xxx".\n\nABSOLUTE RULE: These functions have ALREADY been executed. DO NOT call these functions again. Only provide a summary message, do NOT call any functions.';
 
       // 함수 실행 결과를 포함한 메시지로 AI 호출 (summarizeAttachment의 경우 files 포함)
       final functionResultsMessages = [...state.messages, AgentActionMessage(role: 'user', content: functionResultsPrompt, files: attachmentFiles)];
@@ -3194,7 +3203,7 @@ class AgentActionController extends _$AgentActionController {
           apiKey: apiKey,
           userId: userId,
           systemPrompt:
-              'You are a helpful assistant. Provide a brief, natural summary of the function execution results. CRITICAL: If any taskId or eventId is mentioned in the function results (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Always include taskId/eventId in the format "(taskId: xxx)" or "(작업 ID: xxx)" in Korean responses.\n\nABSOLUTE RULE: The functions mentioned in the user message have ALREADY been executed. DO NOT call any functions. Only provide a summary message describing what was done. DO NOT call createTask, updateTask, createEvent, updateEvent, or any other functions. If the user message mentions "recentTaskIds" or "recentEventIds" or "RECENT task ID", it means a task/event was JUST created. DO NOT call createTask/createEvent again - only provide a summary message.',
+              'You are a helpful assistant. Provide a brief, natural summary of the function execution results. CRITICAL: If any taskId or eventId is mentioned in the function results (e.g., "taskId: xxx" or "Created task IDs: xxx"), you MUST include it in your response message so it can be referenced in future conversations. Always include taskId/eventId in the format "(taskId: xxx)" or "(Task ID: xxx)".\n\nABSOLUTE RULE: The functions mentioned in the user message have ALREADY been executed. DO NOT call any functions. Only provide a summary message describing what was done. DO NOT call createTask, updateTask, createEvent, updateEvent, or any other functions. If the user message mentions "recentTaskIds" or "recentEventIds" or "RECENT task ID", it means a task/event was JUST created. DO NOT call createTask/createEvent again - only provide a summary message.',
         );
 
         final functionAiResponse = functionResponse.fold((failure) => null, (response) => response);

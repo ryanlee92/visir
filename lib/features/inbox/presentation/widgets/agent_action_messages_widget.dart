@@ -977,57 +977,31 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
     final unescape = HtmlUnescape();
     cleanedContent = unescape.convert(cleanedContent);
 
-    // Parse and convert tagged entities from user messages
+    // For user messages: Parse "Tagged X:" sections and convert zero-width markers to inline tags
     if (isUser) {
-      // Extract tagged entities from "Tagged Tasks:", "Tagged Events:", etc. sections
       final Map<String, Map<String, dynamic>> entityMap = {};
 
       // Parse Tagged Tasks section
-      final taggedTasksMatch = RegExp(r'Tagged Tasks?:\s*\n((?:.*?\(ID:\s*([^\)]+)\)\s*\n?)+)', dotAll: true).firstMatch(cleanedContent);
-      if (taggedTasksMatch != null) {
-        final tasksSection = taggedTasksMatch.group(1) ?? '';
-        // Match pattern: "Full Title (ID: uuid)"
-        // Capture everything before "(ID: " as the title
-        final taskMatches = RegExp(r'(.+?)\s*\(ID:\s*([^\)]+)\)', dotAll: true).allMatches(tasksSection);
-        for (final match in taskMatches) {
-          var title = match.group(1)?.trim() ?? '';
-          final id = match.group(2)?.trim() ?? '';
-          if (id.isNotEmpty && title.isNotEmpty) {
-            print('####### title: ${title}');
-            entityMap['task:$id'] = {'title': title, 'id': id, 'type': 'task'};
-          }
+      final taskMatches = RegExp(r'- (.+?) \(ID: ([^\)]+)\)', multiLine: true).allMatches(cleanedContent);
+      for (final match in taskMatches) {
+        final title = match.group(1)?.trim() ?? '';
+        final id = match.group(2)?.trim() ?? '';
+        if (id.isNotEmpty && title.isNotEmpty) {
+          entityMap['task:$id'] = {'title': title, 'id': id};
         }
       }
 
-      // Parse Tagged Events section
-      final taggedEventsMatch = RegExp(r'Tagged Events?:\s*\n((?:.*?\(ID:\s*([^\)]+)\)\s*\n?)+)', dotAll: true).firstMatch(cleanedContent);
-      if (taggedEventsMatch != null) {
-        final eventsSection = taggedEventsMatch.group(1) ?? '';
-        final eventMatches = RegExp(r'(.+?)\s*\(ID:\s*([^\)]+)\)', dotAll: true).allMatches(eventsSection);
-        for (final match in eventMatches) {
-          var title = match.group(1)?.trim() ?? '';
-          final id = match.group(2)?.trim() ?? '';
-          if (id.isNotEmpty && title.isNotEmpty) {
-            entityMap['event:$id'] = {'title': title, 'event_id': id, 'type': 'event'};
-          }
+      // Parse Tagged Events section (similar pattern)
+      final eventMatches = RegExp(r'- (.+?) \(ID: ([^\)]+)\)', multiLine: true).allMatches(cleanedContent);
+      for (final match in eventMatches) {
+        final title = match.group(1)?.trim() ?? '';
+        final id = match.group(2)?.trim() ?? '';
+        if (id.isNotEmpty && title.isNotEmpty && !entityMap.containsKey('task:$id')) {
+          entityMap['event:$id'] = {'title': title, 'event_id': id};
         }
       }
 
-      // Parse Tagged Inboxes section
-      final taggedInboxesMatch = RegExp(r'Tagged Inboxes?:\s*\n((?:.*?\(ID:\s*([^\)]+)\)\s*\n?)+)', dotAll: true).firstMatch(cleanedContent);
-      if (taggedInboxesMatch != null) {
-        final inboxesSection = taggedInboxesMatch.group(1) ?? '';
-        final inboxMatches = RegExp(r'(.+?)\s*\(ID:\s*([^\)]+)\)', dotAll: true).allMatches(inboxesSection);
-        for (final match in inboxMatches) {
-          var title = match.group(1)?.trim() ?? '';
-          final id = match.group(2)?.trim() ?? '';
-          if (id.isNotEmpty && title.isNotEmpty) {
-            entityMap['inbox:$id'] = {'title': title, 'id': id, 'type': 'inbox'};
-          }
-        }
-      }
-
-      // Replace zero-width space mentions with inline badge tags
+      // Replace zero-width markers with inline tags
       cleanedContent = cleanedContent.replaceAllMapped(RegExp(r'\u200b@([^\u200b]+)\u200b', unicode: true), (match) {
         final mentionKey = match.group(1) ?? '';
         if (entityMap.containsKey(mentionKey)) {
@@ -1041,16 +1015,16 @@ class _AgentActionMessagesWidgetState extends ConsumerState<AgentActionMessagesW
             return '<user_tagged_inbox>$jsonText</user_tagged_inbox>';
           }
         }
-        return '';
+        return ''; // Remove marker if no entity found
       });
 
-      // Remove the "Tagged Tasks:", "Tagged Events:", etc. text sections
-      cleanedContent = cleanedContent.replaceAll(RegExp(r'Tagged Tasks?:.*', dotAll: true), '');
-      cleanedContent = cleanedContent.replaceAll(RegExp(r'Tagged Events?:.*', dotAll: true), '');
-      cleanedContent = cleanedContent.replaceAll(RegExp(r'Tagged Inboxes?:.*', dotAll: true), '');
-
-      // Remove any markdown headers that might be left over
-      cleanedContent = cleanedContent.replaceAll(RegExp(r'#+\s*$'), '');
+      // Remove all "Tagged X:" sections
+      cleanedContent = cleanedContent.replaceAll(RegExp(r'\n*##?\s*Tagged Tasks?:.*$', dotAll: true), '');
+      cleanedContent = cleanedContent.replaceAll(RegExp(r'\n*##?\s*Tagged Events?:.*$', dotAll: true), '');
+      cleanedContent = cleanedContent.replaceAll(RegExp(r'\n*##?\s*Tagged Inbox Items?:.*$', dotAll: true), '');
+      cleanedContent = cleanedContent.replaceAll(RegExp(r'\n*##?\s*Tagged Connections?:.*$', dotAll: true), '');
+      cleanedContent = cleanedContent.replaceAll(RegExp(r'\n*##?\s*Tagged Channels?:.*$', dotAll: true), '');
+      cleanedContent = cleanedContent.replaceAll(RegExp(r'\n*##?\s*Tagged Projects?:.*$', dotAll: true), '');
 
       cleanedContent = cleanedContent.trim();
     }
