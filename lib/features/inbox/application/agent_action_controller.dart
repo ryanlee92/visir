@@ -640,12 +640,9 @@ class AgentActionController extends _$AgentActionController {
 
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
-        print('DEBUG: AI response received, message length: ${aiMessage.length}');
 
         // Extract and save token usage
-        print('DEBUG: Calling _saveTokenUsage...');
         await _saveTokenUsage(aiResponse, selectedModel, useUserApiKey);
-        print('DEBUG: _saveTokenUsage completed');
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
@@ -778,14 +775,6 @@ class AgentActionController extends _$AgentActionController {
 
         final executor = McpFunctionExecutor();
         final allFunctionCalls = isRecursiveCall ? <Map<String, dynamic>>[] : executor.parseFunctionCalls(aiMessage);
-
-        if (allFunctionCalls.isNotEmpty) {
-          print('DEBUG: Parsed ${allFunctionCalls.length} function calls from AI response');
-          for (final call in allFunctionCalls) {
-            final funcName = call['function'] as String? ?? '';
-            print('DEBUG: Function call: $funcName');
-          }
-        }
 
         // 중복 함수 호출 제거 (AI가 스스로 판단하도록 룰베이스 제거)
         final functionCalls = <Map<String, dynamic>>[];
@@ -1002,9 +991,6 @@ class AgentActionController extends _$AgentActionController {
             // searchContext가 비어있어도 재귀 호출하여 일반 응답 생성 (검색 결과가 비어있을 수 있음)
             // 재귀 호출에는 최신 state의 messages를 전달 (silent message 포함)
             final currentStateMessages = state.messages;
-            print(
-              '[AgentAction] Calling recursive _generateGeneralChat with searchContext: ${searchContext != null ? "exists (${searchContext.length} chars)" : "null"}, currentStateMessages.length: ${currentStateMessages.length}',
-            );
             await _generateGeneralChat(
               userMessage,
               selectedProject: selectedProject,
@@ -1129,10 +1115,6 @@ class AgentActionController extends _$AgentActionController {
                   availableInboxes: updatedAvailableInboxes,
                   remainingCredits: remainingCredits,
                 );
-
-                if (functionName == 'getPreviousContext') {
-                  print('DEBUG getPreviousContext executed: result=$result');
-                }
 
                 return {'functionCall': functionCall, 'result': result, 'functionName': functionName};
               }),
@@ -1295,8 +1277,6 @@ class AgentActionController extends _$AgentActionController {
                 if ((functionName == 'summarizeAttachment' || functionName == 'getPreviousContext') && result['result'] != null) {
                   final resultData = result['result'] as Map<String, dynamic>;
                   final summary = resultData['summary'] as String?;
-                  print('DEBUG getPreviousContext: functionName=$functionName, summary length=${summary?.length ?? 0}');
-                  print('DEBUG getPreviousContext: summary preview=${summary?.substring(0, summary.length > 100 ? 100 : summary.length)}');
                   successMessage = summary ?? result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
                 } else {
                   successMessage = result['message'] as String? ?? Utils.mainContext.tr.agent_action_task_completed;
@@ -1538,7 +1518,6 @@ class AgentActionController extends _$AgentActionController {
               files: attachmentFilesFromResults?.isNotEmpty == true ? attachmentFilesFromResults : null,
             );
             updatedMessagesWithResponse = [...messages, assistantMessage];
-            print('DEBUG: Created assistant message. Total messages: ${updatedMessagesWithResponse.length}');
 
             // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
             if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
@@ -1568,9 +1547,6 @@ class AgentActionController extends _$AgentActionController {
           // 검색 함수만 호출된 경우, searchContext를 가지고 원래 사용자 요청을 다시 처리
           // 첫 요청에서도 함수 호출만 있고 일반 응답이 없을 때 처리하도록 수정
           if (functionCallsToProcess.isEmpty && resultMessage.trim().isEmpty) {
-            print(
-              '[AgentAction] Generating general response - functionCallsToProcess.isEmpty: true, resultMessage.isEmpty: true, isRecursiveCall: $isRecursiveCall, searchContext: ${searchContext != null ? "exists" : "null"}',
-            );
             // searchContext를 가지고 원래 사용자 요청을 다시 처리하여 자연어 응답 생성
             final me = ref.read(authControllerProvider).value;
             final userId = me?.id;
@@ -3761,11 +3737,8 @@ class AgentActionController extends _$AgentActionController {
 
   /// 챗 히스토리를 저장합니다 (로컬 + Supabase).
   Future<void> _saveChatHistory({List<ProjectEntity>? taggedProjects}) async {
-    print('DEBUG: _saveChatHistory called. Messages count: ${state.messages.length}');
-
     // 메시지가 비어있으면 저장하지 않음
     if (state.messages.isEmpty) {
-      print('DEBUG: Messages empty, skipping save');
       return;
     }
 
@@ -3802,33 +3775,23 @@ class AgentActionController extends _$AgentActionController {
     try {
       await _historyRepository.saveChatHistory(userId: me.id, history: history);
     } catch (e) {
-      // Supabase 저장 실패는 무시 (but log for debugging)
-      print('ERROR: Failed to save chat history: $e');
-      print('Session ID: $sessionId');
-      print('Messages count: ${state.messages.length}');
+      // Supabase 저장 실패는 무시
     }
   }
 
   /// AI 응답에서 토큰 사용량을 추출하고 저장합니다
   Future<void> _saveTokenUsage(Map<String, dynamic> aiResponse, AgentModel model, bool useUserApiKey) async {
-    print('DEBUG: _saveTokenUsage START - provider: ${model.provider.name}, model: ${model.modelName}, useUserApiKey: $useUserApiKey');
-
     try {
       final me = ref.read(authControllerProvider).value;
       if (me == null) {
-        print('DEBUG: User is null, skipping token usage tracking');
         return;
       }
-
-      print('DEBUG: User ID: ${me.id}');
-      print('DEBUG: AI response keys: ${aiResponse.keys.join(", ")}');
 
       // Check if datasource already extracted token usage to _token_usage field
       TokenUsage? tokenUsage;
       final customTokenUsage = aiResponse['_token_usage'] as Map<String, dynamic>?;
 
       if (customTokenUsage != null) {
-        print('DEBUG: Found _token_usage field in response');
         // Extract from custom _token_usage field (already processed by datasource)
         final promptTokens = customTokenUsage['prompt_tokens'] as int? ?? 0;
         final completionTokens = customTokenUsage['completion_tokens'] as int? ?? 0;
@@ -3841,26 +3804,18 @@ class AgentActionController extends _$AgentActionController {
         );
       } else {
         // Fallback to provider-specific extraction
-        print('DEBUG: No _token_usage field, trying provider-specific extraction');
         if (model.provider == AiProvider.anthropic) {
-          print('DEBUG: Extracting from Anthropic response');
           tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
         } else if (model.provider == AiProvider.google) {
-          print('DEBUG: Extracting from Google AI response');
           tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
         } else if (model.provider == AiProvider.openai) {
-          print('DEBUG: Extracting from OpenAI response');
           tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
         }
       }
 
       if (tokenUsage == null) {
-        print('WARNING: Could not extract token usage from AI response');
-        print('WARNING: Response structure: ${aiResponse.toString().substring(0, aiResponse.toString().length > 500 ? 500 : aiResponse.toString().length)}');
         return;
       }
-
-      print('DEBUG: Token usage - prompt: ${tokenUsage.promptTokens}, completion: ${tokenUsage.completionTokens}, total: ${tokenUsage.totalTokens}');
 
       // Calculate credits used
       final creditsUsed = AiPricingCalculator.calculateCreditsCostFromModel(
@@ -3868,8 +3823,6 @@ class AgentActionController extends _$AgentActionController {
         completionTokens: tokenUsage.completionTokens,
         model: model,
       );
-
-      print('DEBUG: Credits used: $creditsUsed');
 
       // Create usage log entity
       final usageLog = AiApiUsageLogEntity(
@@ -3890,21 +3843,13 @@ class AgentActionController extends _$AgentActionController {
       final datasource = SupabaseAiUsageLogDatasource();
       await datasource.saveUsageLog(usageLog);
 
-      print('DEBUG: Usage log saved successfully');
-
       // Deduct credits from user if using platform credits (not user API key)
       if (!useUserApiKey) {
-        final currentCredits = me.userAiCredits;
-        final newCredits = currentCredits - creditsUsed;
-
-        print('DEBUG: Deducting credits: $currentCredits -> $newCredits');
-
         // Refresh user entity to get updated credits from backend
         // The backend should handle credit deduction via Supabase triggers/functions
         ref.invalidate(authControllerProvider);
       }
     } catch (e) {
-      print('ERROR: Failed to save token usage: $e');
       // Don't throw - token usage tracking is non-critical
     }
   }

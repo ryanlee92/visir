@@ -148,7 +148,6 @@ class _AiCreditsScreenState extends ConsumerState<AiCreditsScreen> {
   @override
   Widget build(BuildContext context) {
     final currentCredits = ref.watch(authControllerProvider.select((state) => state.value?.userAiCredits)) ?? 0.0;
-    print('####### currentCredits: ${currentCredits}');
     final tokens = AiPricingCalculator.calculateTokensFromCredits(currentCredits);
     final tokensString = '${Utils.numberFormatter(tokens.toDouble())}';
 

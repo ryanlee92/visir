@@ -5797,7 +5797,6 @@ class McpFunctionExecutor {
   /// Summarizes attachments for a specific inbox
   Future<Map<String, dynamic>> _executeSummarizeAttachment(Map<String, dynamic> args, {required TabType tabType}) async {
     final inboxId = args['inboxId'] as String?;
-    print('DEBUG: summarizeAttachment called with inboxId: $inboxId');
 
     if (inboxId == null || inboxId.isEmpty) {
       return {'success': false, 'error': 'inboxId is required'};
@@ -5812,7 +5811,6 @@ class McpFunctionExecutor {
     if (inboxId.startsWith('mail_')) {
       // Parse mail inboxId: mail_${type}_${hostMail}_${messageId}
       final parts = inboxId.split('_');
-      print('DEBUG: inboxId parts: $parts');
 
       if (parts.length < 4) {
         return {'success': false, 'error': 'Invalid inboxId format'};
@@ -5821,8 +5819,6 @@ class McpFunctionExecutor {
       final messageId = parts.last;
       final typeName = parts[1];
       final hostMail = parts.sublist(2, parts.length - 1).join('_'); // hostMail may contain underscores
-
-      print('DEBUG: Extracted - messageId: $messageId, typeName: $typeName, hostMail: $hostMail');
 
       // Find mail type
       MailEntityType? mailType;
@@ -5836,13 +5832,10 @@ class McpFunctionExecutor {
 
       // Find OAuth for this email
       final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
-      print('DEBUG: Available mail accounts: ${oauths.map((o) => o.email).join(", ")}');
 
       final oauth = oauths.firstWhereOrNull((o) => o.email == hostMail);
 
       if (oauth == null) {
-        print('ERROR: No OAuth found for hostMail: $hostMail');
-        print('ERROR: Available accounts: ${oauths.map((o) => o.email).toList()}');
         return {
           'success': false,
           'error': 'Mail account not found for: $hostMail\n\nThis email account is not connected. Please add the account in Settings > Mail, or the task may be linked to an old/removed email account.'
@@ -6097,10 +6090,7 @@ class McpFunctionExecutor {
     }
 
     // Extract attachment files (images for PDFs, etc.)
-    print('DEBUG: Calling _extractAttachmentFiles for inboxId: $inboxId');
     final attachmentFiles = await _extractAttachmentFiles([inbox], tabType: tabType, attachmentId: attachmentId);
-    print('DEBUG: attachmentFiles keys: ${attachmentFiles.keys.join(", ")}');
-    print('DEBUG: attachmentFiles[$inboxId] length: ${attachmentFiles[inboxId]?.length ?? 0}');
 
     if (attachmentFiles.containsKey(inboxId)) {
       final files = attachmentFiles[inboxId]!;
@@ -6219,8 +6209,6 @@ class McpFunctionExecutor {
         };
       }
     } else {
-      print('ERROR: No attachments found in attachmentFiles for inboxId: $inboxId');
-      print('ERROR: attachmentFiles keys: ${attachmentFiles.keys.toList()}');
       return {
         'success': false,
         'error': 'No attachments found or no content extracted.\n\nThis could happen if:\n1. The email has no attachments\n2. Attachment download failed\n3. The attachment format is not supported\n\nPlease check if the email actually has attachments.',
@@ -6231,27 +6219,19 @@ class McpFunctionExecutor {
   /// Downloads attachments and converts them to PlatformFile format
   /// PDFs are converted to PNG images (one per page)
   Future<Map<String, List<PlatformFile>>> _extractAttachmentFiles(List<InboxEntity> inboxes, {TabType tabType = TabType.home, String? attachmentId}) async {
-    print('DEBUG: _extractAttachmentFiles called with ${inboxes.length} inbox(es)');
     final Map<String, List<PlatformFile>> attachmentFiles = {};
 
     for (final inbox in inboxes) {
-      print('DEBUG: Processing inbox: ${inbox.id}');
       final files = <PlatformFile>[];
 
       try {
         // Process mail attachments
         if (inbox.linkedMail != null) {
-          print('DEBUG: Inbox has linkedMail, hostMail: ${inbox.linkedMail!.hostMail}');
           final mailRepository = ref.read(mailRepositoryProvider);
           final oauths = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths)) ?? [];
           final oauth = oauths.firstWhereOrNull((o) => o.email == inbox.linkedMail!.hostMail);
 
-          if (oauth == null) {
-            print('ERROR: OAuth not found for hostMail: ${inbox.linkedMail!.hostMail}');
-          }
-
           if (oauth != null) {
-            print('DEBUG: OAuth found, fetching mail entity...');
             final mail = inbox.linkedMail!;
             final mailType = MailEntityTypeX.fromOAuthType(oauth.type);
             final labelIdsToTry = mail.labelIds?.isNotEmpty == true ? mail.labelIds! : [CommonMailLabels.inbox.id, CommonMailLabels.sent.id, CommonMailLabels.archive.id];
@@ -6267,7 +6247,6 @@ class McpFunctionExecutor {
             }
 
             if (mailEntity == null) {
-              print('DEBUG: mailEntity not found in labels, trying inbox...');
               final threadResult = await mailRepository.fetchThreads(
                 oauth: oauth,
                 type: mailType,
@@ -6279,78 +6258,52 @@ class McpFunctionExecutor {
             }
 
             if (mailEntity == null) {
-              print('ERROR: mailEntity still null after all attempts');
               continue;
             }
 
-            print('DEBUG: mailEntity found, checking attachments...');
             final attachments = mailEntity.getAttachments();
-            print('DEBUG: Found ${attachments.length} attachment(s)');
 
             if (attachments.isEmpty) {
-              print('ERROR: No attachments in mailEntity');
               continue;
             }
 
             var filteredAttachments = attachments;
             if (attachmentId != null && attachmentId.isNotEmpty) {
-              print('DEBUG: Filtering for specific attachmentId: $attachmentId');
               filteredAttachments = attachments.where((a) => a.id == attachmentId).toList();
               if (filteredAttachments.isEmpty) {
-                print('ERROR: No attachment found with id: $attachmentId');
                 continue;
               }
             }
 
-            print('DEBUG: Processing ${filteredAttachments.length} filtered attachment(s)');
             final attachmentIds = filteredAttachments.map((a) => a.id).whereType<String>().toList();
-            print('DEBUG: Attachment IDs: ${attachmentIds.join(", ")}');
 
             final fetchResult = await mailRepository.fetchAttachments(email: mail.hostMail, messageId: mail.messageId, oauth: oauth, attachmentIds: attachmentIds);
 
             await fetchResult.fold(
               (failure) async {
-                print('ERROR: Failed to fetch attachments: ${failure.toString()}');
                 // Failed to fetch attachments
               },
               (attachmentData) async {
-                print('DEBUG: Successfully fetched ${attachmentData.length} attachment(s)');
-                print('DEBUG: attachmentData keys: ${attachmentData.keys.join(", ")}');
-                print('DEBUG: Available attachment IDs in mailEntity: ${attachments.map((a) => a.id).join(", ")}');
-
-                int entryIndex = 0;
                 for (final entry in attachmentData.entries) {
-                  entryIndex++;
-                  print('DEBUG: Processing entry $entryIndex of ${attachmentData.length}');
-
                   final attachmentId = entry.key;
-                  print('DEBUG: Entry attachmentId: $attachmentId');
-
                   final bytes = entry.value;
-                  print('DEBUG: Bytes is null: ${bytes == null}, Bytes length: ${bytes?.length ?? 0}');
 
                   if (bytes == null) {
-                    print('DEBUG: Skipping entry - bytes is null');
                     continue;
                   }
 
                   final attachment = attachments.firstWhereOrNull((a) => a.id == attachmentId);
-                  print('DEBUG: Attachment lookup result: ${attachment != null ? "found (${attachment.name})" : "NOT FOUND"}');
 
                   if (attachment == null) {
-                    print('DEBUG: Skipping entry - attachment not found in mailEntity');
                     continue;
                   }
 
                   final fileName = attachment.name ?? 'unknown';
-                  print('DEBUG: Converting attachment: $fileName (${bytes.length} bytes)');
 
                   // Convert PDF to images or add as-is for other files
                   final convertedFiles = await _convertAttachmentToFiles(bytes, fileName);
-                  print('DEBUG: Conversion result: ${convertedFiles.length} file(s) created');
 
                   files.addAll(convertedFiles);
-                  print('DEBUG: Total files in list now: ${files.length}');
                 }
               },
             );
@@ -6410,22 +6363,14 @@ class McpFunctionExecutor {
           }
         }
       } catch (e, stackTrace) {
-        print('ERROR: Exception processing attachments: $e');
-        print('ERROR: Stack trace: $stackTrace');
         continue;
       }
 
-      print('DEBUG: Total files collected for inbox ${inbox.id}: ${files.length}');
-
       if (files.isNotEmpty) {
         attachmentFiles[inbox.id] = files;
-        print('DEBUG: Added ${files.length} file(s) to attachmentFiles[${inbox.id}]');
-      } else {
-        print('DEBUG: No files to add for inbox ${inbox.id}');
       }
     }
 
-    print('DEBUG: _extractAttachmentFiles returning with ${attachmentFiles.length} inbox(es) with attachments');
     return attachmentFiles;
   }
 
@@ -6489,12 +6434,7 @@ class McpFunctionExecutor {
       else if (lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerName.endsWith('.csv') || lowerName.endsWith('.html') || lowerName.endsWith('.htm')) {
         files.add(PlatformFile(name: fileName, size: bytes.length, bytes: bytes));
       }
-      // Other file types - log as unsupported
-      else {
-        print('DEBUG: Unsupported file type for summarization: $fileName');
-      }
     } catch (e) {
-      print('ERROR: Exception in _convertAttachmentToFiles: $e');
       // Error converting attachment to files
     }
 

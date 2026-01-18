@@ -209,7 +209,6 @@ class HtmlViewportSyncState extends ConsumerState<HtmlViewportSync> {
     //     measuredWidth = (await controller.getContentWidth())?.toDouble();
     //   }
     // } catch (e) {
-    //   print('[DEBUG] _performContentMeasurement: 측정 중 오류 발생 - $e');
     // }
 
     dynamic metrics;

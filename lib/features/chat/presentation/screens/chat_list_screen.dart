@@ -707,8 +707,6 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
 
     if (scrollController == null) return const SizedBox.shrink();
 
-    print('[ChatListScreen] build called');
-
     return GestureDetector(
       onTap: doEmptyTapAction,
       child: KeyboardShortcut(

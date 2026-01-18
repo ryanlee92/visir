@@ -2234,8 +2234,6 @@ class Utils {
             files.add(platformFile);
           }
 
-          print('files: ${files.length} ${event.session.items.length}');
-
           onDrop?.call(files);
         },
         child: child,
