@@ -19,6 +19,10 @@ import 'package:Visir/features/inbox/application/agent_context_service.dart';
 import 'package:Visir/features/inbox/infrastructure/repositories/inbox_repository.dart';
 import 'package:Visir/features/inbox/infrastructure/repositories/agent_chat_history_repository.dart';
 import 'package:Visir/features/inbox/domain/entities/agent_chat_history_entity.dart';
+import 'package:Visir/features/inbox/infrastructure/utils/token_usage_extractor.dart';
+import 'package:Visir/features/auth/infrastructure/datasources/supabase_ai_usage_log_datasource.dart';
+import 'package:Visir/features/auth/domain/entities/ai_api_usage_log_entity.dart';
+import 'package:Visir/features/common/domain/entities/ai_provider_entity.dart';
 import 'package:Visir/features/inbox/presentation/widgets/inbox_action_suggestions_widget.dart';
 import 'package:Visir/features/inbox/providers.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
@@ -636,6 +640,9 @@ class AgentActionController extends _$AgentActionController {
 
       if (aiResponse != null && aiResponse['message'] != null) {
         var aiMessage = aiResponse['message'] as String;
+
+        // Extract and save token usage
+        await _saveTokenUsage(aiResponse, selectedModel, useUserApiKey);
 
         // HTML 엔티티 unescape 처리
         final unescape = HtmlUnescape();
@@ -1455,6 +1462,9 @@ class AgentActionController extends _$AgentActionController {
 
                   final confirmationAiResponse = confirmationResponse.fold((failure) => null, (response) => response);
                   if (confirmationAiResponse != null && confirmationAiResponse['message'] != null) {
+                    // Extract and save token usage for confirmation message
+                    await _saveTokenUsage(confirmationAiResponse, selectedModel, useUserApiKey);
+
                     resultMessage = confirmationAiResponse['message'] as String;
                     // HTML 엔티티 unescape 처리
                     final unescape = HtmlUnescape();
@@ -3741,6 +3751,76 @@ class AgentActionController extends _$AgentActionController {
       print('ERROR: Failed to save chat history: $e');
       print('Session ID: $sessionId');
       print('Messages count: ${state.messages.length}');
+    }
+  }
+
+  /// AI 응답에서 토큰 사용량을 추출하고 저장합니다
+  Future<void> _saveTokenUsage(Map<String, dynamic> aiResponse, AgentModel model, bool useUserApiKey) async {
+    try {
+      final me = ref.read(authControllerProvider).value;
+      if (me == null) return;
+
+      // Extract token usage based on provider
+      TokenUsage? tokenUsage;
+      if (model.provider == AiProvider.anthropic) {
+        tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
+      } else if (model.provider == AiProvider.google) {
+        tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
+      } else if (model.provider == AiProvider.openai) {
+        tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
+      }
+
+      if (tokenUsage == null) {
+        print('WARNING: Could not extract token usage from AI response');
+        return;
+      }
+
+      print('DEBUG: Token usage - prompt: ${tokenUsage.promptTokens}, completion: ${tokenUsage.completionTokens}, total: ${tokenUsage.totalTokens}');
+
+      // Calculate credits used
+      final creditsUsed = AiPricingCalculator.calculateCreditsCostFromModel(
+        promptTokens: tokenUsage.promptTokens,
+        completionTokens: tokenUsage.completionTokens,
+        model: model,
+      );
+
+      print('DEBUG: Credits used: $creditsUsed');
+
+      // Create usage log entity
+      final usageLog = AiApiUsageLogEntity(
+        id: const Uuid().v4(),
+        userId: me.id,
+        apiProvider: model.provider.key,
+        model: model.modelName,
+        functionName: 'agent_chat', // Function name for agent chat
+        promptTokens: tokenUsage.promptTokens,
+        completionTokens: tokenUsage.completionTokens,
+        totalTokens: tokenUsage.totalTokens,
+        creditsUsed: creditsUsed,
+        usedUserApiKey: useUserApiKey,
+        createdAt: DateTime.now(),
+      );
+
+      // Save usage log to Supabase
+      final datasource = SupabaseAiUsageLogDatasource();
+      await datasource.saveUsageLog(usageLog);
+
+      print('DEBUG: Usage log saved successfully');
+
+      // Deduct credits from user if using platform credits (not user API key)
+      if (!useUserApiKey) {
+        final currentCredits = me.userAiCredits;
+        final newCredits = currentCredits - creditsUsed;
+
+        print('DEBUG: Deducting credits: $currentCredits -> $newCredits');
+
+        // Refresh user entity to get updated credits from backend
+        // The backend should handle credit deduction via Supabase triggers/functions
+        ref.invalidate(authControllerProvider);
+      }
+    } catch (e) {
+      print('ERROR: Failed to save token usage: $e');
+      // Don't throw - token usage tracking is non-critical
     }
   }
 }
