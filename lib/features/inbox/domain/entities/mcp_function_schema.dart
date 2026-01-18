@@ -362,7 +362,7 @@ class McpFunctionRegistry {
       McpFunctionSchema(
         name: 'reschedule',
         description:
-            'Reschedules multiple tasks to today with optimal time slots. **IMPORTANT**: Use task IDs from tagged tasks when available. If user has tagged tasks, extract the IDs from the Tagged Items context. If no tagged items, call searchTask first to get task IDs. This function needs current schedule information to find optimal time slots.',
+            'Reschedules multiple tasks to optimal time slots on today. Works for tasks on any day (moves them to today) or tasks already on today (optimizes their time slots). **IMPORTANT**: Use task IDs from tagged tasks when available. If user has tagged tasks, extract the IDs from the Tagged Items context. If no tagged items, call searchTask first to get task IDs. This function needs current schedule information to find optimal time slots.',
         parameters: [
           McpFunctionParameter(
             name: 'taskIds',

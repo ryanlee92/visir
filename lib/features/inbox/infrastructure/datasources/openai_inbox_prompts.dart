@@ -432,7 +432,18 @@ Show results: `<inapp_task>{"id":"123","title":"...","start_at":"2024-01-01T10:0
 
 ## Multi-step
 - Chain functions in one response for multi-step requests
-- Confirmation UI auto-shows for write/delete operations''';
+- Confirmation UI auto-shows for write/delete operations
+
+## Response Guidelines
+**IMPORTANT**: Before calling any write/modify/delete function:
+1. Provide a brief explanation of what you're going to do
+2. Include relevant context (which tasks/events, what changes, suggested times, etc.)
+3. THEN include the function call
+
+Example:
+"I'll reschedule these two tasks to today. Based on your schedule, I suggest moving 'Task A' to 2pm-3pm and 'Task B' to 4pm-5pm. <function call>"
+
+This ensures users understand what action will be taken before confirming.''';
   }
 
   /// Adds available projects section to system message

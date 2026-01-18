@@ -142,6 +142,8 @@ class AgentActionState {
   final List<String> recentTaskIds; // Recently created/updated task IDs (for AI context)
   final List<String> recentEventIds; // Recently created/updated event IDs (for AI context)
   final List<InboxEntity>? availableInboxes; // Available inboxes from search results (for linking tasks/events)
+  final List<TaskEntity>? taggedTasks; // Tasks extracted from AI responses (available for next turn)
+  final List<EventEntity>? taggedEvents; // Events extracted from AI responses (available for next turn)
 
   AgentActionState({
     this.actionType,
@@ -161,6 +163,8 @@ class AgentActionState {
     List<String>? recentTaskIds,
     List<String>? recentEventIds,
     this.availableInboxes,
+    this.taggedTasks,
+    this.taggedEvents,
   }) : messages = messages ?? [],
        loadedInboxNumbers = loadedInboxNumbers ?? {},
        selectedActionIds = selectedActionIds ?? {},
@@ -183,6 +187,8 @@ class AgentActionState {
     List<String>? recentTaskIds,
     List<String>? recentEventIds,
     List<InboxEntity>? availableInboxes,
+    List<TaskEntity>? taggedTasks,
+    List<EventEntity>? taggedEvents,
   }) {
     return AgentActionState(
       actionType: actionType ?? this.actionType,
@@ -200,6 +206,8 @@ class AgentActionState {
       recentTaskIds: recentTaskIds ?? this.recentTaskIds,
       recentEventIds: recentEventIds ?? this.recentEventIds,
       availableInboxes: availableInboxes ?? this.availableInboxes,
+      taggedTasks: taggedTasks ?? this.taggedTasks,
+      taggedEvents: taggedEvents ?? this.taggedEvents,
     );
   }
 
@@ -471,9 +479,16 @@ class AgentActionController extends _$AgentActionController {
       final projects = ref.read(projectListControllerProvider);
       final projectsList = projects.map((p) => {'id': p.uniqueId, 'name': p.name, 'description': p.description, 'parent_id': p.parentId}).toList();
 
-      // 명시적으로 태그된 항목이 있는 경우에만 context 추가 (사용자가 직접 선택한 경우)
-      if (taggedTasks != null && taggedTasks.isNotEmpty || taggedEvents != null && taggedEvents.isNotEmpty || taggedConnections != null && taggedConnections.isNotEmpty) {
-        taggedContext = _contextService.buildTaggedContext(taggedTasks: taggedTasks, taggedEvents: taggedEvents, taggedConnections: taggedConnections);
+      // Merge state tagged items (from AI responses) with parameter tagged items (from user selection)
+      final allTaggedTasks = [...?state.taggedTasks, ...?taggedTasks];
+      final allTaggedEvents = [...?state.taggedEvents, ...?taggedEvents];
+
+      if (allTaggedTasks.isNotEmpty || allTaggedEvents.isNotEmpty || taggedConnections != null && taggedConnections.isNotEmpty) {
+        taggedContext = _contextService.buildTaggedContext(
+          taggedTasks: allTaggedTasks.isNotEmpty ? allTaggedTasks : null,
+          taggedEvents: allTaggedEvents.isNotEmpty ? allTaggedEvents : null,
+          taggedConnections: taggedConnections,
+        );
       }
 
       // 명시적으로 태그된 채널이 있는 경우에만 context 추가
@@ -1519,9 +1534,46 @@ class AgentActionController extends _$AgentActionController {
             );
             updatedMessagesWithResponse = [...messages, assistantMessage];
 
-            // 검색 결과가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
+            // Extract entities from <inapp_task>, <inapp_event>, <inapp_inbox> tags in assistant's response
+            // and add them to tagged context for next conversation turn
+            final extractedTasks = _extractTasksFromMessage(resultMessage);
+            final extractedEvents = _extractEventsFromMessage(resultMessage);
+            final extractedInboxes = _extractInboxesFromMessage(resultMessage);
+
+            // Add extracted entities to tagged context (avoiding duplicates)
+            if (extractedTasks.isNotEmpty) {
+              final existingTaskIds = updatedTaggedTasks?.map((t) => t.id).toSet() ?? {};
+              final newTasks = extractedTasks.where((t) => t.id != null && !existingTaskIds.contains(t.id)).toList();
+              if (newTasks.isNotEmpty) {
+                updatedTaggedTasks = [...(updatedTaggedTasks ?? []), ...newTasks];
+              }
+            }
+
+            if (extractedEvents.isNotEmpty) {
+              final existingEventIds = updatedTaggedEvents?.map((e) => e.uniqueId).toSet() ?? {};
+              final newEvents = extractedEvents.where((e) => !existingEventIds.contains(e.uniqueId)).toList();
+              if (newEvents.isNotEmpty) {
+                updatedTaggedEvents = [...(updatedTaggedEvents ?? []), ...newEvents];
+              }
+            }
+
+            if (extractedInboxes.isNotEmpty) {
+              final existingInboxIds = updatedAvailableInboxes?.map((i) => i.id).toSet() ?? {};
+              final newInboxes = extractedInboxes.where((i) => !existingInboxIds.contains(i.id)).toList();
+              if (newInboxes.isNotEmpty) {
+                updatedAvailableInboxes = [...(updatedAvailableInboxes ?? []), ...newInboxes];
+              }
+            }
+
+            // 검색 결과 또는 추출된 엔티티가 있으면 state에 저장 (AI가 다음 응답에서 필요시 사용)
             if (updatedLoadedInboxNumbers != state.loadedInboxNumbers || updatedTaggedTasks != taggedTasks || updatedTaggedEvents != taggedEvents) {
-              await _updateState(loadedInboxNumbers: updatedLoadedInboxNumbers, taggedProjects: taggedProjects);
+              await _updateState(
+                loadedInboxNumbers: updatedLoadedInboxNumbers,
+                taggedProjects: taggedProjects,
+                taggedTasks: updatedTaggedTasks,
+                taggedEvents: updatedTaggedEvents,
+                availableInboxes: updatedAvailableInboxes,
+              );
             }
 
             // 재귀 호출인 경우 여기서 종료 (재귀 호출은 이미 상태를 업데이트했음)
@@ -3711,6 +3763,8 @@ class AgentActionController extends _$AgentActionController {
     List<String>? recentTaskIds,
     List<String>? recentEventIds,
     List<InboxEntity>? availableInboxes,
+    List<TaskEntity>? taggedTasks,
+    List<EventEntity>? taggedEvents,
     List<ProjectEntity>? taggedProjects,
   }) async {
     state = state.copyWith(
@@ -3729,6 +3783,8 @@ class AgentActionController extends _$AgentActionController {
       recentTaskIds: recentTaskIds,
       recentEventIds: recentEventIds,
       availableInboxes: availableInboxes,
+      taggedTasks: taggedTasks,
+      taggedEvents: taggedEvents,
     );
 
     // State 업데이트 후 항상 히스토리 저장 시도
@@ -3852,5 +3908,80 @@ class AgentActionController extends _$AgentActionController {
     } catch (e) {
       // Don't throw - token usage tracking is non-critical
     }
+  }
+
+  /// Extract TaskEntity objects from <inapp_task> tags in message
+  List<TaskEntity> _extractTasksFromMessage(String message) {
+    final tasks = <TaskEntity>[];
+    final regex = RegExp(r'<inapp_task>(.*?)</inapp_task>', dotAll: true);
+
+    for (final match in regex.allMatches(message)) {
+      try {
+        final jsonText = match.group(1)?.trim();
+        if (jsonText != null && jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final task = TaskEntity.fromJson(jsonData, local: true);
+          if (task.id != null && task.id!.isNotEmpty) {
+            tasks.add(task);
+          }
+        }
+      } catch (e) {
+        // Skip invalid task JSON
+      }
+    }
+
+    return tasks;
+  }
+
+  /// Extract EventEntity objects from <inapp_event> tags in message
+  List<EventEntity> _extractEventsFromMessage(String message) {
+    final events = <EventEntity>[];
+    final regex = RegExp(r'<inapp_event>(.*?)</inapp_event>', dotAll: true);
+
+    for (final match in regex.allMatches(message)) {
+      try {
+        final jsonText = match.group(1)?.trim();
+        if (jsonText != null && jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+
+          // Try to create EventEntity from full JSON (if it has all required fields)
+          try {
+            final event = EventEntity.fromJson(jsonData);
+            if (event.title != null && event.title!.isNotEmpty) {
+              events.add(event);
+            }
+          } catch (e) {
+            // If fromJson fails, skip - EventEntity requires calendar which we may not have
+          }
+        }
+      } catch (e) {
+        // Skip invalid event JSON
+      }
+    }
+
+    return events;
+  }
+
+  /// Extract InboxEntity objects from <inapp_inbox> tags in message
+  List<InboxEntity> _extractInboxesFromMessage(String message) {
+    final inboxes = <InboxEntity>[];
+    final regex = RegExp(r'<inapp_inbox>(.*?)</inapp_inbox>', dotAll: true);
+
+    for (final match in regex.allMatches(message)) {
+      try {
+        final jsonText = match.group(1)?.trim();
+        if (jsonText != null && jsonText.isNotEmpty) {
+          final jsonData = jsonDecode(jsonText) as Map<String, dynamic>;
+          final inbox = InboxEntity.fromJson(jsonData, local: true);
+          if (inbox.id.isNotEmpty) {
+            inboxes.add(inbox);
+          }
+        }
+      } catch (e) {
+        // Skip invalid inbox JSON
+      }
+    }
+
+    return inboxes;
   }
 }

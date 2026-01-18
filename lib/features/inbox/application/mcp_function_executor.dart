@@ -3818,12 +3818,8 @@ class McpFunctionExecutor {
       if (taskIdStr.isEmpty) continue;
       final task = allTasksMap[taskIdStr];
       if (task != null && task.recurringTaskId == null) {
-        // Exclude recurring task instances
-        final taskStartDate = task.startAt ?? task.startDate;
-        // Exclude tasks already scheduled for today
-        if (taskStartDate != null && DateUtils.dateOnly(taskStartDate) != today) {
-          tasksToReschedule.add(task);
-        }
+        // Exclude recurring task instances, but include all other tasks (even if already on today)
+        tasksToReschedule.add(task);
       }
     }
 
