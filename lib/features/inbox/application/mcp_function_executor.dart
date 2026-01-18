@@ -6307,21 +6307,42 @@ class McpFunctionExecutor {
               },
               (attachmentData) async {
                 print('DEBUG: Successfully fetched ${attachmentData.length} attachment(s)');
+                print('DEBUG: attachmentData keys: ${attachmentData.keys.join(", ")}');
+                print('DEBUG: Available attachment IDs in mailEntity: ${attachments.map((a) => a.id).join(", ")}');
+
+                int entryIndex = 0;
                 for (final entry in attachmentData.entries) {
+                  entryIndex++;
+                  print('DEBUG: Processing entry $entryIndex of ${attachmentData.length}');
+
                   final attachmentId = entry.key;
+                  print('DEBUG: Entry attachmentId: $attachmentId');
+
                   final bytes = entry.value;
+                  print('DEBUG: Bytes is null: ${bytes == null}, Bytes length: ${bytes?.length ?? 0}');
+
                   if (bytes == null) {
+                    print('DEBUG: Skipping entry - bytes is null');
                     continue;
                   }
 
                   final attachment = attachments.firstWhereOrNull((a) => a.id == attachmentId);
-                  if (attachment == null) continue;
+                  print('DEBUG: Attachment lookup result: ${attachment != null ? "found (${attachment.name})" : "NOT FOUND"}');
+
+                  if (attachment == null) {
+                    print('DEBUG: Skipping entry - attachment not found in mailEntity');
+                    continue;
+                  }
 
                   final fileName = attachment.name ?? 'unknown';
+                  print('DEBUG: Converting attachment: $fileName (${bytes.length} bytes)');
 
                   // Convert PDF to images or add as-is for other files
                   final convertedFiles = await _convertAttachmentToFiles(bytes, fileName);
+                  print('DEBUG: Conversion result: ${convertedFiles.length} file(s) created');
+
                   files.addAll(convertedFiles);
+                  print('DEBUG: Total files in list now: ${files.length}');
                 }
               },
             );
@@ -6457,10 +6478,15 @@ class McpFunctionExecutor {
         files.add(PlatformFile(name: fileName, size: bytes.length, bytes: bytes));
       }
       // Text files - add as-is
-      else if (lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerName.endsWith('.csv')) {
+      else if (lowerName.endsWith('.txt') || lowerName.endsWith('.md') || lowerName.endsWith('.csv') || lowerName.endsWith('.html') || lowerName.endsWith('.htm')) {
         files.add(PlatformFile(name: fileName, size: bytes.length, bytes: bytes));
       }
+      // Other file types - log as unsupported
+      else {
+        print('DEBUG: Unsupported file type for summarization: $fileName');
+      }
     } catch (e) {
+      print('ERROR: Exception in _convertAttachmentToFiles: $e');
       // Error converting attachment to files
     }
 
