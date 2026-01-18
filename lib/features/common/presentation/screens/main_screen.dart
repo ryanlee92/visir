@@ -771,8 +771,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   void showSubscriptionDone() {
     Navigator.of(Utils.mainContext).popUntil((route) => route.isFirst);
 
-    Utils.showPopupDialog(child: SubscriptionDoneWidget(), size: Size(440, 0), forcePopup: true, isFlexibleHeightPopup: true);
-
     Confetti.launch(
       context,
       options: const ConfettiOptions(
