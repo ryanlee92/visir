@@ -365,9 +365,13 @@ class AuthRepository implements AuthRepositoryInterface {
           filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'id', value: id),
           callback: (payload) {
             try {
+              print('DEBUG: User table update received via realtime');
               UserEntity user = UserEntity.fromJson(payload.newRecord);
+              print('DEBUG: User parsed, subscription: ${user.subscription != null ? "present" : "null"}');
               onUpdate(user);
-            } catch (e) {}
+            } catch (e) {
+              print('ERROR: Failed to process user update from realtime: $e');
+            }
           },
         )
         .onPostgresChanges(

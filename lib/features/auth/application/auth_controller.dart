@@ -151,13 +151,11 @@ class AuthController extends _$AuthController {
     await updateUser(user: user.copyWith(badge: 0));
   }
 
-  void _updateState({required UserEntity? user}) {
-    if (state.value != null && user?.copyWith(badge: 0) == state.requireValue.copyWith(badge: 0)) return;
-    if (user?.subscription == null) {
-      state = AsyncData(user?.copyWith(subscription: state.requireValue.subscription) ?? fakeUser);
-    } else {
-      state = AsyncData(user ?? fakeUser);
-    }
+  void _updateState({required UserEntity? user, bool forceUpdate = false}) {
+    if (!forceUpdate && state.value != null && user?.copyWith(badge: 0) == state.requireValue.copyWith(badge: 0)) return;
+    final subscription = user?.subscription ?? state.requireValue.subscription;
+    final aiCredits = user?.aiCredits ?? state.requireValue.aiCredits;
+    state = AsyncData(user?.copyWith(subscription: subscription, aiCredits: aiCredits) ?? fakeUser);
   }
 
   Future<void> updateGmailHistoryId(Map<String, String> lastGmailHistoryIds) async {
@@ -215,7 +213,7 @@ class AuthController extends _$AuthController {
       onDeleteInboxConfig: onDeleteInboxConfig,
       onUpdateMessageUnread: onUpdateMessageUnread,
       onUpdate: (user) {
-        _updateState(user: user);
+        _updateState(user: user, forceUpdate: true);
       },
     );
   }
