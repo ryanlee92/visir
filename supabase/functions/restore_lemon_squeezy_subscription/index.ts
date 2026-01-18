@@ -78,7 +78,65 @@ serve(async (req) => {
       }
     );
 
-    // 사용자 정보 업데이트
+    // Check if we need to add credits for active subscription
+    const variantId = String(matchedSubscription.attributes?.variant_id);
+    const status = matchedSubscription.attributes?.status;
+    const isActive = status === 'active' || status === 'on_trial';
+
+    // Ultra Plan variant IDs (Test & Production)
+    const ultraPlanVariantIds = ['1139396', '1139389'];
+    // Pro Plan variant IDs (Test & Production)
+    const proPlanVariantIds = ['915989', '921376', '881561', '921377'];
+
+    const isUltraPlan = ultraPlanVariantIds.includes(variantId);
+    const isProPlan = proPlanVariantIds.includes(variantId);
+
+    // Get current user data to check if credits need to be added
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("ai_credits, ai_credits_updated_at")
+      .eq("id", userId)
+      .single();
+
+    if (userError) {
+      console.error("Error fetching user data:", userError);
+      return new Response("Failed to fetch user data", { status: 500 });
+    }
+
+    // Determine if we should add credits
+    let shouldAddCredits = false;
+    let planType: 'ultra' | 'pro' | null = null;
+
+    if ((isUltraPlan || isProPlan) && isActive) {
+      const lastCreditsAddedAt = userData?.ai_credits_updated_at;
+      const renewsAt = matchedSubscription.attributes?.renews_at;
+
+      if (renewsAt) {
+        const renewsDate = new Date(renewsAt);
+        const renewsYearMonth = `${renewsDate.getFullYear()}-${String(renewsDate.getMonth() + 1).padStart(2, '0')}`;
+
+        if (lastCreditsAddedAt) {
+          const lastAddedDate = new Date(lastCreditsAddedAt);
+          const lastAddedYearMonth = `${lastAddedDate.getFullYear()}-${String(lastAddedDate.getMonth() + 1).padStart(2, '0')}`;
+
+          // Only add credits if this is a different billing period
+          if (renewsYearMonth !== lastAddedYearMonth) {
+            shouldAddCredits = true;
+            planType = isUltraPlan ? 'ultra' : 'pro';
+            console.log(`Restore: Will add credits. Current period: ${renewsYearMonth}, Last added: ${lastAddedYearMonth}`);
+          } else {
+            console.log(`Restore: Credits already added for period ${renewsYearMonth}. Skipping.`);
+          }
+        } else {
+          // No credits ever added, add them now
+          shouldAddCredits = true;
+          planType = isUltraPlan ? 'ultra' : 'pro';
+          console.log(`Restore: First time adding credits for ${planType} plan`);
+        }
+      }
+    }
+
+    // Update subscription
     const { error } = await supabase
       .from("users")
       .update({
@@ -90,6 +148,61 @@ serve(async (req) => {
     if (error) {
       console.error("Error updating user:", error);
       return new Response("Failed to update user", { status: 500 });
+    }
+
+    // Add credits if needed
+    if (shouldAddCredits && planType) {
+      const currentCredits = userData?.ai_credits || 0;
+      let planCredits: number;
+      let planTokens: number;
+      let planName: string;
+
+      if (planType === 'ultra') {
+        planCredits = 12.0; // 600K tokens = $12
+        planTokens = 600000;
+        planName = "Ultra Plan";
+      } else {
+        planCredits = 2.0; // 100K tokens = $2
+        planTokens = 100000;
+        planName = "Pro Plan";
+      }
+
+      const newCredits = currentCredits + planCredits;
+
+      const { error: creditsError } = await supabase
+        .from("users")
+        .update({
+          ai_credits: newCredits,
+          ai_credits_updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      if (creditsError) {
+        console.error("Error updating credits during restore:", creditsError);
+      } else {
+        console.log(`✓ Restore: Added ${planCredits} credits (${planTokens} tokens) for ${planName}. User: ${userId}, New total: ${newCredits}`);
+
+        // Save log
+        const { error: logError } = await supabase
+          .from("ai_api_usage_logs")
+          .insert({
+            id: crypto.randomUUID(),
+            user_id: userId,
+            api_provider: "lemon_squeezy",
+            model: planType === 'ultra' ? "ultra_plan" : "pro_plan",
+            function_name: "subscription_restored",
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: planTokens,
+            credits_used: planCredits,
+            used_user_api_key: false,
+            created_at: new Date().toISOString(),
+          });
+
+        if (logError) {
+          console.error("Error saving restore credit log:", logError);
+        }
+      }
     }
 
     return new Response(

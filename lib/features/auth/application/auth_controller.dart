@@ -242,7 +242,9 @@ class AuthController extends _$AuthController {
   Future<bool?> restoreSubscription({required int lemonSqueezyCustomerId}) async {
     if (repository.currentUserId == null) return null;
     final result = await repository.restoreSubscription(isTestMode: isSubscriptionTestMode, lemonSqueezyCustomerId: lemonSqueezyCustomerId);
-    return result.fold((l) => null, (r) {
+    return result.fold((l) => null, (r) async {
+      // Immediately refresh user data to update UI with new subscription and credits
+      await _getUser();
       return r;
     });
   }
@@ -254,7 +256,9 @@ class AuthController extends _$AuthController {
       subscriptionId: subscriptionId,
       attributes: UserSubscriptionUpdateAttributesEntity(cancelled: true),
     );
-    return result.fold((l) => null, (r) {
+    return result.fold((l) => null, (r) async {
+      // Immediately refresh user data to update UI
+      await _getUser();
       return r;
     });
   }
@@ -266,7 +270,9 @@ class AuthController extends _$AuthController {
       subscriptionId: subscriptionId,
       attributes: UserSubscriptionUpdateAttributesEntity(cancelled: false),
     );
-    return result.fold((l) => null, (r) {
+    return result.fold((l) => null, (r) async {
+      // Immediately refresh user data to update UI
+      await _getUser();
       return r;
     });
   }
