@@ -36,7 +36,7 @@ class AuthController extends _$AuthController {
   LemonSqueezyCustomerEntity? get subscriptionCustomer => _subscriptionCustomer;
   List<LemonSqueezyDiscountEntity> get subscriptionDiscounts => _subscriptionDiscounts;
 
-  bool get isSubscriptionTestMode => onToggleTestMode;
+  bool get isSubscriptionTestMode => useDebugDb;
 
   @override
   Future<UserEntity> build() async {

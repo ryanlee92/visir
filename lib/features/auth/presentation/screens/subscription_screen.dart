@@ -17,7 +17,6 @@ import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_list_item.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_list_section.dart';
 import 'package:Visir/features/preference/presentation/screens/preference_screen.dart';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:collection/collection.dart';
 import 'package:color_mesh/color_mesh.dart';
 import 'package:emoji_extension/emoji_extension.dart';
@@ -232,7 +231,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
 
   Widget subscriptionWidget({required SubscriptionType type, required LemonSqueezyVariantEntity? bestValueVariant}) {
     final subscription = ref.watch(authControllerProvider.select((v) => v.requireValue.subscription));
-    bool isSubscriptionTestMode = onToggleTestMode;
+    bool isSubscriptionTestMode = useDebugDb;
 
     List<LemonSqueezyProductEntity> subscriptionProducts = ref.read(authControllerProvider.notifier).subscriptionProducts;
     List<LemonSqueezyVariantEntity> subscriptionVariants = ref.read(authControllerProvider.notifier).subscriptionVariants;
@@ -337,7 +336,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     final subscription = ref.watch(authControllerProvider.select((v) => v.requireValue.subscription));
     final isAdmin = ref.watch(authControllerProvider.select((v) => v.requireValue.userIsAdmin));
 
-    bool isSubscriptionTestMode = onToggleTestMode;
+    bool isSubscriptionTestMode = useDebugDb;
 
     List<LemonSqueezyVariantEntity> subscriptionVariants = ref.read(authControllerProvider.notifier).subscriptionVariants;
 
@@ -362,12 +361,12 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       final user = ref.read(authControllerProvider).requireValue;
       final date = user.freeTrialEndAt;
       dateString = '${context.tr.subscription_free_trial_ends} ${_formatDate(date)}';
-    } else if (subscription?.isTestMode == !onToggleTestMode && (subscription?.isCancelled ?? false)) {
+    } else if (subscription?.isTestMode == !useDebugDb && (subscription?.isCancelled ?? false)) {
       final date = subscription?.subscriptionEndsAt;
       if (date != null) {
         dateString = '${context.tr.subscription_subscription_ends} ${_formatDate(date)}';
       }
-    } else if (subscription?.isTestMode == !onToggleTestMode && ((subscription?.isActive ?? false) || (subscription?.isPaused ?? false))) {
+    } else if (subscription?.isTestMode == !useDebugDb && ((subscription?.isActive ?? false) || (subscription?.isPaused ?? false))) {
       final date = subscription?.subscriptionRenewsAt;
       if (date != null) {
         dateString = '${context.tr.subscription_next_billing_date} ${_formatDate(date)}';
@@ -616,47 +615,6 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 ],
               );
             },
-          ),
-
-        if (isAdmin)
-          VisirListItem(
-            titleBuilder: (height, baseStyle, subStyle, horizontalSpacing) => TextSpan(text: 'Test Mode', style: baseStyle),
-            titleTrailingBuilder: (height, baseStyle, subStyle, horizontalSpacing) => TextSpan(
-              children: [
-                WidgetSpan(
-                  child: AnimatedToggleSwitch<bool>.rolling(
-                    current: isSubscriptionTestMode,
-                    values: [true, false],
-                    height: PreferenceScreen.buttonHeight,
-                    indicatorSize: Size(PreferenceScreen.buttonWidth / 2, PreferenceScreen.buttonHeight),
-                    indicatorIconScale: 1,
-                    iconOpacity: 0.5,
-                    borderWidth: 0,
-                    onChanged: (value) async {
-                      setState(() {
-                        onToggleTestMode = true;
-                      });
-                      await ref.read(authControllerProvider.notifier).switchSubscriptionTestMode(isTestMode: value);
-                      setState(() {
-                        onToggleTestMode = false;
-                      });
-                    },
-                    iconBuilder: (testMode, selected) => VisirIcon(
-                      type: testMode ? VisirIconType.check : VisirIconType.close,
-                      size: 16,
-                      color: !selected ? context.onBackground : context.onBackground,
-                      isSelected: true,
-                    ),
-                    style: ToggleStyle(
-                      backgroundColor: context.surface,
-                      borderRadius: BorderRadius.circular(6),
-                      borderColor: context.surface.withValues(alpha: 1),
-                      indicatorColor: context.surfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
       ],
     );
