@@ -3771,17 +3771,35 @@ class AgentActionController extends _$AgentActionController {
       print('DEBUG: User ID: ${me.id}');
       print('DEBUG: AI response keys: ${aiResponse.keys.join(", ")}');
 
-      // Extract token usage based on provider
+      // Check if datasource already extracted token usage to _token_usage field
       TokenUsage? tokenUsage;
-      if (model.provider == AiProvider.anthropic) {
-        print('DEBUG: Extracting from Anthropic response');
-        tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
-      } else if (model.provider == AiProvider.google) {
-        print('DEBUG: Extracting from Google AI response');
-        tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
-      } else if (model.provider == AiProvider.openai) {
-        print('DEBUG: Extracting from OpenAI response');
-        tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
+      final customTokenUsage = aiResponse['_token_usage'] as Map<String, dynamic>?;
+
+      if (customTokenUsage != null) {
+        print('DEBUG: Found _token_usage field in response');
+        // Extract from custom _token_usage field (already processed by datasource)
+        final promptTokens = customTokenUsage['prompt_tokens'] as int? ?? 0;
+        final completionTokens = customTokenUsage['completion_tokens'] as int? ?? 0;
+        final totalTokens = customTokenUsage['total_tokens'] as int? ?? (promptTokens + completionTokens);
+
+        tokenUsage = TokenUsage(
+          promptTokens: promptTokens,
+          completionTokens: completionTokens,
+          totalTokens: totalTokens,
+        );
+      } else {
+        // Fallback to provider-specific extraction
+        print('DEBUG: No _token_usage field, trying provider-specific extraction');
+        if (model.provider == AiProvider.anthropic) {
+          print('DEBUG: Extracting from Anthropic response');
+          tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
+        } else if (model.provider == AiProvider.google) {
+          print('DEBUG: Extracting from Google AI response');
+          tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
+        } else if (model.provider == AiProvider.openai) {
+          print('DEBUG: Extracting from OpenAI response');
+          tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
+        }
       }
 
       if (tokenUsage == null) {
