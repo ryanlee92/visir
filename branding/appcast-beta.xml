@@ -5,14 +5,14 @@
 		<description>Your AI Executive Assistant.</description>
 		<language>en</language>
 		<item>
-			<title>Version 2.0.5</title>
+			<title>Version 2.0.6</title>
 			<!-- For the macOS item, it is recommended to add 'sparkle:version' and 'sparkle:shortVersionString' to the item node, rather than as part of the enclosure. -->
-			<sparkle:version>1034</sparkle:version>
-			<sparkle:shortVersionString>2.0.5</sparkle:shortVersionString>
+			<sparkle:version>1035</sparkle:version>
+			<sparkle:shortVersionString>2.0.6</sparkle:shortVersionString>
 			<sparkle:releaseNotesLink>https://visir.pro/rn.shtml</sparkle:releaseNotesLink>
-			<pubDate>Thu, 15 Jan 2026 02:00:00 +0900</pubDate>
+			<pubDate>Mon, 19 Jan 2026 17:00:00 +0900</pubDate>
 			<enclosure url="https://visir.pro/release/visir-beta.zip"
-                sparkle:edSignature="69pHBLi4jlDeaw1Bc5V8SyOTbutAGt4E2QitOIvhiuoq8uSjNZEsOfGlm0Q1NwuretOFnjnywLXfClkp7xFfBw==" length="102467485"
+                sparkle:edSignature="Ji3XdmC33aEDSkEseM6aSx/a5h+YHQ35Z+s9GDX1l5UCgR7D4Z5KbYjo1du/x9uyDkhbMhUq1xAI8N+AkR3KDA==" length="102069480"
 				sparkle:os="macos"
 				type="application/octet-stream" />
 		</item>
