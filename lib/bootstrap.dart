@@ -10,6 +10,7 @@ import 'package:Visir/features/common/infrastructure/entities/environment.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/utils/first_time_tracker.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/task/application/task_list_controller.dart';
 import 'package:Visir/firebase_options.dart';
@@ -161,7 +162,48 @@ Future<ProviderContainer> bootstrap(WidgetsBinding widgetsBinding, ProviderConta
 
   HttpOverrides.global = MyHttpOverrides();
   await providers.initializeProviders(container);
+
+  // Track app installation on first launch with attribution data
+  // This should be called after Supabase is initialized
+  unawaited(_trackAppInstallIfFirst());
+
   return container;
+}
+
+/// Track app installation on first launch
+/// Captures UTM parameters and GA4 client ID from deep link or URL
+Future<void> _trackAppInstallIfFirst() async {
+  try {
+    // For mobile, you would get these from deep link handling
+    // For now, we'll check if there are any stored parameters from app launch
+    final prefs = await SharedPreferences.getInstance();
+
+    final gaClientId = prefs.getString('launch_ga_client_id');
+    final utmSource = prefs.getString('launch_utm_source');
+    final utmMedium = prefs.getString('launch_utm_medium');
+    final utmCampaign = prefs.getString('launch_utm_campaign');
+    final utmTerm = prefs.getString('launch_utm_term');
+    final utmContent = prefs.getString('launch_utm_content');
+
+    await FirstTimeTracker.trackAppInstallIfFirst(
+      gaClientId: gaClientId,
+      utmSource: utmSource,
+      utmMedium: utmMedium,
+      utmCampaign: utmCampaign,
+      utmTerm: utmTerm,
+      utmContent: utmContent,
+    );
+
+    // Clear launch parameters after tracking
+    await prefs.remove('launch_ga_client_id');
+    await prefs.remove('launch_utm_source');
+    await prefs.remove('launch_utm_medium');
+    await prefs.remove('launch_utm_campaign');
+    await prefs.remove('launch_utm_term');
+    await prefs.remove('launch_utm_content');
+  } catch (e) {
+    // Silent fail - don't block app initialization
+  }
 }
 
 /// Creates a fresh ProviderContainer and initializes app providers.

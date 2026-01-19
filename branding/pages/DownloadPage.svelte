@@ -2,11 +2,35 @@
   import Icon from '../components/Icon.svelte';
   // FontAwesome icons are not used - using SVG icons instead
   import Button from '../components/Button.svelte';
+  import { trackDownload, getClientId, getStoredUTMParams } from '../lib/analytics';
 
-  function handleDownload(url: string) {
+  async function handleDownload(platform: string, url: string) {
+    // Track download event with platform and UTM params
+    const utmParams = getStoredUTMParams();
+    trackDownload(platform);
+
+    // Get GA4 client ID for cross-platform tracking
+    const clientId = await getClientId();
+
+    // Build enhanced download URL with tracking params
+    const downloadUrl = new URL(url);
+
+    // Add GA4 client ID if available
+    if (clientId) {
+      downloadUrl.searchParams.set('ga_client_id', clientId);
+    }
+
+    // Add UTM params if available
+    Object.entries(utmParams).forEach(([key, value]) => {
+      downloadUrl.searchParams.set(key, value);
+    });
+
+    // Add platform for backend tracking
+    downloadUrl.searchParams.set('platform', platform);
+
     // Create a temporary anchor element and click it to trigger browser's native download
     const link = document.createElement('a');
-    link.href = url;
+    link.href = downloadUrl.toString();
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
@@ -79,9 +103,9 @@
             <p class="text-visir-text-muted font-light text-sm mb-6">Requires macOS 11.0 or later.</p>
             
             <div class="flex flex-col gap-3 mb-6">
-              <button 
+              <button
                 type="button"
-                on:click={() => handleDownload('https://visir.pro/release/visir-setup.zip')}
+                on:click={() => handleDownload('macos', 'https://visir.pro/release/visir-setup.zip')}
               >
                 <Button variant="primary" className="w-full justify-center">
                   <span>Download for macOS</span>
@@ -98,9 +122,9 @@
                     1
                   </div>
                   <p class="text-sm text-visir-text-muted font-light leading-relaxed">
-                    <button 
+                    <button
                       type="button"
-                      on:click={() => handleDownload('https://visir.pro/release/visir-setup.zip')}
+                      on:click={() => handleDownload('macos', 'https://visir.pro/release/visir-setup.zip')}
                       class="text-visir-primary hover:underline font-medium cursor-pointer bg-transparent border-none p-0"
                     >Download</button> the ZIP file
                   </p>
@@ -138,9 +162,9 @@
             <p class="text-visir-text-muted font-light text-sm mb-6">Windows 10 and 11 supported.</p>
             
             <div class="flex flex-col gap-3 mb-6">
-              <button 
+              <button
                 type="button"
-                on:click={() => handleDownload('https://visir.pro/release/visir-setup.exe')}
+                on:click={() => handleDownload('windows', 'https://visir.pro/release/visir-setup.exe')}
               >
                 <Button variant="primary" className="w-full justify-center">
                   <span>Download for Windows</span>
@@ -157,9 +181,9 @@
                     1
                   </div>
                   <p class="text-sm text-visir-text-muted font-light leading-relaxed">
-                    <button 
+                    <button
                       type="button"
-                      on:click={() => handleDownload('https://visir.pro/release/visir-setup.exe')}
+                      on:click={() => handleDownload('windows', 'https://visir.pro/release/visir-setup.exe')}
                       class="text-visir-primary hover:underline font-medium cursor-pointer bg-transparent border-none p-0"
                     >Download</button> the EXE file
                   </p>

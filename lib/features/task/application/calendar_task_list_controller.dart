@@ -15,6 +15,7 @@ import 'package:Visir/features/common/presentation/utils/extensions/date_time_ex
 import 'package:Visir/features/common/presentation/utils/extensions/list_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/utils/first_time_tracker.dart';
 import 'package:Visir/features/common/presentation/widgets/recurrence_edit_confirm_popup.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
@@ -275,6 +276,15 @@ class CalendarTaskListController extends _$CalendarTaskListController {
           .then((e) {
             resultCount++;
             if (resultCount != 1) return;
+
+            // Track first task creation for funnel analytics
+            if (originalTask == null && newTask != null) {
+              FirstTimeTracker.trackFeatureIfFirst(
+                'task_created',
+                additionalProperties: {'task_type': newTask.endAt != null ? 'event' : 'task', 'is_recurring': newTask.rrule != null},
+              );
+            }
+
             completer.complete();
           })
           .catchError((error) {

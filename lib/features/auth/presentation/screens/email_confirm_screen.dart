@@ -38,7 +38,10 @@ class _EmailConfirmScreenState extends ConsumerState<EmailConfirmScreen> {
 
     try {
       await Supabase.instance.client.auth.signInWithPassword(email: widget.email, password: widget.password);
-      await ref.read(authControllerProvider.notifier).onSignInSuccess();
+      // Track email signup completion
+      await ref.read(authControllerProvider.notifier).onSignInSuccess(
+        signupMethod: 'email',
+      );
       logAnalyticsEvent(eventName: 'signup_email_confirm_success');
       Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {

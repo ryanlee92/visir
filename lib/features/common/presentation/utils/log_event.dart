@@ -95,3 +95,115 @@ void logCalendarTaskCreateEvent({
     );
   }
 }
+
+/// Logs app installation with GA4 client ID and UTM params for funnel tracking
+/// Should be called on first app launch after installation
+Future<void> logAppInstall({
+  String? gaClientId,
+  String? utmSource,
+  String? utmMedium,
+  String? utmCampaign,
+  String? utmTerm,
+  String? utmContent,
+  String? userId,
+}) async {
+  await logAnalyticsEvent(
+    eventName: 'app_install',
+    userId: userId,
+    properties: {
+      'platform': PlatformX.name,
+      if (gaClientId != null) 'ga_client_id': gaClientId,
+      if (utmSource != null) 'utm_source': utmSource,
+      if (utmMedium != null) 'utm_medium': utmMedium,
+      if (utmCampaign != null) 'utm_campaign': utmCampaign,
+      if (utmTerm != null) 'utm_term': utmTerm,
+      if (utmContent != null) 'utm_content': utmContent,
+    },
+  );
+}
+
+/// Logs when user completes signup
+Future<void> logSignupCompleted({
+  required String userId,
+  required String signupMethod,
+  String? gaClientId,
+  String? utmSource,
+}) async {
+  await logAnalyticsEvent(
+    eventName: 'signup_completed',
+    userId: userId,
+    properties: {
+      'signup_method': signupMethod,
+      if (gaClientId != null) 'ga_client_id': gaClientId,
+      if (utmSource != null) 'utm_source': utmSource,
+    },
+  );
+}
+
+/// Logs first-time feature usage for funnel tracking
+Future<void> logFirstTimeFeature({
+  required String featureName,
+  required String userId,
+  Map<String, dynamic>? additionalProperties,
+}) async {
+  await logAnalyticsEvent(
+    eventName: 'first_${featureName}_usage',
+    userId: userId,
+    properties: {
+      'feature_name': featureName,
+      if (additionalProperties != null) ...additionalProperties,
+    },
+  );
+}
+
+/// Logs when user starts a subscription
+Future<void> logSubscriptionStarted({
+  required String userId,
+  required String plan,
+  required double amount,
+  String? currency,
+  String? billingInterval,
+}) async {
+  await logAnalyticsEvent(
+    eventName: 'subscription_started',
+    userId: userId,
+    properties: {
+      'plan': plan,
+      'amount': amount,
+      'currency': currency ?? 'USD',
+      if (billingInterval != null) 'billing_interval': billingInterval,
+    },
+  );
+}
+
+/// Logs when user cancels a subscription
+Future<void> logSubscriptionCancelled({
+  required String userId,
+  required String plan,
+  String? reason,
+}) async {
+  await logAnalyticsEvent(
+    eventName: 'subscription_cancelled',
+    userId: userId,
+    properties: {
+      'plan': plan,
+      if (reason != null) 'cancellation_reason': reason,
+    },
+  );
+}
+
+/// Logs when user's subscription is renewed
+Future<void> logSubscriptionRenewed({
+  required String userId,
+  required String plan,
+  required double amount,
+}) async {
+  await logAnalyticsEvent(
+    eventName: 'subscription_renewed',
+    userId: userId,
+    properties: {
+      'plan': plan,
+      'amount': amount,
+    },
+  );
+}

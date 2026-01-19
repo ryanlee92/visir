@@ -6,6 +6,7 @@ import 'package:Visir/features/common/presentation/utils/google_api_handler.dart
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/microsoft_api_handler.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/utils/first_time_tracker.dart';
 import 'package:Visir/features/common/presentation/widgets/auth_image_view.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
@@ -63,6 +64,10 @@ class _CalendarIntegrationWidgetState extends ConsumerState<CalendarIntegrationW
       if (type == OAuthType.google) GoogleApiHandler.getConnections(ref);
       if (type == OAuthType.microsoft) MicrosoftApiHandler.getConnections(ref);
       await refreshCalendar();
+
+      // Track first calendar sync for funnel analytics
+      FirstTimeTracker.trackFeatureIfFirst('calendar_synced', additionalProperties: {'provider': type == OAuthType.google ? 'google' : 'outlook'});
+
       final user = ref.read(authControllerProvider).requireValue;
       logAnalyticsEvent(
         eventName: user.onTrial ? 'trial_integrate_service' : 'integrate_service',

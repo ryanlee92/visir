@@ -120,9 +120,9 @@ export function setUserProperties(properties: Record<string, any>) {
 // Identify user
 export function identifyUser(userId: string, traits?: Record<string, any>) {
   if (typeof window === 'undefined') return;
-  
+
   const ga4Id = import.meta.env.VITE_GA4_ID;
-  
+
   // GA4 user ID
   if (window.gtag && ga4Id) {
     window.gtag('config', ga4Id, {
@@ -130,5 +130,58 @@ export function identifyUser(userId: string, traits?: Record<string, any>) {
       ...(traits && { user_properties: traits }),
     });
   }
+}
+
+// Get GA4 Client ID for cross-platform tracking
+export function getClientId(): Promise<string | null> {
+  if (typeof window === 'undefined' || !window.gtag) {
+    return Promise.resolve(null);
+  }
+
+  const ga4Id = import.meta.env.VITE_GA4_ID;
+  if (!ga4Id) {
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve) => {
+    window.gtag('get', ga4Id, 'client_id', (clientId: string) => {
+      resolve(clientId || null);
+    });
+  });
+}
+
+// Get UTM parameters from URL
+export function getUTMParams(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+
+  const params = new URLSearchParams(window.location.search);
+  const utmParams: Record<string, string> = {};
+
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach((param) => {
+    const value = params.get(param);
+    if (value) {
+      utmParams[param] = value;
+    }
+  });
+
+  return utmParams;
+}
+
+// Store UTM params in session storage for later use
+export function storeUTMParams() {
+  if (typeof window === 'undefined') return;
+
+  const utmParams = getUTMParams();
+  if (Object.keys(utmParams).length > 0) {
+    sessionStorage.setItem('visir_utm_params', JSON.stringify(utmParams));
+  }
+}
+
+// Get stored UTM params from session storage
+export function getStoredUTMParams(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+
+  const stored = sessionStorage.getItem('visir_utm_params');
+  return stored ? JSON.parse(stored) : {};
 }
 

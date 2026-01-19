@@ -9,6 +9,7 @@ import 'package:Visir/features/common/presentation/utils/google_api_handler.dart
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/microsoft_api_handler.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/utils/first_time_tracker.dart';
 import 'package:Visir/features/common/presentation/widgets/auth_image_view.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
@@ -80,9 +81,7 @@ class _MailIntegrationWidgetState extends ConsumerState<MailIntegrationWidget> {
 
   Future<void> refreshMail() async {
     final refreshInbox = Utils.ref.read(inboxControllerProvider.notifier).refresh();
-    await Future.wait(
-      [Utils.ref.read(mailListControllerProvider.notifier).refresh(), refreshInbox].whereType<Future>(),
-    );
+    await Future.wait([Utils.ref.read(mailListControllerProvider.notifier).refresh(), refreshInbox].whereType<Future>());
     Utils.ref.read(mailLabelListControllerProvider.notifier).load();
   }
 
@@ -109,6 +108,9 @@ class _MailIntegrationWidgetState extends ConsumerState<MailIntegrationWidget> {
       default:
         break;
     }
+
+    // Track first email connection for funnel analytics
+    FirstTimeTracker.trackFeatureIfFirst('email_connected', additionalProperties: {'provider': type == OAuthType.google ? 'gmail' : 'outlook', 'email': oauth.email});
 
     final email = oauth.email;
 

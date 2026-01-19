@@ -6,6 +6,7 @@ import 'package:Visir/features/chat/application/chat_channel_list_controller.dar
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
+import 'package:Visir/features/common/presentation/utils/first_time_tracker.dart';
 import 'package:Visir/features/common/presentation/widgets/auth_image_view.dart';
 import 'package:Visir/features/common/presentation/widgets/desktop_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/popup_menu.dart';
@@ -71,13 +72,14 @@ class _ChatIntegrationWidgetState extends ConsumerState<ChatIntegrationWidget> {
         lastIntegratedEmail = list.lastOrNull?.email;
       });
 
+      // Track first Slack connection for funnel analytics
+      FirstTimeTracker.trackFeatureIfFirst('slack_connected', additionalProperties: {'provider': type == OAuthType.slack ? 'slack' : 'discord', 'team_count': channels.length});
+
       final refreshInbox = Utils.ref.read(inboxControllerProvider.notifier).refresh();
       await Future.wait(
         [
           refreshInbox,
-          Utils.ref
-              .read(notificationControllerProvider.notifier)
-              .updateLinkedSlackTeam(Map.fromEntries(channels.entries.map((e) => MapEntry(e.key, e.value.channels)))),
+          Utils.ref.read(notificationControllerProvider.notifier).updateLinkedSlackTeam(Map.fromEntries(channels.entries.map((e) => MapEntry(e.key, e.value.channels)))),
         ].whereType<Future>(),
       );
     }
@@ -173,8 +175,7 @@ class _ChatIntegrationWidgetState extends ConsumerState<ChatIntegrationWidget> {
                   child: Column(
                     children: list.where((e) => e.type == type).map((e) {
                       ChatInboxFilterType _messageDmInboxFilterTypes = messageDmInboxFilterTypes['${e.teamId}${e.email}'] ?? ChatInboxFilterType.all;
-                      ChatInboxFilterType _messageChannelInboxFilterTypes =
-                          messageChannelInboxFilterTypes['${e.teamId}${e.email}'] ?? ChatInboxFilterType.mentions;
+                      ChatInboxFilterType _messageChannelInboxFilterTypes = messageChannelInboxFilterTypes['${e.teamId}${e.email}'] ?? ChatInboxFilterType.mentions;
 
                       String description =
                           '${context.tr.message_pref_filter_inbox_filter}: ${getIntegrationDescription(messageDmInboxFilterType: _messageDmInboxFilterTypes, messageChannelInboxFilterType: _messageChannelInboxFilterTypes)}';

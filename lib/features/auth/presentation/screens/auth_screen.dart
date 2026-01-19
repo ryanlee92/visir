@@ -221,7 +221,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
         await Supabase.instance.client.auth.signInWithIdToken(provider: OAuthProvider.apple, idToken: idToken, nonce: rawNonce);
       }
-      await ref.read(authControllerProvider.notifier).onSignInSuccess();
+      // Check if this is a new user signup or existing user login
+      final user = Supabase.instance.client.auth.currentUser;
+      final isNewUser = user?.createdAt != null &&
+          DateTime.now().difference(DateTime.parse(user!.createdAt)).inSeconds < 10;
+      await ref.read(authControllerProvider.notifier).onSignInSuccess(
+        signupMethod: isNewUser ? 'apple' : null,
+      );
     } catch (e) {
       developer.log(e.toString());
     }
@@ -258,7 +264,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
         await Supabase.instance.client.auth.signInWithIdToken(provider: OAuthProvider.google, idToken: idToken);
       }
-      await ref.read(authControllerProvider.notifier).onSignInSuccess();
+      // Check if this is a new user signup or existing user login
+      final user = Supabase.instance.client.auth.currentUser;
+      final isNewUser = user?.createdAt != null &&
+          DateTime.now().difference(DateTime.parse(user!.createdAt)).inSeconds < 10;
+      await ref.read(authControllerProvider.notifier).onSignInSuccess(
+        signupMethod: isNewUser ? 'google' : null,
+      );
     } catch (e) {
       developer.log(e.toString());
     }
@@ -306,6 +318,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         await Supabase.instance.client.auth.signInWithPassword(email: emailController.text.trim(), password: passwordController.text.trim());
 
         try {
+          // For email login, no signup tracking needed (signup happens in email confirmation)
           await ref.read(authControllerProvider.notifier).onSignInSuccess();
         } catch (e) {
           developer.log(e.toString());

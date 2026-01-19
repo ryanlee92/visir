@@ -6,7 +6,7 @@
   import MeshBackground from './components/MeshBackground.svelte';
   import LandingPage from './pages/LandingPage.svelte';
   import { getSEOForRoute, updateMetaTags, generateAllStructuredData } from './lib/seo';
-import { trackPageView, initDataLayer } from './lib/analytics';
+import { trackPageView, initDataLayer, storeUTMParams } from './lib/analytics';
 import { initAnalytics } from './lib/init-analytics';
   
   // Lazy load pages
@@ -269,7 +269,10 @@ import { initAnalytics } from './lib/init-analytics';
       // Silent fail
     }
     initDataLayer();
-    
+
+    // Store UTM parameters from URL for funnel tracking
+    storeUTMParams();
+
     // Initialize previous path
     previousPath = window.location.pathname;
     

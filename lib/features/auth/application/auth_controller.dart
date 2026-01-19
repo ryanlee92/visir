@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:Visir/config/providers.dart';
 import 'package:Visir/features/auth/domain/entities/subscription/lemon_squeezy/lemon_squeezy_customer_entity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Visir/features/auth/domain/entities/subscription/lemon_squeezy/lemon_squeezy_discount_entity.dart';
 import 'package:Visir/features/auth/domain/entities/subscription/lemon_squeezy/lemon_squeezy_product_entity.dart';
 import 'package:Visir/features/auth/domain/entities/subscription/lemon_squeezy/lemon_squeezy_variant_entity.dart';
 import 'package:Visir/features/auth/domain/entities/subscription/user_subscription_update_attributes_entity.dart';
+import 'package:Visir/features/auth/domain/entities/subscription/user_subscription_attribute_entity.dart';
 import 'package:Visir/features/auth/domain/entities/user_entity.dart';
 import 'package:Visir/features/auth/infrastructure/repositories/auth_repository.dart';
 import 'package:Visir/features/auth/providers.dart';
@@ -99,12 +101,22 @@ class AuthController extends _$AuthController {
     });
   }
 
-  Future<void> onSignInSuccess() async {
+  Future<void> onSignInSuccess({String? signupMethod}) async {
     tabNotifier.value = TabType.home;
     // 로그인 시 사용자별 설정 초기화
     // await clearUserSpecificSharedPreferences();
     await _getUser();
     await setAnalyticsUserProfile(user: state.requireValue);
+
+    // Track signup completion for new users
+    if (signupMethod != null) {
+      final userId = state.requireValue.id;
+      final prefs = await SharedPreferences.getInstance();
+      final gaClientId = prefs.getString('ga_client_id');
+      final utmSource = prefs.getString('utm_source');
+
+      logSignupCompleted(userId: userId, signupMethod: signupMethod, gaClientId: gaClientId, utmSource: utmSource);
+    }
   }
 
   Future<void> onSignInFailed(Object error) async {
@@ -160,9 +172,37 @@ class AuthController extends _$AuthController {
 
   void _updateState({required UserEntity? user, bool forceUpdate = false}) {
     if (!forceUpdate && state.value != null && user?.copyWith(badge: 0) == state.requireValue.copyWith(badge: 0)) return;
+
     final subscription = user?.subscription ?? state.requireValue.subscription;
     final aiCredits = user?.aiCredits ?? state.requireValue.aiCredits;
-    state = AsyncData(user?.copyWith(subscription: subscription, aiCredits: aiCredits) ?? fakeUser);
+    user = user?.copyWith(subscription: subscription, aiCredits: aiCredits);
+    // Track subscription changes for funnel analytics
+    final prevUser = state.value;
+    final newUser = user;
+    if (prevUser != null && newUser != null) {
+      final prevSubscription = prevUser.subscription;
+      final newSubscription = newUser.subscription ?? user?.subscription ?? state.requireValue.subscription;
+
+      // Check if subscription just became active (new subscription started)
+      final wasInactive = prevSubscription == null || prevSubscription?.attributes?.status != SubscriptionStatus.active;
+      final isNowActive = newSubscription != null && newSubscription.attributes?.status == SubscriptionStatus.active;
+
+      if (wasInactive && isNowActive) {
+        // New subscription started - track it
+        final attrs = newSubscription.attributes;
+        final firstItem = attrs?.firstSubscriptionItem;
+        final price = (firstItem?['price'] as num?)?.toDouble() ?? 0.0;
+
+        logSubscriptionStarted(
+          userId: newUser.id,
+          plan: attrs?.productName ?? 'unknown',
+          amount: price / 100.0,
+          currency: 'USD',
+          billingInterval: (attrs?.billingAnchor ?? 0) <= 31 ? 'monthly' : 'yearly',
+        );
+      }
+    }
+    state = AsyncData(user ?? fakeUser);
   }
 
   Future<void> updateGmailHistoryId(Map<String, String> lastGmailHistoryIds) async {
@@ -249,14 +289,24 @@ class AuthController extends _$AuthController {
     });
   }
 
-  Future<bool?> cancelSubscription({required String subscriptionId}) async {
+  Future<bool?> cancelSubscription({required String subscriptionId, String? reason}) async {
     if (repository.currentUserId == null) return null;
+
+    // Get current subscription info before cancellation
+    final currentUser = state.requireValue;
+    final currentSubscription = currentUser.subscription;
+
     final result = await repository.updateSubscription(
       isTestMode: isSubscriptionTestMode,
       subscriptionId: subscriptionId,
       attributes: UserSubscriptionUpdateAttributesEntity(cancelled: true),
     );
     return result.fold((l) => null, (r) async {
+      // Track subscription cancellation
+      if (currentSubscription != null) {
+        await logSubscriptionCancelled(userId: currentUser.id, plan: currentSubscription.attributes?.productName ?? 'unknown', reason: reason);
+      }
+
       // Immediately refresh user data to update UI
       await _getUser();
       return r;
