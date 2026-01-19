@@ -167,7 +167,7 @@
       </div>
       <div class="flex items-center gap-2 text-base text-visir-text-muted font-light">
         <Icon name="CheckCircle2" size={18} color="#10b981" /> 
-        <span class="font-medium">14-day free trial</span>
+        <span class="font-medium">7-day free trial</span>
       </div>
       <div class="flex items-center gap-2 text-base text-visir-text-muted font-light">
         <Icon name="Shield" size={18} color="#10b981" /> 
