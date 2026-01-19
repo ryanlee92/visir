@@ -201,12 +201,13 @@ class InboxSuggestionControllerInternal extends _$InboxSuggestionControllerInter
             case AiProvider.openai:
               model = AgentModel.gpt41Mini.modelName;
               break;
-            case AiProvider.google:
-              model = AgentModel.gemini25Flash.modelName;
-              break;
-            case AiProvider.anthropic:
-              model = AgentModel.claudeHaiku45.modelName;
-              break;
+            // fixme(Ryan): Google AI, Anthrophic commented
+            // case AiProvider.google:
+            //   model = AgentModel.gemini25Flash.modelName;
+            //   break;
+            // case AiProvider.anthropic:
+            //   model = AgentModel.claudeHaiku45.modelName;
+            //   break;
           }
           apiKey = providerApiKey;
         } else {

@@ -580,10 +580,7 @@ class AgentActionController extends _$AgentActionController {
 
       // 최근 생성/수정된 taskId/eventId를 system prompt에 추가 (AI가 참조할 수 있도록)
       if (state.recentTaskIds.isNotEmpty || state.recentEventIds.isNotEmpty) {
-        systemPrompt += _contextService.buildRecentItemsContext(
-          recentTaskIds: state.recentTaskIds,
-          recentEventIds: state.recentEventIds,
-        );
+        systemPrompt += _contextService.buildRecentItemsContext(recentTaskIds: state.recentTaskIds, recentEventIds: state.recentEventIds);
       }
 
       // conversationSummary가 없으면 항상 제목 생성 요청 추가
@@ -1861,7 +1858,10 @@ class AgentActionController extends _$AgentActionController {
 
                     if (cleanedResponse.isEmpty) {
                       // 함수 호출만 반환된 경우, 사용자에게 더 나은 메시지 표시
-                      final errorMessage = AgentActionMessage(role: 'assistant', content: 'Sorry, there was an issue generating a response based on the search results. Please try again.');
+                      final errorMessage = AgentActionMessage(
+                        role: 'assistant',
+                        content: 'Sorry, there was an issue generating a response based on the search results. Please try again.',
+                      );
                       return [...messages, errorMessage];
                     }
                     final assistantMessage = AgentActionMessage(role: 'assistant', content: cleanedResponse);
@@ -2602,8 +2602,7 @@ class AgentActionController extends _$AgentActionController {
 
       // 함수 실행 결과를 메시지로 변환
       final functionResultsSummary = <String>[];
-      bool onlyGetPreviousContext = functionResults.length == 1 &&
-          (functionResults.first['function_name'] == 'getPreviousContext');
+      bool onlyGetPreviousContext = functionResults.length == 1 && (functionResults.first['function_name'] == 'getPreviousContext');
 
       for (final result in functionResults) {
         final success = result['success'] as bool? ?? false;
@@ -2650,10 +2649,7 @@ class AgentActionController extends _$AgentActionController {
 
       // If only getPreviousContext was called, directly show the result without asking AI to summarize
       if (onlyGetPreviousContext) {
-        await _updateState(
-          messages: messagesWithFunctionResults,
-          isLoading: false,
-        );
+        await _updateState(messages: messagesWithFunctionResults, isLoading: false);
         return;
       }
 
@@ -3853,20 +3849,20 @@ class AgentActionController extends _$AgentActionController {
         final completionTokens = customTokenUsage['completion_tokens'] as int? ?? 0;
         final totalTokens = customTokenUsage['total_tokens'] as int? ?? (promptTokens + completionTokens);
 
-        tokenUsage = TokenUsage(
-          promptTokens: promptTokens,
-          completionTokens: completionTokens,
-          totalTokens: totalTokens,
-        );
+        tokenUsage = TokenUsage(promptTokens: promptTokens, completionTokens: completionTokens, totalTokens: totalTokens);
       } else {
-        // Fallback to provider-specific extraction
-        if (model.provider == AiProvider.anthropic) {
-          tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
-        } else if (model.provider == AiProvider.google) {
-          tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
-        } else if (model.provider == AiProvider.openai) {
+        if (model.provider == AiProvider.openai) {
           tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
         }
+        // fixme(Ryan): Google AI, Anthrophic commented
+        // // Fallback to provider-specific extraction
+        // if (model.provider == AiProvider.anthropic) {
+        //   tokenUsage = TokenUsageExtractor.extractFromAnthropic(aiResponse);
+        // } else if (model.provider == AiProvider.google) {
+        //   tokenUsage = TokenUsageExtractor.extractFromGoogleAi(aiResponse);
+        // } else if (model.provider == AiProvider.openai) {
+        //   tokenUsage = TokenUsageExtractor.extractFromOpenAi(aiResponse);
+        // }
       }
 
       if (tokenUsage == null) {
@@ -3874,11 +3870,7 @@ class AgentActionController extends _$AgentActionController {
       }
 
       // Calculate credits used
-      final creditsUsed = AiPricingCalculator.calculateCreditsCostFromModel(
-        promptTokens: tokenUsage.promptTokens,
-        completionTokens: tokenUsage.completionTokens,
-        model: model,
-      );
+      final creditsUsed = AiPricingCalculator.calculateCreditsCostFromModel(promptTokens: tokenUsage.promptTokens, completionTokens: tokenUsage.completionTokens, model: model);
 
       // Create usage log entity
       final usageLog = AiApiUsageLogEntity(

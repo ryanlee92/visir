@@ -2967,7 +2967,7 @@ class McpFunctionExecutor {
           // Get local events first
           final allEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
           final filteredEvents = _filterLocalEvents(allEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
-          
+
           // Exclude the current event if provided
           final localFilteredEvents = filteredEvents.where((e) => event == null || e.uniqueId != event.uniqueId).toList();
           eventEntities.addAll(localFilteredEvents.take(20));
@@ -3004,11 +3004,11 @@ class McpFunctionExecutor {
                           }
                         }
                       }
-                      
+
                       // Filter remote events using _filterLocalEvents
                       final filteredRemoteEvents = _filterLocalEvents(remoteEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
                       eventEntities.addAll(filteredRemoteEvents);
-                      
+
                       // Stop if we have enough results
                       if (eventEntities.length >= 20) return;
                     },
@@ -3442,11 +3442,11 @@ class McpFunctionExecutor {
                             remoteEvents.add(foundEvent);
                           }
                         }
-                        
+
                         // Filter remote events using _filterLocalEvents
                         final filteredRemoteEvents = _filterLocalEvents(remoteEvents, startDate, endDate, calendarQuery, null, excludeFutureEvents: true);
                         eventEntities.addAll(filteredRemoteEvents);
-                        
+
                         // Stop if we have enough results
                         if (eventEntities.length >= 20) return;
                       },
@@ -4648,7 +4648,15 @@ class McpFunctionExecutor {
   }
 
   /// 로컬 태스크 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
-  List<TaskEntity> _filterLocalTasks(List<TaskEntity> localTasks, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? taskId, bool? isDone, {bool excludeFutureTasks = false}) {
+  List<TaskEntity> _filterLocalTasks(
+    List<TaskEntity> localTasks,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? searchKeyword,
+    String? taskId,
+    bool? isDone, {
+    bool excludeFutureTasks = false,
+  }) {
     var filtered = localTasks;
     final now = DateTime.now();
 
@@ -4967,7 +4975,7 @@ class McpFunctionExecutor {
 
         // 로컬에서 추가 필터링 (날짜 범위 등)
         searchResults = _filterLocalTasks(tasks, startDate, endDate, searchKeyword, taskId, isDone);
-        
+
         // 원격 검색 결과가 비어있으면 로컬 데이터도 확인
         if (searchResults.isEmpty) {
           final allLocalTasks = _getAllTasksFromBothProviders();
@@ -5010,7 +5018,14 @@ class McpFunctionExecutor {
   }
 
   /// 로컬 일정 데이터에서 검색 범위에 해당하는 데이터가 있는지 확인하고 필터링합니다
-  List<EventEntity> _filterLocalEvents(List<EventEntity> localEvents, DateTime? startDate, DateTime? endDate, String? searchKeyword, String? eventId, {bool excludeFutureEvents = false}) {
+  List<EventEntity> _filterLocalEvents(
+    List<EventEntity> localEvents,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? searchKeyword,
+    String? eventId, {
+    bool excludeFutureEvents = false,
+  }) {
     var filtered = localEvents;
     final now = DateTime.now();
 
@@ -5834,7 +5849,8 @@ class McpFunctionExecutor {
       if (oauth == null) {
         return {
           'success': false,
-          'error': 'Mail account not found for: $hostMail\n\nThis email account is not connected. Please add the account in Settings > Mail, or the task may be linked to an old/removed email account.'
+          'error':
+              'Mail account not found for: $hostMail\n\nThis email account is not connected. Please add the account in Settings > Mail, or the task may be linked to an old/removed email account.',
         };
       }
 
@@ -6115,12 +6131,13 @@ class McpFunctionExecutor {
             case AiProvider.openai:
               apiKey = openAiApiKey.isNotEmpty ? openAiApiKey : null;
               break;
-            case AiProvider.google:
-              apiKey = googleAiKey.isNotEmpty ? googleAiKey : null;
-              break;
-            case AiProvider.anthropic:
-              apiKey = anthropicApiKey.isNotEmpty ? anthropicApiKey : null;
-              break;
+            // fixme(Ryan): Google AI, Anthrophic commented
+            // case AiProvider.google:
+            //   apiKey = googleAiKey.isNotEmpty ? googleAiKey : null;
+            //   break;
+            // case AiProvider.anthropic:
+            //   apiKey = anthropicApiKey.isNotEmpty ? anthropicApiKey : null;
+            //   break;
           }
         }
 
@@ -6207,7 +6224,8 @@ class McpFunctionExecutor {
     } else {
       return {
         'success': false,
-        'error': 'No attachments found or no content extracted.\n\nThis could happen if:\n1. The email has no attachments\n2. Attachment download failed\n3. The attachment format is not supported\n\nPlease check if the email actually has attachments.',
+        'error':
+            'No attachments found or no content extracted.\n\nThis could happen if:\n1. The email has no attachments\n2. Attachment download failed\n3. The attachment format is not supported\n\nPlease check if the email actually has attachments.',
       };
     }
   }

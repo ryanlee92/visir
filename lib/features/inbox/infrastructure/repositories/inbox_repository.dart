@@ -130,10 +130,11 @@ class InboxRepository {
     switch (provider) {
       case AiProvider.openai:
         return datasources[DatasourceType.openai];
-      case AiProvider.google:
-        return datasources[DatasourceType.google];
-      case AiProvider.anthropic:
-        return datasources[DatasourceType.microsoft]; // Anthropic은 microsoft 타입으로 매핑
+      // fixme(Ryan): Google AI, Anthrophic commented
+      // case AiProvider.google:
+      //   return datasources[DatasourceType.google];
+      // case AiProvider.anthropic:
+      //   return datasources[DatasourceType.microsoft]; // Anthropic은 microsoft 타입으로 매핑
     }
   }
 
@@ -266,11 +267,32 @@ class InboxRepository {
 
       String? summary;
       if (datasource is OpenAiInboxDatasource) {
-        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, taskEntities: taskEntities, model: model, apiKey: apiKey);
+        summary = await datasource.fetchConversationSummary(
+          inbox: inbox,
+          allInboxes: allInboxes,
+          eventEntities: eventEntities,
+          taskEntities: taskEntities,
+          model: model,
+          apiKey: apiKey,
+        );
       } else if (datasource is GoogleAiInboxDatasource) {
-        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, taskEntities: taskEntities, model: model, apiKey: apiKey);
+        summary = await datasource.fetchConversationSummary(
+          inbox: inbox,
+          allInboxes: allInboxes,
+          eventEntities: eventEntities,
+          taskEntities: taskEntities,
+          model: model,
+          apiKey: apiKey,
+        );
       } else if (datasource is AnthropicAiInboxDatasource) {
-        summary = await datasource.fetchConversationSummary(inbox: inbox, allInboxes: allInboxes, eventEntities: eventEntities, taskEntities: taskEntities, model: model, apiKey: apiKey);
+        summary = await datasource.fetchConversationSummary(
+          inbox: inbox,
+          allInboxes: allInboxes,
+          eventEntities: eventEntities,
+          taskEntities: taskEntities,
+          model: model,
+          apiKey: apiKey,
+        );
       }
 
       // Step 3: Save AI summary to Supabase cache
