@@ -42,10 +42,7 @@ class ScaffoldAvatar extends ConsumerWidget {
           children: [
             SizedBox(height: 8),
             VisirIcon(type: VisirIconType.profile, size: isTabBarCollapsed ? 20 : Theme.of(context).iconTheme.size ?? 20),
-            if (!isTabBarCollapsed) ...[
-              SizedBox(height: 6),
-              Text(Utils.mainContext.tr.sign_in, style: context.labelMedium?.textColor(context.onBackground).appFont(context)),
-            ],
+            if (!isTabBarCollapsed) ...[SizedBox(height: 6), Text(Utils.mainContext.tr.sign_in, style: context.labelMedium?.textColor(context.onBackground).appFont(context))],
             SizedBox(height: 8),
           ],
         ),
@@ -81,15 +78,15 @@ class ScaffoldAvatar extends ConsumerWidget {
               return true;
             },
           ),
-          VisirButtonKeyboardShortcut(
-            message: context.tr.join_slack_community,
-            itemTitle: context.tr.join_slack_community,
-            keys: [],
-            onTrigger: () {
-              Utils.launchSlackCommunity();
-              return true;
-            },
-          ),
+          // VisirButtonKeyboardShortcut(
+          //   message: context.tr.join_slack_community,
+          //   itemTitle: context.tr.join_slack_community,
+          //   keys: [],
+          //   onTrigger: () {
+          //     Utils.launchSlackCommunity();
+          //     return true;
+          //   },
+          // ),
           VisirButtonKeyboardShortcut(
             message: context.tr.download_for_mobile,
             itemTitle: context.tr.download_for_mobile,
