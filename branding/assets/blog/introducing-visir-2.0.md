@@ -1,7 +1,7 @@
 ---
 title: "Introducing Visir 2.0: The AI Executive Assistant"
 excerpt: "Today we are launching our biggest update yet. Visir can now read your email, understand your context, and draft replies for you. This isn't just an incremental update—it's a fundamental shift in how you interact with your work."
-date: "2025-12-17"
+date: "2026-01-13"
 readTime: "12 min read"
 author: "Ryan Lee"
 image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000"

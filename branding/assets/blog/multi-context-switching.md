@@ -1,7 +1,7 @@
 ---
 title: "Why Multi-Context Switching Kills Productivity"
 excerpt: "Research shows it takes 23 minutes to refocus after a distraction. Here is how unified workspaces solve the fragmentation problem."
-date: "2025-12-17"
+date: "2026-01-15"
 readTime: "15 min read"
 author: "Ryan Lee"
 image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&q=80&w=1000"

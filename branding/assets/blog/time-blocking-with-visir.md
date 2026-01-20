@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Time Blocking with Visir"
 excerpt: "Time blocking is the secret weapon of high achievers. Learn how to drag-and-drop your tasks into your calendar effectively and transform your productivity."
-date: "2025-12-17"
+date: "2026-01-19"
 readTime: "18 min read"
 author: "Ryan Lee"
 image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=1000"
