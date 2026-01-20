@@ -88,7 +88,7 @@ class InboxAgentListController extends _$InboxAgentListController {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    DateTime startDate;
+    DateTime startDate = today.subtract(const Duration(days: 1));
     if (_lastAppOpenCloseDate != null) {
       // lastDate의 날짜(00:00:00)부터 시작
       final lastDate = DateTime(_lastAppOpenCloseDate!.year, _lastAppOpenCloseDate!.month, _lastAppOpenCloseDate!.day);
