@@ -1,0 +1,216 @@
+{
+  "name": "Visir",
+  "tagline": "Your AI Executive Assistant | Never Alt-Tab Again",
+  "description": "Your browser tabs are killing your productivity. Visir unifies Slack, Gmail, and Calendar into one timeline. Never Alt-Tab again. Secure, local-first.",
+  "url": "https://visir.pro",
+  "version": "2.0",
+  "platforms": ["macOS", "Windows", "iOS", "Android"],
+
+  "value_propositions": [
+    {
+      "title": "Never Alt-Tab Again",
+      "description": "Email, Slack, and Tasks lived apart. We married them. Drag any message to your calendar to time-block it, or instantly convert it to a task. Reply to emails or chats directly within Visir—no need to switch apps. Empty your inbox in minutes, not hours.",
+      "benefits": [
+        "Protect your focus time: Drag tasks directly onto your calendar to secure focus time.",
+        "Don't lose that thought: Use global shortcuts to capture thoughts without breaking flow.",
+        "Universal Inbox: Manage Email, Team chat, and Calendars in a single list."
+      ]
+    },
+    {
+      "title": "Your Brain, Just Organized by AI",
+      "description": "It plans your day before you even wake up. Catch up on 100 Slack messages in 10 seconds. Your Home tab is an intelligent briefing that automatically analyzes your inbox to categorize items by project and urgency. Get a 'Who, What, Why' summary before every call, so you arrive ready.",
+      "benefits": [
+        "Catch up on 100 Slack messages in 10 seconds: AI separates urgent signals from low-priority noise automatically.",
+        "Arrive ready: Get a 'Who, What, Why' summary before every call.",
+        "Draft responses instantly: AI that understands the thread and drafts context-aware replies."
+      ]
+    },
+    {
+      "title": "Native Power without the Noise",
+      "description": "Don't settle for shallow integrations. Visir provides full-featured dedicated tabs for Mail, Chat, Calendar, and Tasks. Switch between a high-level AI overview and deep-focus work in specific tools with a single click.",
+      "benefits": [
+        "No Compromise: Access the full feature set of your native tools within Visir.",
+        "Keyboard First: Navigate your entire workflow without touching the mouse.",
+        "Offline Capability: Search, read, and organize your work even without an internet connection."
+      ]
+    },
+    {
+      "title": "Command Center in Your Pocket",
+      "description": "Desktop power, mobile size. Most mobile apps are just read-only companions. Visir Mobile is a full command center in your pocket. Triage email, manage projects, and block time on your calendar with the same power as the desktop app.",
+      "benefits": [
+        "Desktop power, mobile size: If you can do it on desktop, you can do it on mobile.",
+        "Swipe to organize: Swipe to snooze, archive, or schedule tasks in seconds.",
+        "See your 'Up Next' instantly: Home Screen Widget shows your context without opening the app."
+      ]
+    }
+  ],
+
+  "integrations": [
+    {
+      "name": "Gmail",
+      "category": "email",
+      "features": ["Full inbox management", "Real-time sync", "Offline access"]
+    },
+    {
+      "name": "Outlook",
+      "category": "email",
+      "features": ["Full inbox management", "Real-time sync", "Offline access"]
+    },
+    {
+      "name": "Slack",
+      "category": "chat",
+      "features": ["Team chat", "Channel management", "Direct messages"]
+    },
+    {
+      "name": "Google Calendar",
+      "category": "calendar",
+      "features": ["Event management", "Time blocking", "Meeting preparation"]
+    }
+  ],
+
+  "features": [
+    "Unified inbox for Gmail, Slack, and Outlook",
+    "AI-powered email triage and categorization",
+    "Calendar integration with time blocking",
+    "Task management with drag-and-drop",
+    "Cross-platform sync",
+    "Offline support",
+    "Privacy-first architecture",
+    "Keyboard-first navigation",
+    "Global shortcuts for quick capture",
+    "Meeting context summaries",
+    "AI-powered response drafting"
+  ],
+
+  "privacy_and_security": {
+    "local_first": true,
+    "data_processing": "Most data processing happens locally on your device",
+    "server_storage": "Email and message content is never stored on our servers—only task metadata is encrypted and stored for sync purposes",
+    "byok": "Bring Your Own Key (BYOK) option available for AI services",
+    "offline_capable": true,
+    "encryption": "Task metadata is encrypted before storage"
+  },
+
+  "faq": [
+    {
+      "question": "How does Visir integrate with Gmail, Slack, and Calendar?",
+      "answer": "Visir connects directly to your Gmail, Outlook, Slack, and Google Calendar accounts through secure OAuth authentication. Once connected, Visir syncs your data locally and provides a unified interface to manage everything in one place. All integrations support real-time bidirectional sync, so changes made in Visir instantly reflect in your original apps."
+    },
+    {
+      "question": "Can I use Visir offline?",
+      "answer": "Yes! Visir syncs your emails, messages, and calendar events to a local database on your device. You can read your content without an internet connection. However, modifications like sending emails, creating tasks, or updating calendar events require an internet connection."
+    },
+    {
+      "question": "How does the AI assistant work?",
+      "answer": "Visir's AI analyzes your inbox to categorize items by project and urgency, summarizes meeting contexts, and helps draft responses. By default, AI processing happens via direct API calls that don't retain data for training. For maximum privacy, you can use your own API key to ensure your data only flows between your device and your personal API console."
+    },
+    {
+      "question": "Is my data secure and private?",
+      "answer": "Absolutely. Visir processes most data locally on your device. Your email and message content is never stored on our servers—only task metadata is encrypted and stored for sync purposes. Text search is performed locally, and you have full control over what data is shared with AI services through the BYOK option."
+    },
+    {
+      "question": "Can I replace my existing productivity tools?",
+      "answer": "Yes! Visir provides full-featured tabs for Mail, Chat, Calendar, and Tasks with complete feature parity. You can manage Gmail, Slack, Google Calendar, and Outlook entirely within Visir without switching apps. All changes sync bidirectionally, so you can still use your original apps when needed."
+    },
+    {
+      "question": "What platforms does Visir support?",
+      "answer": "Visir is available on macOS, Windows, iOS, and Android. The mobile apps offer 100% feature parity with the desktop version, so you can manage your entire workflow from any device. All your data syncs seamlessly across platforms."
+    }
+  ],
+
+  "target_audience": [
+    {
+      "persona": "Developers",
+      "pain_points": ["Context switching", "Deep work interruptions", "Managing multiple tools"],
+      "solution": "Keyboard-first interface, offline capability, unified workspace"
+    },
+    {
+      "persona": "Founders",
+      "pain_points": ["Inbox overload", "Meeting preparation", "Task prioritization"],
+      "solution": "AI-powered triage, meeting context summaries, unified inbox"
+    },
+    {
+      "persona": "Managers",
+      "pain_points": ["Team coordination", "Email management", "Calendar scheduling"],
+      "solution": "Unified team chat, intelligent inbox, calendar time blocking"
+    },
+    {
+      "persona": "Personal Use",
+      "pain_points": ["Too many apps", "Information overload", "Time management"],
+      "solution": "All-in-one workspace, AI organization, mobile command center"
+    }
+  ],
+
+  "social": {
+    "twitter": "https://twitter.com/visir_app",
+    "linkedin": "https://www.linkedin.com/company/visir-app"
+  },
+
+  "contact": {
+    "website": "https://visir.pro",
+    "download": "https://visir.pro/download",
+    "help": "https://visir.pro/help",
+    "privacy": "https://visir.pro/privacy",
+    "terms": "https://visir.pro/terms"
+  },
+
+  "blog": [
+    {
+      "title": "Introducing Visir 2.0: The AI Executive Assistant",
+      "slug": "introducing-visir-2.0",
+      "excerpt": "Today we are launching our biggest update yet. Visir can now read your email, understand your context, and draft replies for you. This isn't just an incremental update—it's a fundamental shift in how you interact with your work.",
+      "date": "2025-12-17",
+      "readTime": "12 min read",
+      "author": "Ryan Lee",
+      "category": "Product",
+      "url": "https://visir.pro/blog/introducing-visir-2.0",
+      "key_points": [
+        "Visir 2.0 introduces an AI executive assistant that understands context and anticipates needs",
+        "Smart email reading with contextual understanding beyond keyword matching",
+        "AI-powered drafts that match your writing style and tone",
+        "Unified workspace intelligence that connects dots across email, Slack, and calendar",
+        "40% reduction in email triage time, 60% faster response times",
+        "Privacy-first with on-device processing and transparent AI",
+        "No training on user data - your data stays yours"
+      ]
+    },
+    {
+      "title": "Why Multi-Context Switching Kills Productivity",
+      "slug": "multi-context-switching",
+      "excerpt": "Research shows it takes 23 minutes to refocus after a distraction. Here is how unified workspaces solve the fragmentation problem.",
+      "date": "2025-12-17",
+      "readTime": "15 min read",
+      "author": "Ryan Lee",
+      "category": "Productivity",
+      "url": "https://visir.pro/blog/multi-context-switching",
+      "key_points": [
+        "It takes 23 minutes to fully refocus after being interrupted",
+        "Context switching causes increased errors, reduced creativity, and higher stress",
+        "Most knowledge workers use 8-10 different applications daily",
+        "Unified workspaces bring all tools into one place, eliminating context switches",
+        "Single timeline view shows email, Slack, and calendar in chronological order",
+        "Universal search finds everything across all apps instantly",
+        "Real productivity gains: more deep work time, faster information retrieval, better decision-making"
+      ]
+    },
+    {
+      "title": "How to Implement Time Blocking with Visir",
+      "slug": "time-blocking-with-visir",
+      "excerpt": "Time blocking is the secret weapon of high achievers. Learn how to drag-and-drop your tasks into your calendar effectively and transform your productivity.",
+      "date": "2025-12-17",
+      "readTime": "18 min read",
+      "author": "Ryan Lee",
+      "category": "Tutorial",
+      "url": "https://visir.pro/blog/time-blocking-with-visir",
+      "key_points": [
+        "Time blocking divides your day into focused blocks dedicated to specific tasks",
+        "Traditional tools require 9 steps to schedule a single task - Visir does it in one drag-and-drop",
+        "Drag tasks directly onto calendar to create linked calendar events automatically",
+        "Advanced techniques: theme days, time boxing, buffer blocks, energy-based blocking",
+        "Common mistakes: over-scheduling, under-estimating duration, not adapting, ignoring context",
+        "Real results: executives get 40% more strategic work time, developers write 3x more code",
+        "Your calendar is a plan, not a prison - adapt when needed"
+      ]
+    }
+  ]
+}
