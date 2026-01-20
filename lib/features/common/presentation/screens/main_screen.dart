@@ -1021,7 +1021,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               logAnalyticsEvent(eventName: user.onTrial ? 'trial_app_foreground' : 'app_foreground');
 
               // 앱이 열릴 때 날짜 저장 (정확한 시간 저장) - 빌드 완료 후 실행
-              if (isSignedIn && isFirst) {
+              // isFirst 조건 제거: 백그라운드에서 포그라운드로 돌아올 때도 날짜 업데이트
+              if (isSignedIn) {
                 Future(() {
                   Utils.ref.read(lastAppOpenCloseDateControllerNotifierProvider).set(DateTime.now());
                 });
