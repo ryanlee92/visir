@@ -25,7 +25,6 @@ import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:emoji_extension/emoji_extension.dart' hide Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/experimental/persist.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -185,7 +184,9 @@ class NotificationControllerInternal extends _$NotificationControllerInternal {
       await FirebaseMessaging.instance.requestPermission();
 
       if (PlatformX.isApple) {
-        apns = await FirebaseMessaging.instance.getAPNSToken();
+        try {
+          apns = await FirebaseMessaging.instance.getAPNSToken();
+        } catch (e) {}
       }
 
       // 전역 변수에서 가져오기 (Edge Function에서 업데이트됨)
