@@ -1021,10 +1021,19 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               logAnalyticsEvent(eventName: user.onTrial ? 'trial_app_foreground' : 'app_foreground');
 
               // 앱이 열릴 때 날짜 저장 (정확한 시간 저장) - 빌드 완료 후 실행
-              // isFirst 조건 제거: 백그라운드에서 포그라운드로 돌아올 때도 날짜 업데이트
+              // 이전 값과 날짜가 다를 때만 업데이트 (시간은 무시하고 날짜만 비교)
               if (isSignedIn) {
                 Future(() {
-                  Utils.ref.read(lastAppOpenCloseDateControllerNotifierProvider).set(DateTime.now());
+                  final now = DateTime.now();
+                  final lastDate = Utils.ref.read(lastAppOpenCloseDateControllerNotifierProvider).state;
+
+                  // 이전 날짜가 없거나, 날짜가 다르면 업데이트
+                  if (lastDate == null ||
+                      lastDate.year != now.year ||
+                      lastDate.month != now.month ||
+                      lastDate.day != now.day) {
+                    Utils.ref.read(lastAppOpenCloseDateControllerNotifierProvider).set(now);
+                  }
                 });
               }
 
