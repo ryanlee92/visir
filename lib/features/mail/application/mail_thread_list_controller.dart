@@ -52,7 +52,9 @@ class MailThreadListController extends _$MailThreadListController {
       }),
     );
 
-    _oauth = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths?.firstWhereOrNull((e) => e.email == threadEmail)))!;
+    final targetOAuth = ref.read(localPrefControllerProvider.select((v) => v.value?.mailOAuths?.firstWhereOrNull((e) => e.email == threadEmail)));
+    if (targetOAuth == null) return [];
+    _oauth = targetOAuth;
 
     _controller = ref.watch(
       mailThreadListControllerInternalProvider(

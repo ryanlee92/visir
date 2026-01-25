@@ -4402,4 +4402,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String mcp_found_completed_tasks(int count) {
     return '$count completed task(s) found';
   }
+
+  @override
+  String no_mail_provider_integrated_email(Object name) {
+    return 'No mail account is connected for this email address : $name';
+  }
 }

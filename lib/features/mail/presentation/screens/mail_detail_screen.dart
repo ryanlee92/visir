@@ -20,6 +20,7 @@ import 'package:Visir/features/common/presentation/widgets/selection_widget.dart
 import 'package:Visir/features/common/presentation/widgets/showcase_wrapper.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
+import 'package:Visir/features/common/presentation/widgets/visir_empty_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/presentation/widgets/tutorial/feature_tutorial_widget.dart';
 import 'package:Visir/features/common/provider.dart';
@@ -37,6 +38,7 @@ import 'package:Visir/features/mail/presentation/widgets/mail_attachment_widget.
 import 'package:Visir/features/mail/presentation/widgets/mail_content_widget.dart';
 import 'package:Visir/features/mail/providers.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
+import 'package:Visir/features/preference/presentation/screens/preference_screen.dart';
 import 'package:Visir/features/task/presentation/widgets/mobile_task_or_event_switcher_widget.dart';
 import 'package:Visir/features/task/presentation/widgets/simple_task_or_event_switcher_widget.dart';
 import 'package:Visir/features/time_saved/actions.dart';
@@ -146,11 +148,12 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
           ?.where((e) => !e.isDraft)
           .toList();
 
-  MailUserEntity get me {
+  MailUserEntity? get me {
     final pref = ref.read(localPrefControllerProvider).value;
     final hostEmail = ref.read(mailConditionProvider(tabType)).threadEmail;
     final mails = pref?.mailOAuths ?? [];
     final mailOAuth = mails.firstWhereOrNull((element) => element.email == hostEmail);
+    if (mailOAuth == null) return null;
     return MailUserEntity(name: mailOAuth!.name, email: mailOAuth.email, type: MailEntityTypeX.fromOAuthType(mailOAuth.type));
   }
 
@@ -305,14 +308,16 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
     if (list.isEmpty) return;
 
     final anchorMail = list.first;
-    
+
     // Create InboxEntity from MailEntity
-    final inboxConfig = widget.inboxConfig ?? InboxConfigEntity(
-      inboxUniqueId: InboxEntity.getInboxIdFromMail(anchorMail),
-      userId: ref.read(authControllerProvider).requireValue.id,
-      dateTime: anchorMail.date ?? DateTime.now(),
-    );
-    
+    final inboxConfig =
+        widget.inboxConfig ??
+        InboxConfigEntity(
+          inboxUniqueId: InboxEntity.getInboxIdFromMail(anchorMail),
+          userId: ref.read(authControllerProvider).requireValue.id,
+          dateTime: anchorMail.date ?? DateTime.now(),
+        );
+
     final inbox = InboxEntity.fromMail(anchorMail, inboxConfig);
 
     // Navigate to home tab
@@ -361,18 +366,21 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
   }
 
   void reply(MailEntity e) {
+    if (me == null) return;
     logAnalyticsEvent(eventName: isFromInbox ? 'inbox_${widget.taskMail!.type.title}_reply' : 'mail_reply');
-    Utils.replyMail(mail: e, me: me);
+    Utils.replyMail(mail: e, me: me!);
   }
 
   void replyAll(MailEntity e) {
+    if (me == null) return;
     logAnalyticsEvent(eventName: isFromInbox ? 'inbox_${widget.taskMail!.type.title}_reply_all' : 'mail_reply_all');
-    Utils.replyAllMail(mail: e, me: me);
+    Utils.replyAllMail(mail: e, me: me!);
   }
 
   void forward(MailEntity e) {
+    if (me == null) return;
     logAnalyticsEvent(eventName: isFromInbox ? 'inbox_${widget.taskMail!.type.title}_forward' : 'mail_forward');
-    Utils.forwardMail(mail: e, me: me);
+    Utils.forwardMail(mail: e, me: me!);
   }
 
   void checkPayloadThenAction() {
@@ -484,6 +492,21 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (me == null) {
+      final hostEmail = ref.read(mailConditionProvider(tabType)).threadEmail;
+      return VisirEmptyWidget(
+        message: context.tr.no_mail_provider_integrated_email(hostEmail ?? ''),
+        buttonText: context.tr.integrate_new_accounts,
+        buttonIcon: VisirIconType.integration,
+        onButtonTap: () {
+          Utils.showPopupDialog(
+            child: PreferenceScreen(key: Utils.preferenceScreenKey, initialPreferenceScreenType: PreferenceScreenType.integration),
+            size: PlatformX.isMobileView ? null : Size(640, 560),
+          );
+        },
+      );
+    }
+
     scrollController ??= ModalScrollController.ofSyncGroup(context)?.addAndGet() ?? ScrollController();
     ref.listen(mailThreadListControllerProvider(tabType: tabType), (prev, next) {
       checkPayloadThenAction();
@@ -1042,14 +1065,14 @@ class MailDetailScreenState extends ConsumerState<MailDetailScreen> {
                                           TextSpan(text: 'To.  ', style: context.bodyMedium?.textColor(context.secondary)),
                                           ...e.to
                                               .map((user) {
-                                                bool isMe = user.email == me.email;
+                                                bool isMe = user.email == me?.email;
                                                 String userName = (user.name ?? '');
                                                 return [
                                                   TextSpan(
                                                     text: ref.read(shouldUseMockDataProvider)
                                                         ? 'Alex Chen'
                                                         : '${isMe
-                                                              ? me.name
+                                                              ? me?.name
                                                               : userName.isEmpty
                                                               ? user.email
                                                               : userName} ',

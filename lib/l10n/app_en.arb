@@ -1884,5 +1884,7 @@
         "type": "int"
       }
     }
-  }
+  },
+
+  "no_mail_provider_integrated_email": "No mail account is connected for this email address : {name}"
 }

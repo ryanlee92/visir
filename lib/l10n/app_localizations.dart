@@ -7823,6 +7823,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} completed task(s) found'**
   String mcp_found_completed_tasks(int count);
+
+  /// No description provided for @no_mail_provider_integrated_email.
+  ///
+  /// In en, this message translates to:
+  /// **'No mail account is connected for this email address : {name}'**
+  String no_mail_provider_integrated_email(Object name);
 }
 
 class _AppLocalizationsDelegate
