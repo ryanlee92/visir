@@ -40,11 +40,13 @@ import 'package:Visir/features/common/presentation/widgets/keyboard_shortcut.dar
 import 'package:Visir/features/common/presentation/widgets/mobile_scaffold.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_app_bar.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
+import 'package:Visir/features/common/presentation/widgets/visir_empty_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/common/provider.dart';
 import 'package:Visir/features/inbox/domain/entities/inbox_config_entity.dart';
 import 'package:Visir/features/preference/application/local_pref_controller.dart';
 import 'package:Visir/features/preference/domain/entities/oauth_entity.dart';
+import 'package:Visir/features/preference/presentation/screens/preference_screen.dart';
 import 'package:Visir/features/time_saved/actions.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -650,6 +652,20 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (ref.read(chatConditionProvider(widget.tabType).select((v) => v.channel)) == null) {
+      return VisirEmptyWidget(
+        message: context.tr.target_chat_not_integrated,
+        buttonText: context.tr.integrate_new_accounts,
+        buttonIcon: VisirIconType.integration,
+        onButtonTap: () {
+          Utils.showPopupDialog(
+            child: PreferenceScreen(key: Utils.preferenceScreenKey, initialPreferenceScreenType: PreferenceScreenType.integration),
+            size: PlatformX.isMobileView ? null : Size(640, 560),
+          );
+        },
+      );
+    }
+
     if (scrollController == null) {
       scrollController ??= ModalScrollController.ofSyncGroup(context)?.addAndGet() ?? ScrollController();
       scrollController?.addListener(scrollListener);

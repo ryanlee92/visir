@@ -4407,4 +4407,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String no_mail_provider_integrated_email(Object name) {
     return 'No mail account is connected for this email address : $name';
   }
+
+  @override
+  String get target_chat_not_integrated =>
+      'No chat account is connected for linked channel';
 }

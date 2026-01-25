@@ -68,9 +68,7 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
 
   void onShowcaseOnListener() {
     if (isShowcaseOn.value == chatTabShowcaseKeyString || isShowcaseOn.value == chatCreateTaskShowcaseKeyString) {
-      final channel = ref.read(
-        chatChannelListControllerProvider.select((e) => e.values.expand((e) => e.channels).firstWhereOrNull((c) => c.id == targetChatChannelId)),
-      );
+      final channel = ref.read(chatChannelListControllerProvider.select((e) => e.values.expand((e) => e.channels).firstWhereOrNull((c) => c.id == targetChatChannelId)));
       if (channel == null) return;
       ref.read(chatConditionProvider(tabType).notifier).setChannel(channel);
       return;
@@ -155,12 +153,9 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
     final integratedTeams = ref.watch(localPrefControllerProvider.select((v) => v.value?.messengerOAuths?.where((e) => e.needReAuth != true).toList() ?? []));
     final chatLastChannelIds = ref.watch(chatLastChannelProvider(tabType));
     final chatLastChannels = chatLastChannelIds.map((e) => channels.firstWhereOrNull((e) => e.id == e)).whereType<MessageChannelEntity>().toList();
-    final emptySuggestedChannels = (channels.where((e) => e.hasUnreadMessage).toList()..sort((b, a) => a.lastUpdated.compareTo(b.lastUpdated)))
-        .take(5)
-        .toList();
+    final emptySuggestedChannels = (channels.where((e) => e.hasUnreadMessage).toList()..sort((b, a) => a.lastUpdated.compareTo(b.lastUpdated))).take(5).toList();
     final channelStateList = ref.watch(chatChannelStateListProvider(tabType));
-    final pinnedChannels = channels.where((e) => channelStateList[e.uniqueId] == ChatChannelSection.pinned).toList()
-      ..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+    final pinnedChannels = channels.where((e) => channelStateList[e.uniqueId] == ChatChannelSection.pinned).toList()..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
 
     final ratio = ref.watch(zoomRatioProvider);
 
@@ -203,8 +198,7 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
                                 ),
                               Expanded(
                                 child: Container(
-                                  child:
-                                      (chatLastChannels.isEmpty && emptySuggestedChannels.isEmpty && pinnedChannels.isEmpty) || resizableClosableDrawer != null
+                                  child: (chatLastChannels.isEmpty && emptySuggestedChannels.isEmpty && pinnedChannels.isEmpty) || resizableClosableDrawer != null
                                       ? VisirEmptyWidget(
                                           message: integratedTeams.isEmpty ? context.tr.no_chat_provider_integrated : context.tr.no_channel_selected,
                                           buttonText: integratedTeams.isEmpty ? context.tr.chat_integrate_chat_button : null,
@@ -218,10 +212,7 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
                                               : null,
                                           onButtonTap: () {
                                             Utils.showPopupDialog(
-                                              child: PreferenceScreen(
-                                                key: Utils.preferenceScreenKey,
-                                                initialPreferenceScreenType: PreferenceScreenType.integration,
-                                              ),
+                                              child: PreferenceScreen(key: Utils.preferenceScreenKey, initialPreferenceScreenType: PreferenceScreenType.integration),
                                               size: PlatformX.isMobileView ? null : Size(640, 560),
                                             );
                                           },
@@ -241,8 +232,7 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
                                                     );
                                                   },
                                                 ),
-                                              if (chatLastChannels.isNotEmpty)
-                                                ...chatLastChannels.map((e) => _buildChannelWidget(e, integratedTeams, isLastOpenedSection: true)),
+                                              if (chatLastChannels.isNotEmpty) ...chatLastChannels.map((e) => _buildChannelWidget(e, integratedTeams, isLastOpenedSection: true)),
 
                                               if (pinnedChannels.isNotEmpty)
                                                 VisirListSection(
@@ -263,8 +253,7 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
                                                     );
                                                   },
                                                 ),
-                                              if (emptySuggestedChannels.isNotEmpty)
-                                                ...emptySuggestedChannels.map((e) => _buildChannelWidget(e, integratedTeams)),
+                                              if (emptySuggestedChannels.isNotEmpty) ...emptySuggestedChannels.map((e) => _buildChannelWidget(e, integratedTeams)),
                                             ],
                                           ),
                                         ),
@@ -312,10 +301,7 @@ class ChatScreenState extends ConsumerState<ChatScreen> with AutomaticKeepAliveC
                               final groups = ref.read(chatGroupListControllerProvider(tabType: tabType)).groups;
                               final sender = members.firstWhereOrNull((e) => e.id == chat.userId);
                               if (sender == null) return;
-                              timeblockDropWidgetKey.currentState?.onInboxDragUpdate(
-                                InboxEntity.fromChat(chat, null, channel, sender, channels, members, groups),
-                                offset,
-                              );
+                              timeblockDropWidgetKey.currentState?.onInboxDragUpdate(InboxEntity.fromChat(chat, null, channel, sender, channels, members, groups), offset);
                             },
                           ),
                         ),

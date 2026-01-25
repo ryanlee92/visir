@@ -1886,5 +1886,6 @@
     }
   },
 
-  "no_mail_provider_integrated_email": "No mail account is connected for this email address : {name}"
+  "no_mail_provider_integrated_email": "No mail account is connected for this email address : {name}",
+  "target_chat_not_integrated": "No chat account is connected for linked channel"
 }

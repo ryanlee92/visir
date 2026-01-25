@@ -535,7 +535,9 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
       setState(() {});
       final date = ref.read(inboxListDateProvider);
       final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-      ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
+      ref
+          .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+          .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
       openInbox();
 
       int? minVisible = listController.visibleRange?.$1;
@@ -561,7 +563,9 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
       setState(() {});
       final date = ref.read(inboxListDateProvider);
       final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-      ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
+      ref
+          .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+          .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
       openInbox();
 
       int? minVisible = listController.visibleRange?.$1;
@@ -597,7 +601,9 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
       setState(() {});
       final date = ref.read(inboxListDateProvider);
       final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-      ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
+      ref
+          .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+          .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
       openInbox();
 
       int? minVisible = listController.visibleRange?.$1;
@@ -632,7 +638,9 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
       setState(() {});
       final date = ref.read(inboxListDateProvider);
       final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-      ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
+      ref
+          .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+          .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         openInbox();
       });
@@ -647,7 +655,9 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
       setState(() {});
       final date = ref.read(inboxListDateProvider);
       final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-      ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
+      ref
+          .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+          .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         openInbox();
       });
@@ -671,7 +681,9 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
       setState(() {});
       final date = ref.read(inboxListDateProvider);
       final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-      ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier).updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
+      ref
+          .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+          .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
       openInbox();
       return true;
     }
@@ -1574,7 +1586,15 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
                                                   final date = ref.read(inboxListDateProvider);
                                                   final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
                                                   ref
-                                                      .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+                                                      .read(
+                                                        inboxConfigListControllerProvider(
+                                                          isSearch: false,
+                                                          year: date.year,
+                                                          month: date.month,
+                                                          day: date.day,
+                                                          isSignedIn: isSignedIn,
+                                                        ).notifier,
+                                                      )
                                                       .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
                                                   openInbox();
                                                 }
@@ -1598,7 +1618,15 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
                                                 final date = ref.read(inboxListDateProvider);
                                                 final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
                                                 ref
-                                                    .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+                                                    .read(
+                                                      inboxConfigListControllerProvider(
+                                                        isSearch: false,
+                                                        year: date.year,
+                                                        month: date.month,
+                                                        day: date.day,
+                                                        isSignedIn: isSignedIn,
+                                                      ).notifier,
+                                                    )
                                                     .updateInboxConfig(
                                                       configs: [
                                                         ...[inbox].map((e) => e.config!.copyWith(isDeleted: !(e.config?.isDeleted ?? false), inboxUniqueId: e.uniqueId)),
@@ -1815,7 +1843,8 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
                                                     String inboxGroupString =
                                                         (inboxGroup?.length == 1
                                                                 ? (inbox.providers.isNotEmpty ? inbox.providers.first.name : '')
-                                                                : inboxGroup?.firstOrNull?.linkedMessage?.channelName ?? (inbox.providers.isNotEmpty ? inbox.providers.first.name : ''))
+                                                                : inboxGroup?.firstOrNull?.linkedMessage?.channelName ??
+                                                                      (inbox.providers.isNotEmpty ? inbox.providers.first.name : ''))
                                                             .toLowerCase();
                                                     bool isSearchMatched = _isSearch
                                                         ? _searchQuery.isEmpty
@@ -1894,7 +1923,15 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
                                                           final date = ref.read(inboxListDateProvider);
                                                           final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
                                                           ref
-                                                              .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+                                                              .read(
+                                                                inboxConfigListControllerProvider(
+                                                                  isSearch: false,
+                                                                  year: date.year,
+                                                                  month: date.month,
+                                                                  day: date.day,
+                                                                  isSignedIn: isSignedIn,
+                                                                ).notifier,
+                                                              )
                                                               .updateInboxConfig(configs: [inbox.config!.copyWith(isRead: true, inboxUniqueId: inbox.id)]);
                                                           openInbox();
                                                         }
@@ -1931,7 +1968,15 @@ class InboxListScreenState extends ConsumerState<InboxListScreen> {
                                                         final date = ref.read(inboxListDateProvider);
                                                         final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
                                                         ref
-                                                            .read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn).notifier)
+                                                            .read(
+                                                              inboxConfigListControllerProvider(
+                                                                isSearch: false,
+                                                                year: date.year,
+                                                                month: date.month,
+                                                                day: date.day,
+                                                                isSignedIn: isSignedIn,
+                                                              ).notifier,
+                                                            )
                                                             .updateInboxConfig(
                                                               configs: [
                                                                 ...[inbox].map((e) => e.config!.copyWith(isDeleted: !(e.config?.isDeleted ?? false), inboxUniqueId: e.uniqueId)),

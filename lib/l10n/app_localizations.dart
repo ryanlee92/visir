@@ -7829,6 +7829,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No mail account is connected for this email address : {name}'**
   String no_mail_provider_integrated_email(Object name);
+
+  /// No description provided for @target_chat_not_integrated.
+  ///
+  /// In en, this message translates to:
+  /// **'No chat account is connected for linked channel'**
+  String get target_chat_not_integrated;
 }
 
 class _AppLocalizationsDelegate

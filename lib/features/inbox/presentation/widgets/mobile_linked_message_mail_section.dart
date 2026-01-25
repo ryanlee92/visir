@@ -6,16 +6,19 @@ import 'package:Visir/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:Visir/features/chat/providers.dart';
 import 'package:Visir/features/common/domain/entities/linked_item_entity.dart';
 import 'package:Visir/features/common/presentation/utils/constants.dart';
+import 'package:Visir/features/common/presentation/utils/extensions/platform_extension.dart';
 import 'package:Visir/features/common/presentation/utils/extensions/ui_extension.dart';
 import 'package:Visir/features/common/presentation/utils/log_event.dart';
 import 'package:Visir/features/common/presentation/utils/utils.dart';
 import 'package:Visir/features/common/presentation/widgets/showcase_wrapper.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_button.dart';
+import 'package:Visir/features/common/presentation/widgets/visir_empty_widget.dart';
 import 'package:Visir/features/common/presentation/widgets/visir_icon.dart';
 import 'package:Visir/features/mail/domain/entities/mail_entity.dart';
 import 'package:Visir/features/mail/domain/entities/mail_label_entity.dart';
 import 'package:Visir/features/mail/presentation/screens/mail_detail_screen.dart';
 import 'package:Visir/features/mail/providers.dart';
+import 'package:Visir/features/preference/presentation/screens/preference_screen.dart';
 import 'package:Visir/features/time_saved/actions.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -65,10 +68,7 @@ class _MobileLinkedMessageSectionState extends ConsumerState<MobileLinkedMessage
       _tourHighlightController.repeat(reverse: true);
     }
 
-    _tourHighlightAnmiation = ColorTween(
-      begin: Utils.mainContext.primary.withValues(alpha: 0.25),
-      end: Utils.mainContext.primary,
-    ).animate(_tourHighlightController);
+    _tourHighlightAnmiation = ColorTween(begin: Utils.mainContext.primary.withValues(alpha: 0.25), end: Utils.mainContext.primary).animate(_tourHighlightController);
 
     isShowcaseOn.addListener(onShowcaseOnListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -132,9 +132,7 @@ class _MobileLinkedMessageSectionState extends ConsumerState<MobileLinkedMessage
     if (linkedMessage == null) return;
     final channels = ref.read(chatChannelListControllerProvider.select((v) => v.values.expand((e) => e.channels).toList()));
     final channel = channels.firstWhereOrNull((e) => e.id == linkedMessage.channelId);
-    if (channel == null) return;
-
-    ref.read(chatConditionProvider(widget.tabType).notifier).setThreadAndChannel(linkedMessage.threadId, channel, targetMessageId: linkedMessage.messageId);
+    if (channel != null) ref.read(chatConditionProvider(widget.tabType).notifier).setThreadAndChannel(linkedMessage.threadId, channel, targetMessageId: linkedMessage.messageId);
 
     logAnalyticsEvent(eventName: 'home_${widget.isEvent ? 'event' : 'task'}_slack_show');
 
@@ -267,12 +265,7 @@ class _MobileLinkedMessageSectionState extends ConsumerState<MobileLinkedMessage
                     Image.asset(linkedMail.type.icon, width: 20, height: 20),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        linkedMail.fromName,
-                        style: context.titleMedium?.textColor(context.outlineVariant),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      child: Text(linkedMail.fromName, style: context.titleMedium?.textColor(context.outlineVariant), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                     AnimatedBuilder(
                       animation: _tourHighlightAnmiation,
