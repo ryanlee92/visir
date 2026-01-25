@@ -572,7 +572,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                 child: Text(m.fromName, style: context.bodyLarge?.copyWith(color: context.outlineVariant), maxLines: 1),
                               ),
                               SizedBox(width: 8),
-                              if (PlatformX.isMobileView)
+                              if (PlatformX.isMobileView || true)
                                 PopupMenu(
                                   type: ContextMenuActionType.tap,
                                   location: PopupMenuLocation.right,
@@ -685,7 +685,7 @@ class _TaskListTaskDetailScreenState extends ConsumerState<TaskListTaskDetailScr
                                 child: Text('${m.userName} - ${m.channelName}', style: context.bodyLarge?.copyWith(color: context.outlineVariant), maxLines: 1),
                               ),
                               SizedBox(width: 4),
-                              if (PlatformX.isMobileView)
+                              if (PlatformX.isMobileView || true)
                                 PopupMenu(
                                   type: ContextMenuActionType.tap,
                                   location: PopupMenuLocation.right,
