@@ -98,7 +98,7 @@ class _SimpleLinkedMessageMailSectionState extends ConsumerState<SimpleLinkedMes
     final linkedMails = widget.linkedMails ?? [];
     final linkedMessages = widget.linkedMessages ?? [];
     final isAgentMode = ref.watch(currentInboxScreenTypeProvider) == InboxScreenType.agent;
-    final usePopupMenu = isAgentMode && widget.tabType == TabType.home;
+    final usePopupMenu = true || (isAgentMode && widget.tabType == TabType.home);
 
     return Column(
       children: [
@@ -287,6 +287,7 @@ class _SimpleLinkedMessageMailSectionState extends ConsumerState<SimpleLinkedMes
                         child: VisirIcon(type: VisirIconType.show, size: 14, isSelected: true),
                       );
                     }
+
                     return VisirButton(
                       key: showcaseButtonKey,
                       type: VisirButtonAnimationType.scaleAndOpacity,
