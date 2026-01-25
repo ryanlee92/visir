@@ -168,6 +168,10 @@ class ChatThreadScreenState extends ConsumerState<ChatThreadScreen> {
   @override
   void initState() {
     super.initState();
+    
+    if (ref.read(chatConditionProvider(widget.tabType).select((v) => v.channel)) == null) {
+      return;
+    }
 
     _channel = widget.channel;
 

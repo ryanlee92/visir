@@ -151,7 +151,7 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
     return channels.firstWhereOrNull((e) => e.id == channelId) ?? ref.read(chatConditionProvider(tabType)).channel!;
   }
 
-  String get teamId => ref.read(chatConditionProvider(widget.tabType).select((v) => v.channel!.teamId));
+  String get teamId => ref.read(chatConditionProvider(widget.tabType).select((v) => v.channel?.teamId ?? ''));
   List<MessageChannelEntity> get channels => ref.read(chatChannelListControllerProvider.select((v) => v[teamId]?.channels ?? []));
   List<MessageMemberEntity> get members => ref.read(chatMemberListControllerProvider(tabType: tabType).select((v) => v.members));
   List<MessageGroupEntity> get groups => ref.read(chatGroupListControllerProvider(tabType: tabType).select((v) => v.groups));
@@ -176,6 +176,10 @@ class ChatListScreenState extends ConsumerState<ChatListScreen> {
   @override
   void initState() {
     super.initState();
+
+    if (ref.read(chatConditionProvider(widget.tabType).select((v) => v.channel)) == null) {
+      return;
+    }
 
     initialChannel = _channel;
     hasUnreadAtFirst = _channel.hasUnreadMessage;
