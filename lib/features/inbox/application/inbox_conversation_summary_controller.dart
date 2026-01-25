@@ -333,351 +333,389 @@ Future<String?> _searchAndGenerateContext(
       }
     }
 
-    // Search in mail (Gmail, Outlook Mail)
-    // For mail providers, combine all keywords into a single query (space-separated)
-    // This works better for Gmail/Outlook search syntax
+    // Prepare common data for parallel searches
     final mailQuery = keywords.join(' ');
-    if (mailQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
-      for (final oauth in mailOAuths) {
-        final mailRepository = ref.watch(mailRepositoryProvider);
-        final user = ref.read(authControllerProvider).requireValue;
-
-        // Retry with backoff on failure
-        final mailResult = await _retryEitherWithBackoff(() async {
-          return await mailRepository.fetchMailsForLabel(
-            oauth: oauth,
-            user: user,
-            isInbox: false,
-            labelId: null,
-            email: null,
-            pageToken: null,
-            q: mailQuery,
-            startDate:
-                event?.startDate.subtract(const Duration(days: 30)) ?? task?.startDate.subtract(const Duration(days: 30)) ?? DateTime.now().subtract(const Duration(days: 30)),
-            endDate: event?.endDate ?? task?.endDate ?? DateTime.now(),
-          );
-        });
-
-        await mailResult.fold(
-          (failure) async {
-            // Mail search failed, skip this OAuth account
-          },
-          (mails) async {
-            // Group mails by threadId
-            final Map<String, MailEntity> threadMap = {}; // threadId -> representative mail
-
-            for (final mailList in mails.values) {
-              for (final mail in mailList.messages) {
-                if (mail.threadId == null || mail.threadId!.isEmpty) continue;
-
-                final threadKey = '${mail.threadId}_${oauth.email}';
-
-                // Check if this threadId already exists (by threadId, not messageId)
-                if (processedThreadIds.contains(threadKey)) continue;
-
-                // Keep the most recent mail from each thread as representative
-                if (!threadMap.containsKey(threadKey) || (mail.date != null && threadMap[threadKey]!.date != null && mail.date!.isAfter(threadMap[threadKey]!.date!))) {
-                  threadMap[threadKey] = mail;
-                }
-              }
-            }
-
-            // Fetch full thread for each unique threadId
-            for (final entry in threadMap.entries) {
-              final threadKey = entry.key;
-              final representativeMail = entry.value;
-
-              if (processedThreadIds.contains(threadKey)) continue;
-              processedThreadIds.add(threadKey);
-
-              // Fetch full thread
-              final threadResult = await mailRepository.fetchThreads(
-                oauth: oauth,
-                type: representativeMail.type,
-                threadId: representativeMail.threadId!,
-                labelId: CommonMailLabels.inbox.id,
-                email: oauth.email,
-              );
-
-              await threadResult.fold(
-                (failure) async {
-                  // Failed to fetch thread, skip this thread
-                },
-                (threadMails) async {
-                  // Convert all thread mails to InboxEntity
-                  final date = ref.read(inboxListDateProvider);
-                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-                  final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
-                  for (final mail in threadMails) {
-                    final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
-                    searchResults.add(InboxEntity.fromMail(mail, config));
-                  }
-                },
-              );
-            }
-          },
-        );
-      }
-    }
-
-    // Search in chat (Slack)
-    // For Slack, combine all keywords into a single query (space-separated)
-    // Slack search treats space-separated keywords as OR by default, but combining them
-    // reduces API calls and provides broader search results
     final chatQuery = keywords.join(' ');
-    if (chatQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
-      for (final oauth in messengerOAuths) {
-        final chatRepository = ref.watch(chatRepositoryProvider);
-        final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
-        final user = ref.read(authControllerProvider).requireValue;
+    final taskQuery = keywords.join(' ');
+    final calendarQuery = keywords.join(' ');
+    final startDate =
+        event?.startDate.subtract(const Duration(days: 30)) ?? task?.startDate.subtract(const Duration(days: 30)) ?? DateTime.now().subtract(const Duration(days: 30));
+    final endDate = event?.endDate ?? task?.endDate ?? DateTime.now();
+    final user = ref.read(authControllerProvider).requireValue;
+    final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
+    final date = ref.read(inboxListDateProvider);
+    final mailRepository = ref.watch(mailRepositoryProvider);
+    final chatRepository = ref.watch(chatRepositoryProvider);
+    final channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
 
-        // Retry with backoff on failure
-        final chatResult = await _retryEitherWithBackoff(() async {
-          return await chatRepository.searchMessage(oauth: oauth, user: user, q: chatQuery, pageToken: null, channels: channels, sortType: SearchSortType.relevant);
+    // Run searches in parallel: mail, chat, tasks, and calendar
+    final searchFutures = <Future<void>>[];
+    List<TaskEntity> taskEntities = [];
+    List<EventEntity> eventEntities = [];
+    final mailSearchResults = <InboxEntity>[];
+    final chatSearchResults = <InboxEntity>[];
+
+    // Search in mail (Gmail, Outlook Mail) - parallelize OAuth accounts
+    if (mailQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+      searchFutures.addAll(
+        mailOAuths.map((oauth) async {
+          try {
+            // Retry with backoff on failure
+            final mailResult = await _retryEitherWithBackoff(() async {
+              return await mailRepository.fetchMailsForLabel(
+                oauth: oauth,
+                user: user,
+                isInbox: false,
+                labelId: null,
+                email: null,
+                pageToken: null,
+                q: mailQuery,
+                startDate: startDate,
+                endDate: endDate,
+              );
+            });
+
+            await mailResult.fold(
+              (failure) async {
+                // Mail search failed, skip this OAuth account
+              },
+              (mails) async {
+                // Group mails by threadId
+                final Map<String, MailEntity> threadMap = {}; // threadId -> representative mail
+                final localProcessedThreadIds = <String>{};
+
+                for (final mailList in mails.values) {
+                  for (final mail in mailList.messages) {
+                    if (mail.threadId == null || mail.threadId!.isEmpty) continue;
+
+                    final threadKey = '${mail.threadId}_${oauth.email}';
+
+                    // Check if this threadId already exists (by threadId, not messageId)
+                    if (processedThreadIds.contains(threadKey) || localProcessedThreadIds.contains(threadKey)) continue;
+
+                    // Keep the most recent mail from each thread as representative
+                    if (!threadMap.containsKey(threadKey) || (mail.date != null && threadMap[threadKey]!.date != null && mail.date!.isAfter(threadMap[threadKey]!.date!))) {
+                      threadMap[threadKey] = mail;
+                    }
+                  }
+                }
+
+                // Fetch full thread for each unique threadId in parallel
+                final threadFutures = threadMap.entries.map((entry) async {
+                  final threadKey = entry.key;
+                  final representativeMail = entry.value;
+
+                  if (processedThreadIds.contains(threadKey) || localProcessedThreadIds.contains(threadKey)) return;
+                  processedThreadIds.add(threadKey);
+                  localProcessedThreadIds.add(threadKey);
+
+                  // Fetch full thread
+                  final threadResult = await mailRepository.fetchThreads(
+                    oauth: oauth,
+                    type: representativeMail.type,
+                    threadId: representativeMail.threadId!,
+                    labelId: CommonMailLabels.inbox.id,
+                    email: oauth.email,
+                  );
+
+                  await threadResult.fold(
+                    (failure) async {
+                      // Failed to fetch thread, skip this thread
+                    },
+                    (threadMails) async {
+                      // Convert all thread mails to InboxEntity
+                      final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+                      for (final mail in threadMails) {
+                        final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromMail(mail));
+                        mailSearchResults.add(InboxEntity.fromMail(mail, config));
+                      }
+                    },
+                  );
+                });
+
+                await Future.wait(threadFutures);
+              },
+            );
+          } catch (e) {
+            // Skip on error
+          }
+        }),
+      );
+    }
+
+    // Search in chat (Slack) - parallelize OAuth accounts
+    if (chatQuery.isNotEmpty && !ref.read(shouldUseMockDataProvider)) {
+      searchFutures.addAll(
+        messengerOAuths.map((oauth) async {
+          try {
+            // Retry with backoff on failure
+            final chatResult = await _retryEitherWithBackoff(() async {
+              return await chatRepository.searchMessage(oauth: oauth, user: user, q: chatQuery, pageToken: null, channels: channels, sortType: SearchSortType.relevant);
+            });
+
+            await chatResult.fold(
+              (failure) async {
+                // Chat search failed, skip this OAuth account
+              },
+              (result) async {
+                // Group messages by threadId
+                final Map<String, MessageEntity> threadMap = {}; // threadKey -> representative message
+                final localProcessedThreadIds = <String>{};
+
+                for (final message in result.messages) {
+                  // Use threadId if available, otherwise use messageId as threadId
+                  final threadId = message.threadId?.isNotEmpty == true && message.threadId != message.id ? message.threadId! : message.id;
+                  final threadKey = '${threadId}_${message.teamId}_${message.channelId}';
+
+                  // Check if this threadId already exists (by threadId, not messageId)
+                  if (processedThreadIds.contains(threadKey) || localProcessedThreadIds.contains(threadKey)) continue;
+
+                  // Keep the most recent message from each thread as representative
+                  if (!threadMap.containsKey(threadKey) ||
+                      (message.createdAt != null && threadMap[threadKey]!.createdAt != null && message.createdAt!.isAfter(threadMap[threadKey]!.createdAt!))) {
+                    threadMap[threadKey] = message;
+                  }
+                }
+
+                // Fetch full thread for each unique threadId in parallel
+                final threadFutures = threadMap.entries.map((entry) async {
+                  final threadKey = entry.key;
+                  final representativeMessage = entry.value;
+
+                  if (processedThreadIds.contains(threadKey) || localProcessedThreadIds.contains(threadKey)) return;
+                  processedThreadIds.add(threadKey);
+                  localProcessedThreadIds.add(threadKey);
+
+                  final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
+                  final channel = _channels.firstWhereOrNull((c) => c.id == representativeMessage.channelId && c.teamId == representativeMessage.teamId);
+
+                  if (channel == null) return;
+
+                  // Use threadId if available, otherwise use messageId
+                  final parentMessageId = representativeMessage.threadId?.isNotEmpty == true && representativeMessage.threadId != representativeMessage.id
+                      ? representativeMessage.threadId!
+                      : representativeMessage.id;
+
+                  if (parentMessageId == null) return;
+
+                  // Fetch full thread
+                  final threadResult = await chatRepository.fetchReplies(oauth: oauth, channel: channel, parentMessageId: parentMessageId);
+
+                  await threadResult.fold(
+                    (failure) async {
+                      // Failed to fetch thread replies, skip this thread
+                    },
+                    (threadData) async {
+                      // Convert all thread messages to InboxEntity
+                      final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
+                      final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
+                      final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
+
+                      for (final message in threadData.messages) {
+                        final member = _members.firstWhereOrNull((m) => m.id == message.userId);
+                        if (member != null && message.teamId != null && message.channelId != null && message.userId != null) {
+                          final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromChat(message));
+                          chatSearchResults.add(InboxEntity.fromChat(message, config, channel, member, _channels, _members, _groups));
+                        }
+                      }
+                    },
+                  );
+                });
+
+                await Future.wait(threadFutures);
+              },
+            );
+          } catch (e) {
+            // Skip on error
+          }
+        }),
+      );
+    }
+
+    // Search in tasks (local) - can run in parallel with other searches
+    if (taskQuery.isNotEmpty) {
+      searchFutures.add(() async {
+        final now = DateTime.now();
+        final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+        final startDate = threeMonthsAgo;
+        final endDate = now;
+
+        // Get tasks from taskListControllerProvider
+        final tasksFromTaskList =
+            ref
+                .read(taskListControllerInternalProvider(isSignedIn: isSignedIn, labelId: 'all'))
+                .value
+                ?.tasks
+                .where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask)
+                .toList() ??
+            [];
+
+        final tasksFromCalendar = <TaskEntity>[];
+
+        // Get tasks for current month, 1 month ago, and 2 months ago in parallel
+        final monthTaskFutures = List.generate(3, (i) async {
+          final targetDate = DateTime(now.year, now.month - i, 1);
+          try {
+            final monthTasks = ref.read(calendarTaskListControllerInternalProvider(isSignedIn: isSignedIn, targetYear: targetDate.year, targetMonth: targetDate.month)).value ?? [];
+            return monthTasks.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask).toList();
+          } catch (e) {
+            return <TaskEntity>[];
+          }
         });
 
-        await chatResult.fold(
-          (failure) async {
-            // Chat search failed, skip this OAuth account
-          },
-          (result) async {
-            // Group messages by threadId
-            final Map<String, MessageEntity> threadMap = {}; // threadKey -> representative message
-
-            for (final message in result.messages) {
-              // Use threadId if available, otherwise use messageId as threadId
-              final threadId = message.threadId?.isNotEmpty == true && message.threadId != message.id ? message.threadId! : message.id;
-              final threadKey = '${threadId}_${message.teamId}_${message.channelId}';
-
-              // Check if this threadId already exists (by threadId, not messageId)
-              if (processedThreadIds.contains(threadKey)) continue;
-
-              // Keep the most recent message from each thread as representative
-              if (!threadMap.containsKey(threadKey) ||
-                  (message.createdAt != null && threadMap[threadKey]!.createdAt != null && message.createdAt!.isAfter(threadMap[threadKey]!.createdAt!))) {
-                threadMap[threadKey] = message;
-              }
-            }
-
-            // Fetch full thread for each unique threadId
-            for (final entry in threadMap.entries) {
-              final threadKey = entry.key;
-              final representativeMessage = entry.value;
-
-              if (processedThreadIds.contains(threadKey)) continue;
-              processedThreadIds.add(threadKey);
-
-              final _channels = ref.read(chatChannelListControllerProvider).values.expand((e) => e.channels).toList();
-              final channel = _channels.firstWhereOrNull((c) => c.id == representativeMessage.channelId && c.teamId == representativeMessage.teamId);
-
-              if (channel == null) continue;
-
-              // Use threadId if available, otherwise use messageId
-              final parentMessageId = representativeMessage.threadId?.isNotEmpty == true && representativeMessage.threadId != representativeMessage.id
-                  ? representativeMessage.threadId!
-                  : representativeMessage.id;
-
-              if (parentMessageId == null) continue;
-
-              // Fetch full thread
-              final threadResult = await chatRepository.fetchReplies(oauth: oauth, channel: channel, parentMessageId: parentMessageId);
-
-              await threadResult.fold(
-                (failure) async {
-                  // Failed to fetch thread replies, skip this thread
-                },
-                (threadData) async {
-                  // Convert all thread messages to InboxEntity
-                  final _members = ref.read(chatChannelListControllerProvider).values.expand((e) => e.members).toList();
-                  final _groups = ref.read(chatChannelListControllerProvider).values.expand((e) => e.groups).toList();
-                  final date = ref.read(inboxListDateProvider);
-                  final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-                  final configs = ref.read(inboxConfigListControllerProvider(isSearch: false, year: date.year, month: date.month, day: date.day, isSignedIn: isSignedIn));
-
-                  for (final message in threadData.messages) {
-                    final member = _members.firstWhereOrNull((m) => m.id == message.userId);
-                    if (member != null && message.teamId != null && message.channelId != null && message.userId != null) {
-                      final config = configs?.configs.firstWhereOrNull((c) => c.id == InboxEntity.getInboxIdFromChat(message));
-                      searchResults.add(InboxEntity.fromChat(message, config, channel, member, _channels, _members, _groups));
-                    }
-                  }
-                },
-              );
-            }
-          },
-        );
-      }
-    }
-
-    // Search in tasks (local) - from both taskListControllerProvider and calendarTaskListControllerInternalProvider
-    List<TaskEntity> taskEntities = [];
-    final taskQuery = keywords.join(' ');
-    if (taskQuery.isNotEmpty) {
-      final now = DateTime.now();
-      final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
-      final startDate = threeMonthsAgo;
-      final endDate = now;
-      // Get tasks from calendarTaskListControllerInternalProvider for recent 3 months
-      final isSignedIn = ref.read(authControllerProvider.select((v) => v.requireValue.isSignedIn));
-
-      // Get tasks from taskListControllerProvider
-      final tasksFromTaskList =
-          ref
-              .read(taskListControllerInternalProvider(isSignedIn: isSignedIn, labelId: 'all'))
-              .value
-              ?.tasks
-              .where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask)
-              .toList() ??
-          [];
-
-      final tasksFromCalendar = <TaskEntity>[];
-
-      // Get tasks for current month, 1 month ago, and 2 months ago
-      for (int i = 0; i < 3; i++) {
-        final targetDate = DateTime(now.year, now.month - i, 1);
-        try {
-          final monthTasks = ref.read(calendarTaskListControllerInternalProvider(isSignedIn: isSignedIn, targetYear: targetDate.year, targetMonth: targetDate.month)).value ?? [];
-          tasksFromCalendar.addAll(monthTasks.where((t) => !t.isCancelled && !t.isOriginalRecurrenceTask && !t.isEventDummyTask));
-        } catch (e) {
-          // Skip if provider is not available
+        final monthTaskResults = await Future.wait(monthTaskFutures);
+        for (final monthTasks in monthTaskResults) {
+          tasksFromCalendar.addAll(monthTasks);
         }
-      }
 
-      // Combine and deduplicate tasks
-      final allTasksMap = <String, TaskEntity>{};
-      for (final task in tasksFromTaskList) {
-        if (task.id != null) {
-          allTasksMap[task.id!] = task;
+        // Combine and deduplicate tasks
+        final allTasksMap = <String, TaskEntity>{};
+        for (final task in tasksFromTaskList) {
+          if (task.id != null) {
+            allTasksMap[task.id!] = task;
+          }
         }
-      }
-      for (final task in tasksFromCalendar) {
-        if (task.id != null) {
-          allTasksMap[task.id!] = task;
+        for (final task in tasksFromCalendar) {
+          if (task.id != null) {
+            allTasksMap[task.id!] = task;
+          }
         }
-      }
-      final allTasks = allTasksMap.values.toList();
+        final allTasks = allTasksMap.values.toList();
 
-      // Filter by date range (last 3 months) and keywords
-      final nowForFilter = DateTime.now();
-      var filteredTasks = allTasks.where((t) {
-        final taskDate = t.startAt ?? t.startDate;
-        if (taskDate == null) return false;
-        // Always exclude tasks that start after now
-        if (taskDate.isAfter(nowForFilter)) return false;
-        // Filter by date range (last 3 months)
-        if (taskDate.isBefore(startDate)) return false;
-        // Note: endDate is same as nowForFilter, so this check is redundant but kept for clarity
-        if (taskDate.isAfter(endDate)) return false;
-        return true;
-      }).toList();
-
-      // Filter by keywords
-      if (taskQuery.isNotEmpty) {
-        final keyword = taskQuery.toLowerCase();
-        filteredTasks = filteredTasks.where((t) {
-          final title = t.title?.toLowerCase() ?? '';
-          final description = t.description?.toLowerCase() ?? '';
-          return title.contains(keyword) || description.contains(keyword);
+        // Filter by date range (last 3 months) and keywords
+        final nowForFilter = DateTime.now();
+        var filteredTasks = allTasks.where((t) {
+          final taskDate = t.startAt ?? t.startDate;
+          if (taskDate == null) return false;
+          // Always exclude tasks that start after now
+          if (taskDate.isAfter(nowForFilter)) return false;
+          // Filter by date range (last 3 months)
+          if (taskDate.isBefore(startDate)) return false;
+          if (taskDate.isAfter(endDate)) return false;
+          return true;
         }).toList();
-      }
 
-      // Sort by date (closest to today first) and take 20
-      filteredTasks.sort((a, b) {
-        final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
-        final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
-        return bDate.compareTo(aDate);
-      });
-      taskEntities.addAll(filteredTasks.take(20));
+        // Filter by keywords
+        if (taskQuery.isNotEmpty) {
+          final keyword = taskQuery.toLowerCase();
+          filteredTasks = filteredTasks.where((t) {
+            final title = t.title?.toLowerCase() ?? '';
+            final description = t.description?.toLowerCase() ?? '';
+            return title.contains(keyword) || description.contains(keyword);
+          }).toList();
+        }
+
+        // Sort by date (closest to today first) and take 20
+        filteredTasks.sort((a, b) {
+          final aDate = a.startAt ?? a.startDate ?? DateTime(1970);
+          final bDate = b.startAt ?? b.startDate ?? DateTime(1970);
+          return bDate.compareTo(aDate);
+        });
+        taskEntities.addAll(filteredTasks.take(20));
+      }());
     }
 
-    // Search in calendar (local first, then remote if needed)
-    // Combine all keywords into a single query (space-separated) for better search results
-    List<EventEntity> eventEntities = [];
-    final calendarQuery = keywords.join(' ');
+    // Search in calendar (local first, then remote if needed) - can run in parallel with other searches
     if (calendarQuery.isNotEmpty) {
-      final now = DateTime.now();
-      final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
-      final startDate = threeMonthsAgo;
-      final endDate = now;
+      searchFutures.add(() async {
+        final now = DateTime.now();
+        final threeMonthsAgo = DateTime(now.year, now.month - 2, 1);
+        final startDate = threeMonthsAgo;
+        final endDate = now;
 
-      // Get local events first
-      final allLocalEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
-      
-      // Filter local events by date range and keywords, excluding future events
-      final keyword = calendarQuery.toLowerCase();
-      final localFilteredEvents = allLocalEvents.where((e) {
-        final eventStart = e.startDate;
-        if (eventStart == null) return false;
-        // Always exclude events that start after now
-        if (eventStart.isAfter(now)) return false;
-        // Filter by date range (last 3 months)
-        if (eventStart.isBefore(startDate)) return false;
-        if (eventStart.isAfter(endDate)) return false;
-        // Filter by keywords
-        final title = e.title?.toLowerCase() ?? '';
-        final description = e.description?.toLowerCase() ?? '';
-        final location = e.location?.toLowerCase() ?? '';
-        if (!title.contains(keyword) && !description.contains(keyword) && !location.contains(keyword)) {
-          return false;
-        }
-        // Exclude the current event if it exists
-        if (event != null && e.uniqueId == event.uniqueId) return false;
-        return true;
-      }).toList();
-      
-      eventEntities.addAll(localFilteredEvents.take(20));
+        // Get local events first
+        final allLocalEvents = ref.read(calendarEventListControllerProvider(tabType: TabType.home)).eventsOnView;
 
-      // If we don't have enough results and mock data is disabled, search remotely
-      if (eventEntities.length < 20 && !ref.read(shouldUseMockDataProvider)) {
-        for (final oauth in calendarOAuths) {
-          final calendarRepository = ref.watch(calendarRepositoryProvider);
-          final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
+        // Filter local events by date range and keywords, excluding future events
+        final keyword = calendarQuery.toLowerCase();
+        final localFilteredEvents = allLocalEvents.where((e) {
+          final eventStart = e.startDate;
+          if (eventStart == null) return false;
+          // Always exclude events that start after now
+          if (eventStart.isAfter(now)) return false;
+          // Filter by date range (last 3 months)
+          if (eventStart.isBefore(startDate)) return false;
+          if (eventStart.isAfter(endDate)) return false;
+          // Filter by keywords
+          final title = e.title?.toLowerCase() ?? '';
+          final description = e.description?.toLowerCase() ?? '';
+          final location = e.location?.toLowerCase() ?? '';
+          if (!title.contains(keyword) && !description.contains(keyword) && !location.contains(keyword)) {
+            return false;
+          }
+          // Exclude the current event if it exists
+          if (event != null && e.uniqueId == event.uniqueId) return false;
+          return true;
+        }).toList();
 
-          await calendarListResult.fold(
-            (failure) async {
-              // Calendar list fetch failed, skip this OAuth account
-            },
-            (calendarMap) async {
-              final calendars = calendarMap.values
-                  .expand((e) => e)
-                  .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
-                  .toList();
-              if (calendars.isEmpty) return;
+        eventEntities.addAll(localFilteredEvents.take(20));
 
-              // Retry with backoff on failure
-              final eventResult = await _retryEitherWithBackoff(() async {
-                return await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
-              });
+        // If we don't have enough results and mock data is disabled, search remotely
+        if (eventEntities.length < 20 && !ref.read(shouldUseMockDataProvider)) {
+          // Parallelize calendar OAuth account searches
+          final calendarSearchFutures = calendarOAuths.map((oauth) async {
+            try {
+              final calendarRepository = ref.watch(calendarRepositoryProvider);
+              final calendarListResult = await calendarRepository.fetchCalendarLists(oauth: oauth);
 
-              await eventResult.fold(
+              await calendarListResult.fold(
                 (failure) async {
-                  // Calendar search failed, skip this OAuth account
+                  // Calendar list fetch failed, skip this OAuth account
                 },
-                (result) async {
-                  // Collect all events from the result, excluding the current event
-                  final nowForFilter = DateTime.now();
-                  for (final eventList in result.events.values) {
-                    for (final foundEvent in eventList) {
-                      // Always exclude events that start after now
-                      if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(nowForFilter)) {
-                        continue;
+                (calendarMap) async {
+                  final calendars = calendarMap.values
+                      .expand((e) => e)
+                      .where((c) => c.email == oauth.email && c.type != null && c.type!.datasourceType == oauth.type.datasourceType)
+                      .toList();
+                  if (calendars.isEmpty) return;
+
+                  // Retry with backoff on failure
+                  final eventResult = await _retryEitherWithBackoff(() async {
+                    return await calendarRepository.searchEventLists(query: calendarQuery, oauth: oauth, calendars: calendars, nextPageTokens: null);
+                  });
+
+                  await eventResult.fold(
+                    (failure) async {
+                      // Calendar search failed, skip this OAuth account
+                    },
+                    (result) async {
+                      // Collect all events from the result, excluding the current event
+                      final nowForFilter = DateTime.now();
+                      for (final eventList in result.events.values) {
+                        for (final foundEvent in eventList) {
+                          // Always exclude events that start after now
+                          if (foundEvent.startDate != null && foundEvent.startDate!.isAfter(nowForFilter)) {
+                            continue;
+                          }
+                          // Exclude the current event if it exists
+                          if (event == null || foundEvent.uniqueId != event.uniqueId) {
+                            eventEntities.add(foundEvent);
+                          }
+                        }
                       }
-                      // Exclude the current event if it exists
-                      if (event == null || foundEvent.uniqueId != event.uniqueId) {
-                        eventEntities.add(foundEvent);
-                      }
-                    }
-                  }
-                  
-                  // Stop if we have enough results
-                  if (eventEntities.length >= 20) return;
+
+                      // Stop if we have enough results
+                      if (eventEntities.length >= 20) return;
+                    },
+                  );
                 },
               );
-            },
-          );
+            } catch (e) {
+              // Skip on error
+            }
+          });
+
+          await Future.wait(calendarSearchFutures);
         }
-      }
+      }());
     }
+
+    // Wait for all searches to complete in parallel
+    await Future.wait(searchFutures);
+
+    // Merge search results from different sources
+    searchResults.addAll(mailSearchResults);
+    searchResults.addAll(chatSearchResults);
 
     // Sort by date (closest to today first) and limit total results to avoid overwhelming the context
     searchResults.sort((a, b) => b.inboxDatetime.compareTo(a.inboxDatetime));
@@ -734,20 +772,23 @@ Future<String?> _searchAndGenerateContext(
     );
 
     // Update loading state before returning result
-    final summary = summaryResult.fold((failure) {
-      // On failure, update to error state to show error message
-      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
-      return null;
-    }, (summary) {
-      // Check if summary is empty or null
-      if (summary == null || summary.isEmpty || summary.trim().isEmpty) {
+    final summary = summaryResult.fold(
+      (failure) {
+        // On failure, update to error state to show error message
         ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
         return null;
-      }
-      ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
-      return summary;
-    });
-    
+      },
+      (summary) {
+        // Check if summary is empty or null
+        if (summary == null || summary.isEmpty || summary.trim().isEmpty) {
+          ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
+          return null;
+        }
+        ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.success);
+        return summary;
+      },
+    );
+
     return summary;
   } catch (e) {
     ref.read(loadingStatusProvider.notifier).update(InboxConversationSummary.stringKey, LoadingState.error);
