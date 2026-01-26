@@ -31,11 +31,61 @@
   <!-- Blog -->
   <url>
     <loc>https://visir.pro/blog</loc>
-    <lastmod>2025-01-27</lastmod>
+    <lastmod>2026-01-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
+
+  <!-- Blog Posts -->
+  <url>
+    <loc>https://visir.pro/blog/multi-context-switching</loc>
+    <lastmod>2026-01-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://visir.pro/blog/introducing-visir-2.0</loc>
+    <lastmod>2026-01-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://visir.pro/blog/time-blocking-with-visir</loc>
+    <lastmod>2026-01-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://visir.pro/blog/inbox-prioritization-that-brings-back-your-focus</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://visir.pro/blog/sunsama-vs-taskey-2025-planner-first-ritual-vs-all-in-one-execution-hub</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://visir.pro/blog/context-switching-vs-multitasking</loc>
+    <lastmod>2025-12-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://visir.pro/blog/adhd-productivity-boost</loc>
+    <lastmod>2025-12-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Integrations -->
   <url>
     <loc>https://visir.pro/integrations</loc>
