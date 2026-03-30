@@ -56,7 +56,14 @@ class VisirButton extends StatelessWidget {
     this.elevation = 0,
     this.tooltip,
     this.maxWidth,
+    this.expandHitArea = EdgeInsets.zero,
   });
+
+  /// Additional area around the visual button that should show the tooltip
+  /// and count as a touch/hover target. This expands the region that the
+  /// Tooltip watches and can be used to provide a more forgiving touch area.
+  /// Defaults to `EdgeInsets.zero` (no expansion).
+  final EdgeInsets expandHitArea;
 
   /// The text label shown inside the button.
   final String label;
@@ -200,14 +207,12 @@ class VisirButton extends StatelessWidget {
     );
 
     // Ensure accessible touch target for icon-only scenarios:
-    constrained = SizedBox(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minWidth: _VisirButtonTokens.minTouchTarget,
-          minHeight: _VisirButtonTokens.minTouchTarget,
-        ),
-        child: Center(child: constrained),
+    constrained = ConstrainedBox(
+      constraints: const BoxConstraints(
+        minWidth: _VisirButtonTokens.minTouchTarget,
+        minHeight: _VisirButtonTokens.minTouchTarget,
       ),
+      child: Center(child: constrained),
     );
 
     final semantics = Semantics(
@@ -217,10 +222,29 @@ class VisirButton extends StatelessWidget {
       child: constrained,
     );
 
+    // Wrap the semantics with padding defined by `expandHitArea` so the tooltip
+    // and hover area are expanded. Placing the Tooltip outside this padded
+    // region ensures hovering or long-pressing anywhere inside the expanded
+    // area will show the Tooltip.
+    final Widget padded = Padding(padding: expandHitArea, child: semantics);
+
+    // If expandHitArea is non-zero, ensure taps in the padded area are forwarded
+    // to the inner button by adding a translucent GestureDetector around it.
+    // This makes the expanded region interactive while preserving visuals.
+    final Widget interactive = expandHitArea != EdgeInsets.zero
+        ? GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: onPressed,
+            child: padded,
+          )
+        : padded;
+
     if (tooltip != null && tooltip!.isNotEmpty) {
-      return Tooltip(message: tooltip!, child: semantics);
+      // Tooltip must be outside (wrap) the interactive semantics so hover/long-press
+      // works across the expanded area.
+      return Tooltip(message: tooltip!, child: interactive);
     }
 
-    return semantics;
+    return interactive;
   }
 }
