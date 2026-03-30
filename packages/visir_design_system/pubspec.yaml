@@ -1,0 +1,52 @@
+name: visir_design_system
+description: >-
+  Visir Design System - a small Flutter package that contains reusable
+  VisirXXX widgets used across the Visir application.
+version: 0.1.0+1
+publish_to: 'none' # private package (won't be published to pub.dev)
+
+homepage: https://visir.pro
+repository: https://github.com/ryanlee92/visir
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+
+# Package dependencies. Keep these minimal so the design system can be
+# consumed easily by the Visir app and other packages in the mono-repo.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  flutter_riverpod: ^3.0.3
+  # Add other shared deps as needed (e.g. icons, animations) when widgets are added.
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.5.4
+  # Add any lints or code generation packages you use in your repo.
+
+# Flutter-specific configuration.
+flutter:
+  uses-material-design: true
+  # If you add shared assets (icons, fonts) for the design system, list them here.
+  # assets:
+  #   - assets/icons/
+  #   - assets/fonts/
+
+# Notes:
+# - The package's public library entry file should be `lib/visir_design_system.dart`
+#   which re-exports widgets from `lib/src/` (for example `lib/src/widgets/visir_button.dart`).
+# - To consume this package from the monorepo app, add a path dependency in the app's pubspec:
+#   visir_design_system:
+#     path: packages/visir_design_system
+#
+# Example minimal `lib/visir_design_system.dart` (create this file next):
+#   library visir_design_system;
+#
+#   export 'src/widgets/visir_button.dart';
+#   export 'src/widgets/visir_icon.dart';
+#
+# This pubspec is intentionally minimal; expand dependencies and metadata as you add widgets.
