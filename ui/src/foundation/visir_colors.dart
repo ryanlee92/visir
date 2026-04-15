@@ -27,4 +27,32 @@ class VisirColors {
   final Color danger;
   final Color success;
   final Color warning;
+
+  VisirColors copyWith({
+    Color? accent,
+    Color? accentStrong,
+    Color? surface,
+    Color? surfaceMuted,
+    Color? surfaceOutline,
+    Color? text,
+    Color? textMuted,
+    Color? textInverse,
+    Color? danger,
+    Color? success,
+    Color? warning,
+  }) {
+    return VisirColors(
+      accent: accent ?? this.accent,
+      accentStrong: accentStrong ?? this.accentStrong,
+      surface: surface ?? this.surface,
+      surfaceMuted: surfaceMuted ?? this.surfaceMuted,
+      surfaceOutline: surfaceOutline ?? this.surfaceOutline,
+      text: text ?? this.text,
+      textMuted: textMuted ?? this.textMuted,
+      textInverse: textInverse ?? this.textInverse,
+      danger: danger ?? this.danger,
+      success: success ?? this.success,
+      warning: warning ?? this.warning,
+    );
+  }
 }

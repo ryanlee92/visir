@@ -44,4 +44,18 @@ class VisirTokens {
       ),
     );
   }
+
+  VisirTokens copyWith({
+    VisirColors? colors,
+    VisirSpacing? spacing,
+    VisirRadius? radius,
+    VisirMotion? motion,
+  }) {
+    return VisirTokens(
+      colors: colors ?? this.colors,
+      spacing: spacing ?? this.spacing,
+      radius: radius ?? this.radius,
+      motion: motion ?? this.motion,
+    );
+  }
 }
