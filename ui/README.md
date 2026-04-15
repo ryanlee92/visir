@@ -29,6 +29,8 @@ import '../../ui/visir_ui.dart';
 ## Example
 
 ```dart
+import 'package:flutter/material.dart';
+
 import '../../ui/visir_ui.dart';
 
 class ExamplePanel extends StatelessWidget {
