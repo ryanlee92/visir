@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../ui/visir_ui.dart';
@@ -17,15 +18,33 @@ void main() {
   });
 
   testWidgets('disabled button ignores taps', (tester) async {
+    var enabledTapCount = 0;
+    var disabledTapCount = 0;
+
     await tester.pumpWidget(
       makeUiTestableWidget(
-        child: VisirButton(label: 'Continue', onPressed: null),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            VisirButton(label: 'Enabled', onPressed: () => enabledTapCount++),
+            VisirButton(
+              label: 'Disabled',
+              isLoading: true,
+              onPressed: () => disabledTapCount++,
+            ),
+          ],
+        ),
       ),
     );
 
-    await tester.tap(find.byType(VisirButton));
+    await tester.tap(find.text('Enabled'));
     await tester.pump();
-    expect(find.text('Continue'), findsOneWidget);
+
+    await tester.tap(find.text('Disabled'));
+    await tester.pump();
+
+    expect(enabledTapCount, 1);
+    expect(disabledTapCount, 0);
   });
 
   testWidgets('loading button shows spinner and preserves label slot', (
@@ -47,24 +66,61 @@ void main() {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            VisirButton(
-              label: 'Small',
-              size: VisirButtonSize.sm,
-              onPressed: () {},
+            Container(
+              key: const ValueKey('small-button-container'),
+              child: VisirButton(
+                label: 'Small',
+                size: VisirButtonSize.sm,
+                onPressed: () {},
+              ),
             ),
-            VisirButton(
-              label: 'Large',
-              size: VisirButtonSize.lg,
-              onPressed: () {},
+            Container(
+              key: const ValueKey('large-button-container'),
+              child: VisirButton(
+                label: 'Large',
+                size: VisirButtonSize.lg,
+                onPressed: () {},
+              ),
             ),
           ],
         ),
       ),
     );
 
-    final smallHeight = tester.getSize(find.text('Small')).height;
-    final largeHeight = tester.getSize(find.text('Large')).height;
+    final smallHeight = tester
+        .getSize(find.byKey(const ValueKey('small-button-container')))
+        .height;
+    final largeHeight = tester
+        .getSize(find.byKey(const ValueKey('large-button-container')))
+        .height;
     expect(largeHeight, greaterThan(smallHeight));
+  });
+
+  testWidgets('autofocus focuses injected node and enter activates callback', (
+    tester,
+  ) async {
+    final focusNode = FocusNode(debugLabel: 'visir-button-focus');
+    addTearDown(focusNode.dispose);
+    var activationCount = 0;
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(
+          label: 'Continue',
+          autofocus: true,
+          focusNode: focusNode,
+          onPressed: () => activationCount++,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(focusNode.hasPrimaryFocus, isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+
+    expect(activationCount, 1);
   });
 
   testWidgets('hovering lowers opacity or transforms toward pressed feedback', (

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../foundation/visir_enums.dart';
 import '../theme/visir_theme.dart';
@@ -112,6 +113,7 @@ class _VisirButtonState extends State<VisirButton> {
     child = Focus(
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
+      onKeyEvent: disabled ? null : _handleKeyEvent,
       child: MouseRegion(
         onEnter: (_) => setState(() => _hovering = true),
         onExit: (_) => setState(() {
@@ -134,6 +136,19 @@ class _VisirButtonState extends State<VisirButton> {
     }
 
     return child;
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    final isActivationKey =
+        event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space;
+
+    if (event is KeyDownEvent && isActivationKey) {
+      widget.onPressed?.call();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
   }
 
   BoxDecoration _decoration(VisirThemeData theme, bool disabled) {
