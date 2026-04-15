@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import '../sections/visir_badge_section.dart';
 import '../sections/visir_button_section.dart';
 import '../sections/visir_card_section.dart';
+import '../sections/visir_divider_section.dart';
+import '../sections/visir_empty_state_section.dart';
 import '../sections/visir_icon_button_section.dart';
 import '../sections/visir_input_section.dart';
+import '../sections/visir_section_section.dart';
+import '../sections/visir_spinner_section.dart';
 import 'showcase_sections.dart';
 
 const showcaseScrollViewKey = ValueKey('showcase-scroll-view');
@@ -33,13 +37,27 @@ class _ShowcasePageState extends State<ShowcasePage> {
       showcaseSectionIds.contains(id),
       'Jump target $id must exist in showcaseSectionIds.',
     );
-    final key = _sectionKeys[id];
-    if (key?.currentContext == null) return;
-    await Scrollable.ensureVisible(
-      key!.currentContext!,
+    if (!_scrollController.hasClients) return;
+    final targetContext = _sectionKeys[id]?.currentContext;
+    if (targetContext == null) return;
+    final targetBox = targetContext.findRenderObject() as RenderBox?;
+    if (targetBox == null) return;
+    final scrollStorageContext =
+        _scrollController.position.context.storageContext;
+    final scrollBox = scrollStorageContext.findRenderObject() as RenderBox?;
+    if (scrollBox == null) return;
+    final targetDy = targetBox
+        .localToGlobal(Offset.zero, ancestor: scrollBox)
+        .dy;
+    final targetOffset = _scrollController.offset + targetDy;
+    final clampedOffset = targetOffset.clamp(
+      _scrollController.position.minScrollExtent,
+      _scrollController.position.maxScrollExtent,
+    );
+    await _scrollController.animateTo(
+      clampedOffset.toDouble(),
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeOut,
-      alignment: 0.1,
     );
   }
 
@@ -50,6 +68,10 @@ class _ShowcasePageState extends State<ShowcasePage> {
       'input' => const VisirInputSection(),
       'card' => const VisirCardSection(),
       'badge' => const VisirBadgeSection(),
+      'section' => const VisirSectionSection(),
+      'divider' => const VisirDividerSection(),
+      'spinner' => const VisirSpinnerSection(),
+      'empty-state' => const VisirEmptyStateSection(),
       _ => _buildPlaceholderSection(id, colors),
     };
     final description = switch (id) {
@@ -63,6 +85,12 @@ class _ShowcasePageState extends State<ShowcasePage> {
         'Compose bordered, muted, or elevated surfaces with density and tap behavior.',
       'badge' =>
         'Communicate status and category with semantic tones and concise labeling.',
+      'section' => 'Group related content under an optional section title.',
+      'divider' => 'Separate stacked content with a low-emphasis line divider.',
+      'spinner' =>
+        'Represent in-flight work with enum-based loading indicator options.',
+      'empty-state' =>
+        'Guide users with descriptive empty copy and a clear next action.',
       _ => sectionPlaceholderDescription(id),
     };
 
@@ -175,6 +203,13 @@ class _ShowcasePageState extends State<ShowcasePage> {
                           ),
                         )
                         .toList(),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Component area coming soon',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.outline,
+                    ),
                   ),
                 ],
               ),
