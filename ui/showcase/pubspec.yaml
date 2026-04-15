@@ -1,0 +1,24 @@
+name: visir_ui_showcase
+description: "Standalone Visir UI showcase"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.11.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  visir_ui:
+    path: ..
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+dependency_overrides:
+  intl: ^0.20.2
