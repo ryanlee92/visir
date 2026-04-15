@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'showcase_page.dart';
+import 'showcase_theme.dart';
 
 class ShowcaseApp extends StatelessWidget {
   const ShowcaseApp({super.key});
@@ -10,10 +11,7 @@ class ShowcaseApp extends StatelessWidget {
     return MaterialApp(
       title: 'Visir UI Showcase',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blueGrey,
-      ),
+      theme: ShowcaseTheme.build(),
       home: const ShowcasePage(),
     );
   }
