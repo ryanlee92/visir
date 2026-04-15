@@ -164,6 +164,11 @@ void main() {
 
       expect(tapCount, 1);
 
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+
+      expect(tapCount, 2);
+
       semantics.dispose();
     },
   );

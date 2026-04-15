@@ -1,3 +1,5 @@
+import 'dart:ui' show SemanticsAction;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,7 +61,7 @@ void main() {
             widget.properties.label == 'Create item' &&
             widget.properties.button == true,
       ),
-      findsWidgets,
+      findsOneWidget,
     );
   });
 
@@ -83,7 +85,7 @@ void main() {
             widget.properties.button == true &&
             widget.properties.enabled == false,
       ),
-      findsWidgets,
+      findsOneWidget,
     );
 
     semantics.dispose();
@@ -286,6 +288,31 @@ void main() {
     expect(activationCount, 1);
   });
 
+  testWidgets('space key activates focused button once', (tester) async {
+    final focusNode = FocusNode(debugLabel: 'space-activation');
+    addTearDown(focusNode.dispose);
+    var activationCount = 0;
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(
+          label: 'Continue',
+          autofocus: true,
+          focusNode: focusNode,
+          onPressed: () => activationCount++,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(focusNode.hasPrimaryFocus, isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+
+    expect(activationCount, 1);
+  });
+
   testWidgets('focused button shows a visible focus treatment', (tester) async {
     final focusNode = FocusNode(debugLabel: 'focus-visual');
     addTearDown(focusNode.dispose);
@@ -350,6 +377,44 @@ void main() {
       ),
       findsOneWidget,
     );
+
+    final semanticsFinder = find.byWidgetPredicate(
+      (widget) =>
+          widget is Semantics &&
+          widget.properties.label == 'Continue' &&
+          widget.properties.button == true &&
+          widget.properties.enabled == true,
+    );
+    final semanticsData = tester
+        .getSemantics(semanticsFinder)
+        .getSemanticsData();
+    expect(semanticsData.hasAction(SemanticsAction.tap), isTrue);
+
+    semantics.dispose();
+  });
+
+  testWidgets('disabled loading button omits tap semantics action', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: const VisirButton(label: 'Busy', isLoading: true),
+      ),
+    );
+
+    final semanticsFinder = find.byWidgetPredicate(
+      (widget) =>
+          widget is Semantics &&
+          widget.properties.label == 'Busy' &&
+          widget.properties.button == true &&
+          widget.properties.enabled == false,
+    );
+    final semanticsData = tester
+        .getSemantics(semanticsFinder)
+        .getSemanticsData();
+    expect(semanticsData.hasAction(SemanticsAction.tap), isFalse);
 
     semantics.dispose();
   });

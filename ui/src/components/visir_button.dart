@@ -165,6 +165,7 @@ class _VisirButtonState extends State<VisirButton> {
             button: true,
             enabled: !disabled,
             label: semanticsLabel,
+            onTap: disabled ? null : widget.onPressed,
             child: Focus(
               focusNode: _focusNode,
               autofocus: !disabled && widget.autofocus,

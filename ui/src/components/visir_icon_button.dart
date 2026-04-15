@@ -23,20 +23,15 @@ class VisirIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      enabled: onPressed != null,
-      label: semanticLabel,
-      child: VisirButton(
-        label: '',
-        onPressed: onPressed,
-        variant: variant,
-        size: size,
-        tooltip: tooltip,
-        leading: icon,
-        isIconOnly: true,
-        semanticLabel: semanticLabel,
-      ),
+    return VisirButton(
+      label: '',
+      onPressed: onPressed,
+      variant: variant,
+      size: size,
+      tooltip: tooltip,
+      leading: icon,
+      isIconOnly: true,
+      semanticLabel: semanticLabel,
     );
   }
 }
