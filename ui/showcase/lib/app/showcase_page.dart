@@ -24,6 +24,10 @@ class _ShowcasePageState extends State<ShowcasePage> {
   }
 
   Future<void> _jumpTo(String id) async {
+    assert(
+      showcaseSectionIds.contains(id),
+      'Jump target $id must exist in showcaseSectionIds.',
+    );
     final key = _sectionKeys[id];
     if (key?.currentContext == null) return;
     await Scrollable.ensureVisible(
@@ -62,7 +66,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
           Container(
             constraints: const BoxConstraints(minHeight: 120),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.6),
+              color: colors.surface.withValues(alpha: 0.72),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(
@@ -95,52 +99,57 @@ class _ShowcasePageState extends State<ShowcasePage> {
           controller: _scrollController,
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Visir UI',
-                style: theme.textTheme.displaySmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Live Visir component playground',
-                style: theme.textTheme.titleLarge,
-              ),
-              const SizedBox(height: 24),
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                children: featuredShowcaseJumpSectionIds.map((id) {
-                  return TextButton(
-                    onPressed: () => _jumpTo(id),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 12,
-                      ),
-                      backgroundColor: colors.primaryContainer,
-                      foregroundColor: colors.onPrimaryContainer,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: Text('Jump to ${prettySectionTitle(id)}'),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 32),
-              Column(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: showcaseSectionIds
-                    .map((id) => Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: _buildSection(id, colors),
-                        ))
-                    .toList(),
+                children: [
+                  Text(
+                    'Visir UI',
+                    style: theme.textTheme.displaySmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Live Visir component playground',
+                    style: theme.textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 24),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: featuredShowcaseJumpSectionIds.map((id) {
+                      return TextButton(
+                        onPressed: () => _jumpTo(id),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 12,
+                          ),
+                          backgroundColor: colors.primaryContainer,
+                          foregroundColor: colors.onPrimaryContainer,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Text('Jump to ${prettySectionTitle(id)}'),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 32),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: showcaseSectionIds
+                        .map((id) => Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: _buildSection(id, colors),
+                            ))
+                        .toList(),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
