@@ -10,10 +10,7 @@ const List<String> showcaseSectionIds = [
   'empty-state',
 ];
 
-const Set<String> _featuredShowcaseJumpSectionIdSet = {
-  'button',
-  'input',
-};
+const Set<String> _featuredShowcaseJumpSectionIdSet = {'button', 'input'};
 
 final List<String> featuredShowcaseJumpSectionIds = [
   for (final id in showcaseSectionIds)
@@ -23,9 +20,10 @@ final List<String> featuredShowcaseJumpSectionIds = [
 String prettySectionTitle(String id) {
   return id
       .split('-')
-      .map((word) => word.isEmpty
-          ? word
-          : word[0].toUpperCase() + word.substring(1))
+      .map(
+        (word) =>
+            word.isEmpty ? word : word[0].toUpperCase() + word.substring(1),
+      )
       .join(' ');
 }
 

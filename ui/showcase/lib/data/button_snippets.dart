@@ -47,8 +47,7 @@ String buildIconButtonSnippet({
   final arguments = <String>[
     'icon: const Icon(${icon.iconExpression})',
     'semanticLabel: ${dartStringLiteral(semanticLabel)}',
-    if (variantName != 'secondary')
-      'variant: VisirButtonVariant.$variantName',
+    if (variantName != 'secondary') 'variant: VisirButtonVariant.$variantName',
     if (sizeName != 'md') 'size: VisirButtonSize.$sizeName',
     if (hasText(tooltip)) 'tooltip: ${dartStringLiteral(tooltip!.trim())}',
     'onPressed: ${enabled ? '() {}' : 'null'}',

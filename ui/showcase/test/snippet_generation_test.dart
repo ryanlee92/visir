@@ -55,7 +55,9 @@ void main() {
     final code = buildInputSnippet(
       label: 'Email',
       hintText: 'name@example.com',
-      prefixIcon: curatedIconOptions.firstWhere((option) => option.id == 'mail'),
+      prefixIcon: curatedIconOptions.firstWhere(
+        (option) => option.id == 'mail',
+      ),
       errorText: 'Invalid address',
       enabled: false,
     );

@@ -1,17 +1,20 @@
-# visir_ui_showcase
+# Visir UI Showcase
 
-A new Flutter project.
+Standalone Flutter web showcase for the repo-local `visir_ui` library.
 
-## Getting Started
+## Run locally
 
-This project is a starting point for a Flutter application.
+```bash
+cd ui/showcase
+flutter pub get
+flutter run -d chrome
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Useful commands
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+cd ui/showcase
+dart analyze lib test
+flutter test
+flutter build web --release
+```
