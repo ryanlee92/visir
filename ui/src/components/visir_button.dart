@@ -86,6 +86,7 @@ class _VisirButtonState extends State<VisirButton> {
       VisirButtonSize.lg => theme.tokens.spacing.xl.toDouble(),
     };
     final hasLabel = !widget.isIconOnly;
+    final foregroundColor = _foregroundColor(theme);
 
     Widget child = SizedBox(
       width: widget.isExpanded ? double.infinity : null,
@@ -95,32 +96,36 @@ class _VisirButtonState extends State<VisirButton> {
           decoration: _decoration(theme, disabled),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Row(
-              mainAxisSize: widget.isExpanded
-                  ? MainAxisSize.max
-                  : MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (widget.leading != null) widget.leading!,
-                if (widget.leading != null && hasLabel) const SizedBox(width: 8),
-                if (hasLabel)
-                  Flexible(
-                    child: Text(
-                      widget.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: _labelStyle(theme),
+            child: IconTheme.merge(
+              data: IconThemeData(color: foregroundColor),
+              child: Row(
+                mainAxisSize: widget.isExpanded
+                    ? MainAxisSize.max
+                    : MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (widget.leading != null) widget.leading!,
+                  if (widget.leading != null && hasLabel)
+                    const SizedBox(width: 8),
+                  if (hasLabel)
+                    Flexible(
+                      child: Text(
+                        widget.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _labelStyle(theme),
+                      ),
                     ),
-                  ),
-                if (widget.isLoading) ...[
-                  if (hasLabel) const SizedBox(width: 8),
-                  VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
+                  if (widget.isLoading) ...[
+                    if (hasLabel) const SizedBox(width: 8),
+                    VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
+                  ],
+                  if (widget.trailing != null) ...[
+                    if (hasLabel || widget.isLoading) const SizedBox(width: 8),
+                    widget.trailing!,
+                  ],
                 ],
-                if (widget.trailing != null) ...[
-                  if (hasLabel || widget.isLoading) const SizedBox(width: 8),
-                  widget.trailing!,
-                ],
-              ],
+              ),
             ),
           ),
         ),
@@ -273,15 +278,8 @@ class _VisirButtonState extends State<VisirButton> {
   }
 
   TextStyle _labelStyle(VisirThemeData theme) {
-    final color = switch (widget.variant) {
-      VisirButtonVariant.primary => theme.tokens.colors.textInverse,
-      VisirButtonVariant.secondary => theme.tokens.colors.text,
-      VisirButtonVariant.ghost => theme.tokens.colors.textMuted,
-      VisirButtonVariant.danger => theme.tokens.colors.text,
-    };
-
     return TextStyle(
-      color: color,
+      color: _foregroundColor(theme),
       fontSize: switch (widget.size) {
         VisirButtonSize.sm => 13,
         VisirButtonSize.md => 15,
@@ -290,6 +288,15 @@ class _VisirButtonState extends State<VisirButton> {
       fontWeight: FontWeight.w600,
       height: 1.2,
     );
+  }
+
+  Color _foregroundColor(VisirThemeData theme) {
+    return switch (widget.variant) {
+      VisirButtonVariant.primary => theme.tokens.colors.textInverse,
+      VisirButtonVariant.secondary => theme.tokens.colors.text,
+      VisirButtonVariant.ghost => theme.tokens.colors.textMuted,
+      VisirButtonVariant.danger => theme.tokens.colors.text,
+    };
   }
 
   VisirSpinnerSize _spinnerSize() {

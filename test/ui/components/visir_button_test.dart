@@ -26,6 +26,7 @@ void main() {
           body: makeUiTestableWidget(
             child: VisirIconButton(
               icon: const Icon(Icons.add),
+              semanticLabel: 'Create',
               tooltip: 'Create',
               onPressed: () => tapCount += 1,
             ),
@@ -36,6 +37,57 @@ void main() {
 
     await tester.tap(find.byType(VisirIconButton));
     expect(tapCount, 1);
+  });
+
+  testWidgets('icon button wires semantic label for accessibility', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirIconButton(
+          icon: const Icon(Icons.add),
+          semanticLabel: 'Create item',
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics &&
+            widget.properties.label == 'Create item' &&
+            widget.properties.button == true,
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('icon button applies primary button foreground color to icon', (
+    tester,
+  ) async {
+    Color? capturedIconColor;
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirIconButton(
+          icon: Builder(
+            builder: (context) {
+              capturedIconColor = IconTheme.of(context).color;
+              return const Icon(Icons.add);
+            },
+          ),
+          semanticLabel: 'Create item',
+          variant: VisirButtonVariant.primary,
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    expect(
+      capturedIconColor,
+      VisirThemeData.fallback().tokens.colors.textInverse,
+    );
   });
 
   testWidgets('empty label does not implicitly switch to icon-only layout', (
@@ -57,7 +109,9 @@ void main() {
     );
   });
 
-  testWidgets('button tooltip message is wired through Tooltip', (tester) async {
+  testWidgets('button tooltip message is wired through Tooltip', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
