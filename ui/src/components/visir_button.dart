@@ -83,6 +83,7 @@ class _VisirButtonState extends State<VisirButton> {
       VisirButtonSize.md => theme.tokens.spacing.lg.toDouble(),
       VisirButtonSize.lg => theme.tokens.spacing.xl.toDouble(),
     };
+    final hasLabel = widget.label.trim().isNotEmpty;
 
     Widget child = SizedBox(
       width: widget.isExpanded ? double.infinity : null,
@@ -98,24 +99,23 @@ class _VisirButtonState extends State<VisirButton> {
                   : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (widget.leading != null) ...[
-                  widget.leading!,
-                  const SizedBox(width: 8),
-                ],
-                Flexible(
-                  child: Text(
-                    widget.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _labelStyle(theme),
+                if (widget.leading != null) widget.leading!,
+                if (widget.leading != null && hasLabel) const SizedBox(width: 8),
+                if (hasLabel)
+                  Flexible(
+                    child: Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _labelStyle(theme),
+                    ),
                   ),
-                ),
                 if (widget.isLoading) ...[
-                  const SizedBox(width: 8),
+                  if (hasLabel) const SizedBox(width: 8),
                   VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
                 ],
                 if (widget.trailing != null) ...[
-                  const SizedBox(width: 8),
+                  if (hasLabel || widget.isLoading) const SizedBox(width: 8),
                   widget.trailing!,
                 ],
               ],

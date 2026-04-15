@@ -17,6 +17,45 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
+  testWidgets('icon button reuses button interaction shell', (tester) async {
+    var tapCount = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: makeUiTestableWidget(
+            child: VisirIconButton(
+              icon: const Icon(Icons.add),
+              tooltip: 'Create',
+              onPressed: () => tapCount += 1,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(VisirIconButton));
+    expect(tapCount, 1);
+  });
+
+  testWidgets('button tooltip message is wired through Tooltip', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: makeUiTestableWidget(
+            child: VisirButton(
+              label: 'Tooltip',
+              tooltip: 'Create item',
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byTooltip('Create item'), findsOneWidget);
+  });
+
   testWidgets('disabled button ignores taps', (tester) async {
     var enabledTapCount = 0;
     var disabledTapCount = 0;
