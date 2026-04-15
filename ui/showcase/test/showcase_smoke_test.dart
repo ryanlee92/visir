@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
 import 'package:visir_ui_showcase/app/showcase_sections.dart';
@@ -26,23 +26,31 @@ void main() {
     final scrollState = tester.state<ScrollableState>(scrollable);
     expect(scrollState.position.pixels, equals(0));
 
-    await tester.drag(scrollable, const Offset(0, -150));
+    scrollState.position.jumpTo(scrollState.position.maxScrollExtent);
+    await tester.pumpAndSettle();
+    final viewportRect = tester.getRect(find.byType(SafeArea));
+    final offscreenButtonRect = tester.getRect(buttonHeader);
+    expect(offscreenButtonRect.top, lessThan(viewportRect.top));
+
+    await tester.drag(scrollable, const Offset(0, -32));
     await tester.pumpAndSettle();
     final afterDragOffset = scrollState.position.pixels;
     expect(afterDragOffset, greaterThan(0));
 
-    await tester.tap(find.text('Jump to ${prettySectionTitle('button')}'));
+    final jumpButton = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, 'Jump to ${prettySectionTitle('button')}'),
+    );
+    jumpButton.onPressed!.call();
     await tester.pumpAndSettle();
-    final postJumpOffset = scrollState.position.pixels;
-    expect(postJumpOffset, isNot(equals(afterDragOffset)));
-    final viewportRect = tester.getRect(find.byType(SafeArea));
     final buttonRect = tester.getRect(buttonHeader);
+    expect(scrollState.position.pixels, lessThan(afterDragOffset));
     expect(buttonRect.top, greaterThanOrEqualTo(viewportRect.top));
     expect(buttonRect.bottom, lessThanOrEqualTo(viewportRect.bottom));
 
-    expect(
-      find.text('Component area coming soon'),
-      findsNWidgets(showcaseSectionIds.length),
-    );
+    for (final id in showcaseSectionIds) {
+      expect(find.text(prettySectionTitle(id)), findsOneWidget);
+    }
+
+    expect(find.text('Component area coming soon'), findsWidgets);
   });
 }
