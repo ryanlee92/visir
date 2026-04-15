@@ -46,8 +46,8 @@ class VisirInput extends StatelessWidget {
           hintText: hintText,
           hintStyle: TextStyle(color: tokens.colors.textMuted),
           errorText: errorText,
-          prefixIcon: prefix,
-          suffixIcon: suffix,
+          prefix: prefix,
+          suffix: suffix,
           filled: true,
           fillColor: tokens.colors.surface,
           border: OutlineInputBorder(

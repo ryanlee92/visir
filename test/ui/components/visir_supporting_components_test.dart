@@ -56,6 +56,35 @@ void main() {
     semantics.dispose();
   });
 
+  testWidgets('VisirInput uses generic affix slots for prefix and suffix', (
+    tester,
+  ) async {
+    const prefix = Text('pre');
+    const suffix = Text('post');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: makeUiTestableWidget(
+            child: const VisirInput(
+              label: 'Email',
+              prefix: prefix,
+              suffix: suffix,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    final decoration = textField.decoration!;
+
+    expect(decoration.prefix, same(prefix));
+    expect(decoration.suffix, same(suffix));
+    expect(decoration.prefixIcon, isNull);
+    expect(decoration.suffixIcon, isNull);
+  });
+
   testWidgets('VisirCard density changes padding profile', (tester) async {
     await tester.pumpWidget(
       makeUiTestableWidget(
@@ -140,6 +169,45 @@ void main() {
       semantics.dispose();
     },
   );
+
+  testWidgets('actionable VisirCard shows a visible focus treatment', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: makeUiTestableWidget(
+            child: VisirCard(onTap: () {}, child: const Text('Focusable card')),
+          ),
+        ),
+      ),
+    );
+
+    final decorationFinder = find.descendant(
+      of: find.byType(VisirCard),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is Container && widget.decoration is BoxDecoration,
+      ),
+    );
+    final unfocusedDecoration =
+        tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
+
+    final focusNode = Focus.of(tester.element(find.text('Focusable card')));
+    focusNode.requestFocus();
+    await tester.pump();
+
+    final focusedDecoration =
+        tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
+
+    expect(
+      (unfocusedDecoration.border! as Border).top.color,
+      VisirThemeData.fallback().tokens.colors.surfaceOutline,
+    );
+    expect(
+      (focusedDecoration.border! as Border).top.color,
+      VisirThemeData.fallback().tokens.colors.accent,
+    );
+  });
 
   testWidgets('VisirEmptyState renders title description and action', (
     tester,
