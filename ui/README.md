@@ -9,6 +9,14 @@ This library provides clean, enum-driven `Visir` components without coupling to 
 ## Import note
 
 Because this library intentionally lives outside `lib/`, consume it with relative imports inside this repository for now.
+The number of `../` segments depends on where the importing file lives.
+
+Examples:
+
+- From `lib/features/inbox/view/inbox_panel.dart`:
+  `import '../../../../ui/visir_ui.dart';`
+- From `test/ui/test_ui_widget.dart`:
+  `import '../../ui/visir_ui.dart';`
 
 ```dart
 import '../../ui/visir_ui.dart';
@@ -25,6 +33,13 @@ import '../../ui/visir_ui.dart';
 - `VisirDivider`
 - `VisirSpinner`
 - `VisirEmptyState`
+
+## Theme and Foundations
+
+`visir_ui.dart` also exports the theme and foundation surface, not only widgets.
+Use `VisirTheme` / `VisirThemeData` to read configured styling, and use enums/tokens
+(`Visir*Variant`, `Visir*Size`, spacing/radius/motion/color tokens) for consistent,
+enum-driven API usage across components.
 
 ## Example
 
