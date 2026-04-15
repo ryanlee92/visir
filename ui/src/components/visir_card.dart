@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../foundation/visir_enums.dart';
 import '../theme/visir_theme.dart';
@@ -55,6 +56,33 @@ class VisirCard extends StatelessWidget {
       return body;
     }
 
-    return GestureDetector(onTap: onTap, child: body);
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        enabled: true,
+        child: Focus(
+          onKeyEvent: (node, event) {
+            final isActivationKey =
+                event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.space;
+
+            if (event is KeyDownEvent && isActivationKey) {
+              onTap?.call();
+              return KeyEventResult.handled;
+            }
+
+            return KeyEventResult.ignored;
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTap,
+              child: body,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
