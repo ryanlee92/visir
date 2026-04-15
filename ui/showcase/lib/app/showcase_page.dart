@@ -11,7 +11,9 @@ class ShowcasePage extends StatefulWidget {
 
 class _ShowcasePageState extends State<ShowcasePage> {
   final ScrollController _scrollController = ScrollController();
-  final List<String> _jumpIds = ['button', 'input'];
+  final Map<String, GlobalKey> _sectionKeys = {
+    for (final id in showcaseSectionIds) id: GlobalKey()
+  };
 
   @override
   void dispose() {
@@ -20,7 +22,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
   }
 
   Future<void> _jumpTo(String id) async {
-    final key = showcaseSectionKeys[id];
+    final key = _sectionKeys[id];
     if (key?.currentContext == null) return;
     await Scrollable.ensureVisible(
       key!.currentContext!,
@@ -32,7 +34,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
 
   Widget _buildSection(String id, ColorScheme colors) {
     return Container(
-      key: showcaseSectionKeys[id],
+      key: _sectionKeys[id],
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -56,18 +58,21 @@ class _ShowcasePageState extends State<ShowcasePage> {
           ),
           const SizedBox(height: 16),
           Container(
-            height: 120,
+            constraints: const BoxConstraints(minHeight: 120),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.6),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(
-              child: Text(
-                'Component area coming soon',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: colors.primary),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  'Component area coming soon',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: colors.primary),
+                ),
               ),
             ),
           ),
@@ -82,35 +87,36 @@ class _ShowcasePageState extends State<ShowcasePage> {
     final colors = theme.colorScheme;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Visir UI',
-              style: theme.textTheme.displaySmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Live Visir component playground',
-              style: theme.textTheme.titleLarge,
-            ),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: _jumpIds.map((id) {
-                return SizedBox(
-                  height: 40,
-                  child: TextButton(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Visir UI',
+                style: theme.textTheme.displaySmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Live Visir component playground',
+                style: theme.textTheme.titleLarge,
+              ),
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: featuredShowcaseJumpSectionIds.map((id) {
+                  return TextButton(
                     onPressed: () => _jumpTo(id),
                     style: TextButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
                       backgroundColor: colors.primaryContainer,
                       foregroundColor: colors.onPrimaryContainer,
                       shape: RoundedRectangleBorder(
@@ -118,21 +124,21 @@ class _ShowcasePageState extends State<ShowcasePage> {
                       ),
                     ),
                     child: Text('Jump to ${prettySectionTitle(id)}'),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 32),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: showcaseSectionIds
-                  .map((id) => Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: _buildSection(id, colors),
-                      ))
-                  .toList(),
-            ),
-          ],
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 32),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: showcaseSectionIds
+                    .map((id) => Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: _buildSection(id, colors),
+                        ))
+                    .toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );

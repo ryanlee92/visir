@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 const List<String> showcaseSectionIds = [
   'button',
   'icon-button',
@@ -10,6 +8,11 @@ const List<String> showcaseSectionIds = [
   'divider',
   'spinner',
   'empty-state',
+];
+
+const List<String> featuredShowcaseJumpSectionIds = [
+  'button',
+  'input',
 ];
 
 String prettySectionTitle(String id) {
@@ -24,7 +27,3 @@ String prettySectionTitle(String id) {
 String sectionPlaceholderDescription(String id) {
   return 'Placeholder for ${prettySectionTitle(id)} components.';
 }
-
-final Map<String, GlobalKey> showcaseSectionKeys = {
-  for (final id in showcaseSectionIds) id: GlobalKey(),
-};
