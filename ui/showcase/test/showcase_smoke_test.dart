@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
+import 'package:visir_ui_showcase/app/showcase_page.dart';
 import 'package:visir_ui_showcase/app/showcase_sections.dart';
 
 void main() {
   testWidgets('ShowcaseApp renders hero text, featured jump links, and sections',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 
@@ -17,35 +22,25 @@ void main() {
         findsOneWidget,
       );
     }
-    final buttonHeader = find.text(prettySectionTitle('button'));
-
+    final inputHeader = find.text(prettySectionTitle('input'));
     final scrollable = find.descendant(
-      of: find.byType(SingleChildScrollView),
+      of: find.byKey(showcaseScrollViewKey),
       matching: find.byType(Scrollable),
     );
     final scrollState = tester.state<ScrollableState>(scrollable);
     expect(scrollState.position.pixels, equals(0));
 
-    scrollState.position.jumpTo(scrollState.position.maxScrollExtent);
-    await tester.pumpAndSettle();
     final viewportRect = tester.getRect(find.byType(SafeArea));
-    final offscreenButtonRect = tester.getRect(buttonHeader);
-    expect(offscreenButtonRect.top, lessThan(viewportRect.top));
+    final inputBeforeJump = tester.getRect(inputHeader);
+    expect(inputBeforeJump.bottom, greaterThan(viewportRect.bottom));
 
-    await tester.drag(scrollable, const Offset(0, -32));
+    await tester.tap(find.text('Jump to ${prettySectionTitle('input')}'));
     await tester.pumpAndSettle();
-    final afterDragOffset = scrollState.position.pixels;
-    expect(afterDragOffset, greaterThan(0));
 
-    final jumpButton = tester.widget<TextButton>(
-      find.widgetWithText(TextButton, 'Jump to ${prettySectionTitle('button')}'),
-    );
-    jumpButton.onPressed!.call();
-    await tester.pumpAndSettle();
-    final buttonRect = tester.getRect(buttonHeader);
-    expect(scrollState.position.pixels, lessThan(afterDragOffset));
-    expect(buttonRect.top, greaterThanOrEqualTo(viewportRect.top));
-    expect(buttonRect.bottom, lessThanOrEqualTo(viewportRect.bottom));
+    expect(scrollState.position.pixels, greaterThan(0));
+    final inputAfterJump = tester.getRect(inputHeader);
+    expect(inputAfterJump.top, greaterThanOrEqualTo(viewportRect.top));
+    expect(inputAfterJump.bottom, lessThanOrEqualTo(viewportRect.bottom));
 
     for (final id in showcaseSectionIds) {
       expect(find.text(prettySectionTitle(id)), findsOneWidget);

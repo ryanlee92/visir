@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'showcase_sections.dart';
 
+const showcaseScrollViewKey = ValueKey('showcase-scroll-view');
+
 class ShowcasePage extends StatefulWidget {
   const ShowcasePage({super.key});
 
@@ -89,6 +91,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
+          key: showcaseScrollViewKey,
           controller: _scrollController,
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
