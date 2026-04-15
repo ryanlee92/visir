@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../sections/visir_button_section.dart';
+import '../sections/visir_icon_button_section.dart';
 import 'showcase_sections.dart';
 
 const showcaseScrollViewKey = ValueKey('showcase-scroll-view');
@@ -39,6 +41,19 @@ class _ShowcasePageState extends State<ShowcasePage> {
   }
 
   Widget _buildSection(String id, ColorScheme colors) {
+    final Widget content = switch (id) {
+      'button' => const VisirButtonSection(),
+      'icon-button' => const VisirIconButtonSection(),
+      _ => _buildPlaceholderSection(id, colors),
+    };
+    final description = switch (id) {
+      'button' =>
+        'Compose action buttons with variants, states, and icon slots.',
+      'icon-button' =>
+        'Build compact icon-led actions with semantic labels and variants.',
+      _ => sectionPlaceholderDescription(id),
+    };
+
     return Container(
       key: _sectionKeys[id],
       width: double.infinity,
@@ -59,30 +74,33 @@ class _ShowcasePageState extends State<ShowcasePage> {
           ),
           const SizedBox(height: 8),
           Text(
-            sectionPlaceholderDescription(id),
+            description,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
-          Container(
-            constraints: const BoxConstraints(minHeight: 120),
-            decoration: BoxDecoration(
-              color: colors.surface.withValues(alpha: 0.72),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Text(
-                  'Component area coming soon',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: colors.primary),
-                ),
-              ),
-            ),
-          ),
+          content,
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderSection(String id, ColorScheme colors) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 120),
+      decoration: BoxDecoration(
+        color: colors.surface.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Text(
+            'Component area coming soon',
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: colors.primary),
+          ),
+        ),
       ),
     );
   }
