@@ -38,7 +38,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colors.surfaceVariant,
+        color: colors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -60,7 +60,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
           Container(
             constraints: const BoxConstraints(minHeight: 120),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(

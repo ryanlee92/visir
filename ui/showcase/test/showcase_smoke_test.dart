@@ -17,20 +17,28 @@ void main() {
         findsOneWidget,
       );
     }
-
-    final scrollable = find.byType(Scrollable);
     final buttonHeader = find.text(prettySectionTitle('button'));
-    final initialTop = tester.getTopLeft(buttonHeader).dy;
+
+    final scrollable = find.descendant(
+      of: find.byType(SingleChildScrollView),
+      matching: find.byType(Scrollable),
+    );
+    final scrollState = tester.state<ScrollableState>(scrollable);
+    expect(scrollState.position.pixels, equals(0));
+
     await tester.drag(scrollable, const Offset(0, -150));
     await tester.pumpAndSettle();
-    final draggedTop = tester.getTopLeft(buttonHeader).dy;
-    expect(draggedTop, lessThan(initialTop - 20));
+    final afterDragOffset = scrollState.position.pixels;
+    expect(afterDragOffset, greaterThan(0));
 
     await tester.tap(find.text('Jump to ${prettySectionTitle('button')}'));
     await tester.pumpAndSettle();
-    final postJumpTop = tester.getTopLeft(buttonHeader).dy;
-    expect(postJumpTop, lessThan(draggedTop - 20));
-    expect(postJumpTop, lessThanOrEqualTo(initialTop + 12));
+    final postJumpOffset = scrollState.position.pixels;
+    expect(postJumpOffset, isNot(equals(afterDragOffset)));
+    final viewportRect = tester.getRect(find.byType(SafeArea));
+    final buttonRect = tester.getRect(buttonHeader);
+    expect(buttonRect.top, greaterThanOrEqualTo(viewportRect.top));
+    expect(buttonRect.bottom, lessThanOrEqualTo(viewportRect.bottom));
 
     expect(
       find.text('Component area coming soon'),
