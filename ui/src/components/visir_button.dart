@@ -21,7 +21,11 @@ class VisirButton extends StatefulWidget {
     this.autofocus = false,
     this.focusNode,
     this.isIconOnly = false,
-  });
+    this.semanticLabel,
+  }) : assert(
+         !isIconOnly || (semanticLabel != null && semanticLabel != ''),
+         'Icon-only buttons require a semanticLabel.',
+       );
 
   final String label;
   final VoidCallback? onPressed;
@@ -35,6 +39,7 @@ class VisirButton extends StatefulWidget {
   final bool autofocus;
   final FocusNode? focusNode;
   final bool isIconOnly;
+  final String? semanticLabel;
 
   @override
   State<VisirButton> createState() => _VisirButtonState();
@@ -44,6 +49,7 @@ class _VisirButtonState extends State<VisirButton> {
   final FocusNode _internalFocusNode = FocusNode();
   bool _hovering = false;
   bool _pressed = false;
+  bool _focused = false;
 
   bool get _isDisabled => widget.onPressed == null || widget.isLoading;
 
@@ -87,81 +93,99 @@ class _VisirButtonState extends State<VisirButton> {
     };
     final hasLabel = !widget.isIconOnly;
     final foregroundColor = _foregroundColor(theme);
+    final semanticsLabel = widget.semanticLabel ?? (hasLabel ? widget.label : null);
 
-    Widget child = SizedBox(
-      width: widget.isExpanded ? double.infinity : null,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: height),
-        child: DecoratedBox(
-          decoration: _decoration(theme, disabled),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: IconTheme.merge(
-              data: IconThemeData(color: foregroundColor),
-              child: Row(
-                mainAxisSize: widget.isExpanded
-                    ? MainAxisSize.max
-                    : MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (widget.leading != null) widget.leading!,
-                  if (widget.leading != null && hasLabel)
-                    const SizedBox(width: 8),
-                  if (hasLabel)
-                    Flexible(
-                      child: Text(
-                        widget.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: _labelStyle(theme),
-                      ),
-                    ),
-                  if (widget.isLoading) ...[
-                    if (hasLabel) const SizedBox(width: 8),
-                    VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
-                  ],
-                  if (widget.trailing != null) ...[
-                    if (hasLabel || widget.isLoading) const SizedBox(width: 8),
-                    widget.trailing!,
-                  ],
-                ],
-              ),
-            ),
+    final visualChild = DecoratedBox(
+      decoration: _decoration(theme, disabled),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: IconTheme.merge(
+          data: IconThemeData(color: foregroundColor),
+          child: Row(
+            mainAxisSize: widget.isExpanded ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.leading != null) widget.leading!,
+              if (widget.leading != null && hasLabel) const SizedBox(width: 8),
+              if (hasLabel)
+                Flexible(
+                  child: Text(
+                    widget.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: _labelStyle(theme),
+                  ),
+                ),
+              if (widget.isLoading) ...[
+                if (hasLabel) const SizedBox(width: 8),
+                VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
+              ],
+              if (widget.trailing != null) ...[
+                if (hasLabel || widget.isLoading) const SizedBox(width: 8),
+                widget.trailing!,
+              ],
+            ],
           ),
         ),
       ),
     );
 
-    child = AnimatedOpacity(
+    final animatedVisual = AnimatedOpacity(
       duration: theme.tokens.motion.normal,
       curve: theme.tokens.motion.curve,
       opacity: disabled ? theme.components.button.disabledOpacity : 1,
-      child: AnimatedScale(
+      child: TweenAnimationBuilder<double>(
         duration: theme.tokens.motion.emphasized,
         curve: theme.tokens.motion.curve,
-        scale: _showsInteractionFeedback
-            ? theme.components.button.pressedScale
-            : 1,
-        child: child,
+        tween: Tween<double>(
+          end: _showsInteractionFeedback
+              ? theme.components.button.pressedScale
+              : 1,
+        ),
+        builder: (context, scale, child) {
+          return Transform.scale(
+            scale: scale,
+            transformHitTests: false,
+            child: child,
+          );
+        },
+        child: visualChild,
       ),
     );
 
-    child = Focus(
-      focusNode: _focusNode,
-      autofocus: !disabled && widget.autofocus,
-      canRequestFocus: !disabled,
-      skipTraversal: disabled,
-      onKeyEvent: disabled ? null : _handleKeyEvent,
-      child: MouseRegion(
-        onEnter: disabled ? null : _handleHoverEnter,
-        onExit: disabled ? null : _handleHoverExit,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapDown: disabled ? null : _handleTapDown,
-          onTapCancel: disabled ? null : _handleTapCancel,
-          onTapUp: disabled ? null : _handleTapUp,
-          onTap: disabled ? null : widget.onPressed,
-          child: child,
+    Widget child = SizedBox(
+      width: widget.isExpanded ? double.infinity : null,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: height),
+        child: MergeSemantics(
+          child: Semantics(
+            button: true,
+            enabled: !disabled,
+            label: semanticsLabel,
+            child: Focus(
+              focusNode: _focusNode,
+              autofocus: !disabled && widget.autofocus,
+              canRequestFocus: !disabled,
+              skipTraversal: disabled,
+              onFocusChange: _handleFocusChange,
+              onKeyEvent: disabled ? null : _handleKeyEvent,
+              child: MouseRegion(
+                cursor: disabled
+                    ? MouseCursor.defer
+                    : SystemMouseCursors.click,
+                onEnter: disabled ? null : _handleHoverEnter,
+                onExit: disabled ? null : _handleHoverExit,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTapDown: disabled ? null : _handleTapDown,
+                  onTapCancel: disabled ? null : _handleTapCancel,
+                  onTapUp: disabled ? null : _handleTapUp,
+                  onTap: disabled ? null : widget.onPressed,
+                  child: Center(child: animatedVisual),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -182,7 +206,7 @@ class _VisirButtonState extends State<VisirButton> {
         event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space;
 
-    if (event is KeyDownEvent && isActivationKey) {
+    if (event is KeyUpEvent && isActivationKey) {
       widget.onPressed?.call();
       return KeyEventResult.handled;
     }
@@ -196,6 +220,14 @@ class _VisirButtonState extends State<VisirButton> {
     }
 
     setState(() => _hovering = true);
+  }
+
+  void _handleFocusChange(bool focused) {
+    if (_focused == focused) {
+      return;
+    }
+
+    setState(() => _focused = focused);
   }
 
   void _handleHoverExit(PointerExitEvent event) {
@@ -264,16 +296,24 @@ class _VisirButtonState extends State<VisirButton> {
           ? colors.danger.withValues(alpha: 0.22)
           : colors.surface,
       borderRadius: BorderRadius.circular(theme.tokens.radius.md),
-      border: Border.all(color: colors.surfaceOutline),
-      boxShadow: isPrimary
-          ? [
-              BoxShadow(
-                color: colors.accent.withValues(alpha: disabled ? 0.08 : 0.34),
-                blurRadius: theme.components.button.glowBlur,
-                offset: const Offset(0, 10),
-              ),
-            ]
-          : const [],
+      border: Border.all(
+        color: _focused ? colors.accent : colors.surfaceOutline,
+        width: _focused ? 2 : 1,
+      ),
+      boxShadow: [
+        if (isPrimary)
+          BoxShadow(
+            color: colors.accent.withValues(alpha: disabled ? 0.08 : 0.34),
+            blurRadius: theme.components.button.glowBlur,
+            offset: const Offset(0, 10),
+          ),
+        if (_focused)
+          BoxShadow(
+            color: colors.accent.withValues(alpha: disabled ? 0.12 : 0.24),
+            blurRadius: theme.components.button.glowBlur,
+            spreadRadius: 1,
+          ),
+      ],
     );
   }
 

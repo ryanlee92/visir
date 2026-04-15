@@ -25,6 +25,7 @@ class VisirIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      enabled: onPressed != null,
       label: semanticLabel,
       child: VisirButton(
         label: '',
@@ -34,6 +35,7 @@ class VisirIconButton extends StatelessWidget {
         tooltip: tooltip,
         leading: icon,
         isIconOnly: true,
+        semanticLabel: semanticLabel,
       ),
     );
   }

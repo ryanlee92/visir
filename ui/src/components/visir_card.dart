@@ -78,7 +78,7 @@ class _VisirCardState extends State<VisirCard> {
         event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space;
 
-    if (event is KeyDownEvent && isActivationKey) {
+    if (event is KeyUpEvent && isActivationKey) {
       widget.onTap?.call();
       return KeyEventResult.handled;
     }

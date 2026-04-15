@@ -59,8 +59,34 @@ void main() {
             widget.properties.label == 'Create item' &&
             widget.properties.button == true,
       ),
-      findsOneWidget,
+      findsWidgets,
     );
+  });
+
+  testWidgets('icon button exposes disabled semantics state', (tester) async {
+    final semantics = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirIconButton(
+          icon: const Icon(Icons.add),
+          semanticLabel: 'Create item',
+        ),
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics &&
+            widget.properties.label == 'Create item' &&
+            widget.properties.button == true &&
+            widget.properties.enabled == false,
+      ),
+      findsWidgets,
+    );
+
+    semantics.dispose();
   });
 
   testWidgets('icon button applies primary button foreground color to icon', (
@@ -127,6 +153,20 @@ void main() {
     );
 
     expect(find.byTooltip('Create item'), findsOneWidget);
+  });
+
+  testWidgets('icon-only button requires an explicit semantic label', (
+    tester,
+  ) async {
+    expect(
+      () => VisirButton(
+        label: '',
+        leading: const Icon(Icons.add),
+        isIconOnly: true,
+        onPressed: () {},
+      ),
+      throwsAssertionError,
+    );
   });
 
   testWidgets('disabled button ignores taps', (tester) async {
@@ -246,6 +286,90 @@ void main() {
     expect(activationCount, 1);
   });
 
+  testWidgets('focused button shows a visible focus treatment', (tester) async {
+    final focusNode = FocusNode(debugLabel: 'focus-visual');
+    addTearDown(focusNode.dispose);
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(
+          label: 'Continue',
+          focusNode: focusNode,
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    final decorationFinder = find.descendant(
+      of: find.byType(VisirButton),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
+    );
+
+    final unfocusedDecoration =
+        tester.widget<DecoratedBox>(decorationFinder).decoration as BoxDecoration;
+
+    focusNode.requestFocus();
+    await tester.pumpAndSettle();
+
+    final focusedDecoration =
+        tester.widget<DecoratedBox>(decorationFinder).decoration as BoxDecoration;
+
+    expect(
+      (unfocusedDecoration.border! as Border).top.color,
+      VisirThemeData.fallback().tokens.colors.surfaceOutline,
+    );
+    expect(
+      (focusedDecoration.border! as Border).top.color,
+      VisirThemeData.fallback().tokens.colors.accent,
+    );
+  });
+
+  testWidgets('enabled button exposes button semantics and enabled state', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(label: 'Continue', onPressed: () {}),
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics &&
+            widget.properties.label == 'Continue' &&
+            widget.properties.button == true &&
+            widget.properties.enabled == true,
+      ),
+      findsOneWidget,
+    );
+
+    semantics.dispose();
+  });
+
+  testWidgets('enabled button uses click cursor on desktop pointers', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(label: 'Continue', onPressed: () {}),
+      ),
+    );
+
+    final mouseRegion = tester.widget<MouseRegion>(
+      find.descendant(
+        of: find.byType(VisirButton),
+        matching: find.byType(MouseRegion),
+      ),
+    );
+
+    expect(mouseRegion.cursor, SystemMouseCursors.click);
+  });
+
   testWidgets('disabled loading button cannot autofocus or take focus', (
     tester,
   ) async {
@@ -342,20 +466,62 @@ void main() {
       ),
     );
 
-    final enabledBefore = tester.getRect(find.text('Enabled hover'));
+    final enabledShell = find.descendant(
+      of: find.byType(VisirButton).first,
+      matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+    );
+    final enabledBefore = tester.getRect(enabledShell);
+    final enabledTextBefore = tester.getRect(find.text('Enabled hover'));
     final disabledBefore = tester.getRect(find.text('Disabled hover'));
 
     await gesture.moveTo(tester.getCenter(find.text('Enabled hover')));
     await tester.pumpAndSettle();
 
-    final enabledAfter = tester.getRect(find.text('Enabled hover'));
-    expect(enabledAfter.width, lessThan(enabledBefore.width));
-    expect(enabledAfter.height, lessThan(enabledBefore.height));
+    final enabledAfter = tester.getRect(enabledShell);
+    final enabledTextAfter = tester.getRect(find.text('Enabled hover'));
+    expect(enabledAfter, enabledBefore);
+    expect(enabledTextAfter.width, lessThan(enabledTextBefore.width));
+    expect(enabledTextAfter.height, lessThan(enabledTextBefore.height));
 
     await gesture.moveTo(tester.getCenter(find.text('Disabled hover')));
     await tester.pumpAndSettle();
 
     final disabledAfter = tester.getRect(find.text('Disabled hover'));
     expect(disabledAfter, disabledBefore);
+  });
+
+  testWidgets('press feedback shrinks and then restores enabled button', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(label: 'Press me', onPressed: () {}),
+      ),
+    );
+
+    final center = tester.getCenter(find.text('Press me'));
+    final buttonShell = find.descendant(
+      of: find.byType(VisirButton),
+      matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+    );
+    final shellBefore = tester.getRect(buttonShell);
+    final textBefore = tester.getRect(find.text('Press me'));
+
+    final gesture = await tester.startGesture(center);
+    await tester.pumpAndSettle();
+
+    final shellPressed = tester.getRect(buttonShell);
+    final textPressed = tester.getRect(find.text('Press me'));
+    expect(shellPressed, shellBefore);
+    expect(textPressed.width, lessThan(textBefore.width));
+    expect(textPressed.height, lessThan(textBefore.height));
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    final shellAfter = tester.getRect(buttonShell);
+    final textAfter = tester.getRect(find.text('Press me'));
+    expect(shellAfter, shellBefore);
+    expect(textAfter, textBefore);
   });
 }

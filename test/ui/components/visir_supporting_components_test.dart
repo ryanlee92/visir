@@ -1,4 +1,4 @@
-import 'dart:ui' show SemanticsAction, SemanticsFlag;
+import 'dart:ui' show SemanticsAction, Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,10 +48,9 @@ void main() {
         .getSemantics(find.byType(EditableText))
         .getSemanticsData();
     expect(semanticsData.label, contains('Email'));
-    expect(semanticsData.hasFlag(SemanticsFlag.isTextField), isTrue);
-    expect(semanticsData.hasFlag(SemanticsFlag.isFocusable), isTrue);
-    expect(semanticsData.hasFlag(SemanticsFlag.hasEnabledState), isTrue);
-    expect(semanticsData.hasFlag(SemanticsFlag.isEnabled), isTrue);
+    expect(semanticsData.flagsCollection.isTextField, isTrue);
+    expect(semanticsData.flagsCollection.isFocused, isNot(Tristate.none));
+    expect(semanticsData.flagsCollection.isEnabled, Tristate.isTrue);
 
     semantics.dispose();
   });
@@ -148,10 +147,9 @@ void main() {
           .getSemantics(find.byType(VisirCard))
           .getSemanticsData();
       expect(semanticsData.label, 'Open task');
-      expect(semanticsData.hasFlag(SemanticsFlag.isButton), isTrue);
-      expect(semanticsData.hasFlag(SemanticsFlag.isFocusable), isTrue);
-      expect(semanticsData.hasFlag(SemanticsFlag.hasEnabledState), isTrue);
-      expect(semanticsData.hasFlag(SemanticsFlag.isEnabled), isTrue);
+      expect(semanticsData.flagsCollection.isButton, isTrue);
+      expect(semanticsData.flagsCollection.isFocused, isNot(Tristate.none));
+      expect(semanticsData.flagsCollection.isEnabled, Tristate.isTrue);
       expect(semanticsData.hasAction(SemanticsAction.tap), isTrue);
       expect(semanticsData.hasAction(SemanticsAction.focus), isTrue);
 
@@ -206,6 +204,59 @@ void main() {
     expect(
       (focusedDecoration.border! as Border).top.color,
       VisirThemeData.fallback().tokens.colors.accent,
+    );
+  });
+
+  testWidgets('VisirSection renders title and child', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: const VisirSection(
+          title: 'Workspace',
+          child: Text('Panel body'),
+        ),
+      ),
+    );
+
+    expect(find.text('Workspace'), findsOneWidget);
+    expect(find.text('Panel body'), findsOneWidget);
+  });
+
+  testWidgets('VisirDivider renders a 1px line across available width', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: const SizedBox(width: 200, child: VisirDivider()),
+      ),
+    );
+
+    final sizedBox = tester.widget<SizedBox>(
+      find.descendant(
+        of: find.byType(VisirDivider),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is SizedBox && widget.height == 1,
+        ),
+      ),
+    );
+
+    expect(sizedBox.height, 1);
+  });
+
+  testWidgets('VisirSpinner renders circular progress with expected size', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: const VisirSpinner(size: VisirSpinnerSize.lg),
+      ),
+    );
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is SizedBox && widget.width == 20 && widget.height == 20,
+      ),
+      findsOneWidget,
     );
   });
 
