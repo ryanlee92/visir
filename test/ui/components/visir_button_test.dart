@@ -38,6 +38,25 @@ void main() {
     expect(tapCount, 1);
   });
 
+  testWidgets('empty label does not implicitly switch to icon-only layout', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(
+          label: '',
+          leading: const Icon(Icons.add),
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate((widget) => widget is Text && widget.data == ''),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('button tooltip message is wired through Tooltip', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

@@ -20,6 +20,7 @@ class VisirButton extends StatefulWidget {
     this.tooltip,
     this.autofocus = false,
     this.focusNode,
+    this.isIconOnly = false,
   });
 
   final String label;
@@ -33,6 +34,7 @@ class VisirButton extends StatefulWidget {
   final String? tooltip;
   final bool autofocus;
   final FocusNode? focusNode;
+  final bool isIconOnly;
 
   @override
   State<VisirButton> createState() => _VisirButtonState();
@@ -83,7 +85,7 @@ class _VisirButtonState extends State<VisirButton> {
       VisirButtonSize.md => theme.tokens.spacing.lg.toDouble(),
       VisirButtonSize.lg => theme.tokens.spacing.xl.toDouble(),
     };
-    final hasLabel = widget.label.trim().isNotEmpty;
+    final hasLabel = !widget.isIconOnly;
 
     Widget child = SizedBox(
       width: widget.isExpanded ? double.infinity : null,

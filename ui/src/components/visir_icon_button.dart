@@ -28,6 +28,7 @@ class VisirIconButton extends StatelessWidget {
       size: size,
       tooltip: tooltip,
       leading: icon,
+      isIconOnly: true,
     );
   }
 }
