@@ -10,9 +10,14 @@ const List<String> showcaseSectionIds = [
   'empty-state',
 ];
 
-const List<String> featuredShowcaseJumpSectionIds = [
+const Set<String> _featuredShowcaseJumpSectionIdSet = {
   'button',
   'input',
+};
+
+final List<String> featuredShowcaseJumpSectionIds = [
+  for (final id in showcaseSectionIds)
+    if (_featuredShowcaseJumpSectionIdSet.contains(id)) id,
 ];
 
 String prettySectionTitle(String id) {
