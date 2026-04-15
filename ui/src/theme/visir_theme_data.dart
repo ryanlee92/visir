@@ -1,0 +1,3 @@
+class VisirThemeData {
+  const VisirThemeData();
+}
