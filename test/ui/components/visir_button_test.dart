@@ -20,6 +20,8 @@ void main() {
   testWidgets('disabled button ignores taps', (tester) async {
     var enabledTapCount = 0;
     var disabledTapCount = 0;
+    final disabledFocusNode = FocusNode(debugLabel: 'disabled-button-focus');
+    addTearDown(disabledFocusNode.dispose);
 
     await tester.pumpWidget(
       makeUiTestableWidget(
@@ -30,6 +32,7 @@ void main() {
             VisirButton(
               label: 'Disabled',
               isLoading: true,
+              focusNode: disabledFocusNode,
               onPressed: () => disabledTapCount++,
             ),
           ],
@@ -41,6 +44,12 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.text('Disabled'));
+    await tester.pump();
+
+    disabledFocusNode.requestFocus();
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump();
 
     expect(enabledTapCount, 1);
@@ -123,7 +132,7 @@ void main() {
     expect(activationCount, 1);
   });
 
-  testWidgets('hovering lowers opacity or transforms toward pressed feedback', (
+  testWidgets('hover feedback only changes enabled button visuals', (
     tester,
   ) async {
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -132,16 +141,30 @@ void main() {
     await gesture.addPointer(location: Offset.zero);
     await tester.pumpWidget(
       makeUiTestableWidget(
-        child: VisirButton(label: 'Hover', onPressed: () {}),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            VisirButton(label: 'Enabled hover', onPressed: () {}),
+            const VisirButton(label: 'Disabled hover'),
+          ],
+        ),
       ),
     );
 
-    await gesture.moveTo(tester.getCenter(find.byType(VisirButton)));
+    final enabledBefore = tester.getRect(find.text('Enabled hover'));
+    final disabledBefore = tester.getRect(find.text('Disabled hover'));
+
+    await gesture.moveTo(tester.getCenter(find.text('Enabled hover')));
     await tester.pumpAndSettle();
 
-    final animatedScale = tester.widget<AnimatedScale>(
-      find.byType(AnimatedScale),
-    );
-    expect(animatedScale.scale, lessThan(1.0));
+    final enabledAfter = tester.getRect(find.text('Enabled hover'));
+    expect(enabledAfter.width, lessThan(enabledBefore.width));
+    expect(enabledAfter.height, lessThan(enabledBefore.height));
+
+    await gesture.moveTo(tester.getCenter(find.text('Disabled hover')));
+    await tester.pumpAndSettle();
+
+    final disabledAfter = tester.getRect(find.text('Disabled hover'));
+    expect(disabledAfter, disabledBefore);
   });
 }

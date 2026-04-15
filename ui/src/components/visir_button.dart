@@ -42,10 +42,24 @@ class _VisirButtonState extends State<VisirButton> {
   bool _hovering = false;
   bool _pressed = false;
 
+  bool get _isDisabled => widget.onPressed == null || widget.isLoading;
+
+  bool get _showsInteractionFeedback => !_isDisabled && (_pressed || _hovering);
+
+  @override
+  void didUpdateWidget(covariant VisirButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_isDisabled && (_hovering || _pressed)) {
+      _hovering = false;
+      _pressed = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = VisirTheme.of(context);
-    final disabled = widget.onPressed == null || widget.isLoading;
+    final disabled = _isDisabled;
     final height = switch (widget.size) {
       VisirButtonSize.sm => 36.0,
       VisirButtonSize.md => 44.0,
@@ -105,7 +119,9 @@ class _VisirButtonState extends State<VisirButton> {
       child: AnimatedScale(
         duration: theme.tokens.motion.emphasized,
         curve: theme.tokens.motion.curve,
-        scale: _pressed || _hovering ? theme.components.button.pressedScale : 1,
+        scale: _showsInteractionFeedback
+            ? theme.components.button.pressedScale
+            : 1,
         child: child,
       ),
     );
@@ -115,16 +131,13 @@ class _VisirButtonState extends State<VisirButton> {
       autofocus: widget.autofocus,
       onKeyEvent: disabled ? null : _handleKeyEvent,
       child: MouseRegion(
-        onEnter: (_) => setState(() => _hovering = true),
-        onExit: (_) => setState(() {
-          _hovering = false;
-          _pressed = false;
-        }),
+        onEnter: disabled ? null : _handleHoverEnter,
+        onExit: disabled ? null : _handleHoverExit,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTapDown: disabled ? null : (_) => setState(() => _pressed = true),
-          onTapCancel: disabled ? null : () => setState(() => _pressed = false),
-          onTapUp: disabled ? null : (_) => setState(() => _pressed = false),
+          onTapDown: disabled ? null : _handleTapDown,
+          onTapCancel: disabled ? null : _handleTapCancel,
+          onTapUp: disabled ? null : _handleTapUp,
           onTap: disabled ? null : widget.onPressed,
           child: child,
         ),
@@ -139,6 +152,10 @@ class _VisirButtonState extends State<VisirButton> {
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (_isDisabled) {
+      return KeyEventResult.ignored;
+    }
+
     final isActivationKey =
         event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space;
@@ -149,6 +166,53 @@ class _VisirButtonState extends State<VisirButton> {
     }
 
     return KeyEventResult.ignored;
+  }
+
+  void _handleHoverEnter(PointerEnterEvent event) {
+    if (_hovering) {
+      return;
+    }
+
+    setState(() => _hovering = true);
+  }
+
+  void _handleHoverExit(PointerExitEvent event) {
+    _clearInteractionState();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    if (_pressed) {
+      return;
+    }
+
+    setState(() => _pressed = true);
+  }
+
+  void _handleTapCancel() {
+    if (!_pressed) {
+      return;
+    }
+
+    setState(() => _pressed = false);
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    if (!_pressed) {
+      return;
+    }
+
+    setState(() => _pressed = false);
+  }
+
+  void _clearInteractionState() {
+    if (!_hovering && !_pressed) {
+      return;
+    }
+
+    setState(() {
+      _hovering = false;
+      _pressed = false;
+    });
   }
 
   BoxDecoration _decoration(VisirThemeData theme, bool disabled) {
