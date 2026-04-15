@@ -39,12 +39,15 @@ class VisirButton extends StatefulWidget {
 }
 
 class _VisirButtonState extends State<VisirButton> {
+  final FocusNode _internalFocusNode = FocusNode();
   bool _hovering = false;
   bool _pressed = false;
 
   bool get _isDisabled => widget.onPressed == null || widget.isLoading;
 
   bool get _showsInteractionFeedback => !_isDisabled && (_pressed || _hovering);
+
+  FocusNode get _focusNode => widget.focusNode ?? _internalFocusNode;
 
   @override
   void didUpdateWidget(covariant VisirButton oldWidget) {
@@ -54,6 +57,16 @@ class _VisirButtonState extends State<VisirButton> {
       _hovering = false;
       _pressed = false;
     }
+
+    if (_isDisabled && _focusNode.hasFocus) {
+      _focusNode.unfocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    _internalFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -127,8 +140,10 @@ class _VisirButtonState extends State<VisirButton> {
     );
 
     child = Focus(
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
+      focusNode: _focusNode,
+      autofocus: !disabled && widget.autofocus,
+      canRequestFocus: !disabled,
+      skipTraversal: disabled,
       onKeyEvent: disabled ? null : _handleKeyEvent,
       child: MouseRegion(
         onEnter: disabled ? null : _handleHoverEnter,

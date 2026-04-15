@@ -49,6 +49,8 @@ void main() {
     disabledFocusNode.requestFocus();
     await tester.pump();
 
+    expect(disabledFocusNode.hasPrimaryFocus, isFalse);
+
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump();
 
@@ -130,6 +132,83 @@ void main() {
     await tester.pump();
 
     expect(activationCount, 1);
+  });
+
+  testWidgets('disabled loading button cannot autofocus or take focus', (
+    tester,
+  ) async {
+    final focusNode = FocusNode(debugLabel: 'disabled-loading-focus');
+    addTearDown(focusNode.dispose);
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(
+          label: 'Busy',
+          isLoading: true,
+          autofocus: true,
+          focusNode: focusNode,
+          onPressed: () {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(focusNode.hasPrimaryFocus, isFalse);
+
+    focusNode.requestFocus();
+    await tester.pump();
+
+    expect(focusNode.hasPrimaryFocus, isFalse);
+  });
+
+  testWidgets('focus traversal skips disabled button', (tester) async {
+    final firstFocusNode = FocusNode(debugLabel: 'first-focus');
+    final disabledFocusNode = FocusNode(debugLabel: 'disabled-focus');
+    final lastFocusNode = FocusNode(debugLabel: 'last-focus');
+    addTearDown(firstFocusNode.dispose);
+    addTearDown(disabledFocusNode.dispose);
+    addTearDown(lastFocusNode.dispose);
+
+    late BuildContext traversalContext;
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: FocusTraversalGroup(
+          policy: WidgetOrderTraversalPolicy(),
+          child: Builder(
+            builder: (context) {
+              traversalContext = context;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  VisirButton(
+                    label: 'First',
+                    focusNode: firstFocusNode,
+                    onPressed: () {},
+                  ),
+                  VisirButton(label: 'Disabled', focusNode: disabledFocusNode),
+                  VisirButton(
+                    label: 'Last',
+                    focusNode: lastFocusNode,
+                    onPressed: () {},
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    firstFocusNode.requestFocus();
+    await tester.pump();
+    expect(firstFocusNode.hasPrimaryFocus, isTrue);
+
+    FocusScope.of(traversalContext).nextFocus();
+    await tester.pump();
+
+    expect(disabledFocusNode.hasPrimaryFocus, isFalse);
+    expect(lastFocusNode.hasPrimaryFocus, isTrue);
   });
 
   testWidgets('hover feedback only changes enabled button visuals', (
