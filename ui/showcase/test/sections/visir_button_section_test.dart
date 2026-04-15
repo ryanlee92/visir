@@ -22,4 +22,22 @@ void main() {
 
     expect(find.textContaining('VisirButtonVariant.danger'), findsOneWidget);
   });
+
+  testWidgets('button section updates snippet when loading changes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: VisirButtonSection()),
+        ),
+      ),
+    );
+
+    await tester.ensureVisible(find.text('Loading'));
+    await tester.tap(find.text('Loading'));
+    await tester.pump();
+
+    expect(find.textContaining('isLoading: true'), findsOneWidget);
+  });
 }

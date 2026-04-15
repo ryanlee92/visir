@@ -7,6 +7,7 @@ import '../playground/playground_enum_picker.dart';
 import '../playground/playground_panel.dart';
 import '../playground/playground_text_field.dart';
 import '../playground/preview_frame.dart';
+import 'showcase_section_layout.dart';
 
 class VisirButtonSection extends StatefulWidget {
   const VisirButtonSection({super.key});
@@ -52,11 +53,12 @@ class _VisirButtonSectionState extends State<VisirButtonSection> {
         const SizedBox(height: 8),
         Text(
           'Primary action button with enum-based variants, sizes, '
-          'loading state, and optional icon slots.',
+          'loading state, and optional icon slots. Keyboard focus styling '
+          'is preserved in the live preview.',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 16),
-        _SectionLayout(
+        ShowcaseSectionLayout(
           preview: PlaygroundPanel(
             title: 'Live Preview',
             child: PreviewFrame(
@@ -240,49 +242,6 @@ class _IconSelector extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _SectionLayout extends StatelessWidget {
-  const _SectionLayout({
-    required this.preview,
-    required this.controls,
-    required this.snippet,
-  });
-
-  final Widget preview;
-  final Widget controls;
-  final Widget snippet;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth >= 1080) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: preview),
-              const SizedBox(width: 16),
-              Expanded(child: controls),
-              const SizedBox(width: 16),
-              Expanded(child: snippet),
-            ],
-          );
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            preview,
-            const SizedBox(height: 16),
-            controls,
-            const SizedBox(height: 16),
-            snippet,
-          ],
-        );
-      },
     );
   }
 }

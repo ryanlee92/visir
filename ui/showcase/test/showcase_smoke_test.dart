@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
 import 'package:visir_ui_showcase/app/showcase_page.dart';
 import 'package:visir_ui_showcase/app/showcase_sections.dart';
+import 'package:visir_ui_showcase/sections/visir_button_section.dart';
+import 'package:visir_ui_showcase/sections/visir_icon_button_section.dart';
 
 void main() {
   testWidgets(
@@ -47,6 +49,8 @@ void main() {
         expect(find.text(prettySectionTitle(id)), findsOneWidget);
       }
 
+      expect(find.byType(VisirButtonSection), findsOneWidget);
+      expect(find.byType(VisirIconButtonSection), findsOneWidget);
       expect(find.text('Component area coming soon'), findsWidgets);
     },
   );

@@ -7,6 +7,7 @@ import '../playground/playground_enum_picker.dart';
 import '../playground/playground_panel.dart';
 import '../playground/playground_text_field.dart';
 import '../playground/preview_frame.dart';
+import 'showcase_section_layout.dart';
 
 class VisirIconButtonSection extends StatefulWidget {
   const VisirIconButtonSection({super.key});
@@ -47,112 +48,85 @@ class _VisirIconButtonSectionState extends State<VisirIconButtonSection> {
         const SizedBox(height: 8),
         Text(
           'Compact action button for icon-led actions with enforced '
-          'semantic labeling.',
+          'semantic labeling and keyboard focus support.',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final preview = PlaygroundPanel(
-              title: 'Live Preview',
-              child: PreviewFrame(
-                child: VisirIconButton(
-                  icon: Icon(_icon.iconData),
-                  semanticLabel: _semanticLabel.trim().isEmpty
-                      ? 'Action'
-                      : _semanticLabel.trim(),
-                  onPressed: _enabled ? () {} : null,
-                  variant: _variant,
-                  size: _size,
-                  tooltip: _tooltip.trim().isEmpty ? null : _tooltip.trim(),
-                ),
+        ShowcaseSectionLayout(
+          preview: PlaygroundPanel(
+            title: 'Live Preview',
+            child: PreviewFrame(
+              child: VisirIconButton(
+                icon: Icon(_icon.iconData),
+                semanticLabel: _semanticLabel.trim().isEmpty
+                    ? 'Action'
+                    : _semanticLabel.trim(),
+                onPressed: _enabled ? () {} : null,
+                variant: _variant,
+                size: _size,
+                tooltip: _tooltip.trim().isEmpty ? null : _tooltip.trim(),
               ),
-            );
-            final controls = PlaygroundPanel(
-              title: 'Controls',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  PlaygroundTextField(
-                    label: 'Semantic Label',
-                    value: _semanticLabel,
-                    onChanged: (value) =>
-                        setState(() => _semanticLabel = value),
-                  ),
-                  const SizedBox(height: 12),
-                  PlaygroundTextField(
-                    label: 'Tooltip',
-                    value: _tooltip,
-                    hintText: 'Optional hover hint',
-                    onChanged: (value) => setState(() => _tooltip = value),
-                  ),
-                  const SizedBox(height: 12),
-                  PlaygroundEnumPicker<VisirButtonVariant>(
-                    label: 'Variant',
-                    values: VisirButtonVariant.values,
-                    value: _variant,
-                    onChanged: (value) => setState(() => _variant = value),
-                    labelBuilder: _enumLabel,
-                  ),
-                  const SizedBox(height: 12),
-                  PlaygroundEnumPicker<VisirButtonSize>(
-                    label: 'Size',
-                    values: VisirButtonSize.values,
-                    value: _size,
-                    onChanged: (value) => setState(() => _size = value),
-                    labelBuilder: _enumLabel,
-                  ),
-                  const SizedBox(height: 12),
-                  Text('Icon', style: Theme.of(context).textTheme.labelLarge),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final option in curatedIconOptions)
-                        ChoiceChip(
-                          label: Text(option.label),
-                          avatar: Icon(option.iconData, size: 16),
-                          selected: _icon.id == option.id,
-                          onSelected: (_) => setState(() => _icon = option),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  _BooleanToggle(
-                    label: 'Enabled',
-                    value: _enabled,
-                    onChanged: (value) => setState(() => _enabled = value),
-                  ),
-                ],
-              ),
-            );
-            final snippet = _SnippetPanel(code: _snippet);
-
-            if (constraints.maxWidth >= 1080) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: preview),
-                  const SizedBox(width: 16),
-                  Expanded(child: controls),
-                  const SizedBox(width: 16),
-                  Expanded(child: snippet),
-                ],
-              );
-            }
-
-            return Column(
+            ),
+          ),
+          controls: PlaygroundPanel(
+            title: 'Controls',
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                preview,
-                const SizedBox(height: 16),
-                controls,
-                const SizedBox(height: 16),
-                snippet,
+                PlaygroundTextField(
+                  label: 'Semantic Label',
+                  value: _semanticLabel,
+                  onChanged: (value) => setState(() => _semanticLabel = value),
+                ),
+                const SizedBox(height: 12),
+                PlaygroundTextField(
+                  label: 'Tooltip',
+                  value: _tooltip,
+                  hintText: 'Optional hover hint',
+                  onChanged: (value) => setState(() => _tooltip = value),
+                ),
+                const SizedBox(height: 12),
+                PlaygroundEnumPicker<VisirButtonVariant>(
+                  label: 'Variant',
+                  values: VisirButtonVariant.values,
+                  value: _variant,
+                  onChanged: (value) => setState(() => _variant = value),
+                  labelBuilder: _enumLabel,
+                ),
+                const SizedBox(height: 12),
+                PlaygroundEnumPicker<VisirButtonSize>(
+                  label: 'Size',
+                  values: VisirButtonSize.values,
+                  value: _size,
+                  onChanged: (value) => setState(() => _size = value),
+                  labelBuilder: _enumLabel,
+                ),
+                const SizedBox(height: 12),
+                Text('Icon', style: Theme.of(context).textTheme.labelLarge),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final option in curatedIconOptions)
+                      ChoiceChip(
+                        label: Text(option.label),
+                        avatar: Icon(option.iconData, size: 16),
+                        selected: _icon.id == option.id,
+                        onSelected: (_) => setState(() => _icon = option),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                _BooleanToggle(
+                  label: 'Enabled',
+                  value: _enabled,
+                  onChanged: (value) => setState(() => _enabled = value),
+                ),
               ],
-            );
-          },
+            ),
+          ),
+          snippet: _SnippetPanel(code: _snippet),
         ),
       ],
     );
