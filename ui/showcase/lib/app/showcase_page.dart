@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../sections/visir_badge_section.dart';
 import '../sections/visir_button_section.dart';
+import '../sections/visir_card_section.dart';
 import '../sections/visir_icon_button_section.dart';
+import '../sections/visir_input_section.dart';
 import 'showcase_sections.dart';
 
 const showcaseScrollViewKey = ValueKey('showcase-scroll-view');
@@ -44,6 +47,9 @@ class _ShowcasePageState extends State<ShowcasePage> {
     final Widget content = switch (id) {
       'button' => const VisirButtonSection(),
       'icon-button' => const VisirIconButtonSection(),
+      'input' => const VisirInputSection(),
+      'card' => const VisirCardSection(),
+      'badge' => const VisirBadgeSection(),
       _ => _buildPlaceholderSection(id, colors),
     };
     final description = switch (id) {
@@ -51,6 +57,12 @@ class _ShowcasePageState extends State<ShowcasePage> {
         'Compose action buttons with variants, states, and icon slots.',
       'icon-button' =>
         'Build compact icon-led actions with semantic labels and variants.',
+      'input' =>
+        'Build labeled inputs with hinting, icon affordances, and validation copy.',
+      'card' =>
+        'Compose bordered, muted, or elevated surfaces with density and tap behavior.',
+      'badge' =>
+        'Communicate status and category with semantic tones and concise labeling.',
       _ => sectionPlaceholderDescription(id),
     };
 

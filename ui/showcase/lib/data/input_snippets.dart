@@ -9,12 +9,16 @@ String buildInputSnippet({
   String? errorText,
   bool enabled = true,
 }) {
+  final safeLabel = label.trim().isEmpty ? 'Input Label' : label.trim();
+  final safeHintText = hintText?.trim();
+  final safeErrorText = errorText?.trim();
   final arguments = <String>[
-    'label: ${dartStringLiteral(label)}',
-    if (hasText(hintText)) 'hintText: ${dartStringLiteral(hintText!.trim())}',
+    'label: ${dartStringLiteral(safeLabel)}',
+    if (hasText(safeHintText)) 'hintText: ${dartStringLiteral(safeHintText!)}',
     if (prefixIcon != null) 'prefix: const Icon(${prefixIcon.iconExpression})',
     if (suffixIcon != null) 'suffix: const Icon(${suffixIcon.iconExpression})',
-    if (hasText(errorText)) 'errorText: ${dartStringLiteral(errorText!.trim())}',
+    if (hasText(safeErrorText))
+      'errorText: ${dartStringLiteral(safeErrorText!)}',
     if (!enabled) 'enabled: false',
   ];
 

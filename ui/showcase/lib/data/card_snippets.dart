@@ -8,11 +8,13 @@ String buildCardSnippet({
 }) {
   final variantName = enumName(variant);
   final densityName = enumName(density);
+  final safeChildSnippet = childSnippet.trim().isEmpty
+      ? "const Text('Card content')"
+      : childSnippet.trim();
   final arguments = <String>[
-    'child: $childSnippet',
+    'child: $safeChildSnippet',
     if (variantName != 'elevated') 'variant: VisirCardVariant.$variantName',
-    if (densityName != 'comfortable')
-      'density: VisirCardDensity.$densityName',
+    if (densityName != 'comfortable') 'density: VisirCardDensity.$densityName',
     if (isInteractive) 'onTap: () {}',
   ];
 
