@@ -5,6 +5,19 @@ import '../../../ui/visir_ui.dart';
 import '../test_ui_widget.dart';
 
 void main() {
+  test('VisirTheme.updateShouldNotify is false for equivalent data', () {
+    final oldTheme = VisirTheme(
+      data: VisirThemeData.fallback(),
+      child: const SizedBox.shrink(),
+    );
+    final newTheme = VisirTheme(
+      data: VisirThemeData.fallback(),
+      child: const SizedBox.shrink(),
+    );
+
+    expect(newTheme.updateShouldNotify(oldTheme), isFalse);
+  });
+
   testWidgets('VisirTheme.of returns fallback data without an ancestor', (
     tester,
   ) async {
@@ -26,26 +39,19 @@ void main() {
     expect(data.tokens.radius.md, 16);
   });
 
-  testWidgets('VisirTheme merges custom data over defaults', (tester) async {
+  testWidgets('VisirTheme merges custom token data over defaults', (
+    tester,
+  ) async {
     late VisirThemeData data;
+    final fallback = VisirThemeData.fallback();
 
     await tester.pumpWidget(
       makeUiTestableWidget(
         child: VisirTheme(
-          data: VisirThemeData.fallback().copyWith(
-            tokens: VisirTokens.fallback().copyWith(
-              colors: const VisirColors(
-                accent: Color(0xFFAA66FF),
-                accentStrong: Color(0xFF7B39F4),
-                surface: Color(0xCC1F1B33),
-                surfaceMuted: Color(0x9927253F),
-                surfaceOutline: Color(0x33FFFFFF),
-                text: Color(0xFFF8F7FF),
-                textMuted: Color(0xCCDBD7F3),
-                textInverse: Color(0xFF110F1C),
-                danger: Color(0xFFD94B67),
-                success: Color(0xFF3BB273),
-                warning: Color(0xFFF2A93B),
+          data: fallback.copyWith(
+            tokens: fallback.tokens.copyWith(
+              colors: fallback.tokens.colors.copyWith(
+                accent: const Color(0xFFAA66FF),
               ),
             ),
           ),
@@ -60,5 +66,7 @@ void main() {
     );
 
     expect(data.tokens.colors.accent, const Color(0xFFAA66FF));
+    expect(data.tokens.colors.text, fallback.tokens.colors.text);
+    expect(data.tokens.radius.md, fallback.tokens.radius.md);
   });
 }

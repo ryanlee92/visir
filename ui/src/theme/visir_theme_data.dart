@@ -32,4 +32,15 @@ class VisirThemeData {
       components: components ?? this.components,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is VisirThemeData &&
+            tokens == other.tokens &&
+            components == other.components;
+  }
+
+  @override
+  int get hashCode => Object.hash(tokens, components);
 }

@@ -55,4 +55,36 @@ class VisirColors {
       warning: warning ?? this.warning,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is VisirColors &&
+            accent == other.accent &&
+            accentStrong == other.accentStrong &&
+            surface == other.surface &&
+            surfaceMuted == other.surfaceMuted &&
+            surfaceOutline == other.surfaceOutline &&
+            text == other.text &&
+            textMuted == other.textMuted &&
+            textInverse == other.textInverse &&
+            danger == other.danger &&
+            success == other.success &&
+            warning == other.warning;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    accent,
+    accentStrong,
+    surface,
+    surfaceMuted,
+    surfaceOutline,
+    text,
+    textMuted,
+    textInverse,
+    danger,
+    success,
+    warning,
+  );
 }

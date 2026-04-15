@@ -58,4 +58,42 @@ class VisirTokens {
       motion: motion ?? this.motion,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is VisirTokens &&
+            colors == other.colors &&
+            spacing.xs == other.spacing.xs &&
+            spacing.sm == other.spacing.sm &&
+            spacing.md == other.spacing.md &&
+            spacing.lg == other.spacing.lg &&
+            spacing.xl == other.spacing.xl &&
+            radius.sm == other.radius.sm &&
+            radius.md == other.radius.md &&
+            radius.lg == other.radius.lg &&
+            radius.pill == other.radius.pill &&
+            motion.fast == other.motion.fast &&
+            motion.normal == other.motion.normal &&
+            motion.emphasized == other.motion.emphasized &&
+            motion.curve == other.motion.curve;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    colors,
+    spacing.xs,
+    spacing.sm,
+    spacing.md,
+    spacing.lg,
+    spacing.xl,
+    radius.sm,
+    radius.md,
+    radius.lg,
+    radius.pill,
+    motion.fast,
+    motion.normal,
+    motion.emphasized,
+    motion.curve,
+  );
 }
