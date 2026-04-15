@@ -8,7 +8,9 @@ void main() {
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(body: SingleChildScrollView(child: VisirButtonSection())),
+        home: Scaffold(
+          body: SingleChildScrollView(child: VisirButtonSection()),
+        ),
       ),
     );
 

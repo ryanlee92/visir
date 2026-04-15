@@ -103,10 +103,7 @@ class _VisirIconButtonSectionState extends State<VisirIconButtonSection> {
                     labelBuilder: _enumLabel,
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    'Icon',
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
+                  Text('Icon', style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,

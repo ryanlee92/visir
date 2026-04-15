@@ -16,7 +16,7 @@ class ShowcasePage extends StatefulWidget {
 class _ShowcasePageState extends State<ShowcasePage> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _sectionKeys = {
-    for (final id in showcaseSectionIds) id: GlobalKey()
+    for (final id in showcaseSectionIds) id: GlobalKey(),
   };
 
   @override
@@ -67,16 +67,12 @@ class _ShowcasePageState extends State<ShowcasePage> {
         children: [
           Text(
             prettySectionTitle(id),
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          Text(
-            description,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text(description, style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 16),
           content,
         ],
@@ -125,8 +121,9 @@ class _ShowcasePageState extends State<ShowcasePage> {
                 children: [
                   Text(
                     'Visir UI',
-                    style: theme.textTheme.displaySmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -159,10 +156,12 @@ class _ShowcasePageState extends State<ShowcasePage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: showcaseSectionIds
-                        .map((id) => Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: _buildSection(id, colors),
-                            ))
+                        .map(
+                          (id) => Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: _buildSection(id, colors),
+                          ),
+                        )
                         .toList(),
                   ),
                 ],
