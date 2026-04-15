@@ -5,12 +5,12 @@ class VisirEmptyState extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
-    this.action,
+    required this.action,
   });
 
   final String title;
   final String description;
-  final Widget? action;
+  final Widget action;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,8 @@ class VisirEmptyState extends StatelessWidget {
         Text(title),
         const SizedBox(height: 8),
         Text(description, textAlign: TextAlign.center),
-        if (action != null) ...[const SizedBox(height: 16), action!],
+        const SizedBox(height: 16),
+        action,
       ],
     );
   }
