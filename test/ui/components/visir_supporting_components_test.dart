@@ -254,7 +254,8 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(
       find.byWidgetPredicate(
-        (widget) => widget is SizedBox && widget.width == 20 && widget.height == 20,
+        (widget) =>
+            widget is SizedBox && widget.width == 20 && widget.height == 20,
       ),
       findsOneWidget,
     );

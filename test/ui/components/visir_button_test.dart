@@ -303,18 +303,21 @@ void main() {
     final decorationFinder = find.descendant(
       of: find.byType(VisirButton),
       matching: find.byWidgetPredicate(
-        (widget) => widget is DecoratedBox && widget.decoration is BoxDecoration,
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
       ),
     );
 
     final unfocusedDecoration =
-        tester.widget<DecoratedBox>(decorationFinder).decoration as BoxDecoration;
+        tester.widget<DecoratedBox>(decorationFinder).decoration
+            as BoxDecoration;
 
     focusNode.requestFocus();
     await tester.pumpAndSettle();
 
     final focusedDecoration =
-        tester.widget<DecoratedBox>(decorationFinder).decoration as BoxDecoration;
+        tester.widget<DecoratedBox>(decorationFinder).decoration
+            as BoxDecoration;
 
     expect(
       (unfocusedDecoration.border! as Border).top.color,

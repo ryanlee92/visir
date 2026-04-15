@@ -93,7 +93,8 @@ class _VisirButtonState extends State<VisirButton> {
     };
     final hasLabel = !widget.isIconOnly;
     final foregroundColor = _foregroundColor(theme);
-    final semanticsLabel = widget.semanticLabel ?? (hasLabel ? widget.label : null);
+    final semanticsLabel =
+        widget.semanticLabel ?? (hasLabel ? widget.label : null);
 
     final visualChild = DecoratedBox(
       decoration: _decoration(theme, disabled),
@@ -102,7 +103,9 @@ class _VisirButtonState extends State<VisirButton> {
         child: IconTheme.merge(
           data: IconThemeData(color: foregroundColor),
           child: Row(
-            mainAxisSize: widget.isExpanded ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisSize: widget.isExpanded
+                ? MainAxisSize.max
+                : MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.leading != null) widget.leading!,
@@ -170,9 +173,7 @@ class _VisirButtonState extends State<VisirButton> {
               onFocusChange: _handleFocusChange,
               onKeyEvent: disabled ? null : _handleKeyEvent,
               child: MouseRegion(
-                cursor: disabled
-                    ? MouseCursor.defer
-                    : SystemMouseCursors.click,
+                cursor: disabled ? MouseCursor.defer : SystemMouseCursors.click,
                 onEnter: disabled ? null : _handleHoverEnter,
                 onExit: disabled ? null : _handleHoverExit,
                 child: GestureDetector(
