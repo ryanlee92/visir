@@ -294,8 +294,8 @@ class _VisirButtonState extends State<VisirButton> {
     final background = switch (widget.variant) {
       VisirButtonVariant.primary => LinearGradient(
         colors: [
-          Color.lerp(colors.accent, Colors.white, isHovered ? 0.08 : 0)!,
-          Color.lerp(colors.accentStrong, Colors.white, isHovered ? 0.04 : 0)!,
+          Color.lerp(colors.accent, Colors.white, isHovered ? 0.04 : 0)!,
+          Color.lerp(colors.accentStrong, Colors.white, isHovered ? 0.02 : 0)!,
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -314,7 +314,7 @@ class _VisirButtonState extends State<VisirButton> {
                 ? colors.surfaceOutline.withValues(alpha: 0.08)
                 : Colors.transparent)
           : isDanger
-          ? colors.danger.withValues(alpha: isHovered ? 0.28 : 0.22)
+          ? colors.danger.withValues(alpha: isHovered ? 0.38 : 0.32)
           : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0)!,
       borderRadius: BorderRadius.circular(control.radius),
       border: Border.all(color: borderState.color, width: borderState.width),
