@@ -53,8 +53,6 @@ class _VisirButtonState extends State<VisirButton> {
 
   bool get _isDisabled => widget.onPressed == null || widget.isLoading;
 
-  bool get _showsInteractionFeedback => !_isDisabled && (_pressed || _hovering);
-
   FocusNode get _focusNode => widget.focusNode ?? _internalFocusNode;
 
   @override
@@ -80,17 +78,11 @@ class _VisirButtonState extends State<VisirButton> {
   @override
   Widget build(BuildContext context) {
     final theme = VisirTheme.of(context);
+    final control = theme.components.control;
     final disabled = _isDisabled;
-    final height = switch (widget.size) {
-      VisirButtonSize.sm => 36.0,
-      VisirButtonSize.md => 44.0,
-      VisirButtonSize.lg => 52.0,
-    };
-    final horizontalPadding = switch (widget.size) {
-      VisirButtonSize.sm => theme.tokens.spacing.md.toDouble(),
-      VisirButtonSize.md => theme.tokens.spacing.lg.toDouble(),
-      VisirButtonSize.lg => theme.tokens.spacing.xl.toDouble(),
-    };
+    final pressed = !disabled && _pressed;
+    final height = control.sizing.heightFor(widget.size);
+    final horizontalPadding = control.sizing.horizontalPaddingFor(widget.size);
     final hasLabel = !widget.isIconOnly;
     final foregroundColor = _foregroundColor(theme);
     final semanticsLabel =
@@ -98,36 +90,44 @@ class _VisirButtonState extends State<VisirButton> {
 
     final visualChild = DecoratedBox(
       decoration: _decoration(theme, disabled),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: IconTheme.merge(
-          data: IconThemeData(color: foregroundColor),
-          child: Row(
-            mainAxisSize: widget.isExpanded
-                ? MainAxisSize.max
-                : MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.leading != null) widget.leading!,
-              if (widget.leading != null && hasLabel) const SizedBox(width: 8),
-              if (hasLabel)
-                Flexible(
-                  child: Text(
-                    widget.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _labelStyle(theme),
-                  ),
-                ),
-              if (widget.isLoading) ...[
-                if (hasLabel) const SizedBox(width: 8),
-                VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
-              ],
-              if (widget.trailing != null) ...[
-                if (hasLabel || widget.isLoading) const SizedBox(width: 8),
-                widget.trailing!,
-              ],
-            ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(control.radius),
+        child: ColoredBox(
+          key: const ValueKey('visir-button-hover-overlay'),
+          color: _hoverOverlayColor(theme, disabled),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: IconTheme.merge(
+              data: IconThemeData(color: foregroundColor),
+              child: Row(
+                mainAxisSize: widget.isExpanded
+                    ? MainAxisSize.max
+                    : MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (widget.leading != null) widget.leading!,
+                  if (widget.leading != null && hasLabel)
+                    const SizedBox(width: 8),
+                  if (hasLabel)
+                    Flexible(
+                      child: Text(
+                        widget.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _labelStyle(theme),
+                      ),
+                    ),
+                  if (widget.isLoading) ...[
+                    if (hasLabel) const SizedBox(width: 8),
+                    VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
+                  ],
+                  if (widget.trailing != null) ...[
+                    if (hasLabel || widget.isLoading) const SizedBox(width: 8),
+                    widget.trailing!,
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -136,14 +136,12 @@ class _VisirButtonState extends State<VisirButton> {
     final animatedVisual = AnimatedOpacity(
       duration: theme.tokens.motion.normal,
       curve: theme.tokens.motion.curve,
-      opacity: disabled ? theme.components.button.disabledOpacity : 1,
+      opacity: disabled || pressed ? control.interaction.disabledOpacity : 1,
       child: TweenAnimationBuilder<double>(
         duration: theme.tokens.motion.emphasized,
         curve: theme.tokens.motion.curve,
         tween: Tween<double>(
-          end: _showsInteractionFeedback
-              ? theme.components.button.pressedScale
-              : 1,
+          end: pressed ? control.interaction.pressedScale : 1,
         ),
         builder: (context, scale, child) {
           return Transform.scale(
@@ -272,14 +270,26 @@ class _VisirButtonState extends State<VisirButton> {
   }
 
   BoxDecoration _decoration(VisirThemeData theme, bool disabled) {
+    final control = theme.components.control;
     final colors = theme.tokens.colors;
     final isPrimary = widget.variant == VisirButtonVariant.primary;
     final isGhost = widget.variant == VisirButtonVariant.ghost;
     final isDanger = widget.variant == VisirButtonVariant.danger;
+    final isHovered = !disabled && _hovering;
+    final borderState = disabled
+        ? control.borders.disabled
+        : _focused
+        ? control.borders.focus
+        : isHovered
+        ? control.borders.hover
+        : control.borders.base;
 
     final background = switch (widget.variant) {
       VisirButtonVariant.primary => LinearGradient(
-        colors: [colors.accent, colors.accentStrong],
+        colors: [
+          Color.lerp(colors.accent, Colors.white, isHovered ? 0.08 : 0)!,
+          Color.lerp(colors.accentStrong, Colors.white, isHovered ? 0.04 : 0)!,
+        ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
@@ -293,19 +303,20 @@ class _VisirButtonState extends State<VisirButton> {
       color: isPrimary
           ? null
           : isGhost
-          ? Colors.transparent
+          ? (isHovered
+                ? colors.surfaceOutline.withValues(alpha: 0.08)
+                : Colors.transparent)
           : isDanger
-          ? colors.danger.withValues(alpha: 0.22)
-          : colors.surface,
-      borderRadius: BorderRadius.circular(theme.tokens.radius.md),
-      border: Border.all(
-        color: _focused ? colors.accent : colors.surfaceOutline,
-        width: _focused ? 2 : 1,
-      ),
+          ? colors.danger.withValues(alpha: isHovered ? 0.28 : 0.22)
+          : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0)!,
+      borderRadius: BorderRadius.circular(control.radius),
+      border: Border.all(color: borderState.color, width: borderState.width),
       boxShadow: [
         if (isPrimary)
           BoxShadow(
-            color: colors.accent.withValues(alpha: disabled ? 0.08 : 0.34),
+            color: colors.accent.withValues(
+              alpha: disabled ? 0.08 : (isHovered ? 0.42 : 0.34),
+            ),
             blurRadius: theme.components.button.glowBlur,
             offset: const Offset(0, 10),
           ),
@@ -317,6 +328,21 @@ class _VisirButtonState extends State<VisirButton> {
           ),
       ],
     );
+  }
+
+  Color _hoverOverlayColor(VisirThemeData theme, bool disabled) {
+    if (disabled || !_hovering) {
+      return Colors.transparent;
+    }
+
+    final colors = theme.tokens.colors;
+
+    return switch (widget.variant) {
+      VisirButtonVariant.primary => colors.text.withValues(alpha: 0.06),
+      VisirButtonVariant.secondary => colors.text.withValues(alpha: 0.08),
+      VisirButtonVariant.ghost => colors.text.withValues(alpha: 0.03),
+      VisirButtonVariant.danger => colors.text.withValues(alpha: 0.04),
+    };
   }
 
   TextStyle _labelStyle(VisirThemeData theme) {

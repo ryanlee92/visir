@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/visir_component_role_themes.dart';
 import '../theme/visir_theme.dart';
 
 class VisirInput extends StatelessWidget {
@@ -24,7 +25,9 @@ class VisirInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = VisirTheme.of(context).tokens;
+    final theme = VisirTheme.of(context);
+    final tokens = theme.tokens;
+    final control = theme.components.control;
 
     return Material(
       color: Colors.transparent,
@@ -50,32 +53,27 @@ class VisirInput extends StatelessWidget {
           suffix: suffix,
           filled: true,
           fillColor: tokens.colors.surface,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius.md),
-            borderSide: BorderSide(color: tokens.colors.surfaceOutline),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius.md),
-            borderSide: BorderSide(color: tokens.colors.surfaceOutline),
-          ),
-          disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius.md),
-            borderSide: BorderSide(color: tokens.colors.surfaceOutline),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius.md),
-            borderSide: BorderSide(color: tokens.colors.accent),
-          ),
+          border: _border(control.radius, control.borders.base),
+          enabledBorder: _border(control.radius, control.borders.base),
+          disabledBorder: _border(control.radius, control.borders.disabled),
+          focusedBorder: _border(control.radius, control.borders.focus),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius.md),
+            borderRadius: BorderRadius.circular(control.radius),
             borderSide: BorderSide(color: tokens.colors.danger),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(tokens.radius.md),
+            borderRadius: BorderRadius.circular(control.radius),
             borderSide: BorderSide(color: tokens.colors.danger),
           ),
         ),
       ),
+    );
+  }
+
+  OutlineInputBorder _border(double radius, VisirBorderState state) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(radius),
+      borderSide: BorderSide(color: state.color, width: state.width),
     );
   }
 }

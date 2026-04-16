@@ -84,6 +84,57 @@ void main() {
     expect(decoration.suffixIcon, isNull);
   });
 
+  testWidgets('VisirInput focus border and radius follow control tokens', (
+    tester,
+  ) async {
+    const borders = VisirBorderStates(
+      base: VisirBorderState(color: Color(0xFF4263EB), width: 2),
+      hover: VisirBorderState(color: Color(0xFF4263EB), width: 2),
+      focus: VisirBorderState(color: Color(0xFFD9480F), width: 4),
+      disabled: VisirBorderState(color: Color(0xFFADB5BD), width: 2),
+    );
+    const radius = 28.0;
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        control: baseTheme.components.control.copyWith(
+          borders: borders,
+          radius: radius,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: const VisirInput(label: 'Email'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    final enabledBorder =
+        textField.decoration!.enabledBorder! as OutlineInputBorder;
+    expect(enabledBorder.borderRadius, BorderRadius.circular(radius));
+    expect(enabledBorder.borderSide.color, borders.base.color);
+    expect(enabledBorder.borderSide.width, borders.base.width);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final focusedBorder =
+        textField.decoration!.focusedBorder! as OutlineInputBorder;
+    expect(focusedBorder.borderRadius, BorderRadius.circular(radius));
+    expect(focusedBorder.borderSide.color, borders.focus.color);
+    expect(focusedBorder.borderSide.width, borders.focus.width);
+  });
+
   testWidgets('VisirCard density changes padding profile', (tester) async {
     await tester.pumpWidget(
       makeUiTestableWidget(
