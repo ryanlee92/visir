@@ -330,8 +330,12 @@ void main() {
             widget is DecoratedBox && widget.decoration is BoxDecoration,
       ),
     );
-    final smallPaddingFinder = find.descendant(
+    final smallHoverOverlayFinder = find.descendant(
       of: smallButtonFinder,
+      matching: find.byKey(const ValueKey('visir-button-hover-overlay')),
+    );
+    final smallPaddingFinder = find.descendant(
+      of: smallHoverOverlayFinder,
       matching: find.byType(Padding),
     );
     final disabledDecorationFinder = find.descendant(
@@ -342,6 +346,7 @@ void main() {
       ),
     );
 
+    expect(smallPaddingFinder, findsOneWidget);
     final smallPadding = tester.widget<Padding>(smallPaddingFinder.first);
     expect(
       smallPadding.padding,
@@ -652,7 +657,7 @@ void main() {
 
     final enabledShell = find.descendant(
       of: find.byType(VisirButton).first,
-      matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+      matching: find.byKey(const ValueKey('visir-button-shell')),
     );
     final enabledDecorationFinder = find.descendant(
       of: find.byType(VisirButton).first,
@@ -790,7 +795,7 @@ void main() {
       final center = tester.getCenter(find.text('Press me'));
       final buttonShell = find.descendant(
         of: find.byType(VisirButton),
-        matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+        matching: find.byKey(const ValueKey('visir-button-shell')),
       );
       final animatedOpacityFinder = find.descendant(
         of: find.byType(VisirButton),

@@ -81,7 +81,7 @@ class _VisirButtonState extends State<VisirButton> {
     final control = theme.components.control;
     final disabled = _isDisabled;
     final pressed = !disabled && _pressed;
-    final height = control.sizing.heightFor(widget.size);
+    final verticalPadding = control.sizing.verticalPaddingFor(widget.size);
     final horizontalPadding = control.sizing.horizontalPaddingFor(widget.size);
     final iconSpacing = control.sizing.iconSpacing;
     final hasLabel = !widget.isIconOnly;
@@ -97,7 +97,10 @@ class _VisirButtonState extends State<VisirButton> {
           key: const ValueKey('visir-button-hover-overlay'),
           color: _hoverOverlayColor(theme, disabled),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: verticalPadding,
+            ),
             child: IconTheme.merge(
               data: IconThemeData(color: foregroundColor),
               child: Row(
@@ -161,34 +164,32 @@ class _VisirButtonState extends State<VisirButton> {
     );
 
     Widget child = SizedBox(
+      key: const ValueKey('visir-button-shell'),
       width: widget.isExpanded ? double.infinity : null,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: height),
-        child: MergeSemantics(
-          child: Semantics(
-            button: true,
-            enabled: !disabled,
-            label: semanticsLabel,
-            onTap: disabled ? null : widget.onPressed,
-            child: Focus(
-              focusNode: _focusNode,
-              autofocus: !disabled && widget.autofocus,
-              canRequestFocus: !disabled,
-              skipTraversal: disabled,
-              onFocusChange: _handleFocusChange,
-              onKeyEvent: disabled ? null : _handleKeyEvent,
-              child: MouseRegion(
-                cursor: disabled ? MouseCursor.defer : SystemMouseCursors.click,
-                onEnter: disabled ? null : _handleHoverEnter,
-                onExit: disabled ? null : _handleHoverExit,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTapDown: disabled ? null : _handleTapDown,
-                  onTapCancel: disabled ? null : _handleTapCancel,
-                  onTapUp: disabled ? null : _handleTapUp,
-                  onTap: disabled ? null : widget.onPressed,
-                  child: Center(child: animatedVisual),
-                ),
+      child: MergeSemantics(
+        child: Semantics(
+          button: true,
+          enabled: !disabled,
+          label: semanticsLabel,
+          onTap: disabled ? null : widget.onPressed,
+          child: Focus(
+            focusNode: _focusNode,
+            autofocus: !disabled && widget.autofocus,
+            canRequestFocus: !disabled,
+            skipTraversal: disabled,
+            onFocusChange: _handleFocusChange,
+            onKeyEvent: disabled ? null : _handleKeyEvent,
+            child: MouseRegion(
+              cursor: disabled ? MouseCursor.defer : SystemMouseCursors.click,
+              onEnter: disabled ? null : _handleHoverEnter,
+              onExit: disabled ? null : _handleHoverExit,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: disabled ? null : _handleTapDown,
+                onTapCancel: disabled ? null : _handleTapCancel,
+                onTapUp: disabled ? null : _handleTapUp,
+                onTap: disabled ? null : widget.onPressed,
+                child: Center(child: animatedVisual),
               ),
             ),
           ),
