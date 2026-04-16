@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/visir_theme.dart';
+
 class VisirEmptyState extends StatelessWidget {
   const VisirEmptyState({
     super.key,
@@ -14,13 +16,17 @@ class VisirEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = VisirTheme.of(context);
+    final content = theme.components.content;
+    final surface = theme.components.surface;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(title),
-        const SizedBox(height: 8),
+        SizedBox(height: content.inlineSpacing),
         Text(description, textAlign: TextAlign.center),
-        const SizedBox(height: 16),
+        SizedBox(height: surface.padding.comfortable),
         action,
       ],
     );

@@ -15,24 +15,21 @@ class VisirSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = VisirTheme.of(context).tokens.colors;
+    final theme = VisirTheme.of(context);
+    final colors = theme.tokens.colors;
+    final feedback = theme.components.feedback;
     final color = switch (tone) {
       VisirSpinnerTone.neutral => colors.textMuted,
       VisirSpinnerTone.primary => colors.textInverse,
       VisirSpinnerTone.inverse => colors.text,
     };
-
-    final spinnerSize = switch (size) {
-      VisirSpinnerSize.sm => 12.0,
-      VisirSpinnerSize.md => 16.0,
-      VisirSpinnerSize.lg => 20.0,
-    };
+    final spinnerSize = feedback.sizeFor(size);
 
     return SizedBox(
       width: spinnerSize,
       height: spinnerSize,
       child: CircularProgressIndicator(
-        strokeWidth: 2,
+        strokeWidth: feedback.strokeWidth,
         valueColor: AlwaysStoppedAnimation<Color>(color),
       ),
     );
