@@ -261,6 +261,128 @@ void main() {
     expect(largeHeight, greaterThan(smallHeight));
   });
 
+  testWidgets('button sizing and border states follow control tokens', (
+    tester,
+  ) async {
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    final focusNode = FocusNode(debugLabel: 'control-token-focus');
+    addTearDown(gesture.removePointer);
+    addTearDown(focusNode.dispose);
+
+    const sizing = VisirControlSizing(
+      height: VisirControlSizeScale(sm: 40, md: 54, lg: 68),
+      horizontalPadding: VisirControlSizeScale(sm: 13, md: 21, lg: 34),
+      iconSpacing: 9,
+      compactSpacing: 5,
+    );
+    const borders = VisirBorderStates(
+      base: VisirBorderState(color: Color(0xFF1357AA), width: 3),
+      hover: VisirBorderState(color: Color(0xFF2B8A3E), width: 4),
+      focus: VisirBorderState(color: Color(0xFFE67700), width: 5),
+      disabled: VisirBorderState(color: Color(0xFF6C757D), width: 6),
+    );
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        control: baseTheme.components.control.copyWith(
+          sizing: sizing,
+          borders: borders,
+        ),
+      ),
+    );
+
+    await gesture.addPointer(location: Offset.zero);
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: VisirTheme(
+          data: themedData,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                key: const ValueKey('small-button-container'),
+                child: VisirButton(
+                  label: 'Small',
+                  size: VisirButtonSize.sm,
+                  focusNode: focusNode,
+                  onPressed: () {},
+                ),
+              ),
+              const SizedBox(height: 12),
+              const SizedBox(
+                key: ValueKey('disabled-button-container'),
+                child: VisirButton(label: 'Disabled'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final smallButtonFinder = find.byKey(
+      const ValueKey('small-button-container'),
+    );
+    final smallDecorationFinder = find.descendant(
+      of: smallButtonFinder,
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
+    );
+    final smallPaddingFinder = find.descendant(
+      of: smallButtonFinder,
+      matching: find.byType(Padding),
+    );
+    final disabledDecorationFinder = find.descendant(
+      of: find.byKey(const ValueKey('disabled-button-container')),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
+    );
+
+    expect(tester.getSize(smallButtonFinder).height, sizing.height.sm);
+
+    final smallPadding = tester.widget<Padding>(smallPaddingFinder);
+    expect(
+      (smallPadding.padding as EdgeInsets).left,
+      sizing.horizontalPadding.sm,
+    );
+    expect(
+      (smallPadding.padding as EdgeInsets).right,
+      sizing.horizontalPadding.sm,
+    );
+
+    Border borderFor(Finder finder) {
+      final decoration =
+          tester.widget<DecoratedBox>(finder).decoration as BoxDecoration;
+      return decoration.border! as Border;
+    }
+
+    var border = borderFor(smallDecorationFinder);
+    expect(border.top.color, borders.base.color);
+    expect(border.top.width, borders.base.width);
+
+    await gesture.moveTo(tester.getCenter(find.text('Small')));
+    await tester.pumpAndSettle();
+
+    border = borderFor(smallDecorationFinder);
+    expect(border.top.color, borders.hover.color);
+    expect(border.top.width, borders.hover.width);
+
+    focusNode.requestFocus();
+    await tester.pumpAndSettle();
+
+    border = borderFor(smallDecorationFinder);
+    expect(border.top.color, borders.focus.color);
+    expect(border.top.width, borders.focus.width);
+
+    final disabledBorder = borderFor(disabledDecorationFinder);
+    expect(disabledBorder.top.color, borders.disabled.color);
+    expect(disabledBorder.top.width, borders.disabled.width);
+  });
+
   testWidgets('autofocus focuses injected node and enter activates callback', (
     tester,
   ) async {
@@ -598,7 +720,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final afterOverlay = tester.widget<ColoredBox>(overlayFinder).color;
-    expect(afterOverlay.opacity, greaterThan(beforeOverlay.opacity));
+    expect(afterOverlay.a, greaterThan(beforeOverlay.a));
   });
 
   testWidgets('ghost and danger hover stay lighter than secondary hover', (
@@ -642,20 +764,24 @@ void main() {
       await gesture.moveTo(tester.getCenter(find.text(label)));
       await tester.pumpAndSettle();
 
-      return tester.widget<ColoredBox>(
-        find.descendant(
-          of: buttonFinder,
-          matching: find.byKey(const ValueKey('visir-button-hover-overlay')),
-        ),
-      ).color;
+      return tester
+          .widget<ColoredBox>(
+            find.descendant(
+              of: buttonFinder,
+              matching: find.byKey(
+                const ValueKey('visir-button-hover-overlay'),
+              ),
+            ),
+          )
+          .color;
     }
 
     final secondaryOverlay = await hoverOverlayFor('Secondary hover');
     final ghostOverlay = await hoverOverlayFor('Ghost hover');
     final dangerOverlay = await hoverOverlayFor('Danger hover');
 
-    expect(ghostOverlay.opacity, lessThan(secondaryOverlay.opacity));
-    expect(dangerOverlay.opacity, lessThan(secondaryOverlay.opacity));
+    expect(ghostOverlay.a, lessThan(secondaryOverlay.a));
+    expect(dangerOverlay.a, lessThan(secondaryOverlay.a));
   });
 
   testWidgets(
@@ -694,7 +820,10 @@ void main() {
       expect(shellPressed, shellBefore);
       expect(textPressed.width, lessThan(textBefore.width));
       expect(textPressed.height, lessThan(textBefore.height));
-      expect(opacityPressed, lessThan(opacityBefore));
+      expect(
+        opacityPressed,
+        VisirThemeData.fallback().components.control.interaction.pressedOpacity,
+      );
 
       await gesture.up();
       await tester.pumpAndSettle();

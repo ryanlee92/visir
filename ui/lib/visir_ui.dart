@@ -4,6 +4,7 @@ export 'src/foundation/visir_motion.dart';
 export 'src/foundation/visir_radius.dart';
 export 'src/foundation/visir_spacing.dart';
 export 'src/foundation/visir_tokens.dart';
+export 'src/theme/visir_component_role_themes.dart';
 export 'src/theme/visir_component_themes.dart';
 export 'src/theme/visir_theme.dart';
 export 'src/theme/visir_theme_data.dart';

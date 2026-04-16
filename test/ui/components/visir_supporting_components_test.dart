@@ -84,6 +84,57 @@ void main() {
     expect(decoration.suffixIcon, isNull);
   });
 
+  testWidgets('VisirInput focus border and radius follow control tokens', (
+    tester,
+  ) async {
+    const borders = VisirBorderStates(
+      base: VisirBorderState(color: Color(0xFF4263EB), width: 2),
+      hover: VisirBorderState(color: Color(0xFF4263EB), width: 2),
+      focus: VisirBorderState(color: Color(0xFFD9480F), width: 4),
+      disabled: VisirBorderState(color: Color(0xFFADB5BD), width: 2),
+    );
+    const radius = 28.0;
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        control: baseTheme.components.control.copyWith(
+          borders: borders,
+          radius: radius,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: const VisirInput(label: 'Email'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final textField = tester.widget<TextField>(find.byType(TextField));
+    final enabledBorder =
+        textField.decoration!.enabledBorder! as OutlineInputBorder;
+    expect(enabledBorder.borderRadius, BorderRadius.circular(radius));
+    expect(enabledBorder.borderSide.color, borders.base.color);
+    expect(enabledBorder.borderSide.width, borders.base.width);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final focusedBorder =
+        textField.decoration!.focusedBorder! as OutlineInputBorder;
+    expect(focusedBorder.borderRadius, BorderRadius.circular(radius));
+    expect(focusedBorder.borderSide.color, borders.focus.color);
+    expect(focusedBorder.borderSide.width, borders.focus.width);
+  });
+
   testWidgets('VisirCard density changes padding profile', (tester) async {
     await tester.pumpWidget(
       makeUiTestableWidget(
@@ -116,12 +167,173 @@ void main() {
     expect(spacious.height, greaterThan(compact.height));
   });
 
+  testWidgets(
+    'VisirCard reads surface role tokens for padding and decoration',
+    (tester) async {
+      const borders = VisirBorderStates(
+        base: VisirBorderState(color: Color(0xFF2B8A3E), width: 3),
+        hover: VisirBorderState(color: Color(0xFF2B8A3E), width: 3),
+        focus: VisirBorderState(color: Color(0xFFC92A2A), width: 5),
+        disabled: VisirBorderState(color: Color(0xFF868E96), width: 2),
+      );
+      const elevation = VisirSurfaceElevation(
+        baseBlur: 9,
+        baseOffsetY: 7,
+        baseOpacity: 0.41,
+        focusBlur: 13,
+        focusSpread: 4,
+        focusOpacity: 0.67,
+      );
+      final baseTheme = VisirThemeData.fallback();
+      final themedData = baseTheme.copyWith(
+        components: baseTheme.components.copyWith(
+          surface: baseTheme.components.surface.copyWith(
+            padding: const VisirSurfaceDensityScale(
+              compact: 14,
+              comfortable: 18,
+              spacious: 26,
+            ),
+            radius: 31,
+            borders: borders,
+            elevation: elevation,
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Directionality(
+              textDirection: TextDirection.ltr,
+              child: VisirTheme(
+                data: themedData,
+                child: VisirCard(
+                  onTap: () {},
+                  density: VisirCardDensity.compact,
+                  child: const Text('Token card'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final decorationFinder = find.descendant(
+        of: find.byType(VisirCard),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is Container && widget.decoration is BoxDecoration,
+        ),
+      );
+      final unfocusedContainer = tester.widget<Container>(decorationFinder);
+      final unfocusedDecoration =
+          unfocusedContainer.decoration! as BoxDecoration;
+
+      expect(unfocusedContainer.padding, const EdgeInsets.all(14));
+      expect(unfocusedDecoration.borderRadius, BorderRadius.circular(31));
+      expect(
+        (unfocusedDecoration.border! as Border).top.color,
+        borders.base.color,
+      );
+      expect(
+        (unfocusedDecoration.border! as Border).top.width,
+        borders.base.width,
+      );
+      expect(unfocusedDecoration.boxShadow, hasLength(1));
+      expect(
+        unfocusedDecoration.boxShadow!.single.blurRadius,
+        elevation.baseBlur,
+      );
+      expect(
+        unfocusedDecoration.boxShadow!.single.offset.dy,
+        elevation.baseOffsetY,
+      );
+      expect(
+        unfocusedDecoration.boxShadow!.single.color,
+        themedData.tokens.colors.accent.withValues(
+          alpha: elevation.baseOpacity,
+        ),
+      );
+
+      final focusNode = Focus.of(tester.element(find.text('Token card')));
+      focusNode.requestFocus();
+      await tester.pump();
+
+      final focusedDecoration =
+          tester.widget<Container>(decorationFinder).decoration!
+              as BoxDecoration;
+
+      expect(
+        (focusedDecoration.border! as Border).top.color,
+        borders.focus.color,
+      );
+      expect(
+        (focusedDecoration.border! as Border).top.width,
+        borders.focus.width,
+      );
+      expect(focusedDecoration.boxShadow, hasLength(2));
+      expect(focusedDecoration.boxShadow!.last.blurRadius, elevation.focusBlur);
+      expect(
+        focusedDecoration.boxShadow!.last.spreadRadius,
+        elevation.focusSpread,
+      );
+      expect(
+        focusedDecoration.boxShadow!.last.color,
+        themedData.tokens.colors.accent.withValues(
+          alpha: elevation.focusOpacity,
+        ),
+      );
+    },
+  );
+
   testWidgets('VisirBadge shows label', (tester) async {
     await tester.pumpWidget(
       makeUiTestableWidget(child: const VisirBadge(label: 'Beta')),
     );
 
     expect(find.text('Beta'), findsOneWidget);
+  });
+
+  testWidgets('VisirBadge reads content role tokens for padding and radius', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        content: baseTheme.components.content.copyWith(
+          paddingHorizontal: 21,
+          paddingVertical: 9,
+          radius: 17,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: const VisirBadge(label: 'Beta'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final container = tester.widget<Container>(
+      find.descendant(
+        of: find.byType(VisirBadge),
+        matching: find.byType(Container),
+      ),
+    );
+    final decoration = container.decoration! as BoxDecoration;
+
+    expect(
+      container.padding,
+      const EdgeInsets.symmetric(horizontal: 21, vertical: 9),
+    );
+    expect(decoration.borderRadius, BorderRadius.circular(17));
   });
 
   testWidgets(
@@ -226,6 +438,50 @@ void main() {
     expect(find.text('Panel body'), findsOneWidget);
   });
 
+  testWidgets('VisirSection reads spacing from surface role tokens', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        surface: baseTheme.components.surface.copyWith(
+          padding: const VisirSurfaceDensityScale(
+            compact: 23,
+            comfortable: 16,
+            spacious: 24,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: const VisirSection(
+                title: 'Workspace',
+                child: Text('Panel body'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.descendant(
+        of: find.byType(VisirSection),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is SizedBox && widget.height == 23,
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('VisirDivider renders a 1px line across available width', (
     tester,
   ) async {
@@ -247,6 +503,55 @@ void main() {
     expect(sizedBox.height, 1);
   });
 
+  testWidgets('VisirDivider reads surface border tokens for line thickness', (
+    tester,
+  ) async {
+    const borders = VisirBorderStates(
+      base: VisirBorderState(color: Color(0xFF5C7CFA), width: 3),
+      hover: VisirBorderState(color: Color(0xFF5C7CFA), width: 3),
+      focus: VisirBorderState(color: Color(0xFF5C7CFA), width: 3),
+      disabled: VisirBorderState(color: Color(0xFFADB5BD), width: 1),
+    );
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        surface: baseTheme.components.surface.copyWith(borders: borders),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: const SizedBox(width: 200, child: VisirDivider()),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final sizedBox = tester.widget<SizedBox>(
+      find.descendant(
+        of: find.byType(VisirDivider),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is SizedBox && widget.height == borders.base.width,
+        ),
+      ),
+    );
+    final coloredBox = tester.widget<ColoredBox>(
+      find.descendant(
+        of: find.byType(VisirDivider),
+        matching: find.byType(ColoredBox),
+      ),
+    );
+
+    expect(sizedBox.height, borders.base.width);
+    expect(coloredBox.color, borders.base.color);
+  });
+
   testWidgets('VisirSpinner renders circular progress with expected size', (
     tester,
   ) async {
@@ -266,6 +571,48 @@ void main() {
     );
   });
 
+  testWidgets('VisirSpinner reads feedback role tokens for size and stroke', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        feedback: baseTheme.components.feedback.copyWith(
+          size: const VisirFeedbackSizeScale(sm: 15, md: 19, lg: 27),
+          strokeWidth: 5,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: const VisirSpinner(size: VisirSpinnerSize.lg),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final sizedBox = tester.widget<SizedBox>(
+      find.descendant(
+        of: find.byType(VisirSpinner),
+        matching: find.byType(SizedBox),
+      ),
+    );
+    final progress = tester.widget<CircularProgressIndicator>(
+      find.byType(CircularProgressIndicator),
+    );
+
+    expect(sizedBox.width, 27);
+    expect(sizedBox.height, 27);
+    expect(progress.strokeWidth, 5);
+  });
+
   testWidgets('VisirEmptyState renders title description and action', (
     tester,
   ) async {
@@ -282,5 +629,53 @@ void main() {
     expect(find.text('No tasks'), findsOneWidget);
     expect(find.text('Create one to get started'), findsOneWidget);
     expect(find.text('Create'), findsOneWidget);
+  });
+
+  testWidgets('VisirEmptyState reads content and surface spacing tokens', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      components: baseTheme.components.copyWith(
+        surface: baseTheme.components.surface.copyWith(
+          padding: const VisirSurfaceDensityScale(
+            compact: 12,
+            comfortable: 27,
+            spacious: 24,
+          ),
+        ),
+        content: baseTheme.components.content.copyWith(inlineSpacing: 11),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: VisirTheme(
+              data: themedData,
+              child: VisirEmptyState(
+                title: 'No tasks',
+                description: 'Create one to get started',
+                action: VisirButton(label: 'Create', onPressed: () {}),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gaps = tester
+        .widgetList<SizedBox>(
+          find.descendant(
+            of: find.byType(VisirEmptyState),
+            matching: find.byType(SizedBox),
+          ),
+        )
+        .map((widget) => widget.height)
+        .toList();
+
+    expect(gaps, containsAll(<double?>[11, 27]));
   });
 }

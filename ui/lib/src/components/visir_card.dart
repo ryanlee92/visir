@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../foundation/visir_enums.dart';
 import '../foundation/visir_tokens.dart';
+import '../theme/visir_component_role_themes.dart';
 import '../theme/visir_theme.dart';
 
 class VisirCard extends StatefulWidget {
@@ -28,15 +29,23 @@ class _VisirCardState extends State<VisirCard> {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = VisirTheme.of(context).tokens;
+    final theme = VisirTheme.of(context);
+    final tokens = theme.tokens;
+    final surface = theme.components.surface;
     final padding = switch (widget.density) {
-      VisirCardDensity.compact => EdgeInsets.all(tokens.spacing.md),
-      VisirCardDensity.comfortable => EdgeInsets.all(tokens.spacing.lg),
-      VisirCardDensity.spacious => EdgeInsets.all(tokens.spacing.xl),
+      VisirCardDensity.compact => EdgeInsets.all(surface.padding.compact),
+      VisirCardDensity.comfortable => EdgeInsets.all(
+        surface.padding.comfortable,
+      ),
+      VisirCardDensity.spacious => EdgeInsets.all(surface.padding.spacious),
     };
 
     final isInteractive = widget.onTap != null;
-    final decoration = _buildDecoration(tokens, isInteractive && _focused);
+    final decoration = _buildDecoration(
+      tokens,
+      surface,
+      isInteractive && _focused,
+    );
     final body = Container(
       padding: padding,
       decoration: decoration,
@@ -86,13 +95,19 @@ class _VisirCardState extends State<VisirCard> {
     return KeyEventResult.ignored;
   }
 
-  BoxDecoration _buildDecoration(VisirTokens tokens, bool focused) {
+  BoxDecoration _buildDecoration(
+    VisirTokens tokens,
+    VisirSurfaceThemeData surface,
+    bool focused,
+  ) {
     final baseShadows = widget.variant == VisirCardVariant.elevated
         ? [
             BoxShadow(
-              color: tokens.colors.accent.withValues(alpha: 0.18),
-              blurRadius: 18,
-              offset: const Offset(0, 12),
+              color: tokens.colors.accent.withValues(
+                alpha: surface.elevation.baseOpacity,
+              ),
+              blurRadius: surface.elevation.baseBlur,
+              offset: Offset(0, surface.elevation.baseOffsetY),
             ),
           ]
         : const <BoxShadow>[];
@@ -100,12 +115,15 @@ class _VisirCardState extends State<VisirCard> {
         ? [
             ...baseShadows,
             BoxShadow(
-              color: tokens.colors.accent.withValues(alpha: 0.3),
-              blurRadius: 20,
-              spreadRadius: 1,
+              color: tokens.colors.accent.withValues(
+                alpha: surface.elevation.focusOpacity,
+              ),
+              blurRadius: surface.elevation.focusBlur,
+              spreadRadius: surface.elevation.focusSpread,
             ),
           ]
         : baseShadows;
+    final borderState = focused ? surface.borders.focus : surface.borders.base;
 
     return BoxDecoration(
       color: switch (widget.variant) {
@@ -113,11 +131,8 @@ class _VisirCardState extends State<VisirCard> {
         VisirCardVariant.muted => tokens.colors.surfaceMuted,
         VisirCardVariant.outlined => Colors.transparent,
       },
-      borderRadius: BorderRadius.circular(tokens.radius.lg),
-      border: Border.all(
-        color: focused ? tokens.colors.accent : tokens.colors.surfaceOutline,
-        width: focused ? 2 : 1,
-      ),
+      borderRadius: BorderRadius.circular(surface.radius),
+      border: Border.all(color: borderState.color, width: borderState.width),
       boxShadow: shadows,
     );
   }

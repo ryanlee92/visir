@@ -7,11 +7,13 @@ class VisirDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final border = VisirTheme.of(context).components.surface.borders.base;
+
     return SizedBox(
       width: double.infinity,
       child: ColoredBox(
-        color: VisirTheme.of(context).tokens.colors.surfaceOutline,
-        child: const SizedBox(height: 1),
+        color: border.color,
+        child: SizedBox(height: border.width),
       ),
     );
   }

@@ -15,7 +15,9 @@ class VisirBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = VisirTheme.of(context).tokens.colors;
+    final theme = VisirTheme.of(context);
+    final colors = theme.tokens.colors;
+    final content = theme.components.content;
     final background = switch (tone) {
       VisirBadgeTone.neutral => colors.surfaceMuted,
       VisirBadgeTone.primary => colors.accent.withValues(alpha: 0.22),
@@ -25,10 +27,13 @@ class VisirBadge extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: content.paddingHorizontal,
+        vertical: content.paddingVertical,
+      ),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(content.radius),
       ),
       child: Text(label),
     );
