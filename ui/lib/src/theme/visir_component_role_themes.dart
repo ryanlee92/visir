@@ -127,9 +127,6 @@ class VisirControlSizing {
   final double iconSpacing;
   final double compactSpacing;
 
-  @Deprecated('Use verticalPaddingFor instead.')
-  double heightFor(VisirButtonSize size) => verticalPaddingFor(size);
-
   double verticalPaddingFor(VisirButtonSize size) =>
       verticalPadding.resolve(size);
   double horizontalPaddingFor(VisirButtonSize size) =>
