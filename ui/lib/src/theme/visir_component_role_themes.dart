@@ -168,26 +168,62 @@ class VisirControlSizing {
 }
 
 @immutable
+class VisirControlInteractionThemeData {
+  const VisirControlInteractionThemeData({
+    required this.pressedScale,
+    required this.disabledOpacity,
+  });
+
+  final double pressedScale;
+  final double disabledOpacity;
+
+  VisirControlInteractionThemeData copyWith({
+    double? pressedScale,
+    double? disabledOpacity,
+  }) {
+    return VisirControlInteractionThemeData(
+      pressedScale: pressedScale ?? this.pressedScale,
+      disabledOpacity: disabledOpacity ?? this.disabledOpacity,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is VisirControlInteractionThemeData &&
+            pressedScale == other.pressedScale &&
+            disabledOpacity == other.disabledOpacity;
+  }
+
+  @override
+  int get hashCode => Object.hash(pressedScale, disabledOpacity);
+}
+
+@immutable
 class VisirControlThemeData {
   const VisirControlThemeData({
     required this.sizing,
     required this.borders,
     required this.radius,
+    required this.interaction,
   });
 
   final VisirControlSizing sizing;
   final VisirBorderStates borders;
   final double radius;
+  final VisirControlInteractionThemeData interaction;
 
   VisirControlThemeData copyWith({
     VisirControlSizing? sizing,
     VisirBorderStates? borders,
     double? radius,
+    VisirControlInteractionThemeData? interaction,
   }) {
     return VisirControlThemeData(
       sizing: sizing ?? this.sizing,
       borders: borders ?? this.borders,
       radius: radius ?? this.radius,
+      interaction: interaction ?? this.interaction,
     );
   }
 
@@ -197,11 +233,12 @@ class VisirControlThemeData {
         other is VisirControlThemeData &&
             sizing == other.sizing &&
             borders == other.borders &&
-            radius == other.radius;
+            radius == other.radius &&
+            interaction == other.interaction;
   }
 
   @override
-  int get hashCode => Object.hash(sizing, borders, radius);
+  int get hashCode => Object.hash(sizing, borders, radius, interaction);
 }
 
 @immutable

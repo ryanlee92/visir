@@ -43,6 +43,111 @@ void main() {
     expect(updated.hover.width, 3);
   });
 
+  test('VisirControlThemeData copyWith preserves values and updates equality', () {
+    const interaction = VisirControlInteractionThemeData(
+      pressedScale: 0.96,
+      disabledOpacity: 0.45,
+    );
+    const control = VisirControlThemeData(
+      sizing: VisirControlSizing(
+        height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+        horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
+        iconSpacing: 6,
+        compactSpacing: 4,
+      ),
+      borders: VisirBorderStates(
+        base: VisirBorderState(color: Colors.white, width: 1),
+        hover: VisirBorderState(color: Colors.white, width: 1),
+        focus: VisirBorderState(color: Colors.blue, width: 2),
+        disabled: VisirBorderState(color: Colors.grey, width: 1),
+      ),
+      radius: 12,
+      interaction: interaction,
+    );
+
+    final updated = control.copyWith(
+      interaction: interaction.copyWith(pressedScale: 0.9),
+    );
+
+    expect(control.copyWith(), control);
+    expect(updated, isNot(control));
+    expect(updated.interaction.pressedScale, 0.9);
+    expect(updated.sizing, control.sizing);
+  });
+
+  test('VisirComponentThemes copyWith syncs control interaction tokens', () {
+    const interaction = VisirControlInteractionThemeData(
+      pressedScale: 0.96,
+      disabledOpacity: 0.45,
+    );
+    const control = VisirControlThemeData(
+      sizing: VisirControlSizing(
+        height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+        horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
+        iconSpacing: 6,
+        compactSpacing: 4,
+      ),
+      borders: VisirBorderStates(
+        base: VisirBorderState(color: Colors.white, width: 1),
+        hover: VisirBorderState(color: Colors.white, width: 1),
+        focus: VisirBorderState(color: Colors.blue, width: 2),
+        disabled: VisirBorderState(color: Colors.grey, width: 1),
+      ),
+      radius: 12,
+      interaction: interaction,
+    );
+    final themes = VisirComponentThemes(
+      button: const VisirButtonThemeData(glowBlur: 24, interaction: interaction),
+      control: control,
+      surface: const VisirSurfaceThemeData(
+        padding: VisirSurfaceDensityScale(
+          compact: 8,
+          comfortable: 12,
+          spacious: 16,
+        ),
+        radius: 20,
+        borders: VisirBorderStates(
+          base: VisirBorderState(color: Colors.white, width: 1),
+          hover: VisirBorderState(color: Colors.white, width: 1),
+          focus: VisirBorderState(color: Colors.blue, width: 2),
+          disabled: VisirBorderState(color: Colors.grey, width: 1),
+        ),
+        elevation: const VisirSurfaceElevation(
+          baseBlur: 18,
+          baseOffsetY: 12,
+          baseOpacity: 0.18,
+          focusBlur: 20,
+          focusSpread: 1,
+          focusOpacity: 0.3,
+        ),
+      ),
+      content: const VisirContentThemeData(
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        radius: 999,
+        inlineSpacing: 8,
+        compactSpacing: 4,
+      ),
+      feedback: const VisirFeedbackThemeData(
+        size: VisirFeedbackSizeScale(sm: 12, md: 16, lg: 20),
+        strokeWidth: 2,
+        emphasisMuted: 0.6,
+        emphasisStrong: 1,
+      ),
+    );
+
+    final updated = themes.copyWith(
+      control: control.copyWith(
+        interaction: interaction.copyWith(pressedScale: 0.9),
+      ),
+    );
+
+    expect(themes.copyWith(), themes);
+    expect(updated, isNot(themes));
+    expect(updated.control.interaction.pressedScale, 0.9);
+    expect(updated.button.pressedScale, 0.9);
+  });
+
   test('VisirThemeData fallback exposes role-based component themes', () {
     final fallback = VisirThemeData.fallback();
 

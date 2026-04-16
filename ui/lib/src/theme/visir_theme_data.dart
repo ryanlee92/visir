@@ -13,14 +13,17 @@ class VisirThemeData {
 
   factory VisirThemeData.fallback() {
     final tokens = VisirTokens.fallback();
+    const interaction = VisirControlInteractionThemeData(
+      pressedScale: 0.96,
+      disabledOpacity: 0.45,
+    );
 
     return VisirThemeData(
       tokens: tokens,
       components: VisirComponentThemes(
         button: const VisirButtonThemeData(
           glowBlur: 24,
-          pressedScale: 0.96,
-          disabledOpacity: 0.45,
+          interaction: interaction,
         ),
         control: VisirControlThemeData(
           sizing: VisirControlSizing(
@@ -52,6 +55,7 @@ class VisirThemeData {
             ),
           ),
           radius: tokens.radius.md,
+          interaction: interaction,
         ),
         surface: VisirSurfaceThemeData(
           padding: VisirSurfaceDensityScale(

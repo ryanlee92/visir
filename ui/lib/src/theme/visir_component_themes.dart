@@ -6,23 +6,22 @@ import 'visir_component_role_themes.dart';
 class VisirButtonThemeData {
   const VisirButtonThemeData({
     required this.glowBlur,
-    required this.pressedScale,
-    required this.disabledOpacity,
+    required this.interaction,
   });
 
   final double glowBlur;
-  final double pressedScale;
-  final double disabledOpacity;
+  final VisirControlInteractionThemeData interaction;
+
+  double get pressedScale => interaction.pressedScale;
+  double get disabledOpacity => interaction.disabledOpacity;
 
   VisirButtonThemeData copyWith({
     double? glowBlur,
-    double? pressedScale,
-    double? disabledOpacity,
+    VisirControlInteractionThemeData? interaction,
   }) {
     return VisirButtonThemeData(
       glowBlur: glowBlur ?? this.glowBlur,
-      pressedScale: pressedScale ?? this.pressedScale,
-      disabledOpacity: disabledOpacity ?? this.disabledOpacity,
+      interaction: interaction ?? this.interaction,
     );
   }
 
@@ -31,12 +30,11 @@ class VisirButtonThemeData {
     return identical(this, other) ||
         other is VisirButtonThemeData &&
             glowBlur == other.glowBlur &&
-            pressedScale == other.pressedScale &&
-            disabledOpacity == other.disabledOpacity;
+            interaction == other.interaction;
   }
 
   @override
-  int get hashCode => Object.hash(glowBlur, pressedScale, disabledOpacity);
+  int get hashCode => Object.hash(glowBlur, interaction);
 }
 
 @immutable
@@ -62,9 +60,14 @@ class VisirComponentThemes {
     VisirContentThemeData? content,
     VisirFeedbackThemeData? feedback,
   }) {
+    final resolvedControl = control ?? this.control;
+    final resolvedButton = (button ?? this.button).copyWith(
+      interaction: resolvedControl.interaction,
+    );
+
     return VisirComponentThemes(
-      button: button ?? this.button,
-      control: control ?? this.control,
+      button: resolvedButton,
+      control: resolvedControl,
       surface: surface ?? this.surface,
       content: content ?? this.content,
       feedback: feedback ?? this.feedback,
