@@ -515,7 +515,7 @@ void main() {
     expect(lastFocusNode.hasPrimaryFocus, isTrue);
   });
 
-  testWidgets('hover feedback only changes enabled button visuals', (
+  testWidgets('hover feedback changes decoration without pressing scale', (
     tester,
   ) async {
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
@@ -538,8 +538,18 @@ void main() {
       of: find.byType(VisirButton).first,
       matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
     );
+    final enabledDecorationFinder = find.descendant(
+      of: find.byType(VisirButton).first,
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
+    );
     final enabledBefore = tester.getRect(enabledShell);
     final enabledTextBefore = tester.getRect(find.text('Enabled hover'));
+    final enabledDecorationBefore =
+        tester.widget<DecoratedBox>(enabledDecorationFinder).decoration
+            as BoxDecoration;
     final disabledBefore = tester.getRect(find.text('Disabled hover'));
 
     await gesture.moveTo(tester.getCenter(find.text('Enabled hover')));
@@ -547,9 +557,12 @@ void main() {
 
     final enabledAfter = tester.getRect(enabledShell);
     final enabledTextAfter = tester.getRect(find.text('Enabled hover'));
+    final enabledDecorationAfter =
+        tester.widget<DecoratedBox>(enabledDecorationFinder).decoration
+            as BoxDecoration;
     expect(enabledAfter, enabledBefore);
-    expect(enabledTextAfter.width, lessThan(enabledTextBefore.width));
-    expect(enabledTextAfter.height, lessThan(enabledTextBefore.height));
+    expect(enabledTextAfter, enabledTextBefore);
+    expect(enabledDecorationAfter, isNot(enabledDecorationBefore));
 
     await gesture.moveTo(tester.getCenter(find.text('Disabled hover')));
     await tester.pumpAndSettle();
@@ -558,38 +571,155 @@ void main() {
     expect(disabledAfter, disabledBefore);
   });
 
-  testWidgets('press feedback shrinks and then restores enabled button', (
+  testWidgets('secondary hover uses stronger legacy-style overlay treatment', (
     tester,
   ) async {
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+
+    await gesture.addPointer(location: Offset.zero);
     await tester.pumpWidget(
       makeUiTestableWidget(
-        child: VisirButton(label: 'Press me', onPressed: () {}),
+        child: VisirButton(
+          label: 'Secondary hover',
+          variant: VisirButtonVariant.secondary,
+          onPressed: () {},
+        ),
       ),
     );
 
-    final center = tester.getCenter(find.text('Press me'));
-    final buttonShell = find.descendant(
+    final decorationFinder = find.descendant(
       of: find.byType(VisirButton),
-      matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
     );
-    final shellBefore = tester.getRect(buttonShell);
-    final textBefore = tester.getRect(find.text('Press me'));
+    final overlayFinder = find.byKey(
+      const ValueKey('visir-button-hover-overlay'),
+    );
 
-    final gesture = await tester.startGesture(center);
+    final beforeDecoration =
+        tester.widget<DecoratedBox>(decorationFinder).decoration
+            as BoxDecoration;
+    final beforeOverlay = tester.widget<ColoredBox>(overlayFinder).color;
+
+    await gesture.moveTo(tester.getCenter(find.text('Secondary hover')));
     await tester.pumpAndSettle();
 
-    final shellPressed = tester.getRect(buttonShell);
-    final textPressed = tester.getRect(find.text('Press me'));
-    expect(shellPressed, shellBefore);
-    expect(textPressed.width, lessThan(textBefore.width));
-    expect(textPressed.height, lessThan(textBefore.height));
+    final afterDecoration =
+        tester.widget<DecoratedBox>(decorationFinder).decoration
+            as BoxDecoration;
+    final afterOverlay = tester.widget<ColoredBox>(overlayFinder).color;
 
-    await gesture.up();
-    await tester.pumpAndSettle();
-
-    final shellAfter = tester.getRect(buttonShell);
-    final textAfter = tester.getRect(find.text('Press me'));
-    expect(shellAfter, shellBefore);
-    expect(textAfter, textBefore);
+    expect(afterDecoration, isNot(beforeDecoration));
+    expect(afterOverlay.opacity, greaterThan(beforeOverlay.opacity));
   });
+
+  testWidgets('ghost and danger hover stay lighter than secondary hover', (
+    tester,
+  ) async {
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+
+    await gesture.addPointer(location: Offset.zero);
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            VisirButton(
+              label: 'Secondary hover',
+              variant: VisirButtonVariant.secondary,
+              onPressed: () {},
+            ),
+            VisirButton(
+              label: 'Ghost hover',
+              variant: VisirButtonVariant.ghost,
+              onPressed: () {},
+            ),
+            VisirButton(
+              label: 'Danger hover',
+              variant: VisirButtonVariant.danger,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+
+    Future<Color> hoverOverlayFor(String label) async {
+      await gesture.moveTo(tester.getCenter(find.text(label)));
+      await tester.pumpAndSettle();
+
+      return tester.widgetList<ColoredBox>(
+        find.byKey(const ValueKey('visir-button-hover-overlay')),
+      ).elementAt(
+        switch (label) {
+          'Secondary hover' => 0,
+          'Ghost hover' => 1,
+          _ => 2,
+        },
+      ).color;
+    }
+
+    final secondaryOverlay = await hoverOverlayFor('Secondary hover');
+    final ghostOverlay = await hoverOverlayFor('Ghost hover');
+    final dangerOverlay = await hoverOverlayFor('Danger hover');
+
+    expect(ghostOverlay.opacity, lessThan(secondaryOverlay.opacity));
+    expect(dangerOverlay.opacity, lessThan(secondaryOverlay.opacity));
+  });
+
+  testWidgets(
+    'press feedback shrinks, dims, and then restores enabled button',
+    (tester) async {
+      await tester.pumpWidget(
+        makeUiTestableWidget(
+          child: VisirButton(label: 'Press me', onPressed: () {}),
+        ),
+      );
+
+      final center = tester.getCenter(find.text('Press me'));
+      final buttonShell = find.descendant(
+        of: find.byType(VisirButton),
+        matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+      );
+      final animatedOpacityFinder = find.descendant(
+        of: find.byType(VisirButton),
+        matching: find.byType(AnimatedOpacity),
+      );
+      final shellBefore = tester.getRect(buttonShell);
+      final textBefore = tester.getRect(find.text('Press me'));
+      final opacityBefore = tester
+          .widget<AnimatedOpacity>(animatedOpacityFinder)
+          .opacity;
+      expect(opacityBefore, 1);
+
+      final gesture = await tester.startGesture(center);
+      await tester.pumpAndSettle();
+
+      final shellPressed = tester.getRect(buttonShell);
+      final textPressed = tester.getRect(find.text('Press me'));
+      final opacityPressed = tester
+          .widget<AnimatedOpacity>(animatedOpacityFinder)
+          .opacity;
+      expect(shellPressed, shellBefore);
+      expect(textPressed.width, lessThan(textBefore.width));
+      expect(textPressed.height, lessThan(textBefore.height));
+      expect(opacityPressed, lessThan(opacityBefore));
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      final shellAfter = tester.getRect(buttonShell);
+      final textAfter = tester.getRect(find.text('Press me'));
+      final opacityAfter = tester
+          .widget<AnimatedOpacity>(animatedOpacityFinder)
+          .opacity;
+      expect(shellAfter, shellBefore);
+      expect(textAfter, textBefore);
+      expect(opacityAfter, opacityBefore);
+    },
+  );
 }
