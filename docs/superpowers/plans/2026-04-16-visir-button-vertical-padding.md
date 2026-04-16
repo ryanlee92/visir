@@ -267,9 +267,9 @@ git commit -m "feat: make visir button sizing padding driven"
 Run: `dart format ui/lib/src/theme/visir_component_role_themes.dart ui/lib/src/theme/visir_theme_data.dart ui/lib/src/components/visir_button.dart test/ui/components/visir_button_test.dart`
 Expected: Formatter exits successfully.
 
-- [ ] **Step 2: Run analysis**
+- [ ] **Step 2: Run analysis for the root `visir_ui` package only**
 
-Run: `dart analyze ui test/ui`
+Run: `dart analyze ui/lib test/ui`
 Expected: `No issues found!`
 
 - [ ] **Step 3: Run focused button tests**
