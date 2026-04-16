@@ -118,28 +118,34 @@ void main() {
   testWidgets(
     'primary button uses clear white foreground for label, icon, and spinner',
     (tester) async {
+      final theme = VisirThemeData.fallback();
+      final expectedForeground = theme.tokens.colors.textInverse;
       Color? capturedLeadingIconColor;
 
       await tester.pumpWidget(
-        makeUiTestableWidget(
-          child: VisirButton(
-            label: 'Primary',
-            variant: VisirButtonVariant.primary,
-            leading: Builder(
-              builder: (context) {
-                capturedLeadingIconColor = IconTheme.of(context).color;
-                return const Icon(Icons.add);
-              },
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: VisirTheme(
+            data: theme,
+            child: VisirButton(
+              label: 'Primary',
+              variant: VisirButtonVariant.primary,
+              leading: Builder(
+                builder: (context) {
+                  capturedLeadingIconColor = IconTheme.of(context).color;
+                  return const Icon(Icons.add);
+                },
+              ),
+              isLoading: true,
+              onPressed: () {},
             ),
-            isLoading: true,
-            onPressed: () {},
           ),
         ),
       );
 
       final label = tester.widget<Text>(find.text('Primary'));
-      expect(label.style?.color, const Color(0xFFFFFFFF));
-      expect(capturedLeadingIconColor, const Color(0xFFFFFFFF));
+      expect(label.style?.color, expectedForeground);
+      expect(capturedLeadingIconColor, expectedForeground);
 
       final indicatorFinder = find.descendant(
         of: find.byType(VisirButton),
@@ -153,18 +159,27 @@ void main() {
       expect(valueColor, isA<AlwaysStoppedAnimation<Color>>());
       expect(
         (valueColor as AlwaysStoppedAnimation<Color>).value,
-        const Color(0xFFFFFFFF),
+        expectedForeground,
       );
     },
   );
 
   testWidgets('danger button uses vivid crimson fill', (tester) async {
+    final theme = VisirThemeData.fallback();
+    final expectedDangerFill = theme.tokens.colors.danger.withValues(
+      alpha: 0.32,
+    );
+
     await tester.pumpWidget(
-      makeUiTestableWidget(
-        child: VisirButton(
-          label: 'Danger',
-          variant: VisirButtonVariant.danger,
-          onPressed: () {},
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: VisirTheme(
+          data: theme,
+          child: VisirButton(
+            label: 'Danger',
+            variant: VisirButtonVariant.danger,
+            onPressed: () {},
+          ),
         ),
       ),
     );
@@ -180,7 +195,98 @@ void main() {
         tester.widget<DecoratedBox>(decorationFinder.first).decoration
             as BoxDecoration;
 
-    expect(decoration.color, const Color(0x52E13A5F));
+    expect(decoration.color, expectedDangerFill);
+  });
+
+  testWidgets('primary button honors themed inverse foreground token', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      tokens: baseTheme.tokens.copyWith(
+        colors: baseTheme.tokens.colors.copyWith(
+          textInverse: const Color(0xFFF7FFF0),
+        ),
+      ),
+    );
+    Color? capturedLeadingIconColor;
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: VisirTheme(
+          data: themedData,
+          child: VisirButton(
+            label: 'Primary',
+            variant: VisirButtonVariant.primary,
+            leading: Builder(
+              builder: (context) {
+                capturedLeadingIconColor = IconTheme.of(context).color;
+                return const Icon(Icons.add);
+              },
+            ),
+            isLoading: true,
+            onPressed: () {},
+          ),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('Primary'));
+    final indicator = tester.widget<CircularProgressIndicator>(
+      find.descendant(
+        of: find.byType(VisirButton),
+        matching: find.byType(CircularProgressIndicator),
+      ),
+    );
+    final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
+
+    expect(label.style?.color, const Color(0xFFF7FFF0));
+    expect(capturedLeadingIconColor, const Color(0xFFF7FFF0));
+    expect(valueColor.value, const Color(0xFFF7FFF0));
+  });
+
+  testWidgets('danger button honors themed danger token', (tester) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedDanger = const Color(0xFFCC2448);
+    final themedData = baseTheme.copyWith(
+      tokens: baseTheme.tokens.copyWith(
+        colors: baseTheme.tokens.colors.copyWith(danger: themedDanger),
+      ),
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: VisirTheme(
+          data: themedData,
+          child: VisirButton(
+            label: 'Danger',
+            variant: VisirButtonVariant.danger,
+            onPressed: () {},
+          ),
+        ),
+      ),
+    );
+
+    final decoration =
+        tester
+                .widget<DecoratedBox>(
+                  find
+                      .descendant(
+                        of: find.byType(VisirButton),
+                        matching: find.byWidgetPredicate(
+                          (widget) =>
+                              widget is DecoratedBox &&
+                              widget.decoration is BoxDecoration,
+                        ),
+                      )
+                      .first,
+                )
+                .decoration
+            as BoxDecoration;
+
+    expect(decoration.color, themedDanger.withValues(alpha: 0.32));
   });
 
   testWidgets('empty label does not implicitly switch to icon-only layout', (
