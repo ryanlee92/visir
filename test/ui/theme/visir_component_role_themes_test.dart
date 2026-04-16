@@ -6,14 +6,14 @@ import '../../../ui/visir_ui.dart';
 void main() {
   test('VisirControlSizing exposes size accessors', () {
     const sizing = VisirControlSizing(
-      height: VisirControlSizeScale(sm: 30, md: 40, lg: 50),
+      verticalPadding: VisirControlSizeScale(sm: 30, md: 40, lg: 50),
       horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
       iconSpacing: 6,
       compactSpacing: 4,
     );
 
-    expect(sizing.heightFor(VisirButtonSize.sm), 30);
-    expect(sizing.heightFor(VisirButtonSize.lg), 50);
+    expect(sizing.verticalPaddingFor(VisirButtonSize.sm), 30);
+    expect(sizing.verticalPaddingFor(VisirButtonSize.lg), 50);
     expect(sizing.horizontalPaddingFor(VisirButtonSize.md), 12);
     expect(sizing.iconSpacing, 6);
     expect(sizing.compactSpacing, 4);
@@ -51,7 +51,7 @@ void main() {
       );
       const control = VisirControlThemeData(
         sizing: VisirControlSizing(
-          height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+          verticalPadding: VisirControlSizeScale(sm: 6, md: 10, lg: 14),
           horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
           iconSpacing: 6,
           compactSpacing: 4,
@@ -86,7 +86,7 @@ void main() {
     );
     const control = VisirControlThemeData(
       sizing: VisirControlSizing(
-        height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+        verticalPadding: VisirControlSizeScale(sm: 6, md: 10, lg: 14),
         horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
         iconSpacing: 6,
         compactSpacing: 4,
@@ -173,7 +173,7 @@ void main() {
       ),
       control: const VisirControlThemeData(
         sizing: VisirControlSizing(
-          height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+          verticalPadding: VisirControlSizeScale(sm: 6, md: 10, lg: 14),
           horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
           iconSpacing: 6,
           compactSpacing: 4,
@@ -232,8 +232,8 @@ void main() {
     final fallback = VisirThemeData.fallback();
 
     expect(
-      fallback.components.control.sizing.heightFor(VisirButtonSize.md),
-      44,
+      fallback.components.control.sizing.verticalPaddingFor(VisirButtonSize.md),
+      10,
     );
     expect(
       fallback.components.surface.padding.paddingFor(VisirCardDensity.compact),

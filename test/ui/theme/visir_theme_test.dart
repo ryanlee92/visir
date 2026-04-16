@@ -37,7 +37,10 @@ void main() {
 
     expect(data.tokens.colors.accent, const Color(0xFF7C5DFF));
     expect(data.tokens.radius.md, 16);
-    expect(data.components.control.sizing.heightFor(VisirButtonSize.md), 44);
+    expect(
+      data.components.control.sizing.verticalPaddingFor(VisirButtonSize.md),
+      10,
+    );
     expect(data.components.content.radius, 999);
   });
 
