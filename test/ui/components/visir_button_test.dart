@@ -270,7 +270,7 @@ void main() {
     addTearDown(focusNode.dispose);
 
     const sizing = VisirControlSizing(
-      height: VisirControlSizeScale(sm: 40, md: 54, lg: 68),
+      verticalPadding: VisirControlSizeScale(sm: 6, md: 10, lg: 14),
       horizontalPadding: VisirControlSizeScale(sm: 13, md: 21, lg: 34),
       iconSpacing: 9,
       compactSpacing: 5,
@@ -330,8 +330,12 @@ void main() {
             widget is DecoratedBox && widget.decoration is BoxDecoration,
       ),
     );
-    final smallPaddingFinder = find.descendant(
+    final smallHoverOverlayFinder = find.descendant(
       of: smallButtonFinder,
+      matching: find.byKey(const ValueKey('visir-button-hover-overlay')),
+    );
+    final smallPaddingFinder = find.descendant(
+      of: smallHoverOverlayFinder,
       matching: find.byType(Padding),
     );
     final disabledDecorationFinder = find.descendant(
@@ -342,16 +346,11 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(smallButtonFinder).height, sizing.height.sm);
-
-    final smallPadding = tester.widget<Padding>(smallPaddingFinder);
+    expect(smallPaddingFinder, findsOneWidget);
+    final smallPadding = tester.widget<Padding>(smallPaddingFinder.first);
     expect(
-      (smallPadding.padding as EdgeInsets).left,
-      sizing.horizontalPadding.sm,
-    );
-    expect(
-      (smallPadding.padding as EdgeInsets).right,
-      sizing.horizontalPadding.sm,
+      smallPadding.padding,
+      const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
     );
 
     Border borderFor(Finder finder) {
@@ -658,7 +657,7 @@ void main() {
 
     final enabledShell = find.descendant(
       of: find.byType(VisirButton).first,
-      matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+      matching: find.byKey(const ValueKey('visir-button-shell')),
     );
     final enabledDecorationFinder = find.descendant(
       of: find.byType(VisirButton).first,
@@ -796,7 +795,7 @@ void main() {
       final center = tester.getCenter(find.text('Press me'));
       final buttonShell = find.descendant(
         of: find.byType(VisirButton),
-        matching: find.byWidgetPredicate((widget) => widget is ConstrainedBox),
+        matching: find.byKey(const ValueKey('visir-button-shell')),
       );
       final animatedOpacityFinder = find.descendant(
         of: find.byType(VisirButton),

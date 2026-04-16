@@ -116,29 +116,30 @@ class VisirControlSizeScale {
 @immutable
 class VisirControlSizing {
   const VisirControlSizing({
-    required this.height,
+    required this.verticalPadding,
     required this.horizontalPadding,
     required this.iconSpacing,
     required this.compactSpacing,
   });
 
-  final VisirControlSizeScale height;
+  final VisirControlSizeScale verticalPadding;
   final VisirControlSizeScale horizontalPadding;
   final double iconSpacing;
   final double compactSpacing;
 
-  double heightFor(VisirButtonSize size) => height.resolve(size);
+  double verticalPaddingFor(VisirButtonSize size) =>
+      verticalPadding.resolve(size);
   double horizontalPaddingFor(VisirButtonSize size) =>
       horizontalPadding.resolve(size);
 
   VisirControlSizing copyWith({
-    VisirControlSizeScale? height,
+    VisirControlSizeScale? verticalPadding,
     VisirControlSizeScale? horizontalPadding,
     double? iconSpacing,
     double? compactSpacing,
   }) {
     return VisirControlSizing(
-      height: height ?? this.height,
+      verticalPadding: verticalPadding ?? this.verticalPadding,
       horizontalPadding: horizontalPadding ?? this.horizontalPadding,
       iconSpacing: iconSpacing ?? this.iconSpacing,
       compactSpacing: compactSpacing ?? this.compactSpacing,
@@ -149,15 +150,19 @@ class VisirControlSizing {
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is VisirControlSizing &&
-            height == other.height &&
+            verticalPadding == other.verticalPadding &&
             horizontalPadding == other.horizontalPadding &&
             iconSpacing == other.iconSpacing &&
             compactSpacing == other.compactSpacing;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(height, horizontalPadding, iconSpacing, compactSpacing);
+  int get hashCode => Object.hash(
+    verticalPadding,
+    horizontalPadding,
+    iconSpacing,
+    compactSpacing,
+  );
 }
 
 @immutable
