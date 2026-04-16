@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:visir_ui/visir_ui.dart';
 
 class ShowcaseTheme {
   static ThemeData build() {
+    final visirTokens = VisirThemeData.fallback().tokens;
     final baseScheme = const ColorScheme.light(
       surface: Color(0xFFF8F2EA),
       onSurface: Color(0xFF1D1A1F),
@@ -25,10 +27,14 @@ class ShowcaseTheme {
       cardTheme: CardThemeData(
         color: base.colorScheme.surfaceContainerHigh,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(visirTokens.radius.sm),
+        ),
       ),
       chipTheme: base.chipTheme.copyWith(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(visirTokens.radius.pill),
+        ),
       ),
       textTheme: base.textTheme.apply(
         bodyColor: base.colorScheme.onSurface,

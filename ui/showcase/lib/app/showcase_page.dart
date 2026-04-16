@@ -203,7 +203,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: contentSpacing.inlineSpacing),
                       Text(
                         'Interactive component showcase for the visir_ui package.',
                         style: theme.textTheme.titleMedium,

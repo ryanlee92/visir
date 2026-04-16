@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui/visir_ui.dart';
+import 'package:visir_ui_showcase/app/showcase_app.dart';
 import 'package:visir_ui_showcase/app/showcase_page.dart';
 import 'package:visir_ui_showcase/sections/showcase_section_layout.dart';
 
 void main() {
-  testWidgets('showcase page scroll padding follows shared role tokens', (
+  testWidgets('ShowcaseApp renders page shell smoke coverage', (tester) async {
+    tester.view.physicalSize = const Size(800, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Visir UI'), findsOneWidget);
+    expect(find.byKey(showcaseScrollViewKey), findsOneWidget);
+    expect(find.byType(VisirCard), findsWidgets);
+  });
+
+  testWidgets('showcase page shell spacing follows shared role tokens', (
     tester,
   ) async {
     final themeData = _customVisirThemeData();
@@ -23,11 +37,16 @@ void main() {
     final scrollView = tester.widget<SingleChildScrollView>(
       find.byKey(showcaseScrollViewKey),
     );
+    final heroColumn = tester
+        .widgetList<Column>(find.byType(Column))
+        .firstWhere((column) => _isHeroColumn(column));
+    final heroGap = heroColumn.children[1] as SizedBox;
 
     expect(
       scrollView.padding,
       const EdgeInsets.symmetric(horizontal: 31, vertical: 54),
     );
+    expect(heroGap.height, 13);
   });
 
   testWidgets('showcase section layout gap follows shared surface tokens', (
@@ -64,6 +83,15 @@ void main() {
     expect(firstGap.height, 31);
     expect(secondGap.height, 31);
   });
+}
+
+bool _isHeroColumn(Column column) {
+  if (column.children.isEmpty) {
+    return false;
+  }
+
+  final firstChild = column.children.first;
+  return firstChild is Text && firstChild.data == 'Visir UI';
 }
 
 VisirThemeData _customVisirThemeData() {
