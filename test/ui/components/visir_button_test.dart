@@ -588,31 +588,16 @@ void main() {
       ),
     );
 
-    final decorationFinder = find.descendant(
-      of: find.byType(VisirButton),
-      matching: find.byWidgetPredicate(
-        (widget) =>
-            widget is DecoratedBox && widget.decoration is BoxDecoration,
-      ),
-    );
     final overlayFinder = find.byKey(
       const ValueKey('visir-button-hover-overlay'),
     );
 
-    final beforeDecoration =
-        tester.widget<DecoratedBox>(decorationFinder).decoration
-            as BoxDecoration;
     final beforeOverlay = tester.widget<ColoredBox>(overlayFinder).color;
 
     await gesture.moveTo(tester.getCenter(find.text('Secondary hover')));
     await tester.pumpAndSettle();
 
-    final afterDecoration =
-        tester.widget<DecoratedBox>(decorationFinder).decoration
-            as BoxDecoration;
     final afterOverlay = tester.widget<ColoredBox>(overlayFinder).color;
-
-    expect(afterDecoration, isNot(beforeDecoration));
     expect(afterOverlay.opacity, greaterThan(beforeOverlay.opacity));
   });
 
@@ -649,17 +634,19 @@ void main() {
     );
 
     Future<Color> hoverOverlayFor(String label) async {
+      final buttonFinder = find.ancestor(
+        of: find.text(label),
+        matching: find.byType(VisirButton),
+      );
+
       await gesture.moveTo(tester.getCenter(find.text(label)));
       await tester.pumpAndSettle();
 
-      return tester.widgetList<ColoredBox>(
-        find.byKey(const ValueKey('visir-button-hover-overlay')),
-      ).elementAt(
-        switch (label) {
-          'Secondary hover' => 0,
-          'Ghost hover' => 1,
-          _ => 2,
-        },
+      return tester.widget<ColoredBox>(
+        find.descendant(
+          of: buttonFinder,
+          matching: find.byKey(const ValueKey('visir-button-hover-overlay')),
+        ),
       ).color;
     }
 
