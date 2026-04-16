@@ -112,10 +112,69 @@ void main() {
       ),
     );
 
-    expect(
-      capturedIconColor,
-      VisirThemeData.fallback().tokens.colors.textInverse,
+    expect(capturedIconColor, const Color(0xFFFFFFFF));
+  });
+
+  testWidgets(
+    'primary button uses clear white foreground for label, icon, and spinner',
+    (tester) async {
+      Color? capturedLeadingIconColor;
+
+      await tester.pumpWidget(
+        makeUiTestableWidget(
+          child: VisirButton(
+            label: 'Primary',
+            variant: VisirButtonVariant.primary,
+            leading: Builder(
+              builder: (context) {
+                capturedLeadingIconColor = IconTheme.of(context).color;
+                return const Icon(Icons.add);
+              },
+            ),
+            isLoading: true,
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      final label = tester.widget<Text>(find.text('Primary'));
+      expect(label.style?.color, const Color(0xFFFFFFFF));
+      expect(capturedLeadingIconColor, const Color(0xFFFFFFFF));
+
+      final indicatorFinder = find.descendant(
+        of: find.byType(VisirButton),
+        matching: find.byType(CircularProgressIndicator),
+      );
+      final indicator = tester.widget<CircularProgressIndicator>(
+        indicatorFinder,
+      );
+      final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
+      expect(valueColor.value, const Color(0xFFFFFFFF));
+    },
+  );
+
+  testWidgets('danger button uses vivid crimson fill', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(
+          label: 'Danger',
+          variant: VisirButtonVariant.danger,
+          onPressed: () {},
+        ),
+      ),
     );
+
+    final decorationFinder = find.descendant(
+      of: find.byType(VisirButton),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
+    );
+    final decoration =
+        tester.widget<DecoratedBox>(decorationFinder.first).decoration
+            as BoxDecoration;
+
+    expect(decoration.color, const Color(0x52E13A5F));
   });
 
   testWidgets('empty label does not implicitly switch to icon-only layout', (
