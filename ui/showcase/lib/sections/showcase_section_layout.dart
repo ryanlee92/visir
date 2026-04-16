@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visir_ui/visir_ui.dart';
 
 class ShowcaseSectionLayout extends StatelessWidget {
   const ShowcaseSectionLayout({
@@ -14,6 +15,8 @@ class ShowcaseSectionLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gap = VisirTheme.of(context).components.surface.padding.comfortable;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= 1080) {
@@ -21,9 +24,9 @@ class ShowcaseSectionLayout extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: preview),
-              const SizedBox(width: 16),
+              SizedBox(width: gap),
               Expanded(child: controls),
-              const SizedBox(width: 16),
+              SizedBox(width: gap),
               Expanded(child: snippet),
             ],
           );
@@ -33,9 +36,9 @@ class ShowcaseSectionLayout extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             preview,
-            const SizedBox(height: 16),
+            SizedBox(height: gap),
             controls,
-            const SizedBox(height: 16),
+            SizedBox(height: gap),
             snippet,
           ],
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visir_ui/visir_ui.dart';
 
 import '../sections/visir_badge_section.dart';
 import '../sections/visir_button_section.dart';
@@ -62,6 +63,9 @@ class _ShowcasePageState extends State<ShowcasePage> {
   }
 
   Widget _buildSection(String id, ColorScheme colors) {
+    final visirTheme = VisirTheme.of(context);
+    final surfaceSpacing = visirTheme.components.surface.padding;
+    final contentSpacing = visirTheme.components.content;
     final Widget content = switch (id) {
       'button' => const VisirButtonSection(),
       'icon-button' => const VisirIconButtonSection(),
@@ -97,7 +101,9 @@ class _ShowcasePageState extends State<ShowcasePage> {
     return Container(
       key: _sectionKeys[id],
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(
+        surfaceSpacing.comfortable + contentSpacing.compactSpacing,
+      ),
       decoration: BoxDecoration(
         color: colors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(12),
@@ -111,9 +117,9 @@ class _ShowcasePageState extends State<ShowcasePage> {
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: contentSpacing.inlineSpacing),
           Text(description, style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 16),
+          SizedBox(height: surfaceSpacing.comfortable),
           content,
         ],
       ),
@@ -121,6 +127,8 @@ class _ShowcasePageState extends State<ShowcasePage> {
   }
 
   Widget _buildPlaceholderSection(String id, ColorScheme colors) {
+    final surfaceSpacing = VisirTheme.of(context).components.surface.padding;
+
     return Container(
       constraints: const BoxConstraints(minHeight: 120),
       decoration: BoxDecoration(
@@ -129,7 +137,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
       ),
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24),
+          padding: EdgeInsets.symmetric(vertical: surfaceSpacing.spacious),
           child: Text(
             'Component area coming soon',
             style: Theme.of(
@@ -145,9 +153,16 @@ class _ShowcasePageState extends State<ShowcasePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final visirTheme = VisirTheme.of(context);
+    final surfaceSpacing = visirTheme.components.surface.padding;
+    final contentSpacing = visirTheme.components.content;
     final horizontalPadding = MediaQuery.sizeOf(context).width < 720
-        ? 16.0
-        : 24.0;
+        ? surfaceSpacing.comfortable
+        : surfaceSpacing.spacious;
+    final verticalPadding =
+        surfaceSpacing.spacious + contentSpacing.compactSpacing;
+    final sectionSpacing =
+        surfaceSpacing.comfortable + contentSpacing.compactSpacing;
 
     return Scaffold(
       body: SafeArea(
@@ -174,7 +189,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
               physics: const BouncingScrollPhysics(),
               padding: EdgeInsets.symmetric(
                 horizontal: horizontalPadding,
-                vertical: 28,
+                vertical: verticalPadding,
               ),
               child: Center(
                 child: ConstrainedBox(
@@ -193,10 +208,10 @@ class _ShowcasePageState extends State<ShowcasePage> {
                         'Interactive component showcase for the visir_ui package.',
                         style: theme.textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: sectionSpacing),
                       Wrap(
-                        spacing: 12,
-                        runSpacing: 8,
+                        spacing: surfaceSpacing.compact,
+                        runSpacing: contentSpacing.inlineSpacing,
                         children: featuredShowcaseJumpSectionIds.map((id) {
                           return FilledButton.tonal(
                             onPressed: () => _jumpTo(id),
@@ -210,19 +225,21 @@ class _ShowcasePageState extends State<ShowcasePage> {
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 28),
+                      SizedBox(height: verticalPadding),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: showcaseSectionIds
                             .map(
                               (id) => Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
+                                padding: EdgeInsets.only(
+                                  bottom: sectionSpacing,
+                                ),
                                 child: _buildSection(id, colors),
                               ),
                             )
                             .toList(),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: contentSpacing.paddingVertical),
                       Text(
                         'Built for internal component exploration and API discovery.',
                         style: theme.textTheme.bodySmall?.copyWith(
