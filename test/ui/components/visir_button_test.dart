@@ -148,8 +148,13 @@ void main() {
       final indicator = tester.widget<CircularProgressIndicator>(
         indicatorFinder,
       );
-      final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
-      expect(valueColor.value, const Color(0xFFFFFFFF));
+      final valueColor = indicator.valueColor;
+      expect(valueColor, isNotNull);
+      expect(valueColor, isA<AlwaysStoppedAnimation<Color>>());
+      expect(
+        (valueColor as AlwaysStoppedAnimation<Color>).value,
+        const Color(0xFFFFFFFF),
+      );
     },
   );
 
@@ -167,7 +172,8 @@ void main() {
     final decorationFinder = find.descendant(
       of: find.byType(VisirButton),
       matching: find.byWidgetPredicate(
-        (widget) => widget is DecoratedBox && widget.decoration is BoxDecoration,
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
       ),
     );
     final decoration =

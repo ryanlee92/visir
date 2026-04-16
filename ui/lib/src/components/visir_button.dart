@@ -123,7 +123,24 @@ class _VisirButtonState extends State<VisirButton> {
                     ),
                   if (widget.isLoading) ...[
                     if (hasLabel) SizedBox(width: iconSpacing),
-                    VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
+                    widget.variant == VisirButtonVariant.primary
+                        ? VisirTheme(
+                            data: theme.copyWith(
+                              tokens: theme.tokens.copyWith(
+                                colors: theme.tokens.colors.copyWith(
+                                  text: Colors.white,
+                                ),
+                              ),
+                            ),
+                            child: VisirSpinner(
+                              size: _spinnerSize(),
+                              tone: _spinnerTone(),
+                            ),
+                          )
+                        : VisirSpinner(
+                            size: _spinnerSize(),
+                            tone: _spinnerTone(),
+                          ),
                   ],
                   if (widget.trailing != null) ...[
                     if (hasLabel || widget.isLoading)
@@ -283,6 +300,8 @@ class _VisirButtonState extends State<VisirButton> {
     final isGhost = widget.variant == VisirButtonVariant.ghost;
     final isDanger = widget.variant == VisirButtonVariant.danger;
     final isHovered = !disabled && _hovering;
+    const dangerFill = Color(0x52E13A5F);
+    const dangerFillHovered = Color(0x61E13A5F);
     final borderState = disabled
         ? control.borders.disabled
         : _focused
@@ -294,8 +313,8 @@ class _VisirButtonState extends State<VisirButton> {
     final background = switch (widget.variant) {
       VisirButtonVariant.primary => LinearGradient(
         colors: [
-          Color.lerp(colors.accent, Colors.white, isHovered ? 0.08 : 0)!,
-          Color.lerp(colors.accentStrong, Colors.white, isHovered ? 0.04 : 0)!,
+          Color.lerp(colors.accent, Colors.white, isHovered ? 0.04 : 0)!,
+          Color.lerp(colors.accentStrong, Colors.white, isHovered ? 0.02 : 0)!,
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -314,7 +333,7 @@ class _VisirButtonState extends State<VisirButton> {
                 ? colors.surfaceOutline.withValues(alpha: 0.08)
                 : Colors.transparent)
           : isDanger
-          ? colors.danger.withValues(alpha: isHovered ? 0.28 : 0.22)
+          ? (isHovered ? dangerFillHovered : dangerFill)
           : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0)!,
       borderRadius: BorderRadius.circular(control.radius),
       border: Border.all(color: borderState.color, width: borderState.width),
@@ -367,7 +386,7 @@ class _VisirButtonState extends State<VisirButton> {
 
   Color _foregroundColor(VisirThemeData theme) {
     return switch (widget.variant) {
-      VisirButtonVariant.primary => theme.tokens.colors.textInverse,
+      VisirButtonVariant.primary => Colors.white,
       VisirButtonVariant.secondary => theme.tokens.colors.text,
       VisirButtonVariant.ghost => theme.tokens.colors.textMuted,
       VisirButtonVariant.danger => theme.tokens.colors.text,
@@ -383,8 +402,6 @@ class _VisirButtonState extends State<VisirButton> {
   }
 
   VisirSpinnerTone _spinnerTone() {
-    return widget.variant == VisirButtonVariant.primary
-        ? VisirSpinnerTone.primary
-        : VisirSpinnerTone.inverse;
+    return VisirSpinnerTone.inverse;
   }
 }
