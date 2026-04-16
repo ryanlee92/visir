@@ -720,7 +720,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final afterOverlay = tester.widget<ColoredBox>(overlayFinder).color;
-    expect(afterOverlay.opacity, greaterThan(beforeOverlay.opacity));
+    expect(afterOverlay.a, greaterThan(beforeOverlay.a));
   });
 
   testWidgets('ghost and danger hover stay lighter than secondary hover', (
@@ -780,8 +780,8 @@ void main() {
     final ghostOverlay = await hoverOverlayFor('Ghost hover');
     final dangerOverlay = await hoverOverlayFor('Danger hover');
 
-    expect(ghostOverlay.opacity, lessThan(secondaryOverlay.opacity));
-    expect(dangerOverlay.opacity, lessThan(secondaryOverlay.opacity));
+    expect(ghostOverlay.a, lessThan(secondaryOverlay.a));
+    expect(dangerOverlay.a, lessThan(secondaryOverlay.a));
   });
 
   testWidgets(
