@@ -161,11 +161,11 @@ class VisirControlSizing {
 
   @override
   int get hashCode => Object.hash(
-        verticalPadding,
-        horizontalPadding,
-        iconSpacing,
-        compactSpacing,
-      );
+    verticalPadding,
+    horizontalPadding,
+    iconSpacing,
+    compactSpacing,
+  );
 }
 
 @immutable
