@@ -28,7 +28,7 @@ class VisirThemeData {
         ),
         control: VisirControlThemeData(
           sizing: VisirControlSizing(
-            height: const VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+            verticalPadding: const VisirControlSizeScale(sm: 6, md: 10, lg: 14),
             horizontalPadding: VisirControlSizeScale(
               sm: tokens.spacing.md.toDouble(),
               md: tokens.spacing.lg.toDouble(),

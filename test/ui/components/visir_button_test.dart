@@ -270,7 +270,7 @@ void main() {
     addTearDown(focusNode.dispose);
 
     const sizing = VisirControlSizing(
-      height: VisirControlSizeScale(sm: 40, md: 54, lg: 68),
+      verticalPadding: VisirControlSizeScale(sm: 6, md: 10, lg: 14),
       horizontalPadding: VisirControlSizeScale(sm: 13, md: 21, lg: 34),
       iconSpacing: 9,
       compactSpacing: 5,
@@ -342,16 +342,10 @@ void main() {
       ),
     );
 
-    expect(tester.getSize(smallButtonFinder).height, sizing.height.sm);
-
-    final smallPadding = tester.widget<Padding>(smallPaddingFinder);
+    final smallPadding = tester.widget<Padding>(smallPaddingFinder.first);
     expect(
-      (smallPadding.padding as EdgeInsets).left,
-      sizing.horizontalPadding.sm,
-    );
-    expect(
-      (smallPadding.padding as EdgeInsets).right,
-      sizing.horizontalPadding.sm,
+      smallPadding.padding,
+      const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
     );
 
     Border borderFor(Finder finder) {
