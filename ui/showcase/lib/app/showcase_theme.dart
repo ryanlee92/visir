@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:visir_ui/visir_ui.dart';
 
 class ShowcaseTheme {
-  static ThemeData build() {
-    final visirTokens = VisirThemeData.fallback().tokens;
+  static ThemeData build(VisirThemeData visirThemeData) {
+    final visirTokens = visirThemeData.tokens;
     final baseScheme = const ColorScheme.light(
       surface: Color(0xFFF8F2EA),
       onSurface: Color(0xFF1D1A1F),

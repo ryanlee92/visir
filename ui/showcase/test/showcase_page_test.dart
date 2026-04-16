@@ -49,6 +49,42 @@ void main() {
     expect(heroGap.height, 13);
   });
 
+  testWidgets(
+    'ShowcaseApp uses one shared theme source for Material radii and Visir shell',
+    (tester) async {
+      final themeData = _customVisirThemeData();
+      tester.view.physicalSize = const Size(640, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(ShowcaseApp(visirThemeData: themeData));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final context = tester.element(find.byKey(showcaseScrollViewKey));
+      final materialTheme = Theme.of(context);
+      final scrollView = tester.widget<SingleChildScrollView>(
+        find.byKey(showcaseScrollViewKey),
+      );
+      final cardShape =
+          materialTheme.cardTheme.shape! as RoundedRectangleBorder;
+      final chipShape =
+          materialTheme.chipTheme.shape! as RoundedRectangleBorder;
+
+      expect(
+        scrollView.padding,
+        const EdgeInsets.symmetric(horizontal: 31, vertical: 54),
+      );
+      expect(
+        cardShape.borderRadius.resolve(TextDirection.ltr),
+        BorderRadius.circular(33),
+      );
+      expect(
+        chipShape.borderRadius.resolve(TextDirection.ltr),
+        BorderRadius.circular(123),
+      );
+    },
+  );
+
   testWidgets('showcase section layout gap follows shared surface tokens', (
     tester,
   ) async {
@@ -97,6 +133,9 @@ bool _isHeroColumn(Column column) {
 VisirThemeData _customVisirThemeData() {
   final fallback = VisirThemeData.fallback();
   return fallback.copyWith(
+    tokens: fallback.tokens.copyWith(
+      radius: const VisirRadius(sm: 33, md: 16, lg: 22, pill: 123),
+    ),
     components: fallback.components.copyWith(
       surface: fallback.components.surface.copyWith(
         padding: fallback.components.surface.padding.copyWith(
