@@ -39,7 +39,27 @@ class VisirButtonThemeData {
 
 @immutable
 class VisirComponentThemes {
-  const VisirComponentThemes({
+  factory VisirComponentThemes({
+    required VisirButtonThemeData button,
+    required VisirControlThemeData control,
+    required VisirSurfaceThemeData surface,
+    required VisirContentThemeData content,
+    required VisirFeedbackThemeData feedback,
+  }) {
+    final normalizedButton = button.copyWith(
+      interaction: control.interaction,
+    );
+
+    return VisirComponentThemes._raw(
+      button: normalizedButton,
+      control: control,
+      surface: surface,
+      content: content,
+      feedback: feedback,
+    );
+  }
+
+  const VisirComponentThemes._raw({
     required this.button,
     required this.control,
     required this.surface,
@@ -65,7 +85,7 @@ class VisirComponentThemes {
       interaction: resolvedControl.interaction,
     );
 
-    return VisirComponentThemes(
+    return VisirComponentThemes._raw(
       button: resolvedButton,
       control: resolvedControl,
       surface: surface ?? this.surface,
