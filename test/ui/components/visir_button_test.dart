@@ -820,7 +820,10 @@ void main() {
       expect(shellPressed, shellBefore);
       expect(textPressed.width, lessThan(textBefore.width));
       expect(textPressed.height, lessThan(textBefore.height));
-      expect(opacityPressed, lessThan(opacityBefore));
+      expect(
+        opacityPressed,
+        VisirThemeData.fallback().components.control.interaction.pressedOpacity,
+      );
 
       await gesture.up();
       await tester.pumpAndSettle();

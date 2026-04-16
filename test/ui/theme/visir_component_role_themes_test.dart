@@ -32,9 +32,7 @@ void main() {
       disabled: disabled,
     );
 
-    final updated = states.copyWith(
-      hover: hover.copyWith(width: 3),
-    );
+    final updated = states.copyWith(hover: hover.copyWith(width: 3));
 
     expect(updated, isNot(states));
     expect(updated.base, base);
@@ -43,41 +41,47 @@ void main() {
     expect(updated.hover.width, 3);
   });
 
-  test('VisirControlThemeData copyWith preserves values and updates equality', () {
-    const interaction = VisirControlInteractionThemeData(
-      pressedScale: 0.96,
-      disabledOpacity: 0.45,
-    );
-    const control = VisirControlThemeData(
-      sizing: VisirControlSizing(
-        height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
-        horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
-        iconSpacing: 6,
-        compactSpacing: 4,
-      ),
-      borders: VisirBorderStates(
-        base: VisirBorderState(color: Colors.white, width: 1),
-        hover: VisirBorderState(color: Colors.white, width: 1),
-        focus: VisirBorderState(color: Colors.blue, width: 2),
-        disabled: VisirBorderState(color: Colors.grey, width: 1),
-      ),
-      radius: 12,
-      interaction: interaction,
-    );
+  test(
+    'VisirControlThemeData copyWith preserves values and updates equality',
+    () {
+      const interaction = VisirControlInteractionThemeData(
+        pressedScale: 0.96,
+        pressedOpacity: 0.5,
+        disabledOpacity: 0.45,
+      );
+      const control = VisirControlThemeData(
+        sizing: VisirControlSizing(
+          height: VisirControlSizeScale(sm: 36, md: 44, lg: 52),
+          horizontalPadding: VisirControlSizeScale(sm: 8, md: 12, lg: 16),
+          iconSpacing: 6,
+          compactSpacing: 4,
+        ),
+        borders: VisirBorderStates(
+          base: VisirBorderState(color: Colors.white, width: 1),
+          hover: VisirBorderState(color: Colors.white, width: 1),
+          focus: VisirBorderState(color: Colors.blue, width: 2),
+          disabled: VisirBorderState(color: Colors.grey, width: 1),
+        ),
+        radius: 12,
+        interaction: interaction,
+      );
 
-    final updated = control.copyWith(
-      interaction: interaction.copyWith(pressedScale: 0.9),
-    );
+      final updated = control.copyWith(
+        interaction: interaction.copyWith(pressedScale: 0.9),
+      );
 
-    expect(control.copyWith(), control);
-    expect(updated, isNot(control));
-    expect(updated.interaction.pressedScale, 0.9);
-    expect(updated.sizing, control.sizing);
-  });
+      expect(control.copyWith(), control);
+      expect(updated, isNot(control));
+      expect(updated.interaction.pressedScale, 0.9);
+      expect(updated.interaction.pressedOpacity, 0.5);
+      expect(updated.sizing, control.sizing);
+    },
+  );
 
   test('VisirComponentThemes copyWith syncs control interaction tokens', () {
     const interaction = VisirControlInteractionThemeData(
       pressedScale: 0.96,
+      pressedOpacity: 0.5,
       disabledOpacity: 0.45,
     );
     const control = VisirControlThemeData(
@@ -97,7 +101,10 @@ void main() {
       interaction: interaction,
     );
     final themes = VisirComponentThemes(
-      button: const VisirButtonThemeData(glowBlur: 24, interaction: interaction),
+      button: const VisirButtonThemeData(
+        glowBlur: 24,
+        interaction: interaction,
+      ),
       control: control,
       surface: const VisirSurfaceThemeData(
         padding: VisirSurfaceDensityScale(
@@ -151,10 +158,12 @@ void main() {
   test('VisirComponentThemes normalizes mismatched interaction tokens', () {
     const buttonInteraction = VisirControlInteractionThemeData(
       pressedScale: 0.8,
+      pressedOpacity: 0.3,
       disabledOpacity: 0.2,
     );
     const controlInteraction = VisirControlInteractionThemeData(
       pressedScale: 0.96,
+      pressedOpacity: 0.5,
       disabledOpacity: 0.45,
     );
     final themes = VisirComponentThemes(
@@ -231,9 +240,6 @@ void main() {
       12,
     );
     expect(fallback.components.content.paddingHorizontal, 10);
-    expect(
-      fallback.components.feedback.sizeFor(VisirSpinnerSize.lg),
-      20,
-    );
+    expect(fallback.components.feedback.sizeFor(VisirSpinnerSize.lg), 20);
   });
 }

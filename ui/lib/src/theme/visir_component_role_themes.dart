@@ -6,10 +6,7 @@ import '../foundation/visir_enums.dart';
 
 @immutable
 class VisirBorderState {
-  const VisirBorderState({
-    required this.color,
-    required this.width,
-  });
+  const VisirBorderState({required this.color, required this.width});
 
   final Color color;
   final double width;
@@ -95,11 +92,7 @@ class VisirControlSizeScale {
     };
   }
 
-  VisirControlSizeScale copyWith({
-    double? sm,
-    double? md,
-    double? lg,
-  }) {
+  VisirControlSizeScale copyWith({double? sm, double? md, double? lg}) {
     return VisirControlSizeScale(
       sm: sm ?? this.sm,
       md: md ?? this.md,
@@ -171,18 +164,22 @@ class VisirControlSizing {
 class VisirControlInteractionThemeData {
   const VisirControlInteractionThemeData({
     required this.pressedScale,
+    required this.pressedOpacity,
     required this.disabledOpacity,
   });
 
   final double pressedScale;
+  final double pressedOpacity;
   final double disabledOpacity;
 
   VisirControlInteractionThemeData copyWith({
     double? pressedScale,
+    double? pressedOpacity,
     double? disabledOpacity,
   }) {
     return VisirControlInteractionThemeData(
       pressedScale: pressedScale ?? this.pressedScale,
+      pressedOpacity: pressedOpacity ?? this.pressedOpacity,
       disabledOpacity: disabledOpacity ?? this.disabledOpacity,
     );
   }
@@ -192,11 +189,13 @@ class VisirControlInteractionThemeData {
     return identical(this, other) ||
         other is VisirControlInteractionThemeData &&
             pressedScale == other.pressedScale &&
+            pressedOpacity == other.pressedOpacity &&
             disabledOpacity == other.disabledOpacity;
   }
 
   @override
-  int get hashCode => Object.hash(pressedScale, disabledOpacity);
+  int get hashCode =>
+      Object.hash(pressedScale, pressedOpacity, disabledOpacity);
 }
 
 @immutable
@@ -336,13 +335,13 @@ class VisirSurfaceElevation {
 
   @override
   int get hashCode => Object.hash(
-        baseBlur,
-        baseOffsetY,
-        baseOpacity,
-        focusBlur,
-        focusSpread,
-        focusOpacity,
-      );
+    baseBlur,
+    baseOffsetY,
+    baseOpacity,
+    focusBlur,
+    focusSpread,
+    focusOpacity,
+  );
 }
 
 @immutable
@@ -432,12 +431,12 @@ class VisirContentThemeData {
 
   @override
   int get hashCode => Object.hash(
-        paddingHorizontal,
-        paddingVertical,
-        radius,
-        inlineSpacing,
-        compactSpacing,
-      );
+    paddingHorizontal,
+    paddingVertical,
+    radius,
+    inlineSpacing,
+    compactSpacing,
+  );
 }
 
 @immutable
@@ -460,11 +459,7 @@ class VisirFeedbackSizeScale {
     };
   }
 
-  VisirFeedbackSizeScale copyWith({
-    double? sm,
-    double? md,
-    double? lg,
-  }) {
+  VisirFeedbackSizeScale copyWith({double? sm, double? md, double? lg}) {
     return VisirFeedbackSizeScale(
       sm: sm ?? this.sm,
       md: md ?? this.md,

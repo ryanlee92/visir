@@ -13,6 +13,7 @@ class VisirButtonThemeData {
   final VisirControlInteractionThemeData interaction;
 
   double get pressedScale => interaction.pressedScale;
+  double get pressedOpacity => interaction.pressedOpacity;
   double get disabledOpacity => interaction.disabledOpacity;
 
   VisirButtonThemeData copyWith({
@@ -46,9 +47,7 @@ class VisirComponentThemes {
     required VisirContentThemeData content,
     required VisirFeedbackThemeData feedback,
   }) {
-    final normalizedButton = button.copyWith(
-      interaction: control.interaction,
-    );
+    final normalizedButton = button.copyWith(interaction: control.interaction);
 
     return VisirComponentThemes._raw(
       button: normalizedButton,
@@ -106,6 +105,5 @@ class VisirComponentThemes {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(button, control, surface, content, feedback);
+  int get hashCode => Object.hash(button, control, surface, content, feedback);
 }

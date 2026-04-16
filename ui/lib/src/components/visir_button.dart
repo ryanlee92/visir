@@ -83,6 +83,7 @@ class _VisirButtonState extends State<VisirButton> {
     final pressed = !disabled && _pressed;
     final height = control.sizing.heightFor(widget.size);
     final horizontalPadding = control.sizing.horizontalPaddingFor(widget.size);
+    final iconSpacing = control.sizing.iconSpacing;
     final hasLabel = !widget.isIconOnly;
     final foregroundColor = _foregroundColor(theme);
     final semanticsLabel =
@@ -107,7 +108,7 @@ class _VisirButtonState extends State<VisirButton> {
                 children: [
                   if (widget.leading != null) widget.leading!,
                   if (widget.leading != null && hasLabel)
-                    const SizedBox(width: 8),
+                    SizedBox(width: iconSpacing),
                   if (hasLabel)
                     Flexible(
                       child: Text(
@@ -118,11 +119,12 @@ class _VisirButtonState extends State<VisirButton> {
                       ),
                     ),
                   if (widget.isLoading) ...[
-                    if (hasLabel) const SizedBox(width: 8),
+                    if (hasLabel) SizedBox(width: iconSpacing),
                     VisirSpinner(size: _spinnerSize(), tone: _spinnerTone()),
                   ],
                   if (widget.trailing != null) ...[
-                    if (hasLabel || widget.isLoading) const SizedBox(width: 8),
+                    if (hasLabel || widget.isLoading)
+                      SizedBox(width: iconSpacing),
                     widget.trailing!,
                   ],
                 ],
@@ -136,7 +138,11 @@ class _VisirButtonState extends State<VisirButton> {
     final animatedVisual = AnimatedOpacity(
       duration: theme.tokens.motion.normal,
       curve: theme.tokens.motion.curve,
-      opacity: disabled || pressed ? control.interaction.disabledOpacity : 1,
+      opacity: disabled
+          ? control.interaction.disabledOpacity
+          : pressed
+          ? control.interaction.pressedOpacity
+          : 1,
       child: TweenAnimationBuilder<double>(
         duration: theme.tokens.motion.emphasized,
         curve: theme.tokens.motion.curve,

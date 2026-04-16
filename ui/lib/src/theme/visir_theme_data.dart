@@ -15,6 +15,7 @@ class VisirThemeData {
     final tokens = VisirTokens.fallback();
     const interaction = VisirControlInteractionThemeData(
       pressedScale: 0.96,
+      pressedOpacity: 0.5,
       disabledOpacity: 0.45,
     );
 
@@ -45,10 +46,7 @@ class VisirThemeData {
               color: tokens.colors.surfaceOutline,
               width: 1,
             ),
-            focus: VisirBorderState(
-              color: tokens.colors.accent,
-              width: 2,
-            ),
+            focus: VisirBorderState(color: tokens.colors.accent, width: 2),
             disabled: VisirBorderState(
               color: tokens.colors.surfaceOutline.withValues(alpha: 0.4),
               width: 1,
@@ -73,10 +71,7 @@ class VisirThemeData {
               color: tokens.colors.surfaceOutline,
               width: 1,
             ),
-            focus: VisirBorderState(
-              color: tokens.colors.accent,
-              width: 2,
-            ),
+            focus: VisirBorderState(color: tokens.colors.accent, width: 2),
             disabled: VisirBorderState(
               color: tokens.colors.surfaceOutline.withValues(alpha: 0.4),
               width: 1,
