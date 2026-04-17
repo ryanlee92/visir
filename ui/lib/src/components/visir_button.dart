@@ -314,7 +314,7 @@ class _VisirButtonState extends State<VisirButton> {
                 ? colors.surfaceOutline.withValues(alpha: 0.08)
                 : Colors.transparent)
           : isDanger
-          ? colors.danger.withValues(alpha: isHovered ? 0.38 : 0.32)
+          ? colors.danger.withValues(alpha: isHovered ? 1 : 1)
           : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0)!,
       borderRadius: BorderRadius.circular(control.radius),
       border: Border.all(color: borderState.color, width: borderState.width),
