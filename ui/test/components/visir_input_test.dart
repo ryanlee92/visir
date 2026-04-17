@@ -54,8 +54,13 @@ void main() {
       ),
     );
 
-    final textField = tester.widget<TextField>(find.byType(TextField));
-    expect(textField.maxLines, 3);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.maxLines == 3,
+        description: 'text input with maxLines set to 3',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('search mode shows loading spinner and clear action', (
