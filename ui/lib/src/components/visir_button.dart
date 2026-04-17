@@ -98,7 +98,7 @@ class _VisirButtonState extends State<VisirButton> {
           color: _hoverOverlayColor(theme, disabled),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
+              horizontal: hasLabel ? horizontalPadding : verticalPadding,
               vertical: verticalPadding,
             ),
             child: IconTheme.merge(
@@ -305,28 +305,27 @@ class _VisirButtonState extends State<VisirButton> {
       VisirButtonVariant.danger => null,
     };
 
+    final baseColor = isPrimary
+        ? colors.accent
+        : isGhost
+        ? colors.surfaceOutline.withValues(alpha: 0.08)
+        : isDanger
+        ? colors.danger.withValues(alpha: isHovered ? 1 : 1)
+        : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0);
+
     return BoxDecoration(
       gradient: background,
-      color: isPrimary
-          ? null
-          : isGhost
-          ? (isHovered
-                ? colors.surfaceOutline.withValues(alpha: 0.08)
-                : Colors.transparent)
-          : isDanger
-          ? colors.danger.withValues(alpha: isHovered ? 1 : 1)
-          : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0)!,
+      color: baseColor!,
       borderRadius: BorderRadius.circular(control.radius),
       border: Border.all(color: borderState.color, width: borderState.width),
       boxShadow: [
-        if (isPrimary)
-          BoxShadow(
-            color: colors.accent.withValues(
-              alpha: disabled ? 0.08 : (isHovered ? 0.42 : 0.34),
-            ),
-            blurRadius: theme.components.button.glowBlur,
-            offset: const Offset(0, 10),
+        BoxShadow(
+          color: baseColor.withValues(
+            alpha: disabled ? 0.08 : (isHovered ? 0.42 : 0.34),
           ),
+          blurRadius: theme.components.button.glowBlur,
+          offset: const Offset(0, 10),
+        ),
         if (_focused)
           BoxShadow(
             color: colors.accent.withValues(alpha: disabled ? 0.12 : 0.24),
