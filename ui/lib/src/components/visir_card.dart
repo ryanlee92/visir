@@ -106,11 +106,11 @@ class _VisirCardState extends State<VisirCard> {
     VisirSurfaceThemeData surface,
     bool focused,
   ) {
-    final baseShadows = widget.variant == VisirCardVariant.elevated &&
-            widget.showShadow
+    final baseShadows =
+        widget.variant == VisirCardVariant.elevated && widget.showShadow
         ? [
             BoxShadow(
-              color: tokens.colors.accent.withValues(
+              color: tokens.colors.surfaceOutline.withValues(
                 alpha: surface.elevation.baseOpacity,
               ),
               blurRadius: surface.elevation.baseBlur,

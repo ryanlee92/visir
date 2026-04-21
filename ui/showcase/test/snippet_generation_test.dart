@@ -12,6 +12,8 @@ void main() {
     expect(code, contains("label: 'Continue'"));
     expect(code, isNot(contains('variant:')));
     expect(code, isNot(contains('size:')));
+    expect(code, isNot(contains('border:')));
+    expect(code, isNot(contains('showShadow:')));
     expect(code, isNot(contains('isLoading:')));
     expect(code, isNot(contains('isExpanded:')));
     expect(code, contains('onPressed: () {},'));
@@ -22,6 +24,8 @@ void main() {
       label: 'Continue',
       variant: VisirButtonVariant.danger,
       size: VisirButtonSize.lg,
+      border: VisirButtonBorder.base,
+      showShadow: false,
       isLoading: true,
       isExpanded: true,
       leadingIcon: curatedIconOptions.first,
@@ -31,6 +35,8 @@ void main() {
 
     expect(code, contains('VisirButtonVariant.danger'));
     expect(code, contains('VisirButtonSize.lg'));
+    expect(code, contains('VisirButtonBorder.base'));
+    expect(code, contains('showShadow: false'));
     expect(code, contains('isLoading: true'));
     expect(code, contains('isExpanded: true'));
     expect(code, contains('leading: const Icon('));
@@ -48,6 +54,8 @@ void main() {
     expect(code, contains('icon: const Icon(Icons.search)'));
     expect(code, contains("semanticLabel: 'Search'"));
     expect(code, isNot(contains('variant:')));
+    expect(code, isNot(contains('border:')));
+    expect(code, isNot(contains('showShadow:')));
   });
 
   test('input snippet includes only meaningful fields', () {

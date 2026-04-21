@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../foundation/visir_tokens.dart';
 import 'visir_component_role_themes.dart';
@@ -29,9 +30,17 @@ class VisirThemeData {
       tokens: tokens,
       text: VisirTextThemeData.fallback(tokens.colors),
       components: VisirComponentThemes(
-        button: const VisirButtonThemeData(
+        button: VisirButtonThemeData(
           glowBlur: 24,
           interaction: interaction,
+          secondaryBackgroundColor: tokens.colors.surfaceOutline,
+          secondaryHoverOverlayColor: tokens.colors.text.withValues(
+            alpha: 0.08,
+          ),
+          secondaryForegroundColor: tokens.colors.text,
+          ghostBackgroundColor: Colors.transparent,
+          ghostHoverOverlayColor: tokens.colors.text.withValues(alpha: 0.03),
+          ghostForegroundColor: tokens.colors.textMuted,
         ),
         control: VisirControlThemeData(
           sizing: VisirControlSizing(

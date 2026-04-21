@@ -41,7 +41,7 @@ void main() {
     final theme = VisirTheme.of(tester.element(find.byType(VisirButton)));
     final decoration = _buttonDecoration(tester);
 
-    expect(decoration.color, theme.tokens.colors.surfaceOutline);
+    expect(decoration.color, theme.components.button.secondaryBackgroundColor);
   });
 
   testWidgets('ghost buttons keep a transparent base color', (tester) async {
@@ -55,8 +55,9 @@ void main() {
       ),
     );
 
+    final theme = VisirTheme.of(tester.element(find.byType(VisirButton)));
     final decoration = _buttonDecoration(tester);
 
-    expect(decoration.color, Colors.transparent);
+    expect(decoration.color, theme.components.button.ghostBackgroundColor);
   });
 }

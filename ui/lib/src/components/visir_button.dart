@@ -286,6 +286,7 @@ class _VisirButtonState extends State<VisirButton> {
   BoxDecoration _decoration(VisirThemeData theme, bool disabled) {
     final control = theme.components.control;
     final colors = theme.tokens.colors;
+    final buttonTheme = theme.components.button;
     final isPrimary = widget.variant == VisirButtonVariant.primary;
     final isGhost = widget.variant == VisirButtonVariant.ghost;
     final isDanger = widget.variant == VisirButtonVariant.danger;
@@ -308,10 +309,10 @@ class _VisirButtonState extends State<VisirButton> {
     final baseColor = isPrimary
         ? colors.accent
         : isGhost
-        ? Colors.transparent
+        ? buttonTheme.ghostBackgroundColor
         : isDanger
         ? colors.danger
-        : colors.surfaceMuted;
+        : buttonTheme.secondaryBackgroundColor;
 
     return BoxDecoration(
       gradient: background,
@@ -375,11 +376,12 @@ class _VisirButtonState extends State<VisirButton> {
     }
 
     final colors = theme.tokens.colors;
+    final buttonTheme = theme.components.button;
 
     return switch (widget.variant) {
       VisirButtonVariant.primary => colors.text.withValues(alpha: 0.06),
-      VisirButtonVariant.secondary => colors.text.withValues(alpha: 0.08),
-      VisirButtonVariant.ghost => colors.text.withValues(alpha: 0.03),
+      VisirButtonVariant.secondary => buttonTheme.secondaryHoverOverlayColor,
+      VisirButtonVariant.ghost => buttonTheme.ghostHoverOverlayColor,
       VisirButtonVariant.danger => colors.text.withValues(alpha: 0.04),
     };
   }
@@ -399,8 +401,9 @@ class _VisirButtonState extends State<VisirButton> {
   Color _foregroundColor(VisirThemeData theme) {
     return switch (widget.variant) {
       VisirButtonVariant.primary => theme.tokens.colors.textInverse,
-      VisirButtonVariant.secondary => theme.tokens.colors.text,
-      VisirButtonVariant.ghost => theme.tokens.colors.textMuted,
+      VisirButtonVariant.secondary =>
+        theme.components.button.secondaryForegroundColor,
+      VisirButtonVariant.ghost => theme.components.button.ghostForegroundColor,
       VisirButtonVariant.danger => theme.tokens.colors.textInverse,
     };
   }

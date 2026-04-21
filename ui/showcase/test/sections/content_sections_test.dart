@@ -53,7 +53,13 @@ void main() {
 
     expect(find.byType(VisirAppBarSection), findsOneWidget);
     expect(find.text('Title'), findsOneWidget);
+    expect(find.text('Button type'), findsWidgets);
+    expect(find.text('Semantic Label'), findsNothing);
+    expect(find.text('Tooltip'), findsWidgets);
+    expect(find.text('Child Label'), findsWidgets);
+    expect(find.text('Icon'), findsWidgets);
     expect(find.text('Leading'), findsOneWidget);
-    expect(find.text('Trailing'), findsOneWidget);
+    expect(find.text('Trailing action'), findsOneWidget);
+    expect(find.text('Background'), findsOneWidget);
   });
 }

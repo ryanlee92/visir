@@ -87,6 +87,14 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
         caption: base.text.caption.copyWith(color: colors.textMuted),
       ),
       components: base.components.copyWith(
+        button: base.components.button.copyWith(
+          secondaryBackgroundColor: colors.surfaceOutline,
+          secondaryHoverOverlayColor: colors.text.withValues(alpha: 0.08),
+          secondaryForegroundColor: colors.text,
+          ghostBackgroundColor: Colors.transparent,
+          ghostHoverOverlayColor: colors.text.withValues(alpha: 0.03),
+          ghostForegroundColor: colors.textMuted,
+        ),
         control: base.components.control.copyWith(borders: borders),
         surface: base.components.surface.copyWith(borders: borders),
       ),
@@ -127,6 +135,14 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
         caption: base.text.caption.copyWith(color: colors.textMuted),
       ),
       components: base.components.copyWith(
+        button: base.components.button.copyWith(
+          secondaryBackgroundColor: colors.surfaceOutline,
+          secondaryHoverOverlayColor: colors.text.withValues(alpha: 0.08),
+          secondaryForegroundColor: colors.text,
+          ghostBackgroundColor: Colors.transparent,
+          ghostHoverOverlayColor: colors.text.withValues(alpha: 0.03),
+          ghostForegroundColor: colors.textMuted,
+        ),
         control: base.components.control.copyWith(borders: borders),
         surface: base.components.surface.copyWith(borders: borders),
       ),

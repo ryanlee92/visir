@@ -40,4 +40,28 @@ void main() {
 
     expect(find.textContaining('isLoading: true'), findsOneWidget);
   });
+
+  testWidgets('button section updates snippet when border and shadow change', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: VisirButtonSection()),
+        ),
+      ),
+    );
+
+    await tester.ensureVisible(find.text('Success'));
+    await tester.tap(find.text('Success'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('VisirButtonBorder.success'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Shadow'));
+    await tester.tap(find.text('Shadow'));
+    await tester.pump();
+
+    expect(find.textContaining('showShadow: false'), findsOneWidget);
+  });
 }

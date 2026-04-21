@@ -6,6 +6,7 @@ import '../data/icon_options.dart';
 import '../playground/playground_enum_picker.dart';
 import '../playground/playground_panel.dart';
 import '../playground/playground_text_field.dart';
+import '../playground/playground_toggle.dart';
 import '../playground/preview_frame.dart';
 import 'showcase_section_layout.dart';
 
@@ -20,6 +21,8 @@ class _VisirButtonSectionState extends State<VisirButtonSection> {
   String _label = 'Continue';
   VisirButtonVariant _variant = VisirButtonVariant.primary;
   VisirButtonSize _size = VisirButtonSize.md;
+  VisirButtonBorder _border = VisirButtonBorder.none;
+  bool _showShadow = true;
   bool _isLoading = false;
   bool _isExpanded = false;
   bool _enabled = true;
@@ -31,6 +34,8 @@ class _VisirButtonSectionState extends State<VisirButtonSection> {
     label: _label,
     variant: _variant,
     size: _size,
+    border: _border,
+    showShadow: _showShadow,
     isLoading: _isLoading,
     isExpanded: _isExpanded,
     leadingIcon: _leadingIcon,
@@ -69,6 +74,8 @@ class _VisirButtonSectionState extends State<VisirButtonSection> {
                   onPressed: _enabled ? () {} : null,
                   variant: _variant,
                   size: _size,
+                  border: _border,
+                  showShadow: _showShadow,
                   isLoading: _isLoading,
                   isExpanded: _isExpanded,
                   tooltip: _tooltip.trim().isEmpty ? null : _tooltip.trim(),
@@ -116,6 +123,11 @@ class _VisirButtonSectionState extends State<VisirButtonSection> {
                   labelBuilder: _enumLabel,
                 ),
                 const SizedBox(height: 12),
+                _BorderSelector(
+                  value: _border,
+                  onChanged: (value) => setState(() => _border = value),
+                ),
+                const SizedBox(height: 12),
                 _IconSelector(
                   label: 'Leading Icon',
                   selected: _leadingIcon,
@@ -128,17 +140,22 @@ class _VisirButtonSectionState extends State<VisirButtonSection> {
                   onSelected: (icon) => setState(() => _trailingIcon = icon),
                 ),
                 const SizedBox(height: 4),
-                _BooleanToggle(
+                PlaygroundToggle(
                   label: 'Enabled',
                   value: _enabled,
                   onChanged: (value) => setState(() => _enabled = value),
                 ),
-                _BooleanToggle(
+                PlaygroundToggle(
+                  label: 'Shadow',
+                  value: _showShadow,
+                  onChanged: (value) => setState(() => _showShadow = value),
+                ),
+                PlaygroundToggle(
                   label: 'Loading',
                   value: _isLoading,
                   onChanged: (value) => setState(() => _isLoading = value),
                 ),
-                _BooleanToggle(
+                PlaygroundToggle(
                   label: 'Expanded',
                   value: _isExpanded,
                   onChanged: (value) => setState(() => _isExpanded = value),
@@ -183,28 +200,6 @@ class _SnippetPanel extends StatelessWidget {
   }
 }
 
-class _BooleanToggle extends StatelessWidget {
-  const _BooleanToggle({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SwitchListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(label),
-      value: value,
-      onChanged: onChanged,
-    );
-  }
-}
-
 class _IconSelector extends StatelessWidget {
   const _IconSelector({
     required this.label,
@@ -238,6 +233,36 @@ class _IconSelector extends StatelessWidget {
                 avatar: Icon(option.iconData, size: 16),
                 selected: selected?.id == option.id,
                 onSelected: (_) => onSelected(option),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _BorderSelector extends StatelessWidget {
+  const _BorderSelector({required this.value, required this.onChanged});
+
+  final VisirButtonBorder value;
+  final ValueChanged<VisirButtonBorder> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Border', style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final option in VisirButtonBorder.values)
+              ChoiceChip(
+                label: Text(_enumLabel(option)),
+                selected: value == option,
+                onSelected: (_) => onChanged(option),
               ),
           ],
         ),
