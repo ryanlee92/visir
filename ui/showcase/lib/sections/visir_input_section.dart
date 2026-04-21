@@ -22,18 +22,35 @@ class _VisirInputSectionState extends State<VisirInputSection> {
   String _hintText = 'name@example.com';
   String _errorText = '';
   bool _enabled = true;
+  VisirInputBorder _border = VisirInputBorder.none;
   CuratedIconOption? _suffixIcon;
   bool _isLoading = false;
   bool _showClearButton = false;
   int _maxLines = 1;
   CuratedIconOption? _leadingIcon = curatedIconById('search');
 
+  String? get _safeLabel {
+    final value = _label.trim();
+    return value.isEmpty ? null : value;
+  }
+
+  String? get _safeHintText {
+    final value = _hintText.trim();
+    return value.isEmpty ? null : value;
+  }
+
+  String? get _safeErrorText {
+    final value = _errorText.trim();
+    return value.isEmpty ? null : value;
+  }
+
   String get _snippet => buildInputSnippet(
-    label: _label,
-    hintText: _hintText,
+    label: _safeLabel,
+    hintText: _safeHintText,
     suffixIcon: _suffixIcon,
     leadingIcon: _leadingIcon,
-    errorText: _errorText,
+    errorText: _safeErrorText,
+    border: _border,
     enabled: _enabled,
     isLoading: _isLoading,
     showClearButton: _showClearButton,
@@ -65,14 +82,13 @@ class _VisirInputSectionState extends State<VisirInputSection> {
               child: SizedBox(
                 width: 360,
                 child: VisirInput(
-                  label: _label.trim().isEmpty ? 'Input Label' : _label.trim(),
-                  hintText: _hintText.trim().isEmpty ? null : _hintText.trim(),
+                  label: _safeLabel,
+                  border: _border,
+                  hintText: _safeHintText,
                   suffix: _suffixIcon != null
                       ? Icon(_suffixIcon!.iconData)
                       : null,
-                  errorText: _errorText.trim().isEmpty
-                      ? null
-                      : _errorText.trim(),
+                  errorText: _safeErrorText,
                   enabled: _enabled,
                   leading: _leadingIcon != null
                       ? Icon(_leadingIcon!.iconData)
@@ -94,6 +110,11 @@ class _VisirInputSectionState extends State<VisirInputSection> {
                   label: 'Label',
                   value: _label,
                   onChanged: (value) => setState(() => _label = value),
+                ),
+                const SizedBox(height: 12),
+                _BorderSelector(
+                  value: _border,
+                  onChanged: (value) => setState(() => _border = value),
                 ),
                 const SizedBox(height: 12),
                 PlaygroundTextField(
@@ -175,6 +196,38 @@ class _LineCountSelector extends StatelessWidget {
               ChoiceChip(
                 label: Text(option.toString()),
                 selected: value == option,
+                onSelected: (_) => onChanged(option),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _BorderSelector extends StatelessWidget {
+  const _BorderSelector({required this.value, required this.onChanged});
+
+  final VisirInputBorder value;
+  final ValueChanged<VisirInputBorder> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const options = VisirInputBorder.values;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Border', style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final option in options)
+              ChoiceChip(
+                label: Text(option.name),
+                selected: option == value,
                 onSelected: (_) => onChanged(option),
               ),
           ],

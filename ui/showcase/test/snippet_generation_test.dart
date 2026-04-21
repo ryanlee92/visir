@@ -69,6 +69,28 @@ void main() {
     expect(code, contains('enabled: false'));
   });
 
+  test('input snippet omits label when empty', () {
+    final code = buildInputSnippet(
+      label: '',
+      hintText: 'name@example.com',
+    );
+
+    expect(code, contains('VisirInput('));
+    expect(code, contains("hintText: 'name@example.com'"));
+    expect(code, isNot(contains('label:')));
+  });
+
+  test('input snippet emits border mode when non-default', () {
+    final code = buildInputSnippet(
+      label: 'Email',
+      hintText: 'name@example.com',
+      border: VisirInputBorder.success,
+    );
+
+    expect(code, contains('VisirInput('));
+    expect(code, contains('border: VisirInputBorder.success'));
+  });
+
   test('input snippet includes search mode output when requested', () {
     final code = buildInputSnippet(
       label: 'Search',
