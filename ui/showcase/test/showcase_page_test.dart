@@ -4,22 +4,46 @@ import 'package:visir_ui/visir_ui.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
 import 'package:visir_ui_showcase/app/showcase_page.dart';
 import 'package:visir_ui_showcase/app/showcase_theme.dart';
+import 'package:visir_ui_showcase/app/showcase_sections.dart';
 import 'package:visir_ui_showcase/sections/showcase_section_layout.dart';
+import 'package:visir_ui_showcase/sections/visir_button_section.dart';
+import 'package:visir_ui_showcase/sections/visir_input_section.dart';
 
 void main() {
-  testWidgets('ShowcaseApp renders page shell smoke coverage', (tester) async {
-    tester.view.physicalSize = const Size(800, 900);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
-
+  testWidgets('ShowcaseApp renders grouped component sidebar', (tester) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Visir UI'), findsOneWidget);
     expect(find.byKey(const ValueKey('showcase-theme-button')), findsOneWidget);
     expect(find.byKey(showcaseScrollViewKey), findsOneWidget);
-    expect(find.byType(VisirCard), findsWidgets);
-    expect(find.byType(VisirAppBar), findsOneWidget);
+    expect(find.text('Actions'), findsOneWidget);
+    expect(find.text('Forms'), findsOneWidget);
+    expect(find.text('Surfaces'), findsOneWidget);
+    expect(find.text('Feedback'), findsOneWidget);
+    expect(find.text('Status'), findsOneWidget);
+    for (final id in showcaseSectionIds) {
+      expect(find.byKey(ValueKey('showcase-sidebar-$id')), findsOneWidget);
+    }
+    expect(find.byType(VisirButtonSection), findsOneWidget);
+  });
+
+  testWidgets('ShowcaseApp switches the active section from the sidebar', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.byType(VisirButtonSection), findsOneWidget);
+    expect(find.byType(VisirInputSection), findsNothing);
+
+    final inputSidebar = find.byKey(const ValueKey('showcase-sidebar-input'));
+    await tester.ensureVisible(inputSidebar);
+    await tester.tap(inputSidebar);
+    await tester.pump();
+
+    expect(find.byType(VisirInputSection), findsOneWidget);
+    expect(find.byType(VisirButtonSection), findsNothing);
   });
 
   testWidgets('ShowcaseApp theme button toggles the app shell theme', (
@@ -28,6 +52,9 @@ void main() {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pump(const Duration(milliseconds: 100));
 
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('showcase-theme-button')),
+    );
     await tester.tap(find.byKey(const ValueKey('showcase-theme-button')));
     await tester.pump(const Duration(milliseconds: 200));
 
@@ -64,6 +91,11 @@ void main() {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pump(const Duration(milliseconds: 100));
 
+    final inputSidebar = find.byKey(const ValueKey('showcase-sidebar-input'));
+    await tester.ensureVisible(inputSidebar);
+    await tester.tap(inputSidebar);
+    await tester.pump();
+
     final shellFinder = find.byKey(const ValueKey('visir-input-shell'));
     final initialShell =
         tester.widget<Container>(shellFinder).decoration as BoxDecoration;
@@ -85,6 +117,13 @@ void main() {
   ) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pump(const Duration(milliseconds: 100));
+
+    final dividerSidebar = find.byKey(
+      const ValueKey('showcase-sidebar-divider'),
+    );
+    await tester.ensureVisible(dividerSidebar);
+    await tester.tap(dividerSidebar);
+    await tester.pump();
 
     final divider = tester.widget<ColoredBox>(
       find.descendant(
@@ -115,16 +154,11 @@ void main() {
     final scrollView = tester.widget<SingleChildScrollView>(
       find.byKey(showcaseScrollViewKey),
     );
-    final heroColumn = tester
-        .widgetList<Column>(find.byType(Column))
-        .firstWhere((column) => _isHeroColumn(column));
-    final heroGap = heroColumn.children[1] as SizedBox;
 
     expect(
       scrollView.padding,
-      const EdgeInsets.symmetric(horizontal: 31, vertical: 54),
+      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
     );
-    expect(heroGap.height, 38);
   });
 
   testWidgets(
@@ -150,7 +184,7 @@ void main() {
 
       expect(
         scrollView.padding,
-        const EdgeInsets.symmetric(horizontal: 31, vertical: 54),
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       );
       expect(
         cardShape.borderRadius.resolve(TextDirection.ltr),
@@ -194,20 +228,9 @@ void main() {
     final firstGap = layout.children[1] as SizedBox;
     final secondGap = layout.children[3] as SizedBox;
 
-    expect(firstGap.height, 31);
-    expect(secondGap.height, 31);
+    expect(firstGap.height, 16);
+    expect(secondGap.height, 16);
   });
-}
-
-bool _isHeroColumn(Column column) {
-  if (column.children.isEmpty) {
-    return false;
-  }
-
-  final firstChild = column.children.first;
-  return firstChild is Text &&
-      firstChild.data ==
-          'Interactive component showcase for the visir_ui package.';
 }
 
 VisirThemeData _customVisirThemeData() {
@@ -218,15 +241,11 @@ VisirThemeData _customVisirThemeData() {
     ),
     components: fallback.components.copyWith(
       surface: fallback.components.surface.copyWith(
-        padding: fallback.components.surface.padding.copyWith(
-          compact: 19,
-          comfortable: 31,
-          spacious: 47,
+        padding: const VisirSurfaceDensityScale(
+          compact: 12,
+          comfortable: 16,
+          spacious: 31,
         ),
-      ),
-      content: fallback.components.content.copyWith(
-        compactSpacing: 7,
-        inlineSpacing: 13,
       ),
     ),
   );
