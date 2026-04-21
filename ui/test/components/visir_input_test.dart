@@ -38,8 +38,8 @@ void main() {
     );
 
     expect(find.text('Find projects'), findsOneWidget);
-    expect(find.text('Search'), findsNothing);
     expect(find.byIcon(Icons.search), findsOneWidget);
+    expect(find.bySemanticsLabel('Search'), findsOneWidget);
   });
 
   testWidgets('search mode respects maxLines', (tester) async {
@@ -118,5 +118,62 @@ void main() {
     await tester.pump();
 
     expect(clearCount, 1);
+  });
+
+  testWidgets('search mode uses the focused border when focused', (
+    tester,
+  ) async {
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+
+    await tester.pumpWidget(
+      buildHarness(
+        VisirInput(
+          label: 'Search',
+          hintText: 'Find tasks',
+          mode: VisirInputMode.search,
+          focusNode: focusNode,
+        ),
+      ),
+    );
+
+    final shellFinder = find.byKey(
+      const ValueKey('visir-input-search-shell'),
+    );
+
+    final before = tester.widget<Container>(shellFinder);
+    final beforeBorder =
+        (before.decoration as BoxDecoration).border as Border;
+
+    focusNode.requestFocus();
+    await tester.pump();
+
+    final after = tester.widget<Container>(shellFinder);
+    final afterBorder = (after.decoration as BoxDecoration).border as Border;
+
+    expect(beforeBorder.top.color, isNot(equals(afterBorder.top.color)));
+    expect(afterBorder.top.width, greaterThanOrEqualTo(beforeBorder.top.width));
+  });
+
+  testWidgets('search mode shows a danger border when error text is set', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          label: 'Search',
+          hintText: 'Find tasks',
+          mode: VisirInputMode.search,
+          errorText: 'Invalid query',
+        ),
+      ),
+    );
+
+    final container = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-search-shell')),
+    );
+    final border = (container.decoration as BoxDecoration).border as Border;
+
+    expect(border.top.color, const Color(0xFFE13A5F));
   });
 }

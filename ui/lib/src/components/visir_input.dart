@@ -114,76 +114,23 @@ class VisirInput extends StatelessWidget {
     VisirTokens tokens,
     VisirControlThemeData control,
   ) {
-    final effectiveMaxLines = maxLines ?? 1;
-
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: tokens.colors.surface,
-          borderRadius: BorderRadius.circular(control.radius),
-          border: Border.all(
-            color: enabled ? control.borders.base.color : control.borders.disabled.color,
-            width: enabled ? control.borders.base.width : control.borders.disabled.width,
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildLeading(tokens),
-            const SizedBox(width: 8),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                enabled: enabled,
-                autofocus: autofocus,
-                focusNode: focusNode,
-                onSubmitted: onSubmitted,
-                onChanged: onChanged,
-                maxLines: effectiveMaxLines,
-                style: TextStyle(color: tokens.colors.text),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  hintText: hintText,
-                  hintStyle: TextStyle(color: tokens.colors.textMuted),
-                  errorText: errorText,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-            if (isLoading) ...[
-              const SizedBox(width: 8),
-              const VisirSpinner(
-                size: VisirSpinnerSize.sm,
-                tone: VisirSpinnerTone.inverse,
-              ),
-            ],
-            if (showClearButton) ...[
-              const SizedBox(width: 6),
-              IconButton(
-                onPressed: enabled ? onClear : null,
-                icon: Icon(
-                  Icons.close,
-                  size: 16,
-                  color: tokens.colors.textMuted,
-                ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                visualDensity: VisualDensity.compact,
-                splashRadius: 16,
-                tooltip: 'Clear',
-              ),
-            ],
-          ],
-        ),
-      ),
+    return _VisirSearchInput(
+      label: label,
+      hintText: hintText,
+      controller: controller,
+      enabled: enabled,
+      onSubmitted: onSubmitted,
+      onChanged: onChanged,
+      autofocus: autofocus,
+      focusNode: focusNode,
+      leading: leading,
+      showClearButton: showClearButton,
+      onClear: onClear,
+      isLoading: isLoading,
+      errorText: errorText,
+      maxLines: maxLines,
+      tokens: tokens,
+      control: control,
     );
   }
 
@@ -204,5 +151,179 @@ class VisirInput extends StatelessWidget {
       borderRadius: BorderRadius.circular(radius),
       borderSide: BorderSide(color: state.color, width: state.width),
     );
+  }
+}
+
+class _VisirSearchInput extends StatefulWidget {
+  const _VisirSearchInput({
+    required this.label,
+    required this.hintText,
+    required this.controller,
+    required this.enabled,
+    required this.onSubmitted,
+    required this.onChanged,
+    required this.autofocus,
+    required this.focusNode,
+    required this.leading,
+    required this.showClearButton,
+    required this.onClear,
+    required this.isLoading,
+    required this.errorText,
+    required this.maxLines,
+    required this.tokens,
+    required this.control,
+  });
+
+  final String label;
+  final String? hintText;
+  final TextEditingController? controller;
+  final bool enabled;
+  final ValueChanged<String>? onSubmitted;
+  final ValueChanged<String>? onChanged;
+  final bool autofocus;
+  final FocusNode? focusNode;
+  final Widget? leading;
+  final bool showClearButton;
+  final VoidCallback? onClear;
+  final bool isLoading;
+  final String? errorText;
+  final int? maxLines;
+  final VisirTokens tokens;
+  final VisirControlThemeData control;
+
+  @override
+  State<_VisirSearchInput> createState() => _VisirSearchInputState();
+}
+
+class _VisirSearchInputState extends State<_VisirSearchInput> {
+  final FocusNode _internalFocusNode = FocusNode();
+
+  FocusNode get _focusNode => widget.focusNode ?? _internalFocusNode;
+
+  bool get _hasError =>
+      widget.errorText != null && widget.errorText!.trim().isNotEmpty;
+
+  @override
+  void dispose() {
+    _internalFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _focusNode,
+      builder: (context, _) {
+        final borderState = _borderState();
+        final effectiveMaxLines = widget.maxLines ?? 1;
+
+        return Semantics(
+          container: true,
+          label: widget.label,
+          textField: true,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              key: const ValueKey('visir-input-search-shell'),
+              decoration: BoxDecoration(
+                color: widget.tokens.colors.surface,
+                borderRadius: BorderRadius.circular(widget.control.radius),
+                border: Border.all(
+                  color: borderState.color,
+                  width: borderState.width,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildLeading(),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: widget.controller,
+                      enabled: widget.enabled,
+                      autofocus: widget.autofocus,
+                      focusNode: _focusNode,
+                      onSubmitted: widget.onSubmitted,
+                      onChanged: widget.onChanged,
+                      maxLines: effectiveMaxLines,
+                      style: TextStyle(color: widget.tokens.colors.text),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        hintText: widget.hintText,
+                        hintStyle: TextStyle(color: widget.tokens.colors.textMuted),
+                        errorText: widget.errorText,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                  if (widget.isLoading) ...[
+                    const SizedBox(width: 8),
+                    const VisirSpinner(
+                      size: VisirSpinnerSize.sm,
+                      tone: VisirSpinnerTone.inverse,
+                    ),
+                  ],
+                  if (widget.showClearButton) ...[
+                    const SizedBox(width: 6),
+                    IconButton(
+                      onPressed: widget.enabled ? widget.onClear : null,
+                      icon: Icon(
+                        Icons.close,
+                        size: 16,
+                        color: widget.tokens.colors.textMuted,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints.tightFor(
+                        width: 28,
+                        height: 28,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      splashRadius: 16,
+                      tooltip: 'Clear',
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLeading() {
+    if (widget.leading != null) {
+      return widget.leading!;
+    }
+
+    return Icon(
+      Icons.search,
+      size: 16,
+      color: widget.tokens.colors.textMuted,
+    );
+  }
+
+  VisirBorderState _borderState() {
+    if (!widget.enabled) {
+      return widget.control.borders.disabled;
+    }
+
+    if (_hasError) {
+      return widget.control.borders.focus.copyWith(
+        color: widget.tokens.colors.danger,
+      );
+    }
+
+    return _focusNode.hasFocus
+        ? widget.control.borders.focus
+        : widget.control.borders.base;
   }
 }
