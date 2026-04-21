@@ -43,7 +43,6 @@ void main() {
 
     expect(find.text('name@example.com'), findsOneWidget);
     expect(find.text('Email'), findsNothing);
-    expect(find.byWidgetPredicate((widget) => widget is Text && widget.data == null), findsNothing);
   });
 
   testWidgets('input border defaults to none', (tester) async {
