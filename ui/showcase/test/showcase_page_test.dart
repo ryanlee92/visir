@@ -33,11 +33,12 @@ void main() {
     expect(find.byKey(showcaseScrollViewKey), findsOneWidget);
     expect(find.text('Actions'), findsOneWidget);
     expect(find.text('Forms'), findsOneWidget);
+    expect(find.text('Navigation'), findsOneWidget);
     expect(find.text('Surfaces'), findsOneWidget);
     expect(find.text('Feedback'), findsOneWidget);
     expect(find.text('Status'), findsOneWidget);
     for (final id in showcaseSectionIds) {
-      expect(find.byKey(ValueKey('showcase-sidebar-$id')), findsOneWidget);
+      expect(find.byKey(showcaseSidebarSectionKey(id)), findsOneWidget);
     }
     expect(find.byType(VisirButtonSection), findsOneWidget);
   });

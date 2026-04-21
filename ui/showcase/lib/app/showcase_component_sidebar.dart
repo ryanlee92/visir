@@ -74,7 +74,7 @@ class ShowcaseComponentSidebar extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
-                          key: ValueKey('showcase-sidebar-$sectionId'),
+                          key: showcaseSidebarSectionKey(sectionId),
                           dense: true,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),

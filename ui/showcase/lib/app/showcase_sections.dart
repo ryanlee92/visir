@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../sections/visir_badge_section.dart';
+import '../sections/visir_app_bar_section.dart';
 import '../sections/visir_button_section.dart';
 import '../sections/visir_card_section.dart';
 import '../sections/visir_divider_section.dart';
@@ -14,6 +15,7 @@ const List<String> showcaseSectionIds = [
   'button',
   'icon-button',
   'input',
+  'app-bar',
   'card',
   'badge',
   'section',
@@ -32,6 +34,7 @@ final List<String> featuredShowcaseJumpSectionIds = [
 const List<ShowcaseSectionGroup> showcaseSectionGroups = [
   ShowcaseSectionGroup(label: 'Actions', sectionIds: ['button', 'icon-button']),
   ShowcaseSectionGroup(label: 'Forms', sectionIds: ['input']),
+  ShowcaseSectionGroup(label: 'Navigation', sectionIds: ['app-bar']),
   ShowcaseSectionGroup(label: 'Surfaces', sectionIds: ['card', 'section']),
   ShowcaseSectionGroup(label: 'Feedback', sectionIds: ['divider', 'spinner']),
   ShowcaseSectionGroup(label: 'Status', sectionIds: ['badge', 'empty-state']),
@@ -60,6 +63,14 @@ class ShowcaseSectionEntry {
   final WidgetBuilder builder;
 }
 
+Key showcaseSidebarSectionKey(String sectionId) {
+  if (sectionId == 'app-bar') {
+    return const ValueKey('showcase-sidebar-component-app-bar');
+  }
+
+  return ValueKey('showcase-sidebar-$sectionId');
+}
+
 final List<ShowcaseSectionEntry> showcaseSections = [
   ShowcaseSectionEntry(
     id: 'button',
@@ -78,6 +89,12 @@ final List<ShowcaseSectionEntry> showcaseSections = [
     title: 'VisirInput',
     groupLabel: 'Forms',
     builder: (_) => const VisirInputSection(),
+  ),
+  ShowcaseSectionEntry(
+    id: 'app-bar',
+    title: 'VisirAppBar',
+    groupLabel: 'Navigation',
+    builder: (_) => const VisirAppBarSection(),
   ),
   ShowcaseSectionEntry(
     id: 'card',

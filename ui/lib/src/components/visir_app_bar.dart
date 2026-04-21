@@ -11,8 +11,8 @@ class VisirAppBarButton {
     required this.semanticLabel,
     this.onPressed,
     this.tooltip,
-  })  : isDivider = false,
-        child = null;
+  }) : isDivider = false,
+       child = null;
 
   const VisirAppBarButton.child({
     this.key,
@@ -20,17 +20,17 @@ class VisirAppBarButton {
     required this.semanticLabel,
     this.onPressed,
     this.tooltip,
-  })  : isDivider = false,
-        icon = null;
+  }) : isDivider = false,
+       icon = null;
 
   const VisirAppBarButton.divider()
-      : key = null,
-        isDivider = true,
-        icon = null,
-        child = null,
-        semanticLabel = null,
-        onPressed = null,
-        tooltip = null;
+    : key = null,
+      isDivider = true,
+      icon = null,
+      child = null,
+      semanticLabel = null,
+      onPressed = null,
+      tooltip = null;
 
   final Key? key;
   final bool isDivider;
@@ -45,7 +45,7 @@ class VisirAppBarButton {
       final colors = Theme.of(context).colorScheme;
 
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Container(
           key: const ValueKey('visir-app-bar-divider'),
           width: 2,
@@ -62,9 +62,10 @@ class VisirAppBarButton {
           key: key,
           label: '',
           onPressed: onPressed,
-          variant: VisirButtonVariant.ghost,
-          size: VisirButtonSize.sm,
+          variant: VisirButtonVariant.secondary,
+          size: VisirButtonSize.md,
           leading: icon,
+          showShadow: false,
           isIconOnly: true,
           semanticLabel: semanticLabel,
           tooltip: tooltip,
@@ -78,8 +79,9 @@ class VisirAppBarButton {
         key: key,
         label: semanticLabel ?? '',
         onPressed: onPressed,
-        variant: VisirButtonVariant.ghost,
-        size: VisirButtonSize.sm,
+        showShadow: false,
+        variant: VisirButtonVariant.secondary,
+        size: VisirButtonSize.md,
         leading: child,
         tooltip: tooltip,
       ),
@@ -120,9 +122,12 @@ class VisirAppBar extends StatelessWidget implements PreferredSizeWidget {
       color: backgroundColor ?? theme.colorScheme.surface,
       child: Row(
         children: [
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           ...leadings.map((button) => button.build(context)),
-          if (leadings.isEmpty) const SizedBox(width: 6) else const SizedBox(width: 4),
+          if (leadings.isEmpty)
+            const SizedBox(width: 6)
+          else
+            const SizedBox(width: 4),
           Expanded(
             child: Container(
               margin: const EdgeInsets.all(1),
@@ -136,7 +141,7 @@ class VisirAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           if (trailings.isEmpty) const SizedBox(width: 6),
           ...trailings.map((button) => button.build(context)),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
         ],
       ),
     );

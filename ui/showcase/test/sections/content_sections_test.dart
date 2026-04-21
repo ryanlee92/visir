@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
+import 'package:visir_ui_showcase/app/showcase_sections.dart';
 import 'package:visir_ui_showcase/sections/visir_badge_section.dart';
+import 'package:visir_ui_showcase/sections/visir_app_bar_section.dart';
 import 'package:visir_ui_showcase/sections/visir_card_section.dart';
 import 'package:visir_ui_showcase/sections/visir_input_section.dart';
 
@@ -36,5 +38,22 @@ void main() {
     await tester.pump();
 
     expect(find.byType(VisirBadgeSection), findsOneWidget);
+  });
+
+  testWidgets('sidebar browser can switch to the app bar section', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final appBarSidebar = find.byKey(showcaseSidebarSectionKey('app-bar'));
+    await tester.ensureVisible(appBarSidebar);
+    await tester.tap(appBarSidebar);
+    await tester.pump();
+
+    expect(find.byType(VisirAppBarSection), findsOneWidget);
+    expect(find.text('Title'), findsOneWidget);
+    expect(find.text('Leading'), findsOneWidget);
+    expect(find.text('Trailing'), findsOneWidget);
   });
 }
