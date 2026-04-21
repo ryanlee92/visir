@@ -231,6 +231,7 @@ class VisirInput extends StatelessWidget {
       icon: leadingWidget,
       semanticLabel: leadingTooltip ?? 'Leading action',
       size: VisirButtonSize.md,
+      variant: VisirButtonVariant.ghost,
       onPressed: leadingOnPressed,
       tooltip: leadingTooltip,
     );
@@ -242,6 +243,7 @@ class VisirInput extends StatelessWidget {
       icon: trailingWidget,
       semanticLabel: suffixTooltip ?? 'Trailing action',
       size: VisirButtonSize.md,
+      variant: VisirButtonVariant.ghost,
       onPressed: suffixOnPressed,
       tooltip: suffixTooltip,
     );
