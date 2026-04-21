@@ -36,7 +36,9 @@ class _VisirInputSectionState extends State<VisirInputSection> {
     hintText: _hintText,
     prefixIcon: _prefixIcon,
     suffixIcon: _suffixIcon,
-    leadingIcon: _leadingIcon,
+    leadingIcon: _mode == VisirInputMode.search && _useCustomLeading
+        ? _leadingIcon
+        : null,
     errorText: _errorText,
     enabled: _enabled,
     mode: _mode,
