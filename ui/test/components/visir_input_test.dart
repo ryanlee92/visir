@@ -129,6 +129,39 @@ void main() {
     expect(find.byType(VisirIconButton), findsOneWidget);
   });
 
+  testWidgets('input loading spinner follows the theme text color', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      tokens: baseTheme.tokens.copyWith(
+        colors: baseTheme.tokens.colors.copyWith(text: const Color(0xFF222222)),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: VisirTheme(
+            data: themedData,
+            child: const VisirInput(
+              label: 'Search',
+              hintText: 'Find tasks',
+              isLoading: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final spinner = tester.widget<CircularProgressIndicator>(
+      find.byType(CircularProgressIndicator),
+    );
+    final valueColor = spinner.valueColor as AlwaysStoppedAnimation<Color>;
+
+    expect(valueColor.value, const Color(0xFF222222));
+  });
+
   testWidgets('input uses custom leading when provided', (tester) async {
     await tester.pumpWidget(
       buildHarness(

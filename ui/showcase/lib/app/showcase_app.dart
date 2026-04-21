@@ -67,8 +67,23 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
       success: const Color(0xFF16794B),
       warning: const Color(0xFFB16A1A),
     );
+    final borders = VisirBorderStates(
+      base: VisirBorderState(color: colors.surfaceOutline, width: 1),
+      hover: VisirBorderState(color: colors.surfaceOutline, width: 1),
+      focus: VisirBorderState(color: colors.accent, width: 2),
+      disabled: VisirBorderState(
+        color: colors.surfaceOutline.withValues(alpha: 0.4),
+        width: 1,
+      ),
+    );
 
-    return base.copyWith(tokens: base.tokens.copyWith(colors: colors));
+    return base.copyWith(
+      tokens: base.tokens.copyWith(colors: colors),
+      components: base.components.copyWith(
+        control: base.components.control.copyWith(borders: borders),
+        surface: base.components.surface.copyWith(borders: borders),
+      ),
+    );
   }
 
   VisirThemeData _buildDarkVisirTheme(VisirThemeData base) {
@@ -85,7 +100,22 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
       success: const Color(0xFF3BB273),
       warning: const Color(0xFFF2A93B),
     );
+    final borders = VisirBorderStates(
+      base: VisirBorderState(color: colors.surfaceOutline, width: 1),
+      hover: VisirBorderState(color: colors.surfaceOutline, width: 1),
+      focus: VisirBorderState(color: colors.accent, width: 2),
+      disabled: VisirBorderState(
+        color: colors.surfaceOutline.withValues(alpha: 0.4),
+        width: 1,
+      ),
+    );
 
-    return base.copyWith(tokens: base.tokens.copyWith(colors: colors));
+    return base.copyWith(
+      tokens: base.tokens.copyWith(colors: colors),
+      components: base.components.copyWith(
+        control: base.components.control.copyWith(borders: borders),
+        surface: base.components.surface.copyWith(borders: borders),
+      ),
+    );
   }
 }

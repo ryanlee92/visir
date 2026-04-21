@@ -232,7 +232,7 @@ class _SearchLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return VisirSpinner(
       size: VisirSpinnerSize.sm,
-      tone: VisirSpinnerTone.primary,
+      tone: VisirSpinnerTone.inverse,
     );
   }
 }

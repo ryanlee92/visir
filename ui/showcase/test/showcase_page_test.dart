@@ -39,9 +39,7 @@ void main() {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pump(const Duration(milliseconds: 100));
 
-    final shellFinder = find.byKey(
-      const ValueKey('visir-input-shell'),
-    );
+    final shellFinder = find.byKey(const ValueKey('visir-input-shell'));
     final initialShell =
         tester.widget<Container>(shellFinder).decoration as BoxDecoration;
     final initialColor = initialShell.color;
@@ -55,6 +53,23 @@ void main() {
 
     expect(initialColor, isNot(updatedColor));
     expect(updatedColor, const Color(0xCC1F1B33));
+  });
+
+  testWidgets('ShowcaseApp light theme divider uses dark border color', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final divider = tester.widget<ColoredBox>(
+      find.descendant(
+        of: find.byType(VisirDivider),
+        matching: find.byType(ColoredBox),
+      ),
+    );
+
+    expect(divider.color, isNot(Colors.white));
+    expect(divider.color, const Color(0x331D1A1F));
   });
 
   testWidgets('showcase page shell spacing follows shared role tokens', (
@@ -166,7 +181,8 @@ bool _isHeroColumn(Column column) {
 
   final firstChild = column.children.first;
   return firstChild is Text &&
-      firstChild.data == 'Interactive component showcase for the visir_ui package.';
+      firstChild.data ==
+          'Interactive component showcase for the visir_ui package.';
 }
 
 VisirThemeData _customVisirThemeData() {
