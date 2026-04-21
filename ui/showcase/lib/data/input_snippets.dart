@@ -26,7 +26,8 @@ String buildInputSnippet({
     if (suffixIcon != null) 'suffix: const Icon(${suffixIcon.iconExpression})',
     if (hasText(safeErrorText))
       'errorText: ${dartStringLiteral(safeErrorText!)}',
-    if (border != VisirInputBorder.none) 'border: VisirInputBorder.${border.name}',
+    if (border != VisirInputBorder.none)
+      'border: VisirInputBorder.${border.name}',
     if (!enabled) 'enabled: false',
     if (isLoading) 'isLoading: true',
     if (showClearButton) 'showClearButton: true',

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
-import 'package:visir_ui/visir_ui.dart';
 
 void main() {
   testWidgets('showcase page renders input card and badge sections', (

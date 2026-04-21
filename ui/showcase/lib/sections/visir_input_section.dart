@@ -226,7 +226,7 @@ class _BorderSelector extends StatelessWidget {
           children: [
             for (final option in options)
               ChoiceChip(
-                label: Text(option.name),
+                label: Text(_enumLabel(option)),
                 selected: option == value,
                 onSelected: (_) => onChanged(option),
               ),
@@ -276,4 +276,9 @@ class _IconSelector extends StatelessWidget {
       ],
     );
   }
+}
+
+String _enumLabel(Enum value) {
+  final name = value.name;
+  return name[0].toUpperCase() + name.substring(1);
 }
