@@ -4,7 +4,7 @@
 
 **Goal:** Replace the current scroll-based showcase page with a grouped sidebar browser that switches between component demos while preserving each section's own state.
 
-**Architecture:** `ShowcasePage` will become a two-pane shell with a sidebar on the left and a single active component demo on the right. A small registry will define every component's id, display title, group, and widget builder so the shell can render the sidebar without hardcoding section logic. Existing section widgets remain the owners of their own preview, controls, and snippet state; the page only chooses which one is active.
+**Architecture:** `ShowcasePage` will become a two-pane shell with a sidebar on the left and a single active component demo on the right. A registry will define every component's id, display title, group, and widget builder so the shell can render the sidebar without hardcoding section logic. Existing section widgets remain the owners of their own preview, controls, and snippet state; the page only chooses which one is active.
 
 **Tech Stack:** Flutter, widget tests, `visir_ui`, `visir_ui_showcase`
 
@@ -62,7 +62,8 @@ Expected: FAIL because `ShowcasePage` still renders the old scroll-and-jump layo
 Update `ui/showcase/lib/app/showcase_sections.dart` to define a lightweight registry type and grouped metadata. Keep the existing `prettySectionTitle()` helper, but replace the implicit flat list as the source of truth for the page shell.
 
 ```dart
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 import '../sections/visir_badge_section.dart';
 import '../sections/visir_button_section.dart';
 import '../sections/visir_card_section.dart';
@@ -193,10 +194,11 @@ ShowcaseSectionEntry showcaseSectionById(String id) {
 }
 ```
 
-Create `ui/showcase/lib/app/showcase_component_sidebar.dart` with a responsive sidebar widget that renders the grouped list and calls `onSelected` when an item is tapped.
+Create `ui/showcase/lib/app/showcase_component_sidebar.dart` with a sidebar widget that renders the grouped list and calls `onSelected` when an item is tapped.
 
 ```dart
 import 'package:flutter/material.dart';
+
 import 'showcase_sections.dart';
 
 class ShowcaseComponentSidebar extends StatelessWidget {
@@ -233,7 +235,7 @@ class ShowcaseComponentSidebar extends StatelessWidget {
 }
 ```
 
-Rewrite `ui/showcase/lib/app/showcase_page.dart` so the page uses a `Row` with a sidebar and main panel. Keep the app bar and theme toggle, but remove the hero/jump-link scroll content. A narrow-width fallback can be a horizontal selector above the main content if needed, but the main shell should still be selection-driven.
+Rewrite `ui/showcase/lib/app/showcase_page.dart` so the page uses a `Row` with a sidebar and main panel. Keep the app bar and theme toggle, but remove the hero/jump-link scroll content. Use a compact fallback for narrow widths, but keep the same registry and selection logic.
 
 ```dart
 class _ShowcasePageState extends State<ShowcasePage> {
@@ -248,39 +250,95 @@ class _ShowcasePageState extends State<ShowcasePage> {
     return showcaseSectionById(_activeSectionId).builder(context);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMainPane() {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final visirTheme = VisirTheme.of(context);
+    final surfaceSpacing = visirTheme.components.surface.padding;
+    final contentSpacing = visirTheme.components.content;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(
+        horizontal: surfaceSpacing.spacious,
+        vertical: surfaceSpacing.spacious + contentSpacing.compactSpacing,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(
+              surfaceSpacing.comfortable + contentSpacing.compactSpacing,
+            ),
+            decoration: BoxDecoration(
+              color: colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: _buildActiveSection(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isCompact = MediaQuery.sizeOf(context).width < 900;
+    final isDarkMode = widget.themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: VisirAppBar(...),
+      appBar: VisirAppBar(
+        title: 'Visir UI',
+        leadings: const [],
+        trailings: [
+          VisirAppBarButton.icon(
+            key: const ValueKey('showcase-theme-button'),
+            semanticLabel:
+                isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
+            tooltip:
+                isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
+            onPressed: widget.onThemeModeChanged == null
+                ? null
+                : () {
+                    widget.onThemeModeChanged!(
+                      isDarkMode ? ThemeMode.light : ThemeMode.dark,
+                    );
+                  },
+            icon: Icon(
+              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 280,
-              child: ShowcaseComponentSidebar(
-                groups: showcaseSectionGroups,
-                activeSectionId: _activeSectionId,
-                onSelected: _selectSection,
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ...,
-                    vertical: ...,
+        child: isCompact
+            ? Column(
+                children: [
+                  SizedBox(
+                    height: 104,
+                    child: ShowcaseComponentSidebar(
+                      groups: showcaseSectionGroups,
+                      activeSectionId: _activeSectionId,
+                      onSelected: _selectSection,
+                    ),
                   ),
-                  child: _buildActiveSection(),
-                ),
+                  Expanded(child: _buildMainPane()),
+                ],
+              )
+            : Row(
+                children: [
+                  SizedBox(
+                    width: 280,
+                    child: ShowcaseComponentSidebar(
+                      groups: showcaseSectionGroups,
+                      activeSectionId: _activeSectionId,
+                      onSelected: _selectSection,
+                    ),
+                  ),
+                  Expanded(child: _buildMainPane()),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -342,29 +400,7 @@ Expected: FAIL until the compact fallback is implemented.
 
 - [ ] **Step 3: Implement the compact fallback and tighten the page test coverage**
 
-Update `ShowcasePage` so widths below the chosen breakpoint do not waste the full 280px sidebar width. Use a compact selector that still exposes all sections and preserves the same `onSelected` logic.
-
-A practical implementation is to branch on `MediaQuery.sizeOf(context).width`:
-
-```dart
-final isCompact = MediaQuery.sizeOf(context).width < 900;
-
-if (isCompact) {
-  return Column(
-    children: [
-      ShowcaseComponentSidebar(...),
-      Expanded(child: _buildMainPane()),
-    ],
-  );
-}
-
-return Row(
-  children: [
-    SizedBox(width: 280, child: ShowcaseComponentSidebar(...)),
-    Expanded(child: _buildMainPane()),
-  ],
-);
-```
+Update `ShowcasePage` so widths below the chosen breakpoint do not waste the full 280px sidebar width. Use the same `ShowcaseComponentSidebar` and the same registry, but render it in a compact form when the viewport is narrow.
 
 If the compact variant uses a horizontal selector instead of a vertical list, keep the same registry and selection behavior; do not create a second source of truth.
 
