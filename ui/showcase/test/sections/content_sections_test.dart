@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
 
@@ -8,6 +9,14 @@ void main() {
     await tester.pumpWidget(const ShowcaseApp());
 
     expect(find.text('VisirInput'), findsOneWidget);
+    expect(find.text('Search Mode'), findsOneWidget);
+    await tester.ensureVisible(find.text('Search Mode'));
+    await tester.tap(find.text('Search Mode'));
+    await tester.pump();
+    expect(find.text('Loading'), findsWidgets);
+    expect(find.text('Clear Button'), findsWidgets);
+    expect(find.text('Custom Leading'), findsWidgets);
+    expect(find.text('Max Lines'), findsOneWidget);
     expect(find.text('VisirCard'), findsOneWidget);
     expect(find.text('VisirBadge'), findsOneWidget);
   });
