@@ -4,14 +4,12 @@ import 'package:visir_ui/visir_ui.dart';
 
 void main() {
   Widget buildHarness(Widget child) {
-    return MaterialApp(
-      home: Scaffold(
-        body: child,
-      ),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
-  testWidgets('VisirAppBar exposes the expected preferred size', (tester) async {
+  testWidgets('VisirAppBar exposes the expected preferred size', (
+    tester,
+  ) async {
     const appBar = VisirAppBar(title: 'Visir UI', leadings: [], trailings: []);
 
     expect(appBar.preferredSize.height, VisirAppBar.height);
@@ -29,7 +27,7 @@ void main() {
     expect(title.style?.height, theme.text.title.height);
     expect(
       title.style?.color,
-      Theme.of(tester.element(find.byType(VisirAppBar))).colorScheme.outlineVariant,
+      Theme.of(tester.element(find.byType(VisirAppBar))).colorScheme.onSurface,
     );
   });
 

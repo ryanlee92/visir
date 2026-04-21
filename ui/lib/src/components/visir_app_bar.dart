@@ -113,7 +113,7 @@ class VisirAppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = Theme.of(context);
     final visirTheme = VisirTheme.of(context);
     final titleStyle = visirTheme.text.title.copyWith(
-      color: theme.colorScheme.outlineVariant,
+      color: theme.colorScheme.onSurface,
     );
 
     return Container(

@@ -308,10 +308,10 @@ class _VisirButtonState extends State<VisirButton> {
     final baseColor = isPrimary
         ? colors.accent
         : isGhost
-        ? colors.surfaceOutline.withValues(alpha: 0.08)
+        ? Colors.transparent
         : isDanger
-        ? colors.danger.withValues(alpha: isHovered ? 1 : 1)
-        : Color.lerp(colors.surface, colors.text, isHovered ? 0.05 : 0);
+        ? colors.danger
+        : colors.surfaceMuted;
 
     return BoxDecoration(
       gradient: background,
@@ -401,7 +401,7 @@ class _VisirButtonState extends State<VisirButton> {
       VisirButtonVariant.primary => theme.tokens.colors.textInverse,
       VisirButtonVariant.secondary => theme.tokens.colors.text,
       VisirButtonVariant.ghost => theme.tokens.colors.textMuted,
-      VisirButtonVariant.danger => theme.tokens.colors.text,
+      VisirButtonVariant.danger => theme.tokens.colors.textInverse,
     };
   }
 
