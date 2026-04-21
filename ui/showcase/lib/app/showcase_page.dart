@@ -77,6 +77,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final isDarkMode = widget.themeMode == ThemeMode.dark;
     final isCompact = MediaQuery.sizeOf(context).width < 900;
 
@@ -84,6 +85,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
       appBar: VisirAppBar(
         title: 'Visir UI',
         leadings: const [],
+        backgroundColor: theme.colorScheme.surfaceContainerHigh,
         trailings: [
           VisirAppBarButton.icon(
             key: const ValueKey('showcase-theme-button'),

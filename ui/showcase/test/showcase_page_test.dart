@@ -15,6 +15,16 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Visir UI'), findsOneWidget);
+    final appBarContext = tester.element(
+      find.byKey(const ValueKey('visir-app-bar')),
+    );
+    final appBar = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-app-bar')),
+    );
+    expect(
+      appBar.color,
+      Theme.of(appBarContext).colorScheme.surfaceContainerHigh,
+    );
     expect(find.byKey(const ValueKey('showcase-theme-button')), findsOneWidget);
     expect(find.byKey(showcaseScrollViewKey), findsOneWidget);
     expect(find.text('Actions'), findsOneWidget);
