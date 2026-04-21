@@ -13,6 +13,7 @@ void main() {
     expect(find.text('Clear Button'), findsWidgets);
     expect(find.text('Leading Icon'), findsWidgets);
     expect(find.text('Border'), findsWidgets);
+    expect(find.text('Shadow'), findsWidgets);
     expect(find.text('Max Lines'), findsOneWidget);
     expect(find.text('VisirCard'), findsOneWidget);
     expect(find.text('VisirBadge'), findsOneWidget);

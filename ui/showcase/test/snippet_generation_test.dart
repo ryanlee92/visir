@@ -70,10 +70,7 @@ void main() {
   });
 
   test('input snippet omits label when empty', () {
-    final code = buildInputSnippet(
-      label: '',
-      hintText: 'name@example.com',
-    );
+    final code = buildInputSnippet(label: '', hintText: 'name@example.com');
 
     expect(code, contains('VisirInput('));
     expect(code, contains("hintText: 'name@example.com'"));
@@ -118,15 +115,21 @@ void main() {
     expect(defaultCode, contains('VisirCard('));
     expect(defaultCode, isNot(contains('variant:')));
     expect(defaultCode, isNot(contains('density:')));
+    expect(defaultCode, isNot(contains('border:')));
+    expect(defaultCode, isNot(contains('showShadow:')));
     expect(defaultCode, isNot(contains('onTap:')));
 
     final interactiveCode = buildCardSnippet(
       variant: VisirCardVariant.outlined,
       density: VisirCardDensity.compact,
+      border: VisirCardBorder.base,
+      showShadow: false,
       isInteractive: true,
     );
     expect(interactiveCode, contains('VisirCardVariant.outlined'));
     expect(interactiveCode, contains('VisirCardDensity.compact'));
+    expect(interactiveCode, contains('border: VisirCardBorder.base'));
+    expect(interactiveCode, contains('showShadow: false'));
     expect(interactiveCode, contains('onTap: () {},'));
   });
 }

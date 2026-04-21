@@ -67,9 +67,7 @@ void main() {
     },
   );
 
-  testWidgets('VisirInput shell radius and border follow control tokens', (
-    tester,
-  ) async {
+  testWidgets('VisirInput shell radius follows control tokens', (tester) async {
     const borders = VisirBorderStates(
       base: VisirBorderState(color: Color(0xFF4263EB), width: 2),
       hover: VisirBorderState(color: Color(0xFF4263EB), width: 2),
@@ -94,10 +92,7 @@ void main() {
             textDirection: TextDirection.ltr,
             child: VisirTheme(
               data: themedData,
-              child: const VisirInput(
-                label: 'Email',
-                border: VisirInputBorder.base,
-              ),
+              child: const VisirInput(label: 'Email'),
             ),
           ),
         ),
@@ -108,8 +103,7 @@ void main() {
     final baseShell = tester.widget<Container>(shell);
     final baseDecoration = baseShell.decoration as BoxDecoration;
     expect(baseDecoration.borderRadius, BorderRadius.circular(radius));
-    expect((baseDecoration.border as Border).top.color, borders.base.color);
-    expect((baseDecoration.border as Border).top.width, borders.base.width);
+    expect(baseDecoration.border, isNull);
 
     await tester.tap(find.byType(TextField));
     await tester.pumpAndSettle();
@@ -117,8 +111,7 @@ void main() {
     final focusedShell = tester.widget<Container>(shell);
     final focusedDecoration = focusedShell.decoration as BoxDecoration;
     expect(focusedDecoration.borderRadius, BorderRadius.circular(radius));
-    expect((focusedDecoration.border as Border).top.color, borders.base.color);
-    expect((focusedDecoration.border as Border).top.width, borders.base.width);
+    expect(focusedDecoration.border, isNull);
   });
 
   testWidgets('VisirCard density changes padding profile', (tester) async {
@@ -191,8 +184,8 @@ void main() {
       ),
     );
     final border = (card.decoration as BoxDecoration).border! as Border;
-    expect(border.top.color, theme.components.surface.borders.base.color);
-    expect(border.top.width, theme.components.surface.borders.base.width);
+    expect(border.top.color, theme.components.control.borders.base.color);
+    expect(border.top.width, theme.components.control.borders.base.width);
   });
 
   testWidgets('shadow can be disabled without removing focus treatment', (
@@ -476,11 +469,11 @@ void main() {
     final unfocusedBorder = unfocusedDecoration.border! as Border;
     expect(
       unfocusedBorder.top.color,
-      theme.components.surface.borders.base.color,
+      theme.components.control.borders.base.color,
     );
     expect(
       unfocusedBorder.top.width,
-      theme.components.surface.borders.base.width,
+      theme.components.control.borders.base.width,
     );
 
     final focusNode = Focus.of(tester.element(find.text('Focusable card')));
@@ -490,8 +483,14 @@ void main() {
     final focusedDecoration =
         tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
     final focusedBorder = focusedDecoration.border! as Border;
-    expect(focusedBorder.top.color, theme.components.surface.borders.focus.color);
-    expect(focusedBorder.top.width, theme.components.surface.borders.focus.width);
+    expect(
+      focusedBorder.top.color,
+      theme.components.control.borders.focus.color,
+    );
+    expect(
+      focusedBorder.top.width,
+      theme.components.control.borders.focus.width,
+    );
   });
 
   testWidgets('VisirSection renders title and child', (tester) async {

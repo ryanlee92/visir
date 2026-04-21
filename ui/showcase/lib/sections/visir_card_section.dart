@@ -19,12 +19,16 @@ class VisirCardSection extends StatefulWidget {
 class _VisirCardSectionState extends State<VisirCardSection> {
   VisirCardVariant _variant = VisirCardVariant.elevated;
   VisirCardDensity _density = VisirCardDensity.comfortable;
+  VisirCardBorder _border = VisirCardBorder.none;
+  bool _showShadow = true;
   bool _isInteractive = false;
   int _tapCount = 0;
 
   String get _snippet => buildCardSnippet(
     variant: _variant,
     density: _density,
+    border: _border,
+    showShadow: _showShadow,
     isInteractive: _isInteractive,
     childSnippet: "const Text('Card content')",
   );
@@ -55,6 +59,8 @@ class _VisirCardSectionState extends State<VisirCardSection> {
                 width: 360,
                 child: VisirCard(
                   variant: _variant,
+                  border: _border,
+                  showShadow: _showShadow,
                   density: _density,
                   onTap: _isInteractive
                       ? () => setState(() => _tapCount += 1)
@@ -107,6 +113,17 @@ class _VisirCardSectionState extends State<VisirCardSection> {
                   labelBuilder: _enumLabel,
                 ),
                 const SizedBox(height: 4),
+                _BorderSelector(
+                  value: _border,
+                  onChanged: (value) => setState(() => _border = value),
+                ),
+                const SizedBox(height: 12),
+                PlaygroundToggle(
+                  label: 'Shadow',
+                  value: _showShadow,
+                  onChanged: (value) => setState(() => _showShadow = value),
+                ),
+                const SizedBox(height: 12),
                 PlaygroundToggle(
                   label: 'Interactive (onTap)',
                   value: _isInteractive,
@@ -119,6 +136,38 @@ class _VisirCardSectionState extends State<VisirCardSection> {
             ),
           ),
           snippet: CodeSnippetPanel(title: 'Dart Snippet', code: _snippet),
+        ),
+      ],
+    );
+  }
+}
+
+class _BorderSelector extends StatelessWidget {
+  const _BorderSelector({required this.value, required this.onChanged});
+
+  final VisirCardBorder value;
+  final ValueChanged<VisirCardBorder> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    const options = VisirCardBorder.values;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Border', style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final option in options)
+              ChoiceChip(
+                label: Text(_enumLabel(option)),
+                selected: option == value,
+                onSelected: (_) => onChanged(option),
+              ),
+          ],
         ),
       ],
     );
