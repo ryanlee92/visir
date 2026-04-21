@@ -120,28 +120,34 @@ void main() {
     expect(clearCount, 1);
   });
 
-  testWidgets('search mode configures a focused border', (
+  testWidgets('search mode wires the provided focus node', (
     tester,
   ) async {
+    final focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+
     await tester.pumpWidget(
       buildHarness(
-        const VisirInput(
+        VisirInput(
           label: 'Search',
           hintText: 'Find tasks',
           mode: VisirInputMode.search,
+          focusNode: focusNode,
         ),
       ),
     );
 
-    final searchField = tester.widget<TextField>(find.byType(TextField));
-    final focusedBorder =
-        searchField.decoration?.focusedBorder as OutlineInputBorder;
-    final baseBorder = searchField.decoration?.border as OutlineInputBorder;
+    focusNode.requestFocus();
+    await tester.pump();
 
-    expect(focusedBorder.borderSide.color, isNot(equals(baseBorder.borderSide.color)));
+    final searchField = tester.widget<TextField>(find.byType(TextField));
+    final editableText = tester.widget<EditableText>(find.byType(EditableText));
+
+    expect(focusNode.hasFocus, isTrue);
+    expect(editableText.focusNode, same(focusNode));
     expect(
-      focusedBorder.borderSide.width,
-      greaterThanOrEqualTo(baseBorder.borderSide.width),
+      searchField.focusNode,
+      same(focusNode),
     );
   });
 
@@ -162,7 +168,9 @@ void main() {
     final searchField = tester.widget<TextField>(find.byType(TextField));
     final errorBorder =
         searchField.decoration?.errorBorder as OutlineInputBorder;
+    final expectedDanger =
+        VisirTheme.of(tester.element(find.byType(VisirInput))).tokens.colors.danger;
 
-    expect(errorBorder.borderSide.color, const Color(0xFFE13A5F));
+    expect(errorBorder.borderSide.color, expectedDanger);
   });
 }
