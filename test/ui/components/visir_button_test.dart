@@ -115,6 +115,47 @@ void main() {
     expect(capturedIconColor, const Color(0xFFFFFFFF));
   });
 
+  testWidgets('icon button scales icon size with button size', (tester) async {
+    double? smallIconSize;
+    double? largeIconSize;
+
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            VisirIconButton(
+              icon: Builder(
+                builder: (context) {
+                  smallIconSize = IconTheme.of(context).size;
+                  return const Icon(Icons.add);
+                },
+              ),
+              semanticLabel: 'Small',
+              size: VisirButtonSize.sm,
+              onPressed: () {},
+            ),
+            VisirIconButton(
+              icon: Builder(
+                builder: (context) {
+                  largeIconSize = IconTheme.of(context).size;
+                  return const Icon(Icons.add);
+                },
+              ),
+              semanticLabel: 'Large',
+              size: VisirButtonSize.lg,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(smallIconSize, isNotNull);
+    expect(largeIconSize, isNotNull);
+    expect(largeIconSize!, greaterThan(smallIconSize!));
+  });
+
   testWidgets(
     'primary button uses clear white foreground for label, icon, and spinner',
     (tester) async {

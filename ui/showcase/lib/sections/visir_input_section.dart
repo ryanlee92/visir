@@ -18,30 +18,23 @@ class VisirInputSection extends StatefulWidget {
 }
 
 class _VisirInputSectionState extends State<VisirInputSection> {
-  VisirInputMode _mode = VisirInputMode.standard;
   String _label = 'Email';
   String _hintText = 'name@example.com';
   String _errorText = '';
   bool _enabled = true;
-  CuratedIconOption? _prefixIcon = curatedIconById('mail');
   CuratedIconOption? _suffixIcon;
   bool _isLoading = false;
   bool _showClearButton = false;
-  bool _useCustomLeading = false;
   int _maxLines = 1;
   CuratedIconOption? _leadingIcon = curatedIconById('search');
 
   String get _snippet => buildInputSnippet(
     label: _label,
     hintText: _hintText,
-    prefixIcon: _prefixIcon,
     suffixIcon: _suffixIcon,
-    leadingIcon: _mode == VisirInputMode.search && _useCustomLeading
-        ? _leadingIcon
-        : null,
+    leadingIcon: _leadingIcon,
     errorText: _errorText,
     enabled: _enabled,
-    mode: _mode,
     isLoading: _isLoading,
     showClearButton: _showClearButton,
     maxLines: _maxLines,
@@ -74,28 +67,19 @@ class _VisirInputSectionState extends State<VisirInputSection> {
                 child: VisirInput(
                   label: _label.trim().isEmpty ? 'Input Label' : _label.trim(),
                   hintText: _hintText.trim().isEmpty ? null : _hintText.trim(),
-                  mode: _mode,
-                  prefix: _mode == VisirInputMode.standard &&
-                          _prefixIcon != null
-                      ? Icon(_prefixIcon!.iconData)
-                      : null,
-                  suffix: _mode == VisirInputMode.standard &&
-                          _suffixIcon != null
+                  suffix: _suffixIcon != null
                       ? Icon(_suffixIcon!.iconData)
                       : null,
                   errorText: _errorText.trim().isEmpty
                       ? null
                       : _errorText.trim(),
                   enabled: _enabled,
-                  leading: _mode == VisirInputMode.search && _useCustomLeading
-                      ? Icon(_leadingIcon?.iconData ?? Icons.search)
+                  leading: _leadingIcon != null
+                      ? Icon(_leadingIcon!.iconData)
                       : null,
-                  isLoading: _mode == VisirInputMode.search && _isLoading,
-                  showClearButton:
-                      _mode == VisirInputMode.search && _showClearButton,
-                  onClear: _mode == VisirInputMode.search && _showClearButton
-                      ? () {}
-                      : null,
+                  isLoading: _isLoading,
+                  showClearButton: _showClearButton,
+                  onClear: _showClearButton ? () {} : null,
                   maxLines: _maxLines,
                 ),
               ),
@@ -106,16 +90,6 @@ class _VisirInputSectionState extends State<VisirInputSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PlaygroundToggle(
-                  label: 'Search Mode',
-                  value: _mode == VisirInputMode.search,
-                  onChanged: (value) => setState(
-                    () => _mode = value
-                        ? VisirInputMode.search
-                        : VisirInputMode.standard,
-                  ),
-                ),
-                const SizedBox(height: 12),
                 PlaygroundTextField(
                   label: 'Label',
                   value: _label,
@@ -136,46 +110,37 @@ class _VisirInputSectionState extends State<VisirInputSection> {
                 ),
                 const SizedBox(height: 12),
                 _IconSelector(
-                  label: 'Prefix Icon',
-                  selected: _prefixIcon,
-                  onSelected: (icon) => setState(() => _prefixIcon = icon),
-                ),
-                const SizedBox(height: 12),
-                _IconSelector(
-                  label: 'Suffix Icon',
+                  label: 'Trailing Icon',
                   selected: _suffixIcon,
                   onSelected: (icon) => setState(() => _suffixIcon = icon),
                 ),
-                if (_mode == VisirInputMode.search) ...[
-                  const SizedBox(height: 12),
-                  PlaygroundToggle(
-                    label: 'Loading',
-                    value: _isLoading,
-                    onChanged: (value) => setState(() => _isLoading = value),
-                  ),
-                  PlaygroundToggle(
-                    label: 'Clear Button',
-                    value: _showClearButton,
-                    onChanged: (value) =>
-                        setState(() => _showClearButton = value),
-                  ),
-                  PlaygroundToggle(
-                    label: 'Custom Leading',
-                    value: _useCustomLeading,
-                    onChanged: (value) =>
-                        setState(() => _useCustomLeading = value),
-                  ),
-                  const SizedBox(height: 12),
-                  _LineCountSelector(
-                    value: _maxLines,
-                    onChanged: (value) => setState(() => _maxLines = value),
-                  ),
-                ],
-                const SizedBox(height: 4),
+                const SizedBox(height: 12),
+                _IconSelector(
+                  label: 'Leading Icon',
+                  selected: _leadingIcon,
+                  onSelected: (icon) => setState(() => _leadingIcon = icon),
+                ),
+                const SizedBox(height: 12),
+                PlaygroundToggle(
+                  label: 'Loading',
+                  value: _isLoading,
+                  onChanged: (value) => setState(() => _isLoading = value),
+                ),
+                PlaygroundToggle(
+                  label: 'Clear Button',
+                  value: _showClearButton,
+                  onChanged: (value) =>
+                      setState(() => _showClearButton = value),
+                ),
                 PlaygroundToggle(
                   label: 'Enabled',
                   value: _enabled,
                   onChanged: (value) => setState(() => _enabled = value),
+                ),
+                const SizedBox(height: 12),
+                _LineCountSelector(
+                  value: _maxLines,
+                  onChanged: (value) => setState(() => _maxLines = value),
                 ),
               ],
             ),
@@ -188,10 +153,7 @@ class _VisirInputSectionState extends State<VisirInputSection> {
 }
 
 class _LineCountSelector extends StatelessWidget {
-  const _LineCountSelector({
-    required this.value,
-    required this.onChanged,
-  });
+  const _LineCountSelector({required this.value, required this.onChanged});
 
   final int value;
   final ValueChanged<int> onChanged;

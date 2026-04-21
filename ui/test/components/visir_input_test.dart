@@ -6,9 +6,7 @@ void main() {
   Widget buildHarness(Widget child) {
     return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: SizedBox(width: 360, child: child),
-        ),
+        body: Center(child: SizedBox(width: 360, child: child)),
       ),
     );
   }
@@ -24,54 +22,73 @@ void main() {
     expect(find.text('name@example.com'), findsOneWidget);
   });
 
-  testWidgets('search mode shows default search icon and exposes semantics', (
-    tester,
-  ) async {
+  testWidgets('input shell adds padding around the field', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(label: 'Email', hintText: 'name@example.com'),
+      ),
+    );
+
+    final shell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+
+    expect(shell.padding, const EdgeInsets.fromLTRB(16, 8, 12, 8));
+  });
+
+  testWidgets('input shows a leading button when provided', (tester) async {
     await tester.pumpWidget(
       buildHarness(
         const VisirInput(
           label: 'Search',
           hintText: 'Find projects',
-          mode: VisirInputMode.search,
+          leading: Icon(Icons.search),
         ),
       ),
     );
 
     expect(find.text('Find projects'), findsOneWidget);
-    expect(find.byIcon(Icons.search), findsOneWidget);
-    expect(find.bySemanticsLabel('Search'), findsOneWidget);
+    expect(find.byKey(const ValueKey('visir-input-leading')), findsOneWidget);
+    expect(find.byType(VisirIconButton), findsOneWidget);
   });
 
-  testWidgets('search mode respects maxLines', (tester) async {
+  testWidgets('input shows a trailing button when provided', (tester) async {
     await tester.pumpWidget(
       buildHarness(
         const VisirInput(
-          label: 'Search',
-          hintText: 'Find notes',
-          mode: VisirInputMode.search,
-          maxLines: 3,
+          label: 'Email',
+          hintText: 'name@example.com',
+          suffix: Icon(Icons.mail_outline),
         ),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('visir-input-suffix')), findsOneWidget);
+    expect(find.byType(VisirIconButton), findsOneWidget);
+  });
+
+  testWidgets('input respects maxLines', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(label: 'Notes', hintText: 'Find notes', maxLines: 3),
       ),
     );
 
     expect(
       find.byWidgetPredicate(
-        (widget) => widget is TextField && widget.maxLines == 3,
+        (widget) => widget is EditableText && widget.maxLines == 3,
         description: 'text input with maxLines set to 3',
       ),
       findsOneWidget,
     );
   });
 
-  testWidgets('search mode shows loading spinner and clear action', (
-    tester,
-  ) async {
+  testWidgets('input shows loading spinner and clear action', (tester) async {
     await tester.pumpWidget(
       buildHarness(
         VisirInput(
           label: 'Search',
           hintText: 'Find tasks',
-          mode: VisirInputMode.search,
           isLoading: true,
           showClearButton: true,
           onClear: () {},
@@ -79,50 +96,52 @@ void main() {
       ),
     );
 
-    expect(find.byType(VisirSpinner), findsOneWidget);
-    expect(find.byIcon(Icons.close), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byKey(const ValueKey('visir-input-clear')), findsOneWidget);
+    expect(find.byType(VisirIconButton), findsOneWidget);
   });
 
-  testWidgets('search mode uses custom leading when provided', (tester) async {
+  testWidgets('input uses custom leading when provided', (tester) async {
     await tester.pumpWidget(
       buildHarness(
         const VisirInput(
           label: 'Search',
           hintText: 'Find records',
-          mode: VisirInputMode.search,
           leading: Icon(Icons.tune),
         ),
       ),
     );
 
     expect(find.byIcon(Icons.tune), findsOneWidget);
-    expect(find.byIcon(Icons.search), findsNothing);
+    expect(find.byKey(const ValueKey('visir-input-leading')), findsOneWidget);
+    expect(find.byType(VisirIconButton), findsOneWidget);
   });
 
-  testWidgets('search mode clear action invokes callback', (tester) async {
+  testWidgets('input clear action invokes callback', (tester) async {
     var clearCount = 0;
+    final controller = TextEditingController(text: 'tasks');
+    addTearDown(controller.dispose);
 
     await tester.pumpWidget(
       buildHarness(
         VisirInput(
           label: 'Search',
           hintText: 'Find tasks',
-          mode: VisirInputMode.search,
+          controller: controller,
           showClearButton: true,
           onClear: () => clearCount++,
         ),
       ),
     );
 
-    await tester.tap(find.byIcon(Icons.close));
+    await tester.tap(find.byKey(const ValueKey('visir-input-clear')));
     await tester.pump();
 
     expect(clearCount, 1);
+    expect(find.text('tasks'), findsNothing);
   });
 
-  testWidgets('search mode wires the provided focus node', (
-    tester,
-  ) async {
+  testWidgets('input wires the provided focus node', (tester) async {
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
@@ -131,7 +150,6 @@ void main() {
         VisirInput(
           label: 'Search',
           hintText: 'Find tasks',
-          mode: VisirInputMode.search,
           focusNode: focusNode,
         ),
       ),
@@ -140,18 +158,13 @@ void main() {
     focusNode.requestFocus();
     await tester.pump();
 
-    final searchField = tester.widget<TextField>(find.byType(TextField));
     final editableText = tester.widget<EditableText>(find.byType(EditableText));
 
     expect(focusNode.hasFocus, isTrue);
     expect(editableText.focusNode, same(focusNode));
-    expect(
-      searchField.focusNode,
-      same(focusNode),
-    );
   });
 
-  testWidgets('search mode shows a danger border when error text is set', (
+  testWidgets('input shows a danger border when error text is set', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -159,18 +172,19 @@ void main() {
         const VisirInput(
           label: 'Search',
           hintText: 'Find tasks',
-          mode: VisirInputMode.search,
           errorText: 'Invalid query',
         ),
       ),
     );
 
-    final searchField = tester.widget<TextField>(find.byType(TextField));
-    final errorBorder =
-        searchField.decoration?.errorBorder as OutlineInputBorder;
-    final expectedDanger =
-        VisirTheme.of(tester.element(find.byType(VisirInput))).tokens.colors.danger;
+    final searchShell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final border = searchShell.decoration as BoxDecoration;
+    final expectedDanger = VisirTheme.of(
+      tester.element(find.byType(VisirInput)),
+    ).tokens.colors.danger;
 
-    expect(errorBorder.borderSide.color, expectedDanger);
+    expect((border.border as Border).top.color, expectedDanger);
   });
 }

@@ -54,10 +54,7 @@ class _VisirSpinnerSectionState extends State<VisirSpinnerSection> {
             title: 'Live Preview',
             child: PreviewFrame(
               minHeight: 130,
-              child: TickerMode(
-                enabled: false,
-                child: VisirSpinner(size: _size, tone: _tone),
-              ),
+              child: VisirSpinner(size: _size, tone: _tone),
             ),
           ),
           controls: PlaygroundPanel(

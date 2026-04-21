@@ -15,7 +15,7 @@ class PreviewFrame extends StatelessWidget {
       constraints: BoxConstraints(minHeight: minHeight),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),

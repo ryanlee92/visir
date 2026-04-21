@@ -26,11 +26,7 @@ void main() {
     expect(find.text('name@example.com'), findsOneWidget);
   });
 
-  testWidgets('VisirInput binds label semantics to the text field', (
-    tester,
-  ) async {
-    final semantics = tester.ensureSemantics();
-
+  testWidgets('VisirInput renders the label outside the field', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -44,47 +40,34 @@ void main() {
       ),
     );
 
-    final semanticsData = tester
-        .getSemantics(find.byType(EditableText))
-        .getSemanticsData();
-    expect(semanticsData.label, contains('Email'));
-    expect(semanticsData.flagsCollection.isTextField, isTrue);
-    expect(semanticsData.flagsCollection.isFocused, isNot(Tristate.none));
-    expect(semanticsData.flagsCollection.isEnabled, Tristate.isTrue);
-
-    semantics.dispose();
+    expect(find.text('Email'), findsOneWidget);
+    expect(find.byKey(const ValueKey('visir-input-shell')), findsOneWidget);
   });
 
-  testWidgets('VisirInput uses generic affix slots for prefix and suffix', (
-    tester,
-  ) async {
-    const prefix = Text('pre');
-    const suffix = Text('post');
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: makeUiTestableWidget(
-            child: const VisirInput(
-              label: 'Email',
-              prefix: prefix,
-              suffix: suffix,
+  testWidgets(
+    'VisirInput renders leading and trailing buttons outside the text field',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: makeUiTestableWidget(
+              child: const VisirInput(
+                label: 'Email',
+                leading: Icon(Icons.mail_outline),
+                suffix: Icon(Icons.arrow_forward),
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    final textField = tester.widget<TextField>(find.byType(TextField));
-    final decoration = textField.decoration!;
+      expect(find.byKey(const ValueKey('visir-input-leading')), findsOneWidget);
+      expect(find.byKey(const ValueKey('visir-input-suffix')), findsOneWidget);
+      expect(find.byType(VisirIconButton), findsNWidgets(2));
+    },
+  );
 
-    expect(decoration.prefix, same(prefix));
-    expect(decoration.suffix, same(suffix));
-    expect(decoration.prefixIcon, isNull);
-    expect(decoration.suffixIcon, isNull);
-  });
-
-  testWidgets('VisirInput focus border and radius follow control tokens', (
+  testWidgets('VisirInput shell radius and border follow control tokens', (
     tester,
   ) async {
     const borders = VisirBorderStates(
@@ -118,21 +101,21 @@ void main() {
       ),
     );
 
-    final textField = tester.widget<TextField>(find.byType(TextField));
-    final enabledBorder =
-        textField.decoration!.enabledBorder! as OutlineInputBorder;
-    expect(enabledBorder.borderRadius, BorderRadius.circular(radius));
-    expect(enabledBorder.borderSide.color, borders.base.color);
-    expect(enabledBorder.borderSide.width, borders.base.width);
+    final shell = find.byKey(const ValueKey('visir-input-shell'));
+    final baseShell = tester.widget<Container>(shell);
+    final baseDecoration = baseShell.decoration as BoxDecoration;
+    expect(baseDecoration.borderRadius, BorderRadius.circular(radius));
+    expect((baseDecoration.border as Border).top.color, borders.base.color);
+    expect((baseDecoration.border as Border).top.width, borders.base.width);
 
     await tester.tap(find.byType(TextField));
     await tester.pumpAndSettle();
 
-    final focusedBorder =
-        textField.decoration!.focusedBorder! as OutlineInputBorder;
-    expect(focusedBorder.borderRadius, BorderRadius.circular(radius));
-    expect(focusedBorder.borderSide.color, borders.focus.color);
-    expect(focusedBorder.borderSide.width, borders.focus.width);
+    final focusedShell = tester.widget<Container>(shell);
+    final focusedDecoration = focusedShell.decoration as BoxDecoration;
+    expect(focusedDecoration.borderRadius, BorderRadius.circular(radius));
+    expect((focusedDecoration.border as Border).top.color, borders.base.color);
+    expect((focusedDecoration.border as Border).top.width, borders.base.width);
   });
 
   testWidgets('VisirCard density changes padding profile', (tester) async {
@@ -569,6 +552,7 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(find.byType(RotationTransition), findsOneWidget);
   });
 
   testWidgets('VisirSpinner reads feedback role tokens for size and stroke', (

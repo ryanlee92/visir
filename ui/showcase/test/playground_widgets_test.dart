@@ -169,4 +169,34 @@ void main() {
     expect((frameRect.center.dx - childRect.center.dx).abs(), lessThan(1.0));
     expect((frameRect.center.dy - childRect.center.dy).abs(), lessThan(1.0));
   });
+
+  testWidgets('preview frame uses a brighter background than surface', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(useMaterial3: true),
+        home: const Scaffold(
+          body: SizedBox(
+            width: 320,
+            child: PreviewFrame(child: Text('Preview Child')),
+          ),
+        ),
+      ),
+    );
+
+    final frame = tester.widget<Container>(
+      find.descendant(
+        of: find.byType(PreviewFrame),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is Container && widget.decoration is BoxDecoration,
+        ),
+      ),
+    );
+    final decoration = frame.decoration! as BoxDecoration;
+    final theme = Theme.of(tester.element(find.byType(PreviewFrame)));
+
+    expect(decoration.color, theme.colorScheme.surfaceContainerHighest);
+    expect(decoration.color, isNot(theme.colorScheme.surface));
+  });
 }

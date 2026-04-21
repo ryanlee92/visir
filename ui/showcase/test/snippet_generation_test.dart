@@ -54,7 +54,7 @@ void main() {
     final code = buildInputSnippet(
       label: 'Email',
       hintText: 'name@example.com',
-      prefixIcon: curatedIconOptions.firstWhere(
+      suffixIcon: curatedIconOptions.firstWhere(
         (option) => option.id == 'mail',
       ),
       errorText: 'Invalid address',
@@ -64,17 +64,15 @@ void main() {
     expect(code, contains('VisirInput('));
     expect(code, contains("label: 'Email'"));
     expect(code, contains("hintText: 'name@example.com'"));
-    expect(code, contains('prefix: const Icon(Icons.mail_outline)'));
+    expect(code, contains('suffix: const Icon(Icons.mail_outline)'));
     expect(code, contains("errorText: 'Invalid address'"));
     expect(code, contains('enabled: false'));
-    expect(code, isNot(contains('suffix:')));
   });
 
   test('input snippet includes search mode output when requested', () {
     final code = buildInputSnippet(
       label: 'Search',
       hintText: 'Find projects',
-      mode: VisirInputMode.search,
       leadingIcon: curatedIconOptions.firstWhere(
         (option) => option.id == 'search',
       ),
@@ -86,13 +84,11 @@ void main() {
     expect(code, contains('VisirInput('));
     expect(code, contains("label: 'Search'"));
     expect(code, contains("hintText: 'Find projects'"));
-    expect(code, contains('mode: VisirInputMode.search'));
     expect(code, contains('leading: const Icon(Icons.search)'));
     expect(code, contains('isLoading: true'));
     expect(code, contains('showClearButton: true'));
     expect(code, contains('maxLines: 3'));
     expect(code, isNot(contains('prefix:')));
-    expect(code, isNot(contains('suffix:')));
   });
 
   test('card snippet omits defaults and adds onTap when interactive', () {

@@ -15,7 +15,14 @@ import 'showcase_sections.dart';
 const showcaseScrollViewKey = ValueKey('showcase-scroll-view');
 
 class ShowcasePage extends StatefulWidget {
-  const ShowcasePage({super.key});
+  const ShowcasePage({
+    super.key,
+    this.themeMode = ThemeMode.light,
+    this.onThemeModeChanged,
+  });
+
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode>? onThemeModeChanged;
 
   @override
   State<ShowcasePage> createState() => _ShowcasePageState();
@@ -163,9 +170,34 @@ class _ShowcasePageState extends State<ShowcasePage> {
         surfaceSpacing.spacious + contentSpacing.compactSpacing;
     final sectionSpacing =
         surfaceSpacing.comfortable + contentSpacing.compactSpacing;
+    final isDarkMode = widget.themeMode == ThemeMode.dark;
 
     return Scaffold(
+      appBar: VisirAppBar(
+        title: 'Visir UI',
+        leadings: const [],
+        trailings: [
+          VisirAppBarButton.icon(
+            key: const ValueKey('showcase-theme-button'),
+            semanticLabel:
+                isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
+            tooltip:
+                isDarkMode ? 'Switch to light theme' : 'Switch to dark theme',
+            onPressed: widget.onThemeModeChanged == null
+                ? null
+                : () {
+                    widget.onThemeModeChanged!(
+                      isDarkMode ? ThemeMode.light : ThemeMode.dark,
+                    );
+                  },
+            icon: Icon(
+              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
+        top: false,
         child: Stack(
           children: [
             Positioned.fill(
@@ -197,13 +229,6 @@ class _ShowcasePageState extends State<ShowcasePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Visir UI',
-                        style: theme.textTheme.displaySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: contentSpacing.inlineSpacing),
                       Text(
                         'Interactive component showcase for the visir_ui package.',
                         style: theme.textTheme.titleMedium,

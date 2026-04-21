@@ -15,8 +15,46 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Visir UI'), findsOneWidget);
+    expect(find.byKey(const ValueKey('showcase-theme-button')), findsOneWidget);
     expect(find.byKey(showcaseScrollViewKey), findsOneWidget);
     expect(find.byType(VisirCard), findsWidgets);
+    expect(find.byType(VisirAppBar), findsOneWidget);
+  });
+
+  testWidgets('ShowcaseApp theme button toggles the app shell theme', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    await tester.tap(find.byKey(const ValueKey('showcase-theme-button')));
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(find.byIcon(Icons.light_mode_outlined), findsOneWidget);
+  });
+
+  testWidgets('ShowcaseApp theme button updates the input surface color', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final shellFinder = find.byKey(
+      const ValueKey('visir-input-shell'),
+    );
+    final initialShell =
+        tester.widget<Container>(shellFinder).decoration as BoxDecoration;
+    final initialColor = initialShell.color;
+
+    await tester.tap(find.byKey(const ValueKey('showcase-theme-button')));
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final updatedShell =
+        tester.widget<Container>(shellFinder).decoration as BoxDecoration;
+    final updatedColor = updatedShell.color;
+
+    expect(initialColor, isNot(updatedColor));
+    expect(updatedColor, const Color(0xCC1F1B33));
   });
 
   testWidgets('showcase page shell spacing follows shared role tokens', (
@@ -46,7 +84,7 @@ void main() {
       scrollView.padding,
       const EdgeInsets.symmetric(horizontal: 31, vertical: 54),
     );
-    expect(heroGap.height, 13);
+    expect(heroGap.height, 38);
   });
 
   testWidgets(
@@ -127,7 +165,8 @@ bool _isHeroColumn(Column column) {
   }
 
   final firstChild = column.children.first;
-  return firstChild is Text && firstChild.data == 'Visir UI';
+  return firstChild is Text &&
+      firstChild.data == 'Interactive component showcase for the visir_ui package.';
 }
 
 VisirThemeData _customVisirThemeData() {

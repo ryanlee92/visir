@@ -4,9 +4,8 @@ import '../foundation/visir_enums.dart';
 import '../foundation/visir_tokens.dart';
 import '../theme/visir_component_role_themes.dart';
 import '../theme/visir_theme.dart';
+import 'visir_icon_button.dart';
 import 'visir_spinner.dart';
-
-enum VisirInputMode { standard, search }
 
 class VisirInput extends StatelessWidget {
   const VisirInput({
@@ -14,11 +13,9 @@ class VisirInput extends StatelessWidget {
     required this.label,
     this.hintText,
     this.controller,
-    this.prefix,
     this.suffix,
     this.errorText,
     this.enabled = true,
-    this.mode = VisirInputMode.standard,
     this.onSubmitted,
     this.onChanged,
     this.autofocus = false,
@@ -33,11 +30,9 @@ class VisirInput extends StatelessWidget {
   final String label;
   final String? hintText;
   final TextEditingController? controller;
-  final Widget? prefix;
   final Widget? suffix;
   final String? errorText;
   final bool enabled;
-  final VisirInputMode mode;
   final ValueChanged<String>? onSubmitted;
   final ValueChanged<String>? onChanged;
   final bool autofocus;
@@ -53,192 +48,182 @@ class VisirInput extends StatelessWidget {
     final theme = VisirTheme.of(context);
     final tokens = theme.tokens;
     final control = theme.components.control;
+    final hasError = _hasError;
 
-    return switch (mode) {
-      VisirInputMode.standard => _buildStandard(tokens, control),
-      VisirInputMode.search => _buildSearch(tokens, control),
-    };
-  }
-
-  Widget _buildStandard(
-    VisirTokens tokens,
-    VisirControlThemeData control,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: TextField(
-        controller: controller,
-        enabled: enabled,
-        maxLines: maxLines,
-        autofocus: autofocus,
-        focusNode: focusNode,
-        onSubmitted: onSubmitted,
-        onChanged: onChanged,
-        style: TextStyle(color: tokens.colors.text),
-        decoration: InputDecoration(
-          labelText: label,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          labelStyle: TextStyle(
-            color: tokens.colors.textMuted,
-            fontWeight: FontWeight.w600,
-          ),
-          floatingLabelStyle: TextStyle(
-            color: tokens.colors.textMuted,
-            fontWeight: FontWeight.w600,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(color: tokens.colors.textMuted),
-          errorText: errorText,
-          prefix: prefix,
-          suffix: suffix,
-          filled: true,
-          fillColor: tokens.colors.surface,
-          border: _border(control.radius, control.borders.base),
-          enabledBorder: _border(control.radius, control.borders.base),
-          disabledBorder: _border(control.radius, control.borders.disabled),
-          focusedBorder: _border(control.radius, control.borders.focus),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(control.radius),
-            borderSide: BorderSide(color: tokens.colors.danger),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(control.radius),
-            borderSide: BorderSide(color: tokens.colors.danger),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: tokens.colors.textMuted,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
-      ),
+        _buildShell(tokens: tokens, control: control, hasError: hasError),
+        if (hasError) ...[
+          const SizedBox(height: 6),
+          Text(
+            errorText!.trim(),
+            style: TextStyle(color: tokens.colors.danger, fontSize: 12),
+          ),
+        ],
+      ],
     );
   }
 
-  Widget _buildSearch(
-    VisirTokens tokens,
-    VisirControlThemeData control,
-  ) {
+  bool get _hasError => errorText != null && errorText!.trim().isNotEmpty;
+
+  Widget _buildShell({
+    required VisirTokens tokens,
+    required VisirControlThemeData control,
+    required bool hasError,
+  }) {
     final effectiveMaxLines = maxLines ?? 1;
-    final hasError = errorText != null && errorText!.trim().isNotEmpty;
+    final effectiveBorder = !enabled
+        ? control.borders.disabled
+        : hasError
+        ? VisirBorderState(
+            color: tokens.colors.danger,
+            width: control.borders.base.width,
+          )
+        : control.borders.base;
+    Widget shell({required bool hasText}) {
+      final shouldShowClearButton =
+          showClearButton && (controller == null || hasText);
 
-    return Semantics(
-      container: true,
-      label: label,
-      textField: true,
-      child: Material(
-        color: Colors.transparent,
-        child: TextField(
-          controller: controller,
-          enabled: enabled,
-          autofocus: autofocus,
-          focusNode: focusNode,
-          onSubmitted: onSubmitted,
-          onChanged: onChanged,
-          maxLines: effectiveMaxLines,
-          style: TextStyle(color: tokens.colors.text),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: tokens.colors.surface,
-            isDense: true,
-            hintText: hintText,
-            hintStyle: TextStyle(color: tokens.colors.textMuted),
-            errorText: errorText,
-            prefixIcon: Padding(
-              padding: const EdgeInsetsDirectional.only(start: 12, end: 8),
-              child: leading ??
-                  Icon(
-                    Icons.search,
-                    size: 16,
-                    color: tokens.colors.textMuted,
-                  ),
-            ),
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 0,
-              minHeight: 0,
-            ),
-            suffixIcon: _buildSearchTrailing(tokens),
-            suffixIconConstraints: const BoxConstraints(
-              minWidth: 0,
-              minHeight: 0,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            border: _searchBorder(control.radius, control.borders.base),
-            enabledBorder: _searchBorder(
-              control.radius,
-              enabled
-                  ? (hasError
-                        ? control.borders.focus.copyWith(
-                            color: tokens.colors.danger,
-                          )
-                        : control.borders.base)
-                  : control.borders.disabled,
-            ),
-            focusedBorder: _searchBorder(
-              control.radius,
-              hasError
-                  ? control.borders.focus.copyWith(color: tokens.colors.danger)
-                  : control.borders.focus,
-            ),
-            errorBorder: _searchBorder(
-              control.radius,
-              control.borders.focus.copyWith(color: tokens.colors.danger),
-            ),
-            focusedErrorBorder: _searchBorder(
-              control.radius,
-              control.borders.focus.copyWith(color: tokens.colors.danger),
+      return Semantics(
+        container: true,
+        label: label,
+        textField: true,
+        child: Container(
+          key: const ValueKey('visir-input-shell'),
+          padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+          decoration: BoxDecoration(
+            color: tokens.colors.surface,
+            borderRadius: BorderRadius.circular(control.radius),
+            border: Border.all(
+              color: effectiveBorder.color,
+              width: effectiveBorder.width,
             ),
           ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (leading != null) ...[
+                _buildLeadingButton(leading!),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: TextField(
+                    controller: controller,
+                    enabled: enabled,
+                    autofocus: autofocus,
+                    focusNode: focusNode,
+                    onSubmitted: onSubmitted,
+                    onChanged: onChanged,
+                    maxLines: effectiveMaxLines,
+                    textAlignVertical: effectiveMaxLines == 1
+                        ? TextAlignVertical.center
+                        : TextAlignVertical.top,
+                    style: TextStyle(color: tokens.colors.text, height: 1.2),
+                    decoration: InputDecoration.collapsed(
+                      hintText: hintText,
+                      hintStyle: TextStyle(color: tokens.colors.textMuted),
+                    ),
+                  ),
+                ),
+              ),
+              if (suffix != null) ...[
+                const SizedBox(width: 8),
+                _buildTrailingButton(suffix!),
+              ],
+              if (isLoading) ...[
+                const SizedBox(width: 8),
+                const _SearchLoadingIndicator(),
+              ],
+              if (shouldShowClearButton) ...[
+                const SizedBox(width: 6),
+                _buildClearButton(
+                  enabled
+                      ? () {
+                          controller?.clear();
+                          onClear?.call();
+                        }
+                      : null,
+                ),
+              ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget? _buildSearchTrailing(VisirTokens tokens) {
-    if (!isLoading && !showClearButton) {
-      return null;
+      );
     }
 
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(end: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (isLoading) ...[
-            const VisirSpinner(
-              size: VisirSpinnerSize.sm,
-              tone: VisirSpinnerTone.inverse,
-            ),
-            if (showClearButton) const SizedBox(width: 8),
-          ],
-          if (showClearButton)
-            IconButton(
-              onPressed: enabled ? onClear : null,
-              icon: Icon(
-                Icons.close,
-                size: 16,
-                color: tokens.colors.textMuted,
-              ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-              visualDensity: VisualDensity.compact,
-              splashRadius: 16,
-              tooltip: 'Clear',
-            ),
-        ],
+    if (controller == null) {
+      return shell(hasText: false);
+    }
+
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller!,
+      builder: (context, value, child) {
+        final hasText = value.text.isNotEmpty;
+        return shell(hasText: hasText);
+      },
+    );
+  }
+
+  VisirIconButton _buildLeadingButton(Widget leadingWidget) {
+    return VisirIconButton(
+      key: const ValueKey('visir-input-leading'),
+      icon: leadingWidget,
+      semanticLabel: 'Leading action',
+      size: VisirButtonSize.md,
+      tooltip: 'Leading action',
+    );
+  }
+
+  VisirIconButton _buildTrailingButton(Widget trailingWidget) {
+    return VisirIconButton(
+      key: const ValueKey('visir-input-suffix'),
+      icon: trailingWidget,
+      semanticLabel: 'Trailing action',
+      size: VisirButtonSize.md,
+      tooltip: 'Trailing action',
+    );
+  }
+
+  VisirIconButton _buildClearButton(VoidCallback? onPressed) {
+    return VisirIconButton(
+      key: const ValueKey('visir-input-clear'),
+      icon: const Icon(Icons.close),
+      semanticLabel: 'Clear',
+      size: VisirButtonSize.sm,
+      onPressed: onPressed,
+      tooltip: 'Clear',
+    );
+  }
+}
+
+class _SearchLoadingIndicator extends StatelessWidget {
+  const _SearchLoadingIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = VisirTheme.of(context).tokens;
+
+    return SizedBox(
+      width: 14,
+      height: 14,
+      child: CircularProgressIndicator(
+        strokeWidth: 1.4,
+        valueColor: AlwaysStoppedAnimation<Color>(tokens.colors.textMuted),
       ),
-    );
-  }
-
-  OutlineInputBorder _border(double radius, VisirBorderState state) {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(radius),
-      borderSide: BorderSide(color: state.color, width: state.width),
-    );
-  }
-
-  OutlineInputBorder _searchBorder(double radius, VisirBorderState state) {
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(radius),
-      borderSide: BorderSide(color: state.color, width: state.width),
     );
   }
 }

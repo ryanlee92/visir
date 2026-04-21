@@ -102,7 +102,10 @@ class _VisirButtonState extends State<VisirButton> {
               vertical: verticalPadding,
             ),
             child: IconTheme.merge(
-              data: IconThemeData(color: foregroundColor),
+              data: IconThemeData(
+                color: foregroundColor,
+                size: _iconSize(theme),
+              ),
               child: Row(
                 mainAxisSize: widget.isExpanded
                     ? MainAxisSize.max
@@ -385,5 +388,13 @@ class _VisirButtonState extends State<VisirButton> {
     return widget.variant == VisirButtonVariant.primary
         ? VisirSpinnerTone.primary
         : VisirSpinnerTone.inverse;
+  }
+
+  double _iconSize(VisirThemeData theme) {
+    return theme.components.feedback.sizeFor(switch (widget.size) {
+      VisirButtonSize.sm => VisirSpinnerSize.sm,
+      VisirButtonSize.md => VisirSpinnerSize.md,
+      VisirButtonSize.lg => VisirSpinnerSize.lg,
+    });
   }
 }
