@@ -5,6 +5,7 @@ import '../foundation/visir_enums.dart';
 import '../theme/visir_theme.dart';
 import '../theme/visir_theme_data.dart';
 import 'visir_spinner.dart';
+import 'visir_tooltip.dart';
 
 class VisirButton extends StatefulWidget {
   const VisirButton({
@@ -82,6 +83,7 @@ class _VisirButtonState extends State<VisirButton> {
   @override
   Widget build(BuildContext context) {
     final theme = VisirTheme.of(context);
+    final materialTheme = Theme.of(context);
     final control = theme.components.control;
     final disabled = _isDisabled;
     final pressed = !disabled && _pressed;
@@ -204,8 +206,20 @@ class _VisirButtonState extends State<VisirButton> {
       ),
     );
 
-    if (widget.tooltip case final tooltip?) {
-      child = Tooltip(message: tooltip, child: child);
+    if (widget.tooltip case final tooltip?
+        when tooltip.trim().isNotEmpty && !disabled) {
+      child = VisirTooltip(
+        message: Text(tooltip.trim()),
+        messageDecoration: BoxDecoration(
+          color: materialTheme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: _tooltipShadow,
+        ),
+        messageStyle: materialTheme.textTheme.bodySmall?.copyWith(
+          color: materialTheme.colorScheme.onSurface,
+        ),
+        child: child,
+      );
     }
 
     return child;
@@ -433,3 +447,12 @@ class _VisirButtonState extends State<VisirButton> {
     });
   }
 }
+
+const List<BoxShadow> _tooltipShadow = [
+  BoxShadow(
+    color: Color(0x22000000),
+    blurRadius: 6,
+    offset: Offset(0, 2),
+    spreadRadius: 0,
+  ),
+];
