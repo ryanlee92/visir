@@ -77,39 +77,11 @@ class _ShowcasePageState extends State<ShowcasePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = widget.themeMode == ThemeMode.dark;
     final isCompact = MediaQuery.sizeOf(context).width < 900;
 
     return Scaffold(
-      appBar: VisirAppBar(
-        title: 'Visir UI',
-        leadings: const [],
-        backgroundColor: theme.colorScheme.surfaceContainerHigh,
-        trailings: [
-          VisirAppBarButton.icon(
-            key: const ValueKey('showcase-theme-button'),
-            semanticLabel: isDarkMode
-                ? 'Switch to light theme'
-                : 'Switch to dark theme',
-            tooltip: isDarkMode
-                ? 'Switch to light theme'
-                : 'Switch to dark theme',
-            onPressed: widget.onThemeModeChanged == null
-                ? null
-                : () {
-                    widget.onThemeModeChanged!(
-                      isDarkMode ? ThemeMode.light : ThemeMode.dark,
-                    );
-                  },
-            icon: Icon(
-              isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-            ),
-          ),
-        ],
-      ),
       body: SafeArea(
-        top: false,
+        top: true,
         child: isCompact
             ? Column(
                 children: [
@@ -119,6 +91,8 @@ class _ShowcasePageState extends State<ShowcasePage> {
                       groups: showcaseSectionGroups,
                       activeSectionId: _activeSectionId,
                       onSelected: _selectSection,
+                      themeMode: widget.themeMode,
+                      onThemeModeChanged: widget.onThemeModeChanged,
                     ),
                   ),
                   Expanded(child: _buildMainPane(context, true)),
@@ -132,6 +106,8 @@ class _ShowcasePageState extends State<ShowcasePage> {
                       groups: showcaseSectionGroups,
                       activeSectionId: _activeSectionId,
                       onSelected: _selectSection,
+                      themeMode: widget.themeMode,
+                      onThemeModeChanged: widget.onThemeModeChanged,
                     ),
                   ),
                   Expanded(child: _buildMainPane(context, false)),

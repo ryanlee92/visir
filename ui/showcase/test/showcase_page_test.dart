@@ -15,6 +15,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Visir UI'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('showcase-sidebar-app-bar')),
+      findsOneWidget,
+    );
     final appBarContext = tester.element(
       find.byKey(const ValueKey('visir-app-bar')),
     );
