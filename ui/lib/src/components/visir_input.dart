@@ -116,11 +116,12 @@ class VisirInput extends StatelessWidget {
             children: [
               if (leading != null) ...[
                 _buildLeadingButton(leading!),
-                const SizedBox(width: 8),
-              ],
+                const SizedBox(width: 0),
+              ] else
+                SizedBox(width: 8),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: TextField(
                     controller: controller,
                     enabled: enabled,
@@ -129,8 +130,9 @@ class VisirInput extends StatelessWidget {
                     onSubmitted: onSubmitted,
                     onChanged: onChanged,
                     maxLines: effectiveMaxLines,
+                    minLines: 1,
                     textAlignVertical: effectiveMaxLines == 1
-                        ? TextAlignVertical.center
+                        ? TextAlignVertical.top
                         : TextAlignVertical.top,
                     style: TextStyle(color: tokens.colors.text, height: 1.2),
                     decoration: InputDecoration.collapsed(
@@ -147,9 +149,10 @@ class VisirInput extends StatelessWidget {
               if (isLoading) ...[
                 const SizedBox(width: 8),
                 const _SearchLoadingIndicator(),
+                const SizedBox(width: 8),
               ],
               if (shouldShowClearButton) ...[
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 _buildClearButton(
                   enabled
                       ? () {
@@ -158,6 +161,7 @@ class VisirInput extends StatelessWidget {
                         }
                       : null,
                 ),
+                const SizedBox(width: 2),
               ],
             ],
           ),
