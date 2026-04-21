@@ -697,7 +697,6 @@ void main() {
     final themedData = baseTheme.copyWith(
       tokens: baseTheme.tokens.copyWith(
         colors: baseTheme.tokens.colors.copyWith(
-          accent: const Color(0xFF0057B8),
           text: const Color(0xFF222222),
           textMuted: const Color(0xFF666666),
           textInverse: const Color(0xFFF2F2F2),
@@ -731,7 +730,7 @@ void main() {
     final inverse = await resolveTone(VisirSpinnerTone.inverse);
 
     expect(neutral, const Color(0xFF666666));
-    expect(primary, const Color(0xFF0057B8));
+    expect(primary, const Color(0xFF222222));
     expect(inverse, const Color(0xFFF2F2F2));
     expect(neutral, isNot(primary));
     expect(primary, isNot(inverse));
