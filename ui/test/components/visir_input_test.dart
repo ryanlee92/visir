@@ -82,4 +82,41 @@ void main() {
     expect(find.byType(VisirSpinner), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
   });
+
+  testWidgets('search mode uses custom leading when provided', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          label: 'Search',
+          hintText: 'Find records',
+          mode: VisirInputMode.search,
+          leading: Icon(Icons.tune),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.tune), findsOneWidget);
+    expect(find.byIcon(Icons.search), findsNothing);
+  });
+
+  testWidgets('search mode clear action invokes callback', (tester) async {
+    var clearCount = 0;
+
+    await tester.pumpWidget(
+      buildHarness(
+        VisirInput(
+          label: 'Search',
+          hintText: 'Find tasks',
+          mode: VisirInputMode.search,
+          showClearButton: true,
+          onClear: () => clearCount++,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pump();
+
+    expect(clearCount, 1);
+  });
 }
