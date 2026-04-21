@@ -24,7 +24,7 @@ void main() {
     expect(find.text('name@example.com'), findsOneWidget);
   });
 
-  testWidgets('search mode shows default search icon and omits label text', (
+  testWidgets('search mode shows default search icon and exposes semantics', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -120,39 +120,29 @@ void main() {
     expect(clearCount, 1);
   });
 
-  testWidgets('search mode uses the focused border when focused', (
+  testWidgets('search mode configures a focused border', (
     tester,
   ) async {
-    final focusNode = FocusNode();
-    addTearDown(focusNode.dispose);
-
     await tester.pumpWidget(
       buildHarness(
-        VisirInput(
+        const VisirInput(
           label: 'Search',
           hintText: 'Find tasks',
           mode: VisirInputMode.search,
-          focusNode: focusNode,
         ),
       ),
     );
 
-    final shellFinder = find.byKey(
-      const ValueKey('visir-input-search-shell'),
+    final searchField = tester.widget<TextField>(find.byType(TextField));
+    final focusedBorder =
+        searchField.decoration?.focusedBorder as OutlineInputBorder;
+    final baseBorder = searchField.decoration?.border as OutlineInputBorder;
+
+    expect(focusedBorder.borderSide.color, isNot(equals(baseBorder.borderSide.color)));
+    expect(
+      focusedBorder.borderSide.width,
+      greaterThanOrEqualTo(baseBorder.borderSide.width),
     );
-
-    final before = tester.widget<Container>(shellFinder);
-    final beforeBorder =
-        (before.decoration as BoxDecoration).border as Border;
-
-    focusNode.requestFocus();
-    await tester.pump();
-
-    final after = tester.widget<Container>(shellFinder);
-    final afterBorder = (after.decoration as BoxDecoration).border as Border;
-
-    expect(beforeBorder.top.color, isNot(equals(afterBorder.top.color)));
-    expect(afterBorder.top.width, greaterThanOrEqualTo(beforeBorder.top.width));
   });
 
   testWidgets('search mode shows a danger border when error text is set', (
@@ -169,11 +159,10 @@ void main() {
       ),
     );
 
-    final container = tester.widget<Container>(
-      find.byKey(const ValueKey('visir-input-search-shell')),
-    );
-    final border = (container.decoration as BoxDecoration).border as Border;
+    final searchField = tester.widget<TextField>(find.byType(TextField));
+    final errorBorder =
+        searchField.decoration?.errorBorder as OutlineInputBorder;
 
-    expect(border.top.color, const Color(0xFFE13A5F));
+    expect(errorBorder.borderSide.color, const Color(0xFFE13A5F));
   });
 }
