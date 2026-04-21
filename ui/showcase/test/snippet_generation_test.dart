@@ -3,8 +3,7 @@ import 'package:visir_ui_showcase/data/button_snippets.dart';
 import 'package:visir_ui_showcase/data/card_snippets.dart';
 import 'package:visir_ui_showcase/data/icon_options.dart';
 import 'package:visir_ui_showcase/data/input_snippets.dart';
-
-import '../../visir_ui.dart';
+import 'package:visir_ui/visir_ui.dart';
 
 void main() {
   test('button snippet omits default props', () {
@@ -68,6 +67,31 @@ void main() {
     expect(code, contains('prefix: const Icon(Icons.mail_outline)'));
     expect(code, contains("errorText: 'Invalid address'"));
     expect(code, contains('enabled: false'));
+    expect(code, isNot(contains('suffix:')));
+  });
+
+  test('input snippet includes search mode output when requested', () {
+    final code = buildInputSnippet(
+      label: 'Search',
+      hintText: 'Find projects',
+      mode: VisirInputMode.search,
+      leadingIcon: curatedIconOptions.firstWhere(
+        (option) => option.id == 'search',
+      ),
+      isLoading: true,
+      showClearButton: true,
+      maxLines: 3,
+    );
+
+    expect(code, contains('VisirInput('));
+    expect(code, contains("label: 'Search'"));
+    expect(code, contains("hintText: 'Find projects'"));
+    expect(code, contains('mode: VisirInputMode.search'));
+    expect(code, contains('leading: const Icon(Icons.search)'));
+    expect(code, contains('isLoading: true'));
+    expect(code, contains('showClearButton: true'));
+    expect(code, contains('maxLines: 3'));
+    expect(code, isNot(contains('prefix:')));
     expect(code, isNot(contains('suffix:')));
   });
 
