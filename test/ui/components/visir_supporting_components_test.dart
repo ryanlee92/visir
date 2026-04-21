@@ -274,6 +274,14 @@ void main() {
     );
 
     expect(find.text('Beta'), findsOneWidget);
+
+    final label = tester.widget<Text>(find.text('Beta'));
+    final theme = VisirTheme.of(tester.element(find.byType(VisirBadge)));
+
+    expect(label.style?.fontSize, theme.text.label.fontSize);
+    expect(label.style?.fontWeight, theme.text.label.fontWeight);
+    expect(label.style?.height, theme.text.label.height);
+    expect(label.style?.color, theme.tokens.colors.text);
   });
 
   testWidgets('VisirBadge reads content role tokens for padding and radius', (
@@ -419,6 +427,13 @@ void main() {
 
     expect(find.text('Workspace'), findsOneWidget);
     expect(find.text('Panel body'), findsOneWidget);
+
+    final title = tester.widget<Text>(find.text('Workspace'));
+    final theme = VisirTheme.of(tester.element(find.byType(VisirSection)));
+
+    expect(title.style?.fontSize, theme.text.title.fontSize);
+    expect(title.style?.fontWeight, theme.text.title.fontWeight);
+    expect(title.style?.height, theme.text.title.height);
   });
 
   testWidgets('VisirSection reads spacing from surface role tokens', (
@@ -613,6 +628,19 @@ void main() {
     expect(find.text('No tasks'), findsOneWidget);
     expect(find.text('Create one to get started'), findsOneWidget);
     expect(find.text('Create'), findsOneWidget);
+
+    final theme = VisirTheme.of(tester.element(find.byType(VisirEmptyState)));
+    final title = tester.widget<Text>(find.text('No tasks'));
+    final description = tester.widget<Text>(
+      find.text('Create one to get started'),
+    );
+
+    expect(title.style?.fontSize, theme.text.title.fontSize);
+    expect(title.style?.fontWeight, theme.text.title.fontWeight);
+    expect(title.style?.height, theme.text.title.height);
+    expect(description.style?.fontSize, theme.text.body.fontSize);
+    expect(description.style?.fontWeight, theme.text.body.fontWeight);
+    expect(description.style?.height, theme.text.body.height);
   });
 
   testWidgets('VisirEmptyState reads content and surface spacing tokens', (

@@ -17,6 +17,14 @@ void main() {
     );
 
     expect(find.text('Continue'), findsOneWidget);
+
+    final label = tester.widget<Text>(find.text('Continue'));
+    final theme = VisirTheme.of(tester.element(find.byType(VisirButton)));
+
+    expect(label.style?.fontSize, 15);
+    expect(label.style?.fontWeight, theme.text.label.fontWeight);
+    expect(label.style?.height, 1.2);
+    expect(label.style?.color, theme.tokens.colors.textInverse);
   });
 
   testWidgets('icon button reuses button interaction shell', (tester) async {
@@ -207,9 +215,7 @@ void main() {
 
   testWidgets('danger button uses vivid crimson fill', (tester) async {
     final theme = VisirThemeData.fallback();
-    final expectedDangerFill = theme.tokens.colors.danger.withValues(
-      alpha: 0.32,
-    );
+    final expectedDangerFill = theme.tokens.colors.danger;
 
     await tester.pumpWidget(
       Directionality(
@@ -327,7 +333,7 @@ void main() {
                 .decoration
             as BoxDecoration;
 
-    expect(decoration.color, themedDanger.withValues(alpha: 0.32));
+    expect(decoration.color, themedDanger);
   });
 
   testWidgets('empty label does not implicitly switch to icon-only layout', (
@@ -674,16 +680,18 @@ void main() {
       return decoration.border! as Border;
     }
 
+    final controlBorders = themedData.components.control.borders;
+
     var border = borderFor(smallDecorationFinder);
-    expect(border.top.color, borders.base.color);
-    expect(border.top.width, borders.base.width);
+    expect(border.top.color, controlBorders.base.color);
+    expect(border.top.width, controlBorders.base.width);
 
     await gesture.moveTo(tester.getCenter(find.text('Small')));
     await tester.pumpAndSettle();
 
     border = borderFor(smallDecorationFinder);
-    expect(border.top.color, borders.base.color);
-    expect(border.top.width, borders.base.width);
+    expect(border.top.color, controlBorders.base.color);
+    expect(border.top.width, controlBorders.base.width);
 
     final successBorder = borderFor(successDecorationFinder);
     expect(
@@ -789,7 +797,8 @@ void main() {
             as BoxDecoration;
 
     expect(focusedDecoration.border, isNull);
-    expect(focusedDecoration.boxShadow.length, greaterThan(1));
+    expect(focusedDecoration.boxShadow, isNotNull);
+    expect(focusedDecoration.boxShadow!.length, greaterThan(1));
   });
 
   testWidgets('enabled button exposes button semantics and enabled state', (

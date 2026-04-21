@@ -10,13 +10,18 @@ class VisirSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacing = VisirTheme.of(context).components.surface.padding.compact;
+    final visirTheme = VisirTheme.of(context);
+    final spacing = visirTheme.components.surface.padding.compact;
+    final titleStyle = visirTheme.text.title;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (title != null) ...[Text(title!), SizedBox(height: spacing)],
+        if (title != null) ...[
+          Text(title!, style: titleStyle),
+          SizedBox(height: spacing),
+        ],
         child,
       ],
     );

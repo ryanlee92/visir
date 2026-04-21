@@ -20,6 +20,17 @@ void main() {
 
     expect(find.text('Visir UI'), findsOneWidget);
     expect(find.byKey(const ValueKey('visir-app-bar')), findsOneWidget);
+
+    final title = tester.widget<Text>(find.text('Visir UI'));
+    final theme = VisirTheme.of(tester.element(find.byType(VisirAppBar)));
+
+    expect(title.style?.fontSize, theme.text.title.fontSize);
+    expect(title.style?.fontWeight, theme.text.title.fontWeight);
+    expect(title.style?.height, theme.text.title.height);
+    expect(
+      title.style?.color,
+      Theme.of(tester.element(find.byType(VisirAppBar))).colorScheme.outlineVariant,
+    );
   });
 
   testWidgets('VisirAppBar renders leading and trailing buttons', (

@@ -110,9 +110,8 @@ class VisirAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final visirTheme = VisirTheme.of(context);
-    final titleStyle = theme.textTheme.titleLarge?.copyWith(
+    final titleStyle = visirTheme.text.title.copyWith(
       color: theme.colorScheme.outlineVariant,
-      fontWeight: FontWeight.w700,
     );
 
     return Container(
@@ -131,7 +130,7 @@ class VisirAppBar extends StatelessWidget implements PreferredSizeWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: titleStyle ?? TextStyle(color: visirTheme.tokens.colors.textMuted, fontWeight: FontWeight.w700),
+                style: titleStyle,
               ),
             ),
           ),

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:visir_ui/visir_ui.dart';
 import 'package:visir_ui_showcase/app/showcase_app.dart';
 import 'package:visir_ui_showcase/app/showcase_page.dart';
+import 'package:visir_ui_showcase/app/showcase_theme.dart';
 import 'package:visir_ui_showcase/sections/showcase_section_layout.dart';
 
 void main() {
@@ -31,6 +32,30 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.byIcon(Icons.light_mode_outlined), findsOneWidget);
+  });
+
+  testWidgets('ShowcaseTheme maps Visir text tokens into Material text theme', (
+    tester,
+  ) async {
+    final themeData = _customVisirThemeData();
+    final materialTheme = ShowcaseTheme.build(themeData, Brightness.light);
+
+    expect(
+      materialTheme.textTheme.titleLarge?.fontSize,
+      themeData.text.hero.fontSize,
+    );
+    expect(
+      materialTheme.textTheme.titleLarge?.color,
+      materialTheme.colorScheme.onSurface,
+    );
+    expect(
+      materialTheme.textTheme.labelLarge?.fontSize,
+      themeData.text.label.fontSize,
+    );
+    expect(
+      materialTheme.textTheme.bodyMedium?.fontSize,
+      themeData.text.body.fontSize,
+    );
   });
 
   testWidgets('ShowcaseApp theme button updates the input surface color', (

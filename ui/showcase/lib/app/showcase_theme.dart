@@ -40,6 +40,7 @@ class ShowcaseTheme {
     };
 
     final base = ThemeData(useMaterial3: true, colorScheme: baseScheme);
+    final textTheme = _buildTextTheme(visirThemeData.text, base.colorScheme);
 
     return base.copyWith(
       scaffoldBackgroundColor: base.colorScheme.surface,
@@ -62,10 +63,30 @@ class ShowcaseTheme {
           borderRadius: BorderRadius.circular(visirTokens.radius.pill),
         ),
       ),
-      textTheme: base.textTheme.apply(
-        bodyColor: base.colorScheme.onSurface,
-        displayColor: base.colorScheme.onSurface,
-      ),
+      textTheme: textTheme,
+      primaryTextTheme: textTheme,
     );
   }
+}
+
+TextTheme _buildTextTheme(VisirTextThemeData text, ColorScheme colors) {
+  final onSurface = colors.onSurface;
+
+  return TextTheme(
+    displayLarge: text.hero.copyWith(color: onSurface),
+    displayMedium: text.hero.copyWith(color: onSurface),
+    displaySmall: text.title.copyWith(color: onSurface),
+    headlineLarge: text.hero.copyWith(color: onSurface),
+    headlineMedium: text.title.copyWith(color: onSurface),
+    headlineSmall: text.title.copyWith(color: onSurface),
+    titleLarge: text.hero.copyWith(color: onSurface),
+    titleMedium: text.title.copyWith(color: onSurface),
+    titleSmall: text.body.copyWith(color: onSurface),
+    bodyLarge: text.body.copyWith(color: onSurface),
+    bodyMedium: text.body.copyWith(color: onSurface),
+    bodySmall: text.caption.copyWith(color: onSurface),
+    labelLarge: text.label.copyWith(color: onSurface),
+    labelMedium: text.label.copyWith(color: onSurface),
+    labelSmall: text.caption.copyWith(color: onSurface),
+  );
 }

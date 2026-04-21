@@ -79,6 +79,13 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
 
     return base.copyWith(
       tokens: base.tokens.copyWith(colors: colors),
+      text: base.text.copyWith(
+        hero: base.text.hero.copyWith(color: colors.text),
+        title: base.text.title.copyWith(color: colors.text),
+        body: base.text.body.copyWith(color: colors.text),
+        label: base.text.label.copyWith(color: colors.text),
+        caption: base.text.caption.copyWith(color: colors.textMuted),
+      ),
       components: base.components.copyWith(
         control: base.components.control.copyWith(borders: borders),
         surface: base.components.surface.copyWith(borders: borders),
@@ -112,6 +119,13 @@ class _ShowcaseAppState extends State<ShowcaseApp> {
 
     return base.copyWith(
       tokens: base.tokens.copyWith(colors: colors),
+      text: base.text.copyWith(
+        hero: base.text.hero.copyWith(color: colors.text),
+        title: base.text.title.copyWith(color: colors.text),
+        body: base.text.body.copyWith(color: colors.text),
+        label: base.text.label.copyWith(color: colors.text),
+        caption: base.text.caption.copyWith(color: colors.textMuted),
+      ),
       components: base.components.copyWith(
         control: base.components.control.copyWith(borders: borders),
         surface: base.components.surface.copyWith(borders: borders),

@@ -8,6 +8,7 @@ export 'src/theme/visir_component_role_themes.dart';
 export 'src/theme/visir_component_themes.dart';
 export 'src/theme/visir_theme.dart';
 export 'src/theme/visir_theme_data.dart';
+export 'src/theme/visir_text_theme.dart';
 export 'src/components/visir_badge.dart';
 export 'src/components/visir_app_bar.dart';
 export 'src/components/visir_button.dart';

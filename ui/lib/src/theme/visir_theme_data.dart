@@ -3,13 +3,19 @@ import 'package:flutter/foundation.dart';
 import '../foundation/visir_tokens.dart';
 import 'visir_component_role_themes.dart';
 import 'visir_component_themes.dart';
+import 'visir_text_theme.dart';
 
 @immutable
 class VisirThemeData {
-  const VisirThemeData({required this.tokens, required this.components});
+  const VisirThemeData({
+    required this.tokens,
+    required this.components,
+    required this.text,
+  });
 
   final VisirTokens tokens;
   final VisirComponentThemes components;
+  final VisirTextThemeData text;
 
   factory VisirThemeData.fallback() {
     final tokens = VisirTokens.fallback();
@@ -21,6 +27,7 @@ class VisirThemeData {
 
     return VisirThemeData(
       tokens: tokens,
+      text: VisirTextThemeData.fallback(tokens.colors),
       components: VisirComponentThemes(
         button: const VisirButtonThemeData(
           glowBlur: 24,
@@ -106,10 +113,12 @@ class VisirThemeData {
   VisirThemeData copyWith({
     VisirTokens? tokens,
     VisirComponentThemes? components,
+    VisirTextThemeData? text,
   }) {
     return VisirThemeData(
       tokens: tokens ?? this.tokens,
       components: components ?? this.components,
+      text: text ?? this.text,
     );
   }
 
@@ -118,9 +127,10 @@ class VisirThemeData {
     return identical(this, other) ||
         other is VisirThemeData &&
             tokens == other.tokens &&
-            components == other.components;
+            components == other.components &&
+            text == other.text;
   }
 
   @override
-  int get hashCode => Object.hash(tokens, components);
+  int get hashCode => Object.hash(tokens, components, text);
 }

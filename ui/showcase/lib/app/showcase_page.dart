@@ -71,6 +71,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
 
   Widget _buildSection(String id, ColorScheme colors) {
     final visirTheme = VisirTheme.of(context);
+    final text = visirTheme.text;
     final surfaceSpacing = visirTheme.components.surface.padding;
     final contentSpacing = visirTheme.components.content;
     final Widget content = switch (id) {
@@ -120,12 +121,10 @@ class _ShowcasePageState extends State<ShowcasePage> {
         children: [
           Text(
             prettySectionTitle(id),
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: text.title,
           ),
           SizedBox(height: contentSpacing.inlineSpacing),
-          Text(description, style: Theme.of(context).textTheme.bodyMedium),
+          Text(description, style: text.body),
           SizedBox(height: surfaceSpacing.comfortable),
           content,
         ],
@@ -161,6 +160,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final visirTheme = VisirTheme.of(context);
+    final text = visirTheme.text;
     final surfaceSpacing = visirTheme.components.surface.padding;
     final contentSpacing = visirTheme.components.content;
     final horizontalPadding = MediaQuery.sizeOf(context).width < 720
@@ -231,7 +231,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
                     children: [
                       Text(
                         'Interactive component showcase for the visir_ui package.',
-                        style: theme.textTheme.titleMedium,
+                        style: text.hero,
                       ),
                       SizedBox(height: sectionSpacing),
                       Wrap(
@@ -267,7 +267,7 @@ class _ShowcasePageState extends State<ShowcasePage> {
                       SizedBox(height: contentSpacing.paddingVertical),
                       Text(
                         'Built for internal component exploration and API discovery.',
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: text.caption.copyWith(
                           color: colors.outline,
                         ),
                       ),

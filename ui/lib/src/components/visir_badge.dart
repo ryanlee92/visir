@@ -35,7 +35,10 @@ class VisirBadge extends StatelessWidget {
         color: background,
         borderRadius: BorderRadius.circular(content.radius),
       ),
-      child: Text(label),
+      child: Text(
+        label,
+        style: theme.text.label.copyWith(color: colors.text),
+      ),
     );
   }
 }

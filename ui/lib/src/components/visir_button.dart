@@ -385,14 +385,13 @@ class _VisirButtonState extends State<VisirButton> {
   }
 
   TextStyle _labelStyle(VisirThemeData theme) {
-    return TextStyle(
+    return theme.text.label.copyWith(
       color: _foregroundColor(theme),
       fontSize: switch (widget.size) {
         VisirButtonSize.sm => 13,
         VisirButtonSize.md => 15,
         VisirButtonSize.lg => 17,
       }.toDouble(),
-      fontWeight: FontWeight.w600,
       height: 1.2,
     );
   }
