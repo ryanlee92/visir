@@ -20,6 +20,163 @@ void main() {
 
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('name@example.com'), findsOneWidget);
+
+    final theme = VisirTheme.of(tester.element(find.byType(VisirInput)));
+    final label = tester.widget<Text>(find.text('Email'));
+    final editableText = tester.widget<EditableText>(find.byType(EditableText));
+
+    expect(label.style?.fontSize, theme.text.label.fontSize);
+    expect(label.style?.fontWeight, theme.text.label.fontWeight);
+    expect(label.style?.height, theme.text.label.height);
+    expect(label.style?.color, theme.tokens.colors.textMuted);
+
+    expect(editableText.style.fontSize, theme.text.body.fontSize);
+    expect(editableText.style.fontWeight, theme.text.body.fontWeight);
+    expect(editableText.style.height, theme.text.body.height);
+    expect(editableText.style.color, theme.tokens.colors.text);
+  });
+
+  testWidgets('input can omit label entirely', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(const VisirInput(hintText: 'name@example.com')),
+    );
+
+    expect(find.text('name@example.com'), findsOneWidget);
+    expect(find.text('Email'), findsNothing);
+    expect(find.byWidgetPredicate((widget) => widget is Text && widget.data == null), findsNothing);
+  });
+
+  testWidgets('input border defaults to none', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(const VisirInput(hintText: 'name@example.com')),
+    );
+
+    final shell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final decoration = shell.decoration as BoxDecoration;
+
+    expect(decoration.border, isNull);
+  });
+
+  testWidgets('input border stays none when disabled', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          hintText: 'name@example.com',
+          enabled: false,
+          border: VisirInputBorder.none,
+        ),
+      ),
+    );
+
+    final shell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final decoration = shell.decoration as BoxDecoration;
+
+    expect(decoration.border, isNull);
+  });
+
+  testWidgets('input border states use semantic tokens', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          hintText: 'name@example.com',
+          border: VisirInputBorder.base,
+        ),
+      ),
+    );
+
+    final theme = VisirTheme.of(tester.element(find.byType(VisirInput)));
+    final baseShell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final baseBorder =
+        (baseShell.decoration as BoxDecoration).border! as Border;
+
+    expect(baseBorder.top.color, theme.components.control.borders.base.color);
+    expect(baseBorder.top.width, theme.components.control.borders.base.width);
+
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          hintText: 'name@example.com',
+          border: VisirInputBorder.success,
+        ),
+      ),
+    );
+
+    final successShell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final successBorder =
+        (successShell.decoration as BoxDecoration).border! as Border;
+
+    expect(successBorder.top.color, theme.tokens.colors.success);
+    expect(successBorder.top.width, theme.components.control.borders.base.width);
+
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          hintText: 'name@example.com',
+          border: VisirInputBorder.error,
+        ),
+      ),
+    );
+
+    final errorShell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final errorBorder = (errorShell.decoration as BoxDecoration).border! as Border;
+
+    expect(errorBorder.top.color, theme.tokens.colors.danger);
+    expect(errorBorder.top.width, theme.components.control.borders.base.width);
+  });
+
+  testWidgets('errorText forces the error border', (tester) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          hintText: 'name@example.com',
+          border: VisirInputBorder.success,
+          errorText: 'Invalid email',
+        ),
+      ),
+    );
+
+    final theme = VisirTheme.of(tester.element(find.byType(VisirInput)));
+    final shell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final border = (shell.decoration as BoxDecoration).border! as Border;
+
+    expect(border.top.color, theme.tokens.colors.danger);
+    expect(border.top.width, theme.components.control.borders.base.width);
+  });
+
+  testWidgets('errorText still forces the error border when disabled', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildHarness(
+        const VisirInput(
+          hintText: 'name@example.com',
+          enabled: false,
+          border: VisirInputBorder.success,
+          errorText: 'Invalid email',
+        ),
+      ),
+    );
+
+    final theme = VisirTheme.of(tester.element(find.byType(VisirInput)));
+    final shell = tester.widget<Container>(
+      find.byKey(const ValueKey('visir-input-shell')),
+    );
+    final border = (shell.decoration as BoxDecoration).border! as Border;
+
+    expect(border.top.color, theme.tokens.colors.danger);
+    expect(border.top.width, theme.components.control.borders.base.width);
   });
 
   testWidgets('input shell adds padding around the field', (tester) async {
@@ -245,7 +402,13 @@ void main() {
     final expectedDanger = VisirTheme.of(
       tester.element(find.byType(VisirInput)),
     ).tokens.colors.danger;
+    final theme = VisirTheme.of(tester.element(find.byType(VisirInput)));
+    final error = tester.widget<Text>(find.text('Invalid query'));
 
     expect((border.border as Border).top.color, expectedDanger);
+    expect(error.style?.fontSize, theme.text.caption.fontSize);
+    expect(error.style?.fontWeight, theme.text.caption.fontWeight);
+    expect(error.style?.height, theme.text.caption.height);
+    expect(error.style?.color, expectedDanger);
   });
 }

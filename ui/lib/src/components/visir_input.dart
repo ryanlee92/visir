@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:visir_ui/src/components/visir_spinner.dart';
 
 import '../foundation/visir_enums.dart';
 import '../foundation/visir_tokens.dart';
 import '../theme/visir_component_role_themes.dart';
 import '../theme/visir_theme.dart';
+import '../theme/visir_text_theme.dart';
 import 'visir_icon_button.dart';
+import 'visir_spinner.dart';
+
+enum VisirInputBorder { none, base, success, error }
 
 class VisirInput extends StatelessWidget {
   const VisirInput({
     super.key,
-    required this.label,
+    this.label,
+    this.border = VisirInputBorder.none,
     this.hintText,
     this.controller,
     this.suffix,
@@ -31,7 +35,8 @@ class VisirInput extends StatelessWidget {
     this.maxLines,
   });
 
-  final String label;
+  final String? label;
+  final VisirInputBorder border;
   final String? hintText;
   final TextEditingController? controller;
   final Widget? suffix;
@@ -55,29 +60,34 @@ class VisirInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = VisirTheme.of(context);
     final tokens = theme.tokens;
+    final text = theme.text;
     final control = theme.components.control;
     final hasError = _hasError;
+    final labelText = _labelText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: tokens.colors.textMuted,
-              fontWeight: FontWeight.w600,
+        if (labelText != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              labelText,
+              style: text.label.copyWith(color: tokens.colors.textMuted),
             ),
           ),
+        _buildShell(
+          tokens: tokens,
+          control: control,
+          text: text,
+          hasError: hasError,
         ),
-        _buildShell(tokens: tokens, control: control, hasError: hasError),
         if (hasError) ...[
           const SizedBox(height: 6),
           Text(
             errorText!.trim(),
-            style: TextStyle(color: tokens.colors.danger, fontSize: 12),
+            style: text.caption.copyWith(color: tokens.colors.danger),
           ),
         ],
       ],
@@ -86,27 +96,53 @@ class VisirInput extends StatelessWidget {
 
   bool get _hasError => errorText != null && errorText!.trim().isNotEmpty;
 
+  String? get _labelText {
+    final value = label?.trim();
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+
+    return value;
+  }
+
   Widget _buildShell({
     required VisirTokens tokens,
     required VisirControlThemeData control,
+    required VisirTextThemeData text,
     required bool hasError,
   }) {
     final effectiveMaxLines = maxLines ?? 1;
-    final effectiveBorder = !enabled
-        ? control.borders.disabled
-        : hasError
+    final effectiveBorder = hasError
         ? VisirBorderState(
             color: tokens.colors.danger,
             width: control.borders.base.width,
           )
-        : control.borders.base;
+        : switch (border) {
+            VisirInputBorder.none => null,
+            VisirInputBorder.base => control.borders.base,
+            VisirInputBorder.success => VisirBorderState(
+                color: tokens.colors.success,
+                width: control.borders.base.width,
+              ),
+            VisirInputBorder.error => VisirBorderState(
+                color: tokens.colors.danger,
+                width: control.borders.base.width,
+              ),
+          };
     Widget shell({required bool hasText}) {
       final shouldShowClearButton =
           showClearButton && (controller == null || hasText);
 
+      final border = effectiveBorder == null
+          ? null
+          : Border.all(
+              color: effectiveBorder.color,
+              width: effectiveBorder.width,
+            );
+
       return Semantics(
         container: true,
-        label: label,
+        label: _labelText ?? hintText?.trim() ?? 'Input',
         textField: true,
         child: Container(
           key: const ValueKey('visir-input-shell'),
@@ -114,10 +150,7 @@ class VisirInput extends StatelessWidget {
           decoration: BoxDecoration(
             color: tokens.colors.surface,
             borderRadius: BorderRadius.circular(control.radius),
-            border: Border.all(
-              color: effectiveBorder.color,
-              width: effectiveBorder.width,
-            ),
+            border: border,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,10 +175,12 @@ class VisirInput extends StatelessWidget {
                     textAlignVertical: effectiveMaxLines == 1
                         ? TextAlignVertical.top
                         : TextAlignVertical.top,
-                    style: TextStyle(color: tokens.colors.text, height: 1.2),
+                    style: text.body.copyWith(color: tokens.colors.text),
                     decoration: InputDecoration.collapsed(
                       hintText: hintText,
-                      hintStyle: TextStyle(color: tokens.colors.textMuted),
+                      hintStyle: text.body.copyWith(
+                        color: tokens.colors.textMuted,
+                      ),
                     ),
                   ),
                 ),
