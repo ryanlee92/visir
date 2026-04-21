@@ -94,7 +94,10 @@ void main() {
             textDirection: TextDirection.ltr,
             child: VisirTheme(
               data: themedData,
-              child: const VisirInput(label: 'Email'),
+              child: const VisirInput(
+                label: 'Email',
+                border: VisirInputBorder.base,
+              ),
             ),
           ),
         ),
@@ -148,6 +151,86 @@ void main() {
       find.byKey(const ValueKey('spacious-card')),
     );
     expect(spacious.height, greaterThan(compact.height));
+  });
+
+  testWidgets('elevated card stays borderless by default', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: const VisirCard(
+          variant: VisirCardVariant.elevated,
+          child: Text('Elevated'),
+        ),
+      ),
+    );
+
+    final card = tester.widget<Container>(
+      find.descendant(
+        of: find.byType(VisirCard),
+        matching: find.byType(Container),
+      ),
+    );
+    expect((card.decoration as BoxDecoration).border, isNull);
+  });
+
+  testWidgets('outlined card can opt into base border', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: const VisirCard(
+          variant: VisirCardVariant.outlined,
+          border: VisirCardBorder.base,
+          child: Text('Outlined'),
+        ),
+      ),
+    );
+
+    final theme = VisirTheme.of(tester.element(find.byType(VisirCard)));
+    final card = tester.widget<Container>(
+      find.descendant(
+        of: find.byType(VisirCard),
+        matching: find.byType(Container),
+      ),
+    );
+    final border = (card.decoration as BoxDecoration).border! as Border;
+    expect(border.top.color, theme.components.surface.borders.base.color);
+    expect(border.top.width, theme.components.surface.borders.base.width);
+  });
+
+  testWidgets('shadow can be disabled without removing focus treatment', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: makeUiTestableWidget(
+            child: VisirCard(
+              variant: VisirCardVariant.elevated,
+              showShadow: false,
+              onTap: () {},
+              child: const Text('Focusable'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final cardFinder = find.byType(VisirCard);
+    final decorationFinder = find.descendant(
+      of: cardFinder,
+      matching: find.byWidgetPredicate(
+        (widget) => widget is Container && widget.decoration is BoxDecoration,
+      ),
+    );
+    final unfocused =
+        tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
+    expect(unfocused.boxShadow, isEmpty);
+
+    final focusNode = Focus.of(tester.element(find.text('Focusable')));
+    focusNode.requestFocus();
+    await tester.pump();
+
+    final focused =
+        tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
+    expect(focused.boxShadow, isNotEmpty);
   });
 
   testWidgets(
@@ -213,14 +296,7 @@ void main() {
 
       expect(unfocusedContainer.padding, const EdgeInsets.all(14));
       expect(unfocusedDecoration.borderRadius, BorderRadius.circular(31));
-      expect(
-        (unfocusedDecoration.border! as Border).top.color,
-        borders.base.color,
-      );
-      expect(
-        (unfocusedDecoration.border! as Border).top.width,
-        borders.base.width,
-      );
+      expect(unfocusedDecoration.border, isNull);
       expect(unfocusedDecoration.boxShadow, hasLength(1));
       expect(
         unfocusedDecoration.boxShadow!.single.blurRadius,
@@ -245,14 +321,7 @@ void main() {
           tester.widget<Container>(decorationFinder).decoration!
               as BoxDecoration;
 
-      expect(
-        (focusedDecoration.border! as Border).top.color,
-        borders.focus.color,
-      );
-      expect(
-        (focusedDecoration.border! as Border).top.width,
-        borders.focus.width,
-      );
+      expect(focusedDecoration.border, isNull);
       expect(focusedDecoration.boxShadow, hasLength(2));
       expect(focusedDecoration.boxShadow!.last.blurRadius, elevation.focusBlur);
       expect(
@@ -383,7 +452,12 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: makeUiTestableWidget(
-            child: VisirCard(onTap: () {}, child: const Text('Focusable card')),
+            child: VisirCard(
+              variant: VisirCardVariant.outlined,
+              border: VisirCardBorder.base,
+              onTap: () {},
+              child: const Text('Focusable card'),
+            ),
           ),
         ),
       ),
@@ -398,21 +472,26 @@ void main() {
     final unfocusedDecoration =
         tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
 
+    final theme = VisirTheme.of(tester.element(find.byType(VisirCard)));
+    final unfocusedBorder = unfocusedDecoration.border! as Border;
+    expect(
+      unfocusedBorder.top.color,
+      theme.components.surface.borders.base.color,
+    );
+    expect(
+      unfocusedBorder.top.width,
+      theme.components.surface.borders.base.width,
+    );
+
     final focusNode = Focus.of(tester.element(find.text('Focusable card')));
     focusNode.requestFocus();
     await tester.pump();
 
     final focusedDecoration =
         tester.widget<Container>(decorationFinder).decoration! as BoxDecoration;
-
-    expect(
-      (unfocusedDecoration.border! as Border).top.color,
-      VisirThemeData.fallback().tokens.colors.surfaceOutline,
-    );
-    expect(
-      (focusedDecoration.border! as Border).top.color,
-      VisirThemeData.fallback().tokens.colors.accent,
-    );
+    final focusedBorder = focusedDecoration.border! as Border;
+    expect(focusedBorder.top.color, theme.components.surface.borders.focus.color);
+    expect(focusedBorder.top.width, theme.components.surface.borders.focus.width);
   });
 
   testWidgets('VisirSection renders title and child', (tester) async {

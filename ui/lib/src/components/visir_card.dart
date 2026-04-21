@@ -6,17 +6,23 @@ import '../foundation/visir_tokens.dart';
 import '../theme/visir_component_role_themes.dart';
 import '../theme/visir_theme.dart';
 
+enum VisirCardBorder { none, base }
+
 class VisirCard extends StatefulWidget {
   const VisirCard({
     super.key,
     required this.child,
     this.variant = VisirCardVariant.elevated,
+    this.border = VisirCardBorder.none,
+    this.showShadow = true,
     this.density = VisirCardDensity.comfortable,
     this.onTap,
   });
 
   final Widget child;
   final VisirCardVariant variant;
+  final VisirCardBorder border;
+  final bool showShadow;
   final VisirCardDensity density;
   final VoidCallback? onTap;
 
@@ -100,7 +106,8 @@ class _VisirCardState extends State<VisirCard> {
     VisirSurfaceThemeData surface,
     bool focused,
   ) {
-    final baseShadows = widget.variant == VisirCardVariant.elevated
+    final baseShadows = widget.variant == VisirCardVariant.elevated &&
+            widget.showShadow
         ? [
             BoxShadow(
               color: tokens.colors.accent.withValues(
@@ -124,6 +131,13 @@ class _VisirCardState extends State<VisirCard> {
           ]
         : baseShadows;
     final borderState = focused ? surface.borders.focus : surface.borders.base;
+    final Border? border = switch (widget.variant) {
+      VisirCardVariant.elevated => null,
+      VisirCardVariant.muted || VisirCardVariant.outlined =>
+        widget.border == VisirCardBorder.base
+            ? Border.all(color: borderState.color, width: borderState.width)
+            : null,
+    };
 
     return BoxDecoration(
       color: switch (widget.variant) {
@@ -132,7 +146,7 @@ class _VisirCardState extends State<VisirCard> {
         VisirCardVariant.outlined => Colors.transparent,
       },
       borderRadius: BorderRadius.circular(surface.radius),
-      border: Border.all(color: borderState.color, width: borderState.width),
+      border: border,
       boxShadow: shadows,
     );
   }
