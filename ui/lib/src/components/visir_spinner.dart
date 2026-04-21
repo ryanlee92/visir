@@ -49,8 +49,8 @@ class _VisirSpinnerState extends State<VisirSpinner>
     final feedback = theme.components.feedback;
     final color = switch (widget.tone) {
       VisirSpinnerTone.neutral => colors.textMuted,
-      VisirSpinnerTone.primary => colors.textInverse,
-      VisirSpinnerTone.inverse => colors.text,
+      VisirSpinnerTone.primary => colors.accent,
+      VisirSpinnerTone.inverse => colors.textInverse,
     };
     final spinnerSize = feedback.sizeFor(widget.size);
 

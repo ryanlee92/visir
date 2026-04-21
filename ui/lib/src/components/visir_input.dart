@@ -121,13 +121,13 @@ class VisirInput extends StatelessWidget {
             VisirInputBorder.none => null,
             VisirInputBorder.base => control.borders.base,
             VisirInputBorder.success => VisirBorderState(
-                color: tokens.colors.success,
-                width: control.borders.base.width,
-              ),
+              color: tokens.colors.success,
+              width: control.borders.base.width,
+            ),
             VisirInputBorder.error => VisirBorderState(
-                color: tokens.colors.danger,
-                width: control.borders.base.width,
-              ),
+              color: tokens.colors.danger,
+              width: control.borders.base.width,
+            ),
           };
     Widget shell({required bool hasText}) {
       final shouldShowClearButton =
@@ -267,7 +267,7 @@ class _SearchLoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return VisirSpinner(
       size: VisirSpinnerSize.sm,
-      tone: VisirSpinnerTone.inverse,
+      tone: VisirSpinnerTone.neutral,
     );
   }
 }

@@ -690,6 +690,54 @@ void main() {
     expect(progress.strokeWidth, 5);
   });
 
+  testWidgets('VisirSpinner tones resolve to distinct theme colors', (
+    tester,
+  ) async {
+    final baseTheme = VisirThemeData.fallback();
+    final themedData = baseTheme.copyWith(
+      tokens: baseTheme.tokens.copyWith(
+        colors: baseTheme.tokens.colors.copyWith(
+          accent: const Color(0xFF0057B8),
+          text: const Color(0xFF222222),
+          textMuted: const Color(0xFF666666),
+          textInverse: const Color(0xFFF2F2F2),
+        ),
+      ),
+    );
+
+    Future<Color> resolveTone(VisirSpinnerTone tone) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Directionality(
+              textDirection: TextDirection.ltr,
+              child: VisirTheme(
+                data: themedData,
+                child: VisirSpinner(size: VisirSpinnerSize.md, tone: tone),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final spinner = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      return (spinner.valueColor as AlwaysStoppedAnimation<Color>).value;
+    }
+
+    final neutral = await resolveTone(VisirSpinnerTone.neutral);
+    final primary = await resolveTone(VisirSpinnerTone.primary);
+    final inverse = await resolveTone(VisirSpinnerTone.inverse);
+
+    expect(neutral, const Color(0xFF666666));
+    expect(primary, const Color(0xFF0057B8));
+    expect(inverse, const Color(0xFFF2F2F2));
+    expect(neutral, isNot(primary));
+    expect(primary, isNot(inverse));
+    expect(neutral, isNot(inverse));
+  });
+
   testWidgets('VisirEmptyState renders title description and action', (
     tester,
   ) async {

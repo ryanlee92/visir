@@ -113,7 +113,10 @@ void main() {
         (successShell.decoration as BoxDecoration).border! as Border;
 
     expect(successBorder.top.color, theme.tokens.colors.success);
-    expect(successBorder.top.width, theme.components.control.borders.base.width);
+    expect(
+      successBorder.top.width,
+      theme.components.control.borders.base.width,
+    );
 
     await tester.pumpWidget(
       buildHarness(
@@ -127,7 +130,8 @@ void main() {
     final errorShell = tester.widget<Container>(
       find.byKey(const ValueKey('visir-input-shell')),
     );
-    final errorBorder = (errorShell.decoration as BoxDecoration).border! as Border;
+    final errorBorder =
+        (errorShell.decoration as BoxDecoration).border! as Border;
 
     expect(errorBorder.top.color, theme.tokens.colors.danger);
     expect(errorBorder.top.width, theme.components.control.borders.base.width);
@@ -285,13 +289,15 @@ void main() {
     expect(find.byType(VisirIconButton), findsOneWidget);
   });
 
-  testWidgets('input loading spinner follows the theme text color', (
+  testWidgets('input loading spinner follows the theme muted text color', (
     tester,
   ) async {
     final baseTheme = VisirThemeData.fallback();
     final themedData = baseTheme.copyWith(
       tokens: baseTheme.tokens.copyWith(
-        colors: baseTheme.tokens.colors.copyWith(text: const Color(0xFF222222)),
+        colors: baseTheme.tokens.colors.copyWith(
+          textMuted: const Color(0xFF222222),
+        ),
       ),
     );
 

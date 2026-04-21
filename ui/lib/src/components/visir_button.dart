@@ -414,9 +414,12 @@ class _VisirButtonState extends State<VisirButton> {
   }
 
   VisirSpinnerTone _spinnerTone() {
-    return widget.variant == VisirButtonVariant.primary
-        ? VisirSpinnerTone.primary
-        : VisirSpinnerTone.inverse;
+    return switch (widget.variant) {
+      VisirButtonVariant.primary => VisirSpinnerTone.inverse,
+      VisirButtonVariant.secondary => VisirSpinnerTone.neutral,
+      VisirButtonVariant.ghost => VisirSpinnerTone.neutral,
+      VisirButtonVariant.danger => VisirSpinnerTone.inverse,
+    };
   }
 
   double _iconSize(VisirThemeData theme) {
