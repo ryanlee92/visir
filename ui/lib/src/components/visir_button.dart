@@ -315,7 +315,7 @@ class _VisirButtonState extends State<VisirButton> {
 
     return BoxDecoration(
       gradient: background,
-      color: baseColor!,
+      color: baseColor,
       borderRadius: BorderRadius.circular(control.radius),
       border: _border(theme, disabled),
       boxShadow: widget.showShadow
