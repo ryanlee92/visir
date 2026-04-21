@@ -33,7 +33,7 @@ void main() {
       find.byKey(const ValueKey('visir-input-shell')),
     );
 
-    expect(shell.padding, const EdgeInsets.fromLTRB(16, 8, 12, 8));
+    expect(shell.padding, const EdgeInsets.fromLTRB(6, 4, 6, 4));
   });
 
   testWidgets('input shows a leading button when provided', (tester) async {
@@ -65,6 +65,34 @@ void main() {
 
     expect(find.byKey(const ValueKey('visir-input-suffix')), findsOneWidget);
     expect(find.byType(VisirIconButton), findsOneWidget);
+  });
+
+  testWidgets('input wires custom leading and trailing callbacks', (
+    tester,
+  ) async {
+    var leadingCount = 0;
+    var trailingCount = 0;
+
+    await tester.pumpWidget(
+      buildHarness(
+        VisirInput(
+          label: 'Search',
+          hintText: 'Find projects',
+          leading: const Icon(Icons.search),
+          leadingOnPressed: () => leadingCount++,
+          suffix: const Icon(Icons.arrow_forward),
+          suffixOnPressed: () => trailingCount++,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('visir-input-leading')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('visir-input-suffix')));
+    await tester.pump();
+
+    expect(leadingCount, 1);
+    expect(trailingCount, 1);
   });
 
   testWidgets('input respects maxLines', (tester) async {

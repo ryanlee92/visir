@@ -1,5 +1,7 @@
 enum VisirButtonVariant { primary, secondary, ghost, danger }
 
+enum VisirButtonBorder { none, base, success, error }
+
 enum VisirButtonSize { sm, md, lg }
 
 enum VisirCardVariant { elevated, muted, outlined }

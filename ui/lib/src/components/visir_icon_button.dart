@@ -11,14 +11,18 @@ class VisirIconButton extends StatelessWidget {
     this.onPressed,
     this.variant = VisirButtonVariant.secondary,
     this.size = VisirButtonSize.md,
+    this.border = VisirButtonBorder.none,
+    this.showShadow = false,
     this.tooltip,
   }) : assert(semanticLabel != '');
 
   final Widget icon;
   final String semanticLabel;
+  final bool showShadow;
   final VoidCallback? onPressed;
   final VisirButtonVariant variant;
   final VisirButtonSize size;
+  final VisirButtonBorder border;
   final String? tooltip;
 
   @override
@@ -31,6 +35,8 @@ class VisirIconButton extends StatelessWidget {
       tooltip: tooltip,
       leading: icon,
       isIconOnly: true,
+      border: border,
+      showShadow: showShadow,
       semanticLabel: semanticLabel,
     );
   }

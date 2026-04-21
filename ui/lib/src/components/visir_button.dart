@@ -12,6 +12,8 @@ class VisirButton extends StatefulWidget {
     required this.label,
     this.onPressed,
     this.variant = VisirButtonVariant.primary,
+    this.border = VisirButtonBorder.none,
+    this.showShadow = true,
     this.size = VisirButtonSize.md,
     this.leading,
     this.trailing,
@@ -30,6 +32,8 @@ class VisirButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
   final VisirButtonVariant variant;
+  final VisirButtonBorder border;
+  final bool showShadow;
   final VisirButtonSize size;
   final Widget? leading;
   final Widget? trailing;
@@ -286,13 +290,6 @@ class _VisirButtonState extends State<VisirButton> {
     final isGhost = widget.variant == VisirButtonVariant.ghost;
     final isDanger = widget.variant == VisirButtonVariant.danger;
     final isHovered = !disabled && _hovering;
-    final borderState = disabled
-        ? control.borders.disabled
-        : _focused
-        ? control.borders.focus
-        : isHovered
-        ? control.borders.hover
-        : control.borders.base;
 
     final background = switch (widget.variant) {
       VisirButtonVariant.primary => LinearGradient(
@@ -320,22 +317,55 @@ class _VisirButtonState extends State<VisirButton> {
       gradient: background,
       color: baseColor!,
       borderRadius: BorderRadius.circular(control.radius),
-      border: Border.all(color: borderState.color, width: borderState.width),
-      boxShadow: [
-        BoxShadow(
-          color: baseColor.withValues(
-            alpha: disabled ? 0.08 : (isHovered ? 0.42 : 0.34),
-          ),
-          blurRadius: theme.components.button.glowBlur,
-          offset: const Offset(0, 10),
-        ),
-        if (_focused)
-          BoxShadow(
-            color: colors.accent.withValues(alpha: disabled ? 0.12 : 0.24),
-            blurRadius: theme.components.button.glowBlur,
-            spreadRadius: 1,
-          ),
-      ],
+      border: _border(theme, disabled),
+      boxShadow: widget.showShadow
+          ? [
+              BoxShadow(
+                color: baseColor.withValues(
+                  alpha: disabled ? 0.08 : (isHovered ? 0.42 : 0.34),
+                ),
+                blurRadius: theme.components.button.glowBlur,
+                offset: const Offset(0, 10),
+              ),
+              if (_focused)
+                BoxShadow(
+                  color: colors.accent.withValues(
+                    alpha: disabled ? 0.12 : 0.24,
+                  ),
+                  blurRadius: theme.components.button.glowBlur,
+                  spreadRadius: 1,
+                ),
+            ]
+          : [
+              if (_focused)
+                BoxShadow(
+                  color: colors.accent.withValues(
+                    alpha: disabled ? 0.12 : 0.24,
+                  ),
+                  blurRadius: theme.components.button.glowBlur,
+                  spreadRadius: 1,
+                ),
+            ],
+    );
+  }
+
+  Border? _border(VisirThemeData theme, bool disabled) {
+    if (widget.border == VisirButtonBorder.none) {
+      return null;
+    }
+
+    final control = theme.components.control;
+    final colors = theme.tokens.colors;
+    final color = switch (widget.border) {
+      VisirButtonBorder.none => Colors.transparent,
+      VisirButtonBorder.base => control.borders.base.color,
+      VisirButtonBorder.success => colors.success,
+      VisirButtonBorder.error => colors.danger,
+    };
+
+    return Border.all(
+      color: disabled ? color.withValues(alpha: 0.4) : color,
+      width: control.borders.base.width,
     );
   }
 

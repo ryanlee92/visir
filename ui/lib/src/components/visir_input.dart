@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:visir_ui/src/components/visir_spinner.dart';
 
 import '../foundation/visir_enums.dart';
 import '../foundation/visir_tokens.dart';
 import '../theme/visir_component_role_themes.dart';
 import '../theme/visir_theme.dart';
 import 'visir_icon_button.dart';
-import 'visir_spinner.dart';
 
 class VisirInput extends StatelessWidget {
   const VisirInput({
@@ -14,6 +14,8 @@ class VisirInput extends StatelessWidget {
     this.hintText,
     this.controller,
     this.suffix,
+    this.suffixTooltip,
+    this.suffixOnPressed,
     this.errorText,
     this.enabled = true,
     this.onSubmitted,
@@ -21,6 +23,8 @@ class VisirInput extends StatelessWidget {
     this.autofocus = false,
     this.focusNode,
     this.leading,
+    this.leadingTooltip,
+    this.leadingOnPressed,
     this.showClearButton = false,
     this.onClear,
     this.isLoading = false,
@@ -31,6 +35,8 @@ class VisirInput extends StatelessWidget {
   final String? hintText;
   final TextEditingController? controller;
   final Widget? suffix;
+  final String? suffixTooltip;
+  final VoidCallback? suffixOnPressed;
   final String? errorText;
   final bool enabled;
   final ValueChanged<String>? onSubmitted;
@@ -38,6 +44,8 @@ class VisirInput extends StatelessWidget {
   final bool autofocus;
   final FocusNode? focusNode;
   final Widget? leading;
+  final String? leadingTooltip;
+  final VoidCallback? leadingOnPressed;
   final bool showClearButton;
   final VoidCallback? onClear;
   final bool isLoading;
@@ -186,9 +194,10 @@ class VisirInput extends StatelessWidget {
     return VisirIconButton(
       key: const ValueKey('visir-input-leading'),
       icon: leadingWidget,
-      semanticLabel: 'Leading action',
+      semanticLabel: leadingTooltip ?? 'Leading action',
       size: VisirButtonSize.md,
-      tooltip: 'Leading action',
+      onPressed: leadingOnPressed,
+      tooltip: leadingTooltip,
     );
   }
 
@@ -196,9 +205,10 @@ class VisirInput extends StatelessWidget {
     return VisirIconButton(
       key: const ValueKey('visir-input-suffix'),
       icon: trailingWidget,
-      semanticLabel: 'Trailing action',
+      semanticLabel: suffixTooltip ?? 'Trailing action',
       size: VisirButtonSize.md,
-      tooltip: 'Trailing action',
+      onPressed: suffixOnPressed,
+      tooltip: suffixTooltip,
     );
   }
 
@@ -208,6 +218,7 @@ class VisirInput extends StatelessWidget {
       icon: const Icon(Icons.close),
       semanticLabel: 'Clear',
       size: VisirButtonSize.sm,
+      variant: VisirButtonVariant.ghost,
       onPressed: onPressed,
       tooltip: 'Clear',
     );
@@ -219,15 +230,9 @@ class _SearchLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = VisirTheme.of(context).tokens;
-
-    return SizedBox(
-      width: 14,
-      height: 14,
-      child: CircularProgressIndicator(
-        strokeWidth: 1.4,
-        valueColor: AlwaysStoppedAnimation<Color>(tokens.colors.textMuted),
-      ),
+    return VisirSpinner(
+      size: VisirSpinnerSize.sm,
+      tone: VisirSpinnerTone.primary,
     );
   }
 }

@@ -473,13 +473,84 @@ void main() {
     expect(largeHeight, greaterThan(smallHeight));
   });
 
-  testWidgets('button sizing and border states follow control tokens', (
-    tester,
-  ) async {
+  testWidgets('button is borderless by default', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(label: 'Borderless', onPressed: () {}),
+      ),
+    );
+
+    final decoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.descendant(
+                    of: find.byType(VisirButton),
+                    matching: find.byWidgetPredicate(
+                      (widget) =>
+                          widget is DecoratedBox &&
+                          widget.decoration is BoxDecoration,
+                    ),
+                  ),
+                )
+                .decoration
+            as BoxDecoration;
+
+    expect(decoration.border, isNull);
+  });
+
+  testWidgets('button shows a shadow by default', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(label: 'Shadow', onPressed: () {}),
+      ),
+    );
+
+    final decoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.descendant(
+                    of: find.byType(VisirButton),
+                    matching: find.byWidgetPredicate(
+                      (widget) =>
+                          widget is DecoratedBox &&
+                          widget.decoration is BoxDecoration,
+                    ),
+                  ),
+                )
+                .decoration
+            as BoxDecoration;
+
+    expect(decoration.boxShadow, isNotEmpty);
+  });
+
+  testWidgets('button can opt out of shadow', (tester) async {
+    await tester.pumpWidget(
+      makeUiTestableWidget(
+        child: VisirButton(label: 'Flat', showShadow: false, onPressed: () {}),
+      ),
+    );
+
+    final decoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.descendant(
+                    of: find.byType(VisirButton),
+                    matching: find.byWidgetPredicate(
+                      (widget) =>
+                          widget is DecoratedBox &&
+                          widget.decoration is BoxDecoration,
+                    ),
+                  ),
+                )
+                .decoration
+            as BoxDecoration;
+
+    expect(decoration.boxShadow, isEmpty);
+  });
+
+  testWidgets('button border modes use semantic token colors', (tester) async {
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    final focusNode = FocusNode(debugLabel: 'control-token-focus');
     addTearDown(gesture.removePointer);
-    addTearDown(focusNode.dispose);
 
     const sizing = VisirControlSizing(
       verticalPadding: VisirControlSizeScale(sm: 6, md: 10, lg: 14),
@@ -487,18 +558,30 @@ void main() {
       iconSpacing: 9,
       compactSpacing: 5,
     );
-    const borders = VisirBorderStates(
-      base: VisirBorderState(color: Color(0xFF1357AA), width: 3),
-      hover: VisirBorderState(color: Color(0xFF2B8A3E), width: 4),
-      focus: VisirBorderState(color: Color(0xFFE67700), width: 5),
-      disabled: VisirBorderState(color: Color(0xFF6C757D), width: 6),
-    );
     final baseTheme = VisirThemeData.fallback();
+    const borderWidth = 3.0;
     final themedData = baseTheme.copyWith(
       components: baseTheme.components.copyWith(
         control: baseTheme.components.control.copyWith(
           sizing: sizing,
-          borders: borders,
+          borders: VisirBorderStates(
+            base: VisirBorderState(
+              color: const Color(0xFF1357AA),
+              width: borderWidth,
+            ),
+            hover: VisirBorderState(
+              color: const Color(0xFF2B8A3E),
+              width: borderWidth,
+            ),
+            focus: VisirBorderState(
+              color: const Color(0xFFE67700),
+              width: borderWidth,
+            ),
+            disabled: VisirBorderState(
+              color: const Color(0xFF6C757D),
+              width: borderWidth,
+            ),
+          ),
         ),
       ),
     );
@@ -517,14 +600,27 @@ void main() {
                 child: VisirButton(
                   label: 'Small',
                   size: VisirButtonSize.sm,
-                  focusNode: focusNode,
+                  border: VisirButtonBorder.base,
                   onPressed: () {},
                 ),
               ),
               const SizedBox(height: 12),
-              const SizedBox(
-                key: ValueKey('disabled-button-container'),
-                child: VisirButton(label: 'Disabled'),
+              SizedBox(
+                key: const ValueKey('success-button-container'),
+                child: VisirButton(
+                  label: 'Success',
+                  border: VisirButtonBorder.success,
+                  onPressed: () {},
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                key: const ValueKey('error-button-container'),
+                child: VisirButton(
+                  label: 'Error',
+                  border: VisirButtonBorder.error,
+                  onPressed: () {},
+                ),
               ),
             ],
           ),
@@ -550,8 +646,15 @@ void main() {
       of: smallHoverOverlayFinder,
       matching: find.byType(Padding),
     );
-    final disabledDecorationFinder = find.descendant(
-      of: find.byKey(const ValueKey('disabled-button-container')),
+    final successDecorationFinder = find.descendant(
+      of: find.byKey(const ValueKey('success-button-container')),
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox && widget.decoration is BoxDecoration,
+      ),
+    );
+    final errorDecorationFinder = find.descendant(
+      of: find.byKey(const ValueKey('error-button-container')),
       matching: find.byWidgetPredicate(
         (widget) =>
             widget is DecoratedBox && widget.decoration is BoxDecoration,
@@ -579,19 +682,22 @@ void main() {
     await tester.pumpAndSettle();
 
     border = borderFor(smallDecorationFinder);
-    expect(border.top.color, borders.hover.color);
-    expect(border.top.width, borders.hover.width);
+    expect(border.top.color, borders.base.color);
+    expect(border.top.width, borders.base.width);
 
-    focusNode.requestFocus();
-    await tester.pumpAndSettle();
+    final successBorder = borderFor(successDecorationFinder);
+    expect(
+      successBorder.top.color,
+      VisirThemeData.fallback().tokens.colors.success,
+    );
+    expect(successBorder.top.width, borderWidth);
 
-    border = borderFor(smallDecorationFinder);
-    expect(border.top.color, borders.focus.color);
-    expect(border.top.width, borders.focus.width);
-
-    final disabledBorder = borderFor(disabledDecorationFinder);
-    expect(disabledBorder.top.color, borders.disabled.color);
-    expect(disabledBorder.top.width, borders.disabled.width);
+    final errorBorder = borderFor(errorDecorationFinder);
+    expect(
+      errorBorder.top.color,
+      VisirThemeData.fallback().tokens.colors.danger,
+    );
+    expect(errorBorder.top.width, borderWidth);
   });
 
   testWidgets('autofocus focuses injected node and enter activates callback', (
@@ -646,7 +752,9 @@ void main() {
     expect(activationCount, 1);
   });
 
-  testWidgets('focused button shows a visible focus treatment', (tester) async {
+  testWidgets('focused borderless button shows a visible focus treatment', (
+    tester,
+  ) async {
     final focusNode = FocusNode(debugLabel: 'focus-visual');
     addTearDown(focusNode.dispose);
 
@@ -671,6 +779,7 @@ void main() {
     final unfocusedDecoration =
         tester.widget<DecoratedBox>(decorationFinder).decoration
             as BoxDecoration;
+    expect(unfocusedDecoration.border, isNull);
 
     focusNode.requestFocus();
     await tester.pumpAndSettle();
@@ -679,14 +788,8 @@ void main() {
         tester.widget<DecoratedBox>(decorationFinder).decoration
             as BoxDecoration;
 
-    expect(
-      (unfocusedDecoration.border! as Border).top.color,
-      VisirThemeData.fallback().tokens.colors.surfaceOutline,
-    );
-    expect(
-      (focusedDecoration.border! as Border).top.color,
-      VisirThemeData.fallback().tokens.colors.accent,
-    );
+    expect(focusedDecoration.border, isNull);
+    expect(focusedDecoration.boxShadow.length, greaterThan(1));
   });
 
   testWidgets('enabled button exposes button semantics and enabled state', (
